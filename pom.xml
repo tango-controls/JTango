@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
+		<version>RELEASE</version>
+	</parent>
+
+	<groupId>org.tango</groupId>
+	<artifactId>JavaTangoIDL</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<scm>
+		<connection>${scm.connection.svn.tango-cs}/api/java/common/IDL/trunk</connection>
+		<developerConnection>${scm.developerConnection.svn.tango-cs}/api/java/common/IDL/trunk</developerConnection>
+		<url>${scm.url.svn.tango-cs}/api/java/common/IDL/trunk</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>verdier</id>
+			<name>Pascal Verdier</name>
+			<email>p.verdier@esrf.fr</email>
+			<organization>ESRF</organization>
+			<organizationUrl>http://www.ersf.eu</organizationUrl>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+		<developer>
+			<id>abeille</id>
+			<name>Gwenaëlle Abeillé</name>
+			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+			<organization>Synchrotron Soleil</organization>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+			<roles>
+				<role>integrator</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+
+</project>
