@@ -12,6 +12,9 @@
 	<artifactId>JavaTangoIDL</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<inceptionYear>2004</inceptionYear>
+	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
+
 	<scm>
 		<connection>${scm.connection.svn.tango-cs}/api/java/common/IDL/trunk</connection>
 		<developerConnection>${scm.developerConnection.svn.tango-cs}/api/java/common/IDL/trunk</developerConnection>
@@ -43,4 +46,30 @@
 		</developer>
 	</developers>
 
+	<build>
+		<plugins>
+			<!--check if licence header is present for all files -->
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>src/main/template/header.txt</header>
+					<excludes>
+						<exclude>**/*.txt</exclude>
+					</excludes>
+					<strictCheck>true</strictCheck>
+					<properties>
+						<year>${project.inceptionYear}</year>
+					</properties>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
