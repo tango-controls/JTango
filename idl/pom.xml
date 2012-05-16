@@ -10,7 +10,7 @@
 
 	<groupId>org.tango</groupId>
 	<artifactId>JavaTangoIDL</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 
 	<inceptionYear>2004</inceptionYear>
 	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
