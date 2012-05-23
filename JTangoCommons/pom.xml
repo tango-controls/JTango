@@ -1,0 +1,87 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>fr.soleil</groupId>
+		<artifactId>super-pom-java</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<groupId>org.tango</groupId>
+	<artifactId>JTangoCommons</artifactId>
+	<version>0.0.15</version>
+
+	<name>JTango's Commons</name>
+	<description>commons for tango. Contains all compiled IDL version 4</description>
+
+	<scm>
+		<connection>${scm.connection.cvs.soleil}:JTangoCommons</connection>
+		<developerConnection>${scm.developerConnection.cvs.soleil}:JTangoCommons</developerConnection>
+		<url>${scm.url.cvs.soleil}/JTangoCommons</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>abeille</id>
+			<name>Gwenaëlle Abeillé</name>
+			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+			<organization>Synchrotron Soleil</organization>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>JavaTangoIDL</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>TangORB</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+	</dependencies>
+</project>
+
+
+
