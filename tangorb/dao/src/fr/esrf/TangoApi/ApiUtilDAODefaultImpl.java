@@ -1,0 +1,856 @@
+//+======================================================================
+// $Source$
+//
+// Project:   Tango
+//
+// Description:  java source code for the TANGO client/server API.
+//
+// $Author$
+//
+// Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012
+//						European Synchrotron Radiation Facility
+//                      BP 220, Grenoble 38043
+//                      FRANCE
+//
+// This file is part of Tango.
+//
+// Tango is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Tango is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+//
+// $Revision$
+//
+//-======================================================================
+
+
+package fr.esrf.TangoApi;
+
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.TangoDs.Except;
+import fr.esrf.TangoDs.TangoConst;
+import org.jacorb.orb.Delegate;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Request;
+import org.omg.CORBA.SystemException;
+
+import java.util.*;
+
+/**
+ * Class Description: This class manage a static vector of Database object. <Br>
+ * <Br>
+ * <Br>
+ * <b> Usage example: </b> <Br>
+ * <ul>
+ * <i> Database dbase = ApiUtil.get_db_obj(); <Br>
+ * </ul>
+ * </i>
+ *
+ * @author verdier
+ * @version $Revision$
+ */
+
+public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
+    static private ArrayList<Database> db_list = null;
+    static private Database default_dbase = null;
+
+    static private Hashtable<Integer, AsyncCallObject> async_request_table =
+            new Hashtable<Integer, AsyncCallObject>();
+    static private int async_request_cnt = 0;
+    static private int async_cb_sub_model = ApiDefs.PULL_CALLBACK;
+    static private boolean in_server_code = false;
+
+    // ===================================================================
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param tango_host
+     *            host and port (hostname:portnumber) where database is running.
+     */
+    // ===================================================================
+    public Database get_db_obj(final String tango_host) throws DevFailed {
+	final int i = tango_host.indexOf(":");
+	if (i <= 0) {
+	    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
+		    "Cannot parse port number", "ApiUtil.get_db_obj()");
+	}
+	return get_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
+
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created with TANGO_HOST environment variable .
+     */
+    // ===================================================================
+    public Database get_default_db_obj() throws DevFailed {
+	if (default_dbase == null) {
+	    return get_db_obj();
+	} else {
+	    return default_dbase;
+	}
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created with TANGO_HOST environment variable .
+     */
+    // ===================================================================
+    public synchronized Database get_db_obj() throws DevFailed {
+	if (ApiUtil.getOrb() == null) {
+	    create_orb();
+	}
+
+	// If first time, create vector
+	// ---------------------------------------------------------------
+	if (db_list == null) {
+	    db_list = new ArrayList<Database>();
+	}
+	// If first time, create Database object
+	// -----------------------------------------------------------
+	if (default_dbase == null) {
+	    default_dbase = new Database();
+	    db_list.add(default_dbase);
+	}
+	return db_list.get(0);
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param host host where database is running.
+     * @param port port for database connection.
+     */
+    // ===================================================================
+    public Database get_db_obj(final String host, final String port) throws DevFailed {
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
+
+        // If first time, create vector
+        if (db_list == null) {
+            db_list = new ArrayList<Database>();
+        }
+
+        // Build tango_host string
+        // ---------------------------
+        final String tango_host = host + ":" + port;
+
+        // Search if database object already created for this host and port
+        if (default_dbase != null) {
+            if (default_dbase.get_tango_host().equals(tango_host)) {
+                return default_dbase;
+            }
+        }
+
+            for (final Database dbase : db_list) {
+                if (dbase.get_tango_host().equals(tango_host)) {
+                    return dbase;
+                }
+            }
+
+        // Else, create a new database object
+        final Database dbase = new Database(host, port);
+        db_list.add(dbase);
+        return dbase;
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created for specified host and port, and set
+     * this database object for all following uses..
+     *
+     * @param host host where database is running.
+     * @param port port for database connection.
+     */
+    // ===================================================================
+    public Database change_db_obj(final String host, final String port) throws DevFailed {
+        // Get requested database object
+        final Database dbase = get_db_obj(host, port);
+        // And set it at first vector element as default Dbase
+        db_list.remove(dbase);
+        db_list.add(0, dbase);
+        default_dbase = dbase;
+        return dbase;
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created for specified host and port, and set
+     * this database object for all following uses..
+     *
+     * @param host
+     *            host where database is running.
+     * @param port
+     *            port for database connection.
+     */
+    // ===================================================================
+    public Database set_db_obj(final String host, final String port) throws DevFailed {
+	return change_db_obj(host, port);
+    }
+
+    // ===================================================================
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param tango_host
+     *            host and port (hostname:portnumber) where database is running.
+     */
+    // ===================================================================
+    public Database set_db_obj(final String tango_host) throws DevFailed {
+	final int i = tango_host.indexOf(":");
+	if (i <= 0) {
+	    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
+		    "Cannot parse port number", "ApiUtil.set_db_obj()");
+	}
+	return change_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
+    }
+
+    // ===================================================================
+    // ===================================================================
+
+    // ===================================================================
+    /**
+     * Create the orb object
+     * @throws DevFailed if ORB creation failed
+     */
+    // ===================================================================
+    private static synchronized void create_orb() throws DevFailed {
+        try {
+            // Modified properties fo ORB usage.
+            // ---------------------------------------
+            final Properties props = System.getProperties();
+            props.put("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
+            props.put("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
+
+            // Set retry properties
+            props.put("jacorb.retries", "0");
+            props.put("jacorb.retry_interval", "100");
+
+            // Initial timeout for establishing a connection.
+            props.put("jacorb.connection.client.connect_timeout", "300");
+
+            // Set the Largest transfert.
+            final String str = checkORBgiopMaxMsgSize();
+            // System.out.println("Set jacorb.maxManagedBufSize  to  " + str);
+            props.put("jacorb.maxManagedBufSize", str);
+
+            // Set jacorb verbosity at minimum value
+            props.put("jacorb.config.log.verbosity", "0");
+
+            System.setProperties(props);
+
+            // Initialize ORB
+            // -----------------------------
+            final String[] argv = null;
+            ApiUtil.setOrb(ORB.init(argv, null));
+
+            // Get an instance of DevLockManager to initialize.
+            DevLockManager.getInstance();
+        } catch (final SystemException ex) {
+            // System.out.println("Excption catched in ApiUtil.create_orb");
+            ApiUtil.setOrb(null);
+            ex.printStackTrace();
+            Except.throw_connection_failed(ex.toString(), "Initializing ORB failed !",
+                "ApiUtil.create_orb()");
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ===================================================================
+    /**
+     * Check if the checkORBgiopMaxMsgSize has been set. This environment
+     * variable should be set in Mega bytes.
+     * @return  the property string  to be set.
+     */
+    // ===================================================================
+    private static String checkORBgiopMaxMsgSize() {
+        /*
+         * JacORB definition (see jacorb.properties file):
+         *
+         * This is NOT the maximum buffer size that can be used, but just the
+         * largest size of buffers that will be kept and managed. This value
+         * will be added to an internal constant of 5, so the real value in
+         * bytes is 2**(5+maxManagedBufSize-1). You only need to increase this
+         * value if you are dealing with LOTS of LARGE data structures. You may
+         * decrease it to make the buffer manager release large buffers
+         * immediately rather than keeping them for later reuse.
+         */
+        String str = "20"; // Set to 16 Mbytes
+
+        // Check if environment ask for bigger size.
+        String tmp = ApiUtil.getORBgiopMaxMsgSize();
+        if (tmp != null) {
+            if ((tmp = checkBufferSize(tmp)) != null) {
+                str = tmp;
+            }
+        }
+        return str;
+    }
+
+    // ===================================================================
+    // ===================================================================
+    private static String checkBufferSize(final String str) {
+        // try to get value
+        int nb_mega;
+        try {
+            nb_mega = Integer.parseInt(str);
+        } catch (final NumberFormatException e) {
+            return null;
+        }
+
+        // Compute the real size and the power of 2
+        final long size = (long) nb_mega * 1024 * 1024;
+        long l = size;
+        int cnt;
+        for (cnt = 0; l > 0; cnt++) {
+            l >>= 1;
+        }
+        cnt--;
+
+        // Check if number ob Mb is not power of 2
+        if (Math.pow(2, cnt) < size) {
+            cnt++;
+        }
+        System.out.println(nb_mega + " Mbytes  (2^" + cnt + ")");
+
+        final int jacorb_size = cnt - 4;
+        return Integer.toString(jacorb_size);
+    }
+
+    // ===================================================================
+    /**
+     * Return the orb object
+     */
+    // ===================================================================
+    public ORB get_orb() throws DevFailed {
+	if (ApiUtil.getOrb() == null) {
+	    create_orb();
+	}
+	return ApiUtil.getOrb();
+    }
+
+    // ===================================================================
+    /**
+     * Return the orb object
+     */
+    // ===================================================================
+    public void set_in_server(final boolean val) {
+	in_server_code = val;
+    }
+
+    // ===================================================================
+    /**
+     * Return true if in server code or false if in client code.
+     */
+    // ===================================================================
+    public boolean in_server() {
+	return in_server_code;
+    }
+
+    // ===================================================================
+    /**
+     * Return reconnection delay for controle system.
+     */
+    // ===================================================================
+    private static int reconnection_delay = -1;
+
+    public int getReconnectionDelay() {
+	if (reconnection_delay < 0) {
+	    try {
+		final DbDatum data = get_db_obj().get_property(TangoConst.CONTROL_SYSTEM,
+			"ReconnectionDelay");
+		if (!data.is_empty()) {
+		    reconnection_delay = data.extractLong();
+		}
+	    } catch (final DevFailed e) {/* do nothing */
+	    }
+	    if (reconnection_delay < 0) {
+		reconnection_delay = 1000;
+	    }
+	}
+	return reconnection_delay;
+    }
+
+    // ==========================================================================
+    // ==========================================================================
+    public static String getUser()
+    {
+        return System.getProperty("user.name");
+    }
+    // ==========================================================================
+    // ==========================================================================
+
+
+
+    // ==========================================================================
+    /*
+     * Asynchronous request management
+     */
+    // ==========================================================================
+    // ==========================================================================
+    /**
+     * Add request in hash table and return id
+     */
+    // ==========================================================================
+    public synchronized int put_async_request(final AsyncCallObject aco) {
+
+        async_request_cnt++;
+        aco.id = async_request_cnt;
+        async_request_table.put(async_request_cnt, aco);
+        return async_request_cnt;
+    }
+
+    // ==========================================================================
+    /**
+     * Return the request in hash table for the id
+     *
+     * @throws DevFailed
+     */
+    // ==========================================================================
+    public Request get_async_request(final int id) throws DevFailed {
+
+	if (!async_request_table.containsKey(id)) {
+	    Except.throw_exception("ASYNC_API_ERROR", "request for id " + id + " does not exist",
+		    this.getClass().getCanonicalName() + ".get_async_request");
+	}
+	final AsyncCallObject aco = async_request_table.get(id);
+	return aco.request;
+    }
+
+    // ==========================================================================
+    /**
+     * Return the Asynch Object in hash table for the id
+     */
+    // ==========================================================================
+    public AsyncCallObject get_async_object(final int id) {
+	return async_request_table.get(id);
+    }
+
+    // ==========================================================================
+    /**
+     * Remove asynchronous call request and id from hashtable.
+     */
+    // ==========================================================================
+    // GA: add synchronized
+    public synchronized void remove_async_request(final int id) {
+
+	// Try to destroye Request object (added by PV 7/9/06)
+	final AsyncCallObject aco =  async_request_table.get(id);
+	if (aco != null) {
+	    removePendingRepliesOfRequest(aco.request);
+	    ((org.jacorb.orb.ORB) ApiUtil.getOrb()).removeRequest(aco.request);
+	    async_request_table.remove(id);
+	}
+    }
+
+    private static void removePendingReplies(final Delegate delegate) {
+	// try to solve a memory leak. pending_replies is still growing when
+	// server is in timeout
+	if (!delegate.get_pending_replies().isEmpty()) {
+	    delegate.get_pending_replies().clear();
+	}
+    }
+
+    public static void removePendingRepliesOfRequest(final Request request) {
+	final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
+		.target())._get_delegate();
+	removePendingReplies(delegate);
+    }
+
+    public static void removePendingRepliesOfDevice(final Connection connection) {
+	final org.jacorb.orb.Delegate delegate;
+	if (connection.device_4 != null) {
+	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
+		    ._get_delegate();
+	} else if (connection.device_3 != null) {
+	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
+		    ._get_delegate();
+	} else if (connection.device_2 != null) {
+	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
+		    ._get_delegate();
+	} else if (connection.device != null) {
+	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
+		    ._get_delegate();
+	} else {
+	    return;
+	}
+	removePendingReplies(delegate);
+    }
+
+    // ==========================================================================
+    /**
+     * Set the reply_model in AsyncCallObject for the id key.
+     */
+    // ==========================================================================
+    public void set_async_reply_model(final int id, final int reply_model) {
+	final AsyncCallObject aco = async_request_table.get(id);
+	if (aco != null) {
+	    aco.reply_model = reply_model;
+	}
+    }
+
+    // ==========================================================================
+    /**
+     * Set the Callback object in AsyncCallObject for the id key.
+     */
+    // ==========================================================================
+    public void set_async_reply_cb(final int id, final CallBack cb) {
+	final AsyncCallObject aco = async_request_table.get(id);
+	if (aco != null) {
+	    aco.cb = cb;
+	}
+    }
+
+    // ==========================================================================
+    /**
+     * return the still pending asynchronous call for a reply model.
+     *
+     * @param dev   DeviceProxy object.
+     * @param reply_model
+     *            ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
+     */
+    // ==========================================================================
+    public int pending_asynch_call(final DeviceProxy dev, final int reply_model) {
+	int cnt = 0;
+	final Enumeration _enum = async_request_table.keys();
+	while (_enum.hasMoreElements()) {
+        int n = (Integer)_enum.nextElement();
+	    final AsyncCallObject aco = async_request_table.get(n);
+	    if (aco.dev == dev
+		    && (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model)) {
+		cnt++;
+	    }
+	}
+	return cnt;
+    }
+
+    // ==========================================================================
+    /**
+     * return the still pending asynchronous call for a reply model.
+     *
+     * @param reply_model
+     *            ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
+     */
+    // ==========================================================================
+    public int pending_asynch_call(final int reply_model) {
+	int cnt = 0;
+	final Enumeration _enum = async_request_table.keys();
+	while (_enum.hasMoreElements()) {
+        int n = (Integer)_enum.nextElement();
+	    final AsyncCallObject aco = async_request_table.get(n);
+	    if (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model) {
+		    cnt++;
+	    }
+	}
+	return cnt;
+    }
+
+    // ==========================================================================
+    /**
+     * Return the callback sub model used.
+     *
+     * @param model
+     *            ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
+     */
+    // ==========================================================================
+    public void set_asynch_cb_sub_model(final int model) {
+	async_cb_sub_model = model;
+    }
+
+    // ==========================================================================
+    /**
+     * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
+     * ApiDefs.PULL_CALLBACK).
+     */
+    // ==========================================================================
+    public int get_asynch_cb_sub_model() {
+    	return async_cb_sub_model;
+    }
+
+    // ==========================================================================
+    /**
+     * Fire callback methods for all (any device) asynchronous requests(cmd and
+     * attr) with already arrived replies.
+     */
+    // ==========================================================================
+    public void get_asynch_replies() {
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+            final AsyncCallObject aco = async_request_table.get(n);
+            aco.manage_reply(ApiDefs.NO_TIMEOUT);
+        }
+    }
+
+    // ==========================================================================
+    /**
+     * Fire callback methods for all (any device) asynchronous requests(cmd and
+     * attr) with already arrived replies.
+     */
+    // ==========================================================================
+    public void get_asynch_replies(final int timeout) {
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+            final AsyncCallObject aco = async_request_table.get(n);
+            aco.manage_reply(timeout);
+        }
+    }
+
+    // ==========================================================================
+    /**
+     * Fire callback methods for all (any device) asynchronous requests(cmd and
+     * attr) with already arrived replies.
+     */
+    // ==========================================================================
+    public void get_asynch_replies(final DeviceProxy dev) {
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+                final AsyncCallObject aco = async_request_table.get(n);
+                if (aco.dev == dev) {
+                    aco.manage_reply(ApiDefs.NO_TIMEOUT);
+            }
+        }
+    }
+
+    // ==========================================================================
+    /**
+     * Fire callback methods for all (any device) asynchronous requests(cmd and
+     * attr) with already arrived replies.
+     */
+    // ==========================================================================
+    public void get_asynch_replies(final DeviceProxy dev, final int timeout) {
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+                final AsyncCallObject aco = async_request_table.get(n);
+                if (aco.dev == dev) {
+                    aco.manage_reply(timeout);
+            }
+        }
+    }
+
+    // ==========================================================================
+    /*
+     * Methods to convert data.
+     */
+    // ==========================================================================
+
+    // ==========================================================================
+    /**
+     * Convert arguments to one String array
+     */
+    // ==========================================================================
+    public String[] toStringArray(final String objname, final String[] argin) {
+        final String[] array = new String[1 + argin.length];
+        array[0] = objname;
+            System.arraycopy(argin, 0, array, 1, argin.length);
+        return array;
+    }
+
+    // ==========================================================================
+    /**
+     * Convert arguments to one String array
+     */
+    // ==========================================================================
+    public String[] toStringArray(final String objname, final String argin) {
+        final String[] array = new String[2];
+        array[0] = objname;
+        array[1] = argin;
+        return array;
+    }
+
+    // ==========================================================================
+    /**
+     * Convert arguments to one String array
+     */
+    // ==========================================================================
+    public String[] toStringArray(final String argin) {
+        final String[] array = new String[1];
+        array[0] = argin;
+        return array;
+    }
+
+    // ==========================================================================
+    /**
+     * Convert a DbAttribute class array to a StringArray.
+     *
+     * @param objname
+     *            object name (used in first index of output array)..
+     * @param attr
+     *            DbAttribute array to be converted
+     * @return the String array created from input argument.
+     */
+    // ==========================================================================
+    public String[] toStringArray(final String objname, final DbAttribute[] attr, final int mode) {
+        final int nb_attr = attr.length;
+
+        // Copy object name and nb attrib to String array
+        final ArrayList<String> list = new ArrayList<String>();
+        list.add(objname);
+        list.add("" + nb_attr);
+        for (int i = 0; i < nb_attr; i++) {
+            // Copy Attrib name and nb prop to String array
+            list.add(attr[i].name);
+            list.add("" + attr[i].size());
+            for (int j = 0; j < attr[i].size(); j++) {
+                // Copy data to String array
+                list.add(attr[i].get_property_name(j));
+                final String[] values = attr[i].get_value(j);
+                if (mode != 1) {
+                    list.add("" + values.length);
+                }
+                list.addAll(Arrays.asList(values));
+            }
+        }
+        // alloacte a String array
+        final String[] array = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+
+    // ==========================================================================
+    /**
+     * Convert a StringArray to a DbAttribute class array
+     *
+     * @param array
+     *            String array to be converted
+     * @param mode
+     *            decode argout params mode (mode=2 added 26/10/04)
+     * @return the DbAtribute class array created from input argument.
+     */
+    // ==========================================================================
+    public DbAttribute[] toDbAttributeArray(final String[] array, final int mode) throws DevFailed {
+	if (mode < 1 && mode > 2) {
+            Except.throw_non_supported_exception("API_NotSupportedMode", "Mode " + mode
+                + " to decode attribute properties is not supported",
+                "ApiUtil.toDbAttributeArray()");
+        }
+
+        int idx = 1;
+        final int nb_attr = Integer.parseInt(array[idx++]);
+        final DbAttribute[] attr = new DbAttribute[nb_attr];
+        for (int i = 0; i < nb_attr; i++) {
+            // Create DbAttribute with name and nb properties
+            // ------------------------------------------------------
+            attr[i] = new DbAttribute(array[idx++]);
+
+            // Get nb properties
+            // ------------------------------------------------------
+            final int nb_prop = Integer.parseInt(array[idx++]);
+
+            for (int j = 0; j < nb_prop; j++) {
+            // And copy property name and value in
+            // DbAttribute's DbDatum array
+            // ------------------------------------------
+            final String p_name = array[idx++];
+            switch (mode) {
+            case 1:
+                // Value is just one element
+                attr[i].add(p_name, array[idx++]);
+                break;
+            case 2:
+                // value is an array
+                final int p_length = Integer.parseInt(array[idx++]);
+                final String[] val = new String[p_length];
+                for (int p = 0; p < p_length; p++) {
+                val[p] = array[idx++];
+                }
+                attr[i].add(p_name, val);
+                break;
+            }
+            }
+        }
+        return attr;
+    }
+
+    // ==========================================================================
+    // ==========================================================================
+    public String stateName(final DevState state) {
+	    return TangoConst.Tango_DevStateName[state.value()];
+    }
+
+    // ==========================================================================
+    // ==========================================================================
+    public String stateName(final short state_val) {
+    	return TangoConst.Tango_DevStateName[state_val];
+    }
+
+    // ==========================================================================
+    // ==========================================================================
+    public String qualityName(final AttrQuality att_q) {
+	    return TangoConst.Tango_QualityName[att_q.value()];
+    }
+
+    // ==========================================================================
+    // ==========================================================================
+    public String qualityName(final short att_q_val) {
+	    return TangoConst.Tango_QualityName[att_q_val];
+    }
+
+    // ===================================================================
+    /**
+     * Parse Tango host (check multi Tango_host)
+     */
+    // ===================================================================
+    public String[] parseTangoHost(final String tgh) throws DevFailed {
+        String host = null;
+        String strport = null;
+        try {
+            // Check if there is more than one Tango Host
+            StringTokenizer stk;
+            if (tgh.indexOf(",") > 0) {
+            stk = new StringTokenizer(tgh, ",");
+            } else {
+            stk = new StringTokenizer(tgh);
+            }
+
+            final ArrayList<String> arrayList = new ArrayList<String>();
+            while (stk.hasMoreTokens()) {
+            // Get each Tango_host
+            final String th = stk.nextToken();
+            final StringTokenizer stk2 = new StringTokenizer(th, ":");
+            arrayList.add(stk2.nextToken()); // Host Name
+            arrayList.add(stk2.nextToken()); // Port Number
+            }
+
+            // Get the default one (first)
+            host    = arrayList.get(0);
+            strport = arrayList.get(1);
+            Integer.parseInt(strport);
+
+            // Put second one if exists in a singleton map object
+            final String def_tango_host = host + ":" + strport;
+            final DbRedundancy dbr = DbRedundancy.get_instance();
+            if (arrayList.size() > 3) {
+            final String redun = arrayList.get(2) + ":"
+                        + arrayList.get(3);
+            dbr.put(def_tango_host, redun);
+            }
+        } catch (final Exception e) {
+            Except.throw_exception("TangoApi_TANGO_HOST_NOT_SET", e.toString()
+                + " occurs when parsing " + "\"TANGO_HOST\" property " + tgh,
+                "TangoApi.ApiUtil.parseTangoHost()");
+        }
+        return new String[] { host, strport };
+    }
+
+    // ===================================================================
+    // ===================================================================
+}
