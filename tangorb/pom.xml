@@ -18,9 +18,9 @@
 	<description>Java Tango API</description>
 
 	<scm>
-		<connection>${scm.connection.svn.tango-cs}:api/java/trunk</connection>
-		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/trunk</developerConnection>
-		<url>${scm.url.svn.tango-cs}/api/java/trunk</url>
+		<connection>${scm.connection.svn.tango-cs}:api/java/client/tangorb/trunk</connection>
+		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/client/tangorb/trunk</developerConnection>
+		<url>${scm.url.svn.tango-cs}/api/java/client/tangorb/trunk</url>
 	</scm>
 
 	<developers>
