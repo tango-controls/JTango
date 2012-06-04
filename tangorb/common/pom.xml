@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.tango</groupId>
+		<artifactId>JavaAPI</artifactId>
+		<version>7.4.6-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.tango</groupId>
+	<artifactId>TangORB-javacommon</artifactId>
+
+	<name>Java common</name>
+	<description>Common classes for tango java API</description>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>JavaTangoIDL</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+</project>
