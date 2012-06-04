@@ -48,8 +48,8 @@
 		</developer>
 	</developers>
 	<modules>
-		<module>javadao</module>
-		<module>javacommon</module>
+		<module>dao</module>
+		<module>common</module>
 	</modules>
 
 	<dependencyManagement>
