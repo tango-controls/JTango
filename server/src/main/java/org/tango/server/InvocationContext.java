@@ -1,0 +1,130 @@
+/**
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
+ * This file is part of Tango.
+ *
+ * Tango is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Tango is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.tango.server;
+
+import java.util.Arrays;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.tango.server.annotation.AroundInvoke;
+
+/**
+ * @see AroundInvoke
+ * @author ABEILLE
+ * 
+ */
+public final class InvocationContext {
+    /**
+     * Define the possible invoke contextes.
+     * 
+     * @author ABEILLE
+     * 
+     */
+    public enum ContextType {
+	/**
+	 * Before read attributes loop
+	 */
+	PRE_READ_ATTRIBUTES,
+	/**
+	 * Before read attribute
+	 */
+	PRE_READ_ATTRIBUTE,
+	/**
+	 * After read attribute
+	 */
+	POST_READ_ATTRIBUTE,
+	/**
+	 * After read attributes loop
+	 */
+	POST_READ_ATTRIBUTES,
+	/**
+	 * Before write attribute
+	 */
+	PRE_WRITE_ATTRIBUTE,
+	/**
+	 * After write attribute
+	 */
+	POST_WRITE_ATTRIBUTE,
+	/**
+	 * Before execute command
+	 */
+	PRE_COMMAND,
+	/**
+	 * After execute command
+	 */
+	POST_COMMAND
+    }
+
+    private ContextType context;
+    private String[] names;
+
+    /**
+     * Ctr
+     * 
+     * @param context
+     *            {@link ContextType}
+     * @param names
+     *            Command name or attributes names
+     */
+    public InvocationContext(final ContextType context, final String... names) {
+	super();
+	this.context = context;
+	this.names = names;
+    }
+
+    /**
+     * Command names or attributes names
+     * 
+     * @return Command names or attributes names
+     */
+    public String[] getNames() {
+	return Arrays.copyOf(names, names.length);
+    }
+
+    public void setNames(final String... names) {
+	this.names = names;
+    }
+
+    /**
+     * {@link ContextType}
+     * 
+     * @return The context
+     */
+    public ContextType getContext() {
+	return context;
+    }
+
+    public void setContext(final ContextType context) {
+	this.context = context;
+    }
+
+    @Override
+    public String toString() {
+	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	builder.append("type", context);
+	builder.append("names", Arrays.toString(names));
+	return builder.toString();
+    }
+}

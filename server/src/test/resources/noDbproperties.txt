@@ -1,0 +1,6 @@
+# --- 1/1/1 properties
+1/1/1->myProp:titi
+
+
+CLASS/org.tango.server.testserver.JTangoTest->myClassProp: 10
+
