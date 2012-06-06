@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
+		<version>RELEASE</version>
+	</parent>
+	<groupId>org.tango</groupId>
+	<artifactId>JTangoClientLang</artifactId>
+	<version>0.0.21</version>
+	<name>JTango Client Lang</name>
+	<description>Tango client utilities</description>
+	<scm>
+		<connection>${scm.connection.cvs.soleil}:JTangoClientLang</connection>
+		<developerConnection>${scm.developerConnection.cvs.soleil}:JTangoClientLang</developerConnection>
+		<url>${scm.url.cvs.soleil}/JTangoClientLang</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>abeille</id>
+			<name>Gwenaëlle Abeillé</name>
+			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+			<organization>Synchrotron Soleil</organization>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>TangORB</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>JTangoCommons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mozilla</groupId>
+			<artifactId>javascript</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.transmorph</groupId>
+			<artifactId>transmorph</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-math</groupId>
+			<artifactId>commons-math</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
