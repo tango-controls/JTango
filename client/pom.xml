@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.tango</groupId>
   <artifactId>JTangoClientLang</artifactId>
-  <version>0.0.21</version>
+  <version>0.0.22-SNAPSHOT</version>
   <name>JTango Client Lang</name>
   <description>Tango client utilities</description>
   <developers>
