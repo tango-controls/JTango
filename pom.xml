@@ -1,63 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>super-pom-java</artifactId>
-    <groupId>fr.soleil</groupId>
-    <version>RELEASE</version>
-  </parent>
-  <groupId>org.tango</groupId>
-  <artifactId>JavaAPI</artifactId>
-  <version>7.4.7-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>Java Tango API</name>
-  <description>Java Tango API</description>
-  <developers>
-    <developer>
-      <id>verdier</id>
-      <name>Pascal Verdier</name>
-      <email>p.verdier@esrf.fr</email>
-      <organization>ESRF</organization>
-      <organizationUrl>http://www.ersf.eu</organizationUrl>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-      <timezone>1</timezone>
-    </developer>
-    <developer>
-      <id>abeille</id>
-      <name>Gwenaëlle Abeillé</name>
-      <email>gwenaelle.abeille@synchrotron-soleil.fr</email>
-      <organization>Synchrotron Soleil</organization>
-      <organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
-      <roles>
-        <role>integrator</role>
-      </roles>
-      <timezone>1</timezone>
-    </developer>
-  </developers>
-  <scm>
-    <connection>${scm.connection.svn.tango-cs}:api/java/client/tangorb/trunk</connection>
-    <developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/client/tangorb/trunk</developerConnection>
-    <url>${scm.url.svn.tango-cs}/api/java/client/tangorb/trunk</url>
-  </scm>
-  <modules>
-    <module>dao</module>
-    <module>common</module>
-  </modules>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.tango</groupId>
-        <artifactId>TangORB-javacommon</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.tango</groupId>
-        <artifactId>TangORB</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>fr.esrf.tango</groupId>
+	<artifactId>TangORB</artifactId>
+	<version>7.3.10</version>		
+	<name>Java Tango API</name>
+	<description>Java Tango API based on CORBA</description>
+
+	<parent>
+		<groupId>fr.soleil</groupId>
+		<artifactId>super-pom-java</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<scm>
+		<connection>${scm.connection.svn.tango-cs}:api/java</connection>
+		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java</developerConnection>
+		<url>${scm.url.svn.tango-cs}/api/java</url>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>TangORB-javadao</artifactId>
+			<version>7.3.10</version>
+		</dependency>
+	</dependencies>
 </project>
