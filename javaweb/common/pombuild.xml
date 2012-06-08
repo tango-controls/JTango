@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project name="Create TANGO WEB DEMO" default="prepareSource" basedir=".">
+<target name="prepareSource">
+	<mkdir dir="./src"/>
+	<delete dir="./src/main/java"/>
+	<mkdir dir="./src/main/java"/>
+	<copy todir="./src/main/java">
+		<fileset dir="./src">
+			 <include name="fr/soleil/tangoweb/**/*.*"/>
+			 <include name="fr/soleil/util/**/*.*"/>
+			 <exclude name="**/CVS/**/*.*"/>
+		</fileset>
+	</copy>
+</target>
+<target name="prepareResource">
+		<delete dir="./target/classes"/>
+		<mkdir dir="./target/classes"/>
+		<copy todir="./target/classes">
+			<fileset dir="./src">
+				 <exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+</project>

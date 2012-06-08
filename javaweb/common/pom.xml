@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
+		<version>RELEASE</version>
+	</parent>
+	
+	<groupId>fr.soleil.tangoweb</groupId>
+	<artifactId>WebUtils</artifactId>
+	<name>Web Utils</name>
+	<version>0.0.6-SNAPSHOT</version>
+	<description>Utilities for TANGO WEB Client and Server</description>
+	<scm>
+		<connection>${scm.connection.svn.tango-cs}:api/java/javaweb/common</connection>
+		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/javaweb/common</developerConnection>
+		<url>${scm.url.svn.tango-cs}/api/java/javaweb/common</url>
+	</scm>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+</project>
