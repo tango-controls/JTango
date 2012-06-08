@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE XML SYSTEM "serializationConfig.dtd">
+<config>
+	<beans>
+		<bean id="DeviceAttribute">
+			<className>fr.esrf.TangoApi.DeviceAttribute</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>true</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="deviceattributeDAO"></removeAttribute>
+			</removeAttributes>
+			<attributes>
+				<attribute name="attrval" id="AttributeValue_3"></attribute>
+			</attributes>
+		</bean>
+		<bean id="AttributeValue">
+			<className>fr.esrf.Tango.AttributeValue</className>
+			<!-- true / false--> 
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="value"></removeAttribute>
+			</removeAttributes>
+			<attributes/>
+		</bean>
+		<bean id="AttributeValue_3">
+			<className>fr.esrf.Tango.AttributeValue_3</className>
+			<!-- true / false--> 
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="value" />
+			</removeAttributes>
+			<attributes/>
+		</bean>	
+		<bean id="Database">
+			<className>fr.esrf.TangoApi.Database</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes/>
+			<attributes/>
+		</bean>
+		<bean id="DeviceData">
+			<className>fr.esrf.TangoApi.DeviceData</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="devicedataDAO"></removeAttribute>
+				<removeAttribute name="any"/>
+			</removeAttributes>
+			<attributes/>
+		</bean>
+		<bean id="ApiUtil">
+			<className>fr.esrf.TangoApi.ApiUtil</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes/>
+			<attributes/>
+		</bean>		
+		<bean id="DeviceProxy">
+			<className>fr.esrf.TangoApi.DeviceProxy</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes/>
+			<attributes/>
+		</bean>
+		<bean id="IORDump">
+			<className>fr.esrf.TangoApi.IORdump</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="iordumpDAO"></removeAttribute>
+			</removeAttributes>			
+			<attributes/>
+		</bean>		
+		<bean id="DeviceDataHistory">
+			<className>fr.esrf.TangoApi.DeviceDataHistory</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="devicedatahistoryDAO"></removeAttribute>
+				<removeAttribute name="any"/>
+			</removeAttributes>
+			<attributes>
+				<attribute name="cmd_histo" id="DevCmdHistory"></attribute>
+			</attributes>
+		</bean>
+		
+		<bean id="DevCmdHistory">
+			<className>fr.esrf.Tango.DevCmdHistory</className>
+			<!-- true / false--> 
+			<storeObject>true</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes>
+				<removeAttribute name="value"/>
+			</removeAttributes>
+			<attributes/>
+		</bean>
+		
+		
+		<bean id="ArchivingManagerFacade">
+			<className>fr.soleil.mambo.web.db.ArchivingManagerFacade</className>
+			<!-- true / false--> 
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes />
+			<attributes/>
+		</bean>
+		<bean id="AttributeManagerFacade">
+			<className>fr.soleil.mambo.web.db.AttributeManagerFacade</className>
+			<!-- true / false--> 
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes />
+			<attributes/>
+		</bean>
+		<bean id="ExtractingManagerFacade">
+			<className>fr.soleil.mambo.web.db.ExtractingManagerFacade</className>
+			<!-- true / false-->
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<!-- true / false--> 
+			<removeAllAttributes>false</removeAllAttributes>
+			<removeAttributes />
+			<attributes/>
+		</bean>
+		<bean id="Connection">
+			<className>fr.esrf.TangoApi.Connection</className>
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes />
+			<attributes/>
+		</bean>	
+		<bean id="DeviceProxyDAOMachineStatusInterceptor">
+			<className>fr.soleil.atkwebserver.machinestatus.DeviceProxyDAOMachineStatusInterceptor</className>
+			<storeObject>false</storeObject>
+			<optimizedStorage>false</optimizedStorage>
+			<removeAllAttributes>true</removeAllAttributes>
+			<removeAttributes />
+			<attributes/>
+		</bean>
+	</beans>
+	<rewriterules>
+		<rule>
+			<src>mambo.datasources.db.archiving.WebArchivingManager</src>
+			<dest>fr.soleil.mambo.web.db.ArchivingManagerFacade</dest>
+		</rule>
+		<rule>
+			<src>mambo.datasources.db.attributes.WebAttributeManager</src>
+			<dest>fr.soleil.mambo.web.db.AttributeManagerFacade</dest>
+		</rule>
+		<rule>
+			<src>mambo.datasources.db.extracting.WebExtractingManager</src>
+			<dest>fr.soleil.mambo.web.db.ExtractingManagerFacade</dest>
+		</rule>
+		<rule>
+			<src>admin.astor.DbaseObject$DbConnection</src>
+			<dest>fr.esrf.TangoApi.Connection</dest>
+		</rule>
+		<rule>
+			<src>fr.esrf.web.TangoApi.tangorbversion.TangORBversionWebImpl</src>
+			<dest>fr.esrf.TangoApi.tangorbversion.TangORBversionDefaultImpl</dest>					
+		</rule>
+		<rule>
+			<src>fr.esrf.TangoApi.DeviceProxyDAOWebImpl</src>
+ 			<dest>fr.esrf.TangoApi.DeviceProxy</dest>
+			<!-- <dest>fr.soleil.atkwebserver.machinestatus.DeviceProxyDAOMachineStatusInterceptor</dest>					 -->
+		</rule>
+		<rule>
+			<src>fr.esrf.TangoApi.ConnectionDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.Connection</dest>		
+		</rule>
+		<rule>
+			<src>fr.esrf.TangoApi.DatabaseDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.Database</dest>		
+		</rule>		
+		<rule>
+			<src>fr.esrf.TangoApi.DeviceAttributeDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.DeviceAttribute</dest>		
+		</rule>		
+		<rule>
+			<src>fr.esrf.TangoApi.DeviceDataDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.DeviceData</dest>		
+		</rule>		
+		<rule>
+			<src>fr.esrf.TangoApi.DeviceDataHistoryDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.DeviceDataHistory</dest>		
+		</rule>		
+		<rule>
+			<src>fr.esrf.TangoApi.ApiUtilDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.ApiUtil</dest>		
+		</rule>		
+		<rule>
+			<src>fr.esrf.TangoApi.IORDumpDAOWebImpl</src>
+			<dest>fr.esrf.TangoApi.IORdump</dest>	
+		</rule>
+	</rewriterules>
+</config>

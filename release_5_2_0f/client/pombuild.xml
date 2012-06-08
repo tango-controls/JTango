@@ -1,0 +1,21 @@
+	<project name="Create TANGO WEB DEMO" default="prepareSource" basedir=".">
+	<target name="prepareSource">
+		<delete dir="./target/common"/>
+		<mkdir dir="./target/common"/>
+		<cvs cvsRoot=":pserver:anonymous:@tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs" package="tango/api/javacommon/" dest="./target/common" />
+
+			<copy todir="./target/src/">
+				<fileset dir="./src">
+					 <include name="**/*.*"/>
+					 <exclude name="**/CVS/**/*.*"/>
+				</fileset>
+			</copy>
+		
+		<copy todir="./target/src/">
+			<fileset dir="./target/common/tango/api/javacommon/src">
+				 <include name="**/*.*"/>
+				 <exclude name="**/CVS/**/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+	</project>

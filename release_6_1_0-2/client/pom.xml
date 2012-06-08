@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <parent>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
+		<version>RELEASE</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.soleil.tangoweb</groupId>
+  <artifactId>WebTangORB</artifactId>
+  <name>Web TangORB</name>
+  <version>6.1.0-2</version>
+  <scm>
+    <connection>scm:cvs:pserver:anonymous:@tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs:tango/api/javaweb/client</connection>
+    <developerConnection>scm:cvs:pserver:tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs:tango/api/javaweb/client</developerConnection>
+    <url>http://tango-cs.cvs.sourceforge.net/tango-cs/tango/api/javaweb/client</url>
+  </scm>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>fr.esrf.tango</groupId>
+      <artifactId>TangORB</artifactId>
+      <version>6.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>fr.soleil.tangoweb</groupId>
+      <artifactId>WebUtils</artifactId>
+      <version>0.0.5</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+     
+    </dependency>
+    <dependency>
+      <groupId>fr.soleil.lib</groupId>
+      <artifactId>dtu</artifactId>
+    </dependency>
+  </dependencies>
+</project>

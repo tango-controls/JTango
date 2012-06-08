@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <parent>
+    <artifactId>super-pom</artifactId>
+    <groupId>fr.soleil</groupId>
+    <version>1.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.soleil.tangoweb</groupId>
+  <artifactId>Utils</artifactId>
+  <name>Web Utils</name>
+  <version>0.0.4</version>
+  <description>Utilities for TANGO WEB Client and Server</description>
+  <scm>
+    <connection>scm:cvs:pserver:anonymous:@tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs:tango/api/javaweb/common</connection>
+    <url>http://tango-cs.cvs.sourceforge.net/tango-cs/tango/api/javaweb/common</url>
+  </scm>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+</project>

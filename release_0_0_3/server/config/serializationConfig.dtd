@@ -1,0 +1,38 @@
+<!-- DTD For Tango Web Server Mapping -->
+<!ELEMENT config (beans, rewriterules)>
+<!-- Beans contains all beans which could be used  as Data Access Object or Data Object -->
+<!-- Serializable Data Object aren't be mandatory-->
+<!ELEMENT beans (bean+)>
+<!ELEMENT bean (className, storeObject, optimizedStorage, removeAllAttributes, removeAttributes?, attributes?)>
+<!-- bean and uniqueid for the bean -->
+<!ATTLIST bean 
+		id ID #REQUIRED>
+<!-- className contains complete Name : package.class-->		
+<!ELEMENT className (#PCDATA)>
+<!-- store the object in the server session for futur use ?-->
+<!ELEMENT storeObject (#PCDATA)>
+<!-- If storeObject is	equal to True, we store this object into a special Storage whith optimization -->
+<!ELEMENT optimizedStorage (#PCDATA)>
+<!-- remove all attribute before serialization ?-->
+<!ELEMENT removeAllAttributes (#PCDATA)>
+<!-- attributes list name to remove before serialization-->
+<!ELEMENT removeAttributes (removeAttribute*)>
+<!-- attributes name to remove before serialization -->
+<!ELEMENT removeAttribute (#PCDATA)>
+<!ATTLIST removeAttribute 
+		name NMTOKEN #REQUIRED>
+<!ELEMENT getSuperClassAttributes (#PCDATA)>
+<!ELEMENT attributes (attribute*)>
+<!ELEMENT attribute (#PCDATA)>
+<!ATTLIST attribute 
+		id IDREF #IMPLIED
+		name NMTOKEN #REQUIRED>
+<!-- Rewrite rules, some class in Client Application extends beans classes -->
+<!-- This section define transform rule, for server. -->
+<!-- if a class coresponding to a src class will be present, it will be transform into the coresponding dest class -->
+<!ELEMENT rewriterules (rule+)>
+<!ELEMENT rule (src, dest)>
+<!-- src : contains the complete class name : package.class -->
+<!ELEMENT src (#PCDATA)>
+<!-- dest : contains the complete class name : package.class -->
+<!ELEMENT dest (#PCDATA)>
