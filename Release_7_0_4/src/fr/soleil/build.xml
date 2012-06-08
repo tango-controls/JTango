@@ -1,0 +1,35 @@
+<project name="fillBeansMapping" default="parse" basedir=".">
+	<description>
+		DELETE OLD beans.xml IF EXISTS
+		SAVE beansTemplate.xml AS beans.xml
+		REPLACE THE TAGS BY THE PROPERTIES CONTAINED IN mysql.properties OR oracle.properties
+	</description>
+    
+	<property name="propertiesdir" value="${basedir}/hibernateProperties"/>
+    <property name="beansdir" value="${basedir}/TangoSnapshoting/SnapshotingApi/persistence/spring/mappings"/>
+	
+	<target name="logParameters">
+		<echo>$${propertiesdir}=${propertiesdir}</echo>
+		<echo>$${beansdir}=${beansdir}</echo>
+		<echo>database type: ${datasourcePropertiesFile}</echo>
+	</target>
+	
+	<target name="deleteOldBeansFile">
+		<delete file="${beansdir}/beans.xml"/>
+	</target>
+	
+	<target name="loadTemplate">
+		<copy file="${beansdir}/beansTemplate.xml" tofile="${beansdir}/beans.xml"/>
+	</target>
+	
+	<target name="parse" depends="logParameters,deleteOldBeansFile,loadTemplate">
+		<replace file="${beansdir}/beans.xml" propertyFile="${propertiesdir}/${datasourcePropertiesFile}.properties">
+			<replacefilter token="@DRIVER_CLASS_NAME@" property="DRIVER_CLASS_NAME"/>
+			<replacefilter token="@URL@" property="URL"/>
+			<replacefilter token="@USERNAME@" property="USERNAME"/>
+			<replacefilter token="@PASSWORD@" property="PASSWORD"/>
+			<replacefilter token="@HIBERNATE_DIALECT@" property="HIBERNATE_DIALECT"/>
+		</replace>
+	</target>
+
+</project>

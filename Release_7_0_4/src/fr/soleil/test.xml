@@ -1,0 +1,29 @@
+<project name="testDAO" default="test" basedir=".">
+	<description>
+		Test DAO objects
+	</description>
+    
+	<property name="src" value="../.." />
+	<property name="classes" value="../.." />
+	<property name="lib" value="C:\tango-soleil-win32-5.5.4\tango\share\java\MINIMUM_JARS" />
+	<property name="test.class.name" value="fr.soleil.TangoSnapshoting.SnapshotingApi.persistence.spring.dao.test.AllTests_JUnit4" />
+	<property name="dtu.location" value="D:\workspace\DynamicTangoUtilities\bin" />
+	<property name="beans.location" value="${classes}/fr/soleil/TangoSnapshoting/SnapshotingApi/persistence/spring/mappings" />
+	
+	<path id="test.classpath">
+	  <pathelement location="${classes}" />
+	  <pathelement location="${beans.location}" />
+      <pathelement location="${dtu.location}" />
+      <fileset dir="${lib}">
+		  <include name="**/*.jar"/>
+	  </fileset>
+	</path>
+	
+	<target name="test">
+	  <junit fork="no" haltonfailure="yes">
+		<test name="${test.class.name}" />
+		<formatter type="plain" usefile="false" />
+		<classpath refid="test.classpath" />
+	  </junit>
+	</target>
+</project>

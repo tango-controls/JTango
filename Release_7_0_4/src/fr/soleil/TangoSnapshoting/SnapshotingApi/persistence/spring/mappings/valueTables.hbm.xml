@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.soleil.TangoSnapshoting.SnapshotingApi.persistence.spring.dto">
+	
+	<class name="ScNum1Val" table="t_sc_num_1val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+        <property name="value" column="VALUE"/>
+    </class>
+
+	<class name="ScNum2Val" table="t_sc_num_2val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+        <property name="readValue" column="READ_VALUE"/>
+        <property name="writeValue" column="WRITE_VALUE"/>
+    </class>
+    
+  	<class name="ScStr1Val" table="t_sc_str_1val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+        <property name="value" column="VALUE"/>
+    </class>
+    
+   <class name="ScStr2Val" table="t_sc_str_2val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+        <property name="readValue" column="READ_VALUE"/>
+        <property name="writeValue" column="WRITE_VALUE"/>
+    </class>
+
+	<class name="Sp1Val" table="t_sp_1val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+		<property name="dimX" column="DIM_X"/>
+        <property name="value" column="VALUE"/>
+    </class>
+
+	<class name="Sp2Val" table="t_sp_2val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+		<property name="dimX" column="DIM_X"/>
+		<property name="readValue" column="READ_VALUE"/>
+        <property name="writeValue" column="WRITE_VALUE"/>
+    </class>
+    
+    <class name="Im1Val" table="t_im_1val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+		<property name="dimX" column="DIM_X"/>
+		<property name="dimY" column="DIM_Y"/>
+        <property name="value" column="VALUE"/>
+    </class>
+
+	<class name="Im2Val" table="t_im_2val">
+        <composite-id name="compositeId" class="CompositeId">
+				<key-property name="idSnap" column="ID_SNAP"/>
+		        <key-property name="idAtt" column="ID_ATT"/>
+		</composite-id>
+		<property name="dimX" column="DIM_X"/>
+		<property name="dimY" column="DIM_Y"/>
+		<property name="readValue" column="READ_VALUE"/>
+        <property name="writeValue" column="WRITE_VALUE"/>
+    </class>
+
+</hibernate-mapping>
