@@ -1,0 +1,175 @@
+<html>
+<head>
+<title>Java Server and Client API Classes</title>
+</head>
+<body>
+
+
+<HR>
+<b>TANGO Java API classes<Br><Br>
+See : <a href=ReleaseNote.html> Release Note </a></b>
+<Br>
+
+<h1> Getting started with java client api </h1>
+
+<Br>
+<Br>
+The quickest way of getting started is by studying this example: 
+<Br>
+<Br>                                                                                
+<i>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+     /** <Br>
+      *   Example of a client using the TANGO Api <Br>
+      */ <Br>
+</Font>
+        package my_package;
+<Br>         
+<Br>         
+     import fr.esrf.Tango.*; <Br>
+     import fr.esrf.TangoDs.*; <Br>
+     import fr.esrf.TangoApi.*; <Br>
+<Br>         
+     public class StartingWithTango <Br>
+     { 
+         <ul>
+       public static void main (String args[]) <Br>
+       { 
+           <ul>
+         try <Br>
+         { 
+                 <ul>
+<FONT COLOR="#3b648b">
+     // Database Management. <Br>
+     //---------------------- <Br>
+<Br>
+     // Create a Database object or retrieve an existing connection <Br>
+</Font>
+               Database  dbase = ApiUtil.get_db_obj(); <Br>
+<Br>
+<FONT COLOR="#3b648b">
+     // Get and display database info. <Br>
+</Font>
+              System.out.println(dbase.get_info()); <Br>
+<Br>
+<FONT COLOR="#3b648b">
+    // Build a DbDevInfo object (name, class, server) <Br>
+     // to add a device into the database . <Br>
+</Font>
+             String devname = "tango/admin/corvus"; <Br>
+               DbDevInfo devinfo = new DbDevInfo(devname, "Starter", "Starter/corvus");<Br> 
+               dbase.add_device(devinfo); <Br>
+<Br>
+<FONT COLOR="#3b648b">
+    // Get and isplay info about device import. <Br>
+</Font>
+              DbDevImportInfo       imp_info = dbase.import_device(devname);<Br> 
+               System.out.println(imp_info); <Br>
+<Br>
+<FONT COLOR="#3b648b">
+    // Update device properties. <Br>
+</Font>
+              devname = "my/serial/device"; <Br>
+               DbDatum[] prop; <Br>
+               prop = new DbDatum[3]; <Br>
+               prop[0] = new DbDatum("baudrate", 19200); <Br>
+               prop[1] = new DbDatum("parity",   "none"); <Br>
+               prop[2] = new DbDatum("stopbits", 1); <Br>
+               dbase.put_device_property(devname, prop); <Br>
+<Br>
+<FONT COLOR="#3b648b">
+     // Query the database for device properties. <Br>
+</Font>
+               int   baud   = 9600; <Br>
+               String parity = none; <Br>
+               short  stop   = 1; <Br>
+               String[]  propnames = { "baudrate", "parity", "stopbits"};<Br> 
+               prop = dbase.get_device_property(devname, propnames); <Br>
+               if (prop[0].is_empty()==false)  baud   = prop[0].extractLong(); <Br>
+               if (prop[1].is_empty()==false)  parity = prop[1].extractString(); <Br>
+               if (prop[2].is_empty()==false)  stop   = prop[2].extractShort(); <Br>
+<Br>
+<Br>
+ <FONT COLOR="#3b648b">
+    // Device Management <Br>
+     //------------------ <Br>
+<Br>
+     // get device properties as from database.  <Br>
+</Font>
+              DeviceProxy       dev = new DeviceProxy("my/serial/device");  <Br>
+               prop = dev.get_property(propnames);  <Br>
+               if (prop[0].is_empty()==false)  baud   = prop[0].extractLong();  <Br>
+               if (prop[1].is_empty()==false)  parity = prop[1].extractString();  <Br>
+               if (prop[2].is_empty()==false)  stop   = prop[2].extractShort();  <Br>
+<Br>
+<FONT COLOR="#3b648b">
+    // Send a write command to the device  <Br>
+</Font>
+              DeviceData argin = new DeviceData();  <Br>
+               argin.insert("Hello World !");  <Br>
+               dev.command_inout("DevWriteMessage", argin);  <Br>
+<Br>
+<FONT COLOR="#3b648b">
+     // Send a read command to the device  <Br>
+</Font>
+               DeviceData argout = dev.command_inout("DevReadMessage");  <Br>
+               String  received = argout.extractString();  <Br>
+               System.out.println(received);
+                        </ul>
+         }  <Br>
+  <Br>
+		catch (NonSupportedFeature e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+		}  <Br>
+		catch (NonDbDevice e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+		}  <Br>
+		catch (WrongData e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+		}  <Br>
+		catch (WrongNameSyntax e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+		}  <Br>
+		catch (ConnectionFailed e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+		}  <Br>
+		catch (CommunicationFailed e)
+		{<ul>
+			System.out.println(e.getStack());</ul>
+ 		}  <Br>
+		catch (DevFailed e)
+		{ <ul>
+			Except.print_exception(e); </ul>
+		} 
+         </ul>
+      } 
+      </ul>
+    } 
+</i>
+<Br><Br>
+<Br>                                                                                 
+<Br>
+Modify this example to fit your device server or client's needs, compile it. <Br>
+Do not forget when you start it to set the parameter TANGO_HOST with
+&lt;host_name&gt;:&lt;port_number&gt; <Br>
+
+<b>(i.e. java -DTANGO_HOST=hal:2001 my_package.StartingWithTango </b><Br>
+<Center>
+	or if you have two database servers running <Br>
+</Center>
+
+<b>&nbsp;&nbsp;&nbsp; java -DTANGO_HOST=hal:2001,hal:3001 my_package.StartingWithTango).
+</b>
+<Br><Br>
+
+And forget about those painful early Tango days when you had to learn CORBA and
+manipulate Any's. <Br>
+Life is going to easy and fun from now.<Br>
+<P>
+</body>
+</html>

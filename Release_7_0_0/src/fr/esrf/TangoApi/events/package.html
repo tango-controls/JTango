@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>Client Events Api</title>
+</head>
+<body>
+
+Classes for client events management.
+<Br>
+<Br>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+     /** <Br>
+      *   Example of a client using the TANGO events Api <Br>
+      */ <Br>
+</Font>
+<Br>         
+     import fr.esrf.Tango.*; <Br>
+     import fr.esrf.TangoDs.*; <Br>
+     import fr.esrf.TangoApi.*; <Br>
+     import fr.esrf.TangoApi.events*; <Br>
+<Br>         
+public class  TestEvents <Br>
+{
+<ul>
+	public TestEvents(String devname) throws DevFailed<Br>
+	{
+<ul>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+		//	Subscribe to a change event<Br>
+</Font>
+		TangoEventsAdapter	event_supplier = new TangoEventsAdapter(devname);<Br>
+		PositionEventListener	listener = new PositionEventListener();<Br>
+		event_supplier.addTangoChangeListener(listener, "Position", new String[0]);
+</ul>
+	}<Br>
+	public static void main (String[] args)<Br>
+	{
+<ul>
+		String		devname = "stepper/motor/1";<Br>
+		TestEvents	client;<Br>
+<Br>
+		try<Br>
+		{
+<ul>
+			client = new TestEvents(devname);
+</ul>
+		}<Br>
+		catch(DevFailed e)<Br>
+		{
+<ul>
+			Except.print_exception(e);
+</ul>
+		}
+</ul>
+	}
+<Br><Br>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+	//	Position event listener<Br>
+	//--------------------------------<Br>
+</Font>
+	class PositionEventListener implements ITangoChangeListener<Br>
+	{
+<ul>
+    	public void change(TangoChangeEvent event)<Br>
+		{
+<ul>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+			//	Get attribute device name <Br>
+</Font>
+			TangoChange	tc = (TangoChange)event.getSource();<Br>
+			String		devname = tc.getEventSupplier().name();<Br>
+<Br>
+			try
+			{
+<ul>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+				//	Get attribute and extract value<Br>
+</Font>
+			 	DeviceAttribute	attr = event.getValue();<Br>
+				short			value = attr.extractShort();<Br>
+				System.out.println("Position changed on " + devname + ": " + value);
+</ul>
+	    	}<Br>
+			catch (DevFailed e)<Br>
+			{
+<ul>
+<FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+				//	Check if heart beat<Br>
+</Font>
+				if (e.errors[0].reason.equals("API_EventTimeout"))<Br>
+<ul>				System.out.println(devname + " : API_EventTimeout");</ul>
+				else<Br>
+					fr.esrf.TangoDs.Except.print_exception(e);
+</ul>
+			}
+</ul>
+		}
+</ul>
+	}
+</ul>
+}
+<Br>
+</body>
+</html>
