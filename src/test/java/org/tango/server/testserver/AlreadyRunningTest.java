@@ -27,6 +27,9 @@ package org.tango.server.testserver;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import org.junit.After;
 import org.junit.Test;
 import org.tango.orb.ORBManager;
@@ -46,9 +49,28 @@ public class AlreadyRunningTest {
     }
 
     @Test(expected = DevFailed.class)
-    public void test() throws DevFailed {
-	JTangoTest.startNoDb();
-	JTangoTest.startNoDb();
+    public void test() throws DevFailed, IOException {
+	ServerSocket ss1 = null;
+	try {
+	    ss1 = new ServerSocket(0);
+	    ss1.setReuseAddress(true);
+	    ss1.close();
+	    JTangoTest.startNoDb(ss1.getLocalPort());
+	} finally {
+	    if (ss1 != null)
+		ss1.close();
+	}
+	ServerSocket ss2 = null;
+	try {
+	    ss2 = new ServerSocket(0);
+	    ss2.setReuseAddress(true);
+	    ss2.close();
+	    JTangoTest.startNoDb(ss2.getLocalPort());
+	} finally {
+	    if (ss2 != null)
+		ss2.close();
+	}
+
     }
 
     @After

@@ -24,6 +24,9 @@
  */
 package org.tango.server.testserver;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.tango.server.ServerManager;
@@ -39,16 +42,26 @@ import fr.esrf.Tango.DevFailed;
  */
 public class NoDBDeviceManager {
 
-    public static final String deviceName = "tango://localhost:" + JTangoTest.NO_DB_GIOP_PORT + "/"
-	    + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
+    public static String deviceName;
 
     public static String adminName;
 
     @BeforeClass
-    public static void startDevice() throws DevFailed {
-	JTangoTest.startNoDb();
-	adminName = "tango://localhost:" + JTangoTest.NO_DB_GIOP_PORT + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
-		+ ServerManager.getInstance().getServerName() + "#dbase=no";
+    public static void startDevice() throws DevFailed, IOException {
+	ServerSocket ss1 = null;
+	try {
+	    ss1 = new ServerSocket(0);
+	    ss1.setReuseAddress(true);
+	    ss1.close();
+	    JTangoTest.startNoDb(ss1.getLocalPort());
+	    deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
+	    adminName = "tango://localhost:" + ss1.getLocalPort() + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
+		    + ServerManager.getInstance().getServerName() + "#dbase=no";
+	} finally {
+	    if (ss1 != null)
+		ss1.close();
+	}
+
     }
 
     @AfterClass

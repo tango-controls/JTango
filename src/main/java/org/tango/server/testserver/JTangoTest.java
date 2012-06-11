@@ -722,12 +722,13 @@ public final class JTangoTest {
     }
 
     public static final String NO_DB_DEVICE_NAME = "1/1/1";
-    public static final String NO_DB_GIOP_PORT = "12354";
+    // public static final String NO_DB_GIOP_PORT = "12354";
     public static final String INSTANCE_NAME = "1";
     public static final String SERVER_NAME = JTangoTest.class.getSimpleName();
 
     /**
-     * Start a device with tango database. The server must be declared in tango db.
+     * Start a device with tango database. The server must be declared in tango
+     * db.
      * 
      * @throws DevFailed
      */
@@ -736,16 +737,16 @@ public final class JTangoTest {
 	ServerManager.getInstance().startError(new String[] { INSTANCE_NAME }, SERVER_NAME);
     }
 
-    public static void startNoDbFile() throws DevFailed {
-	System.setProperty("OAPort", NO_DB_GIOP_PORT);
+    public static void startNoDbFile(int portNr) throws DevFailed {
+	System.setProperty("OAPort", Integer.toString(portNr));
 	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
 	ServerManager.getInstance().startError(
 		new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
 			"-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath() }, SERVER_NAME);
     }
 
-    public static void startNoDb() throws DevFailed {
-	System.setProperty("OAPort", NO_DB_GIOP_PORT);
+    public static void startNoDb(int portNr) throws DevFailed {
+	System.setProperty("OAPort", Integer.toString(portNr));
 	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
 	ServerManager.getInstance().startError(new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME },
 		SERVER_NAME);
