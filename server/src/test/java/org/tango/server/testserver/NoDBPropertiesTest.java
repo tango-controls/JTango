@@ -27,6 +27,8 @@ package org.tango.server.testserver;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,9 +53,18 @@ import fr.esrf.TangoApi.DeviceProxy;
 public class NoDBPropertiesTest extends NoDBDeviceManager {
 
     @Test
-    public void testFileProperty() throws DevFailed {
+    public void testFileProperty() throws DevFailed, IOException {
 	stopDevice();
-	JTangoTest.startNoDbFile();
+	ServerSocket ss1 = null;
+	try {
+	    ss1 = new ServerSocket(0);
+	    ss1.setReuseAddress(true);
+	    ss1.close();
+	    JTangoTest.startNoDbFile(ss1.getLocalPort());
+	} finally {
+	    if (ss1 != null)
+		ss1.close();
+	}
 	final DeviceProxy dev = new DeviceProxy(deviceName);
 	final DeviceData devda = dev.command_inout("getMyProperty");
 
