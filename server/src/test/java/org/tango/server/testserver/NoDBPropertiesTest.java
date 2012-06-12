@@ -65,6 +65,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 	    if (ss1 != null)
 		ss1.close();
 	}
+	deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
 	final DeviceProxy dev = new DeviceProxy(deviceName);
 	final DeviceData devda = dev.command_inout("getMyProperty");
 
