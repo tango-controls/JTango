@@ -12,7 +12,7 @@
   <version>7.4.6</version>
   <packaging>pom</packaging>
   <name>Java Tango API</name>
-  <description>Java Tango API</description>
+  <description>Java Tango client API</description>
   <developers>
     <developer>
       <id>verdier</id>
