@@ -288,46 +288,105 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
      * Try to connect if it failed at subscribe
      */
     //===============================================================
-    static void subscribe_if_not_done() {
+    static void subscribeIfNotDone() {
         Enumeration callback_structs = failed_event_callback_map.elements();
         while (callback_structs.hasMoreElements()) {
-            EventCallBackStruct callback_struct =
+            EventCallBackStruct eventCallBackStruct =
                     (EventCallBackStruct) callback_structs.nextElement();
-            String callback_key = callback_struct.device.name().toLowerCase() +
-                    "/" + callback_struct.attr_name + "." + callback_struct.event_name;
+            String callbackKey = eventCallBackStruct.device.name().toLowerCase() +
+                    "/" + eventCallBackStruct.attr_name + "." + eventCallBackStruct.event_name;
 
-            if (callback_struct.consumer!=null) {
+            if (eventCallBackStruct.consumer!=null) {
                 try {
-                    callback_struct.consumer.subscribe_event(
-                            callback_struct.device,
-                            callback_struct.attr_name,
-                            callback_struct.event_type,
-                            callback_struct.callback,
-                            callback_struct.max_size,
-                            callback_struct.filters,
-                            false);
-                    failed_event_callback_map.remove(callback_key);
+                    subscribeIfNotDone(eventCallBackStruct, callbackKey);
                 } catch (DevFailed e) {
                     //	Send error to callback
-                    int source = (callback_struct.consumer instanceof NotifdEventConsumer)?
-                            EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
-                    EventData event_data =
-                            new EventData(callback_struct.device, callback_key,
-                                    callback_struct.event_name, source,
-                                    callback_struct.event_type, null, null, null, e.errors);
-
-                    if (callback_struct.use_ev_queue) {
-                        EventQueue ev_queue = callback_struct.device.getEventQueue();
-                        ev_queue.insert_event(event_data);
-                    } else
-                        callback_struct.callback.push_event(event_data);
+                    sendErrorToCallback(eventCallBackStruct, callbackKey, e);
                 }
             }
             else {
-                System.err.println("====================================================");
-                System.err.println("callback_struct.consumer=null  for " + callback_key);
+                //  ToDo  Pb to re connect!
+                //System.err.println("====================================================");
+                //System.err.println("callback_struct.consumer=null  for " + callbackKey);
+                //  Never connected. Do not know if ZMQ or Notifd.
+                if (EventConsumerUtil.isZmqLoadable()) {
+                    try {
+                        //  Try for zmq
+                        eventCallBackStruct.consumer = ZmqEventConsumer.getInstance();
+                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                        return;
+
+                    }
+                    catch (DevFailed e) {
+                        if (e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+                            try {
+                                //  Try for notifd
+                                eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
+                                subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                                return;
+                            }
+                            catch (DevFailed e2) {
+                               System.err.println(e2);
+                                //  reset if both have failed
+                                eventCallBackStruct.consumer = null;
+                                //	Send error to callback
+                                sendErrorToCallback(eventCallBackStruct, callbackKey, e2);
+                            }
+                        }
+                        else {
+                            //	Send error to callback
+                            eventCallBackStruct.consumer = null;
+                            sendErrorToCallback(eventCallBackStruct, callbackKey, e);
+                        }
+                    }
+                }
+                else {
+                    try {
+                        //  Try for notifd
+                        eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
+                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                        return;
+                    }
+                    catch (DevFailed e) {
+                        System.err.println(e);
+                        //	Send error to callback
+                        sendErrorToCallback(eventCallBackStruct, callbackKey, e);
+                    }
+                }
             }
         }
+    }
+    //===============================================================
+    //===============================================================
+    private static void sendErrorToCallback(EventCallBackStruct cs, String callbackKey, DevFailed e) {
+
+        int source = (cs.consumer instanceof NotifdEventConsumer)?
+                EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
+        EventData eventData =
+                new EventData(cs.device, callbackKey,
+                        cs.event_name, source,
+                        cs.event_type, null, null, null, e.errors);
+
+        if (cs.use_ev_queue) {
+            EventQueue ev_queue = cs.device.getEventQueue();
+            ev_queue.insert_event(eventData);
+        } else
+            cs.callback.push_event(eventData);
+    }
+     //===============================================================
+    //===============================================================
+    private static void subscribeIfNotDone(EventCallBackStruct eventCallBackStruct,
+                                          String callbackKey) throws DevFailed{
+
+        eventCallBackStruct.consumer.subscribe_event(
+                eventCallBackStruct.device,
+                eventCallBackStruct.attr_name,
+                eventCallBackStruct.event_type,
+                eventCallBackStruct.callback,
+                eventCallBackStruct.max_size,
+                eventCallBackStruct.filters,
+                false);
+        failed_event_callback_map.remove(callbackKey);
     }
     //===============================================================
     //===============================================================
@@ -549,8 +608,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceData  deviceData = null;
         boolean     reconnect = false;
         //===========================================================
-        ConnectionStructure(String channelName, String deviceName, String attributeName,
-                            String eventName, Database dbase, DeviceData deviceData, boolean reconnect) {
+        ConnectionStructure(String channelName,
+                            String deviceName,
+                            String attributeName,
+                            String eventName,
+                            Database dbase,
+                            DeviceData deviceData,
+                            boolean reconnect) {
             this.channelName    = channelName;
             this.deviceName     = deviceName;
             this.attributeName  = attributeName;

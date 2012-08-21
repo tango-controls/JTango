@@ -233,7 +233,14 @@ public class ZmqMainThread extends Thread {
                     dataReady = ZMQutils.deMarshallAttDataReady(inputs[3], littleEndian);
                     break;
                 default:
-                    attributeValue = ZMQutils.deMarshallAttribute(inputs[3], littleEndian);
+                    //  ToDo needs idl version
+                    Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
+                    EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
+                    if (eventChannelStruct!=null) {
+                        int idl = eventChannelStruct.getIdlVersion();
+                        attributeValue =
+                                ZMQutils.deMarshallAttribute(inputs[3], littleEndian, idl);
+                    }
             }
             //	And build event data
             EventData event_data =
@@ -341,6 +348,7 @@ public class ZmqMainThread extends Thread {
                             "Event already connected to " + controlStructure.endPoint);
                 }
                 else {
+                    ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
                     eventSocket.setHWM(controlStructure.hwm);
                     eventSocket.connect(controlStructure.endPoint);
                     connected.add(controlStructure.endPoint);

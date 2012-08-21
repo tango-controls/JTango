@@ -88,7 +88,7 @@ public class EventCallBackStruct implements java.io.Serializable {
     //=======================================================================
     //=======================================================================
     public String toString() {
-        StringBuffer    sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("device       = ").append(device.name()).append('\n');
         sb.append("attr_name    = ").append(attr_name).append('\n');
         sb.append("event_name   = ").append(event_name).append('\n');
@@ -97,7 +97,6 @@ public class EventCallBackStruct implements java.io.Serializable {
         sb.append("max_size     = ").append(max_size).append('\n');
         sb.append("event_type   = ").append(event_type).append('\n');
         sb.append("id           = ").append(id).append('\n');
-        sb.append("filters      = ").append(filters).append('\n');
         sb.append("filter_ok    = ").append(filter_ok).append('\n');
         sb.append("use_ev_queue = ").append(use_ev_queue).append('\n');
         return sb.toString();

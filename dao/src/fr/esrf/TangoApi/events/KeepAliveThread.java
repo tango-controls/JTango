@@ -75,7 +75,7 @@ class KeepAliveThread extends TimerTask implements TangoConst {
         if (System.currentTimeMillis() - scheduledExecutionTime() >= MAX_TARDINESS) {
             return; // Too late, skip this execution
         }
-        EventConsumer.subscribe_if_not_done();
+        EventConsumer.subscribeIfNotDone();
         resubscribe_if_needed();
     }
     //===============================================================

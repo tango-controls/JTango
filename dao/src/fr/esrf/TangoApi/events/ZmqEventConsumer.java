@@ -81,7 +81,7 @@ public class ZmqEventConsumer extends EventConsumer
    //===============================================================
    //===============================================================
     public void run() {
-        //  ToDo
+
         //keepAliveTimer.schedule(new KeepAliveThread(),
         //        2000L,//Delay 2s
 //        /        KeepAliveThread.EVENT_HEARTBEAT_PERIOD);
@@ -101,7 +101,7 @@ public class ZmqEventConsumer extends EventConsumer
     //===============================================================
     @Override
     protected void checkIfAlreadyConnected(DeviceProxy device, String attribute, String event_name, CallBack callback, int max_size, boolean stateless) throws DevFailed {
-        //ToDo
+        //  Nothing to do
     }
 
     //===============================================================
@@ -109,7 +109,7 @@ public class ZmqEventConsumer extends EventConsumer
     @Override
     protected void setAdditionalInfoToEventCallBackStruct(EventCallBackStruct callback_struct,
                           String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) throws DevFailed {
-        //ToDo
+        // Nothing
         ApiUtil.printTrace("-------------> Set as ZmqEventConsumer for "+device_name);
         callback_struct.consumer  = this;
     }
@@ -188,13 +188,14 @@ public class ZmqEventConsumer extends EventConsumer
 
         //  Build the buffer to connect event and send it
         ZMQutils.connectEvent(cs.deviceName, cs.attributeName, lsa, cs.eventName);
-
         if (cs.reconnect) {
             EventChannelStruct eventChannelStruct = channel_map.get(cs.channelName);
            // eventChannelStruct.eventChannel = eventChannel;
             eventChannelStruct.last_heartbeat = System.currentTimeMillis();
             eventChannelStruct.heartbeat_skipped = false;
             eventChannelStruct.has_notifd_closed_the_connection = 0;
+            eventChannelStruct.setTangoRelease(lsa.lvalue[0]);
+            eventChannelStruct.setIdlVersion(lsa.lvalue[1]);
         } else {
             EventChannelStruct newEventChannelStruct = new EventChannelStruct();
             //newEventChannelStruct.eventChannel = eventChannel;
@@ -204,6 +205,8 @@ public class ZmqEventConsumer extends EventConsumer
             newEventChannelStruct.has_notifd_closed_the_connection = 0;
             newEventChannelStruct.consumer = this;
             newEventChannelStruct.zmqEndpoint = lsa.svalue[0];
+            newEventChannelStruct.setTangoRelease(lsa.lvalue[0]);
+            newEventChannelStruct.setIdlVersion(lsa.lvalue[1]);
             channel_map.put(cs.channelName, newEventChannelStruct);
             ApiUtil.printTrace("Adding " + cs.channelName + " to channel_map");
         }
@@ -212,28 +215,32 @@ public class ZmqEventConsumer extends EventConsumer
     //===============================================================
     //===============================================================
     @Override
-    protected boolean reSubscribe(EventChannelStruct channelStruct, EventCallBackStruct callbackStruct) {
+    protected boolean reSubscribe(EventChannelStruct channelStruct, EventCallBackStruct eventCallBackStruct) {
         //  ToDo
         boolean done = false;
         try {
             ApiUtil.printTrace("====================================================\n" +
-                                "   Try to resubscribe " + callbackStruct.channel_name);
+                                "   Try to resubscribe " + eventCallBackStruct.channel_name);
             DevVarLongStringArray   lsa =
                 ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                         channelStruct.adm_device_proxy,
-                        callbackStruct.device.name(), callbackStruct.attr_name, callbackStruct.event_name);
+                        eventCallBackStruct.device.name(), eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
 
             //  Build the buffer to connect heartbeat and send it
             ZMQutils.connectHeartbeat(channelStruct.adm_device_proxy.name(), lsa);
 
             //  Build the buffer to connect event and send it
-            ZMQutils.connectEvent(callbackStruct.device.name(),
-                    callbackStruct.attr_name, lsa, callbackStruct.event_name);
+            ZMQutils.connectEvent(eventCallBackStruct.device.name(),
+                    eventCallBackStruct.attr_name, lsa, eventCallBackStruct.event_name);
+
             //  Update the heartbeat time
             push_structured_event_heartbeat(channelStruct.adm_device_proxy.name());
             channelStruct.heartbeat_skipped = false;
             channelStruct.last_subscribed = System.currentTimeMillis();
-            callbackStruct.last_subscribed = channelStruct.last_subscribed;
+            channelStruct.setTangoRelease(lsa.lvalue[0]);
+            channelStruct.setIdlVersion(lsa.lvalue[1]);
+            eventCallBackStruct.last_subscribed = channelStruct.last_subscribed;
+            System.out.println("---------------> idl set to " + lsa.lvalue[1]);
             done = true;
         }catch(DevFailed e) {
             /* */
