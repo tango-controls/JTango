@@ -47,8 +47,7 @@ public interface IApiUtilDAO {
     /**
      * Return the database object created for specified host and port.
      * 
-     * @param tango_host
-     *            host and port (hostname:portnumber) where database is running.
+     * @param tango_host host and port (hostname:portnumber) where database is running.
      */
     // ===================================================================
     public Database get_db_obj(String tango_host) throws DevFailed;
@@ -71,10 +70,8 @@ public interface IApiUtilDAO {
     /**
      * Return the database object created for specified host and port.
      * 
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public Database get_db_obj(String host, String port) throws DevFailed;
@@ -84,10 +81,8 @@ public interface IApiUtilDAO {
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
      * 
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public Database change_db_obj(String host, String port) throws DevFailed;
@@ -97,10 +92,8 @@ public interface IApiUtilDAO {
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
      * 
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public Database set_db_obj(String host, String port) throws DevFailed;
@@ -109,8 +102,7 @@ public interface IApiUtilDAO {
     /**
      * Return the database object created for specified host and port.
      * 
-     * @param tango_host
-     *            host and port (hostname:portnumber) where database is running.
+     * @param tango_host host and port (hostname:portnumber) where database is running.
      */
     // ===================================================================
     public Database set_db_obj(String tango_host) throws DevFailed;
@@ -198,10 +190,8 @@ public interface IApiUtilDAO {
     /**
      * return the still pending asynchronous call for a reply model.
      * 
-     * @param dev
-     *            DeviceProxy object.
-     * @param reply_model
-     *            ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
+     * @param dev DeviceProxy object.
+     * @param reply_model ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
      */
     // ==========================================================================
     public int pending_asynch_call(DeviceProxy dev, int reply_model);
@@ -210,8 +200,7 @@ public interface IApiUtilDAO {
     /**
      * return the still pending asynchronous call for a reply model.
      * 
-     * @param reply_model
-     *            ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
+     * @param reply_model  ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
      */
     // ==========================================================================
     public int pending_asynch_call(int reply_model);
@@ -220,8 +209,7 @@ public interface IApiUtilDAO {
     /**
      * Return the callback sub model used.
      * 
-     * @param model
-     *            ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
+     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
      */
     // ==========================================================================
     public void set_asynch_cb_sub_model(int model);
@@ -296,10 +284,8 @@ public interface IApiUtilDAO {
     /**
      * Convert a DbAttribute class array to a StringArray.
      * 
-     * @param objname
-     *            object name (used in first index of output array)..
-     * @param attr
-     *            DbAttribute array to be converted
+     * @param objname object name (used in first index of output array)..
+     * @param attr    DbAttribute array to be converted
      * @return the String array created from input argument.
      */
     // ==========================================================================
@@ -309,10 +295,8 @@ public interface IApiUtilDAO {
     /**
      * Convert a StringArray to a DbAttribute class array
      * 
-     * @param array
-     *            String array to be converted
-     * @param mode
-     *            decode argout params mode (mode=2 added 26/10/04)
+     * @param array String array to be converted
+     * @param mode  decode argout params mode (mode=2 added 26/10/04)
      * @return the DbAtribute class array created from input argument.
      */
     // ==========================================================================
@@ -343,21 +327,4 @@ public interface IApiUtilDAO {
 
     // ===================================================================
     // ===================================================================
-     
-    // ===================================================================
-    /**
-     * Create the event consumer. This will automatically start a new thread
-     * which is waiting indefinitely for events.
-     */
-    // ===================================================================
-    //public void create_event_consumer() throws DevFailed;
-
-    // ===================================================================
-    /**
-     * Get the event consumer singleton object.
-     * 
-     * @return EventConsumer
-     */
-    // ===================================================================
-    //public IEventConsumer get_event_consumer();
 }
