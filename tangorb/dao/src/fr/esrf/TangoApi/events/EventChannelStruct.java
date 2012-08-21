@@ -60,16 +60,42 @@ public class EventChannelStruct {
 	public int		        has_notifd_closed_the_connection;
     public EventConsumer    consumer;
     public String           zmqEndpoint;
+    private int idlVersion = 0;     //  used by zmq management
+    private int tangoRelease = 0;   //  used by zmq management
 
+    //=======================================================================
     /**
      *  Creates a new instance of EventChannelStruct
      */
+    //=======================================================================
     public EventChannelStruct() {
     }
+    //=======================================================================
+    //=======================================================================
+    int getIdlVersion() {
+        return idlVersion;
+    }
+    //=======================================================================
+    //=======================================================================
+    void setIdlVersion(int idlVersion) {
+        this.idlVersion = idlVersion;
+    }
+    //=======================================================================
+    //=======================================================================
+    int getTangoRelease() {
+        return tangoRelease;
+    }
+    //=======================================================================
+    //=======================================================================
+    void setTangoRelease(int tangoRelease) {
+        this.tangoRelease = tangoRelease;
+    }
 
+    //=======================================================================
+    //=======================================================================
     public String toString() {
 
-        StringBuffer    sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("eventChannel         = ").append(eventChannel).append('\n');
         sb.append("adm_device_proxy     = ").append(adm_device_proxy.name()).append('\n');
         sb.append("last_subscribed      = ").append(last_subscribed).append('\n');

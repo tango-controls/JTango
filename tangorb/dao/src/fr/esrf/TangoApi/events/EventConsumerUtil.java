@@ -118,7 +118,7 @@ public class EventConsumerUtil {
      * @return true if ZMQ could be loaded correctly
      */
     //===============================================================
-    private boolean isZmqLoadable(){
+    public static boolean isZmqLoadable(){
         if (!zmqTested) {
 		
 			String	zmqEnable = System.getenv("ZMQ_ENABLE");

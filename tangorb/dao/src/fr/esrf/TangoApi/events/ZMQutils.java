@@ -59,7 +59,9 @@ public class  ZMQutils {
     public static final int   ZMQ_DISCONNECT_HEARTBEAT   = 2;
     public static final int   ZMQ_CONNECT_EVENT          = 3;
     public static final int   ZMQ_DISCONNECT_EVENT       = 4;
-    //public static final int   ZMQ_CONNECT_MCAST_EVENT    = 5;
+    public static final int   ZMQ_CONNECT_MCAST_EVENT    = 5;
+    public static final int   ZMQ_DELAY_EVENT            = 6;
+    public static final int   ZMQ_RELEASE_EVENT          = 7;
     private static final String[]   commandNames = {
             "ZMQ_END",
             "ZMQ_CONNECT_HEARTBEAT",
@@ -67,10 +69,14 @@ public class  ZMQutils {
             "ZMQ_CONNECT_EVENT",
             "ZMQ_DISCONNECT_EVENT",
             "ZMQ_CONNECT_MCAST_EVENT",
+            "ZMQ_DELAY_EVENT",
+            "ZMQ_RELEASE_EVENT",
     };
 
     private static ZMQ.Context     context = ZMQ.context(1);
 	private static ZMQutils instance = null;
+
+    private static final int HWM_DEFAULT = 1000;
 	//===============================================================
 	//===============================================================
     static ZMQutils getInstance() {
@@ -83,6 +89,8 @@ public class  ZMQutils {
 	//===============================================================
 	private ZMQutils() {
     }
+	//===============================================================
+	//===============================================================
 	//===============================================================
     /**
      *
@@ -350,6 +358,8 @@ public class  ZMQutils {
             stringList.add(lsa.svalue[1]);                          //  EndPoint
             stringList.add(getFullAttributeName(deviceName, attributeName, eventName));    //  Event name
             ArrayList<Integer>  intList = new ArrayList<Integer>();
+            intList.add(lsa.lvalue[0]);     //  Tango release
+            intList.add(lsa.lvalue[1]);     //  IDL version
             intList.add(lsa.lvalue[2]);     //  Sub HWM
             intList.add(lsa.lvalue[3]);     //  Rate
             intList.add(lsa.lvalue[4]);     //  IVL
@@ -436,7 +446,14 @@ public class  ZMQutils {
      * @param deviceName    specified device
      * @param attributeName specified attribute
      * @param eventName     specified event
-     * @return the event subscription info
+     * @return the event subscription info.
+     *  svalue[0]:  heartbeat endpoint.
+     *  svalue[1]:  event endpoint.
+     *  lvalue[0]:  Tango lib release.
+     *  lvalue[1]:  Device IDL version.
+     *  lvalue[2]:  sub HWM.
+     *  lvalue[3]:  rate (for multi cast).
+     *  lvalue[4]:  ivl (for multi cast).
      * @throws DevFailed in case of admin device connection failed
      */
 	//===============================================================
@@ -467,7 +484,7 @@ public class  ZMQutils {
             return AttDataReadyHelper.read(is);
         }
         catch (Exception e) {
-            Except.throw_exception("Api_ConvertionFailed",
+            Except.throw_exception("Api_ConversionFailed",
                     "An exception " + e + " has been catch",
                     "ZMQutils.deMarshallAttDataReady()");
             return null;    //  Cannot occur
@@ -492,7 +509,7 @@ public class  ZMQutils {
             return new AttributeInfoEx(attributeConfig_3);
         }
         catch (Exception e) {
-            Except.throw_exception("Api_ConvertionFailed",
+            Except.throw_exception("Api_ConversionFailed",
                     "An exception " + e + " has been catch",
                     "ZMQutils.deMarshallAttributeConfig()");
             return null;    //  Cannot occur
@@ -503,26 +520,38 @@ public class  ZMQutils {
      * De Marshall data from a receve byte buffer
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
+     * @param idl   idl revision to convert to attribute value
      * @return the data after de marshaling
      * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
-    static DeviceAttribute deMarshallAttribute(byte[] recData, boolean littleIndian) throws DevFailed {
+    static DeviceAttribute deMarshallAttribute(byte[] recData, boolean littleIndian, int idl) throws DevFailed {
         try {
             //  Remove the 4 first bytes (added for c++ alignment)
             byte[]  buffer = new byte[recData.length-4];
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
             CDRInputStream is = new CDRInputStream(null, buffer, littleIndian);
 
-            AttributeValue_4    attributeValue_4 = AttributeValue_4Helper.read(is);
-            return new DeviceAttribute(attributeValue_4);
+            //  Check device IDL
+            if (idl<4) {
+                Except.throw_exception("SeverToOld",
+                        "ZMQ events are not supported for IDL " + idl,
+                        "XMQutils.deMarshallAttribute()");
+            }
+            else {
+                AttributeValue_4    attributeValue_4 = AttributeValue_4Helper.read(is);
+                return new DeviceAttribute(attributeValue_4);
+            }
+        }
+        catch (DevFailed e) {
+            throw e;
         }
         catch (Exception e) {
-            Except.throw_exception("Api_ConvertionFailed",
+            Except.throw_exception("Api_ConversionFailed",
                     "An exception " + e + " has been catch",
                     "ZMQutils.deMarshallAttribute()");
-            return null;    //  Cannot occur
         }
+        return null;    //  Cannot occur
     }
  	//===============================================================
     /**
@@ -547,8 +576,9 @@ public class  ZMQutils {
                     "ZMQutils.getEventType()");
         return type;
     }
-	//===============================================================
-	//===============================================================
+
+    //===============================================================
+    //===============================================================
 
 
     //  Non static methods.
@@ -565,6 +595,7 @@ public class  ZMQutils {
         ControlStructure    controlStructure = new ControlStructure();
 
         int idx = 0;
+        int sizeOfInt = 4;
         controlStructure.commandCode  = bytes[idx++];
 
         switch (controlStructure.commandCode) {
@@ -587,9 +618,12 @@ public class  ZMQutils {
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx++);
                 idx += controlStructure.eventName.length();
-                controlStructure.hwm  = getInteger(bytes, idx);
-                controlStructure.rate = getInteger(bytes, idx + 4);
-                controlStructure.ivl  = getInteger(bytes, idx+8);
+                controlStructure.tango = getInteger(bytes, idx);    idx +=sizeOfInt;
+                controlStructure.idl   = getInteger(bytes, idx);    idx +=sizeOfInt;
+                int hwm = getInteger(bytes, idx);                   idx +=sizeOfInt;
+                controlStructure.hwm   = manageHwmValue(hwm);
+                controlStructure.rate  = getInteger(bytes, idx);    idx +=sizeOfInt;
+                controlStructure.ivl   = getInteger(bytes, idx);    idx +=sizeOfInt;
                 //System.out.println(controlStructure);
                 break;
 
@@ -597,6 +631,9 @@ public class  ZMQutils {
                 controlStructure.eventName = getString(bytes, idx);
                 break;
 
+            case ZMQ_DELAY_EVENT:
+            case ZMQ_RELEASE_EVENT:
+            case ZMQ_CONNECT_MCAST_EVENT:
             default:
                 Except.throw_exception("API_NotImplemented",
                         "Command " + controlStructure.commandCode + "  NOT yet implemented",
@@ -604,6 +641,27 @@ public class  ZMQutils {
         }
 
         return controlStructure;
+    }
+	//===============================================================
+	//===============================================================
+    private int manageHwmValue(int ctrlValue) {
+
+        //  Check if environment value is set
+        String envValue = System.getenv("TANGO_EVENT_BUFFER_HWM");
+        if (envValue!=null) {
+            try {
+                return Integer.parseInt(envValue);
+            }
+            catch (NumberFormatException e ) {
+                System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
+            }
+        }
+        //  Check if has been set by client
+        if (ApiUtil.getEventBufferHWM()>0)
+            return ApiUtil.getEventBufferHWM();
+
+        //  Else return default value from input
+        return ctrlValue;
     }
 	//===============================================================
 	//===============================================================
@@ -628,12 +686,14 @@ public class  ZMQutils {
         int commandCode = -1;
         String  endPoint;
         String  eventName;
-        int     hwm  = 0;
+        int     tango = 0;
+        int     idl   = 0;
+        int     hwm  = HWM_DEFAULT;
         int     rate = 0;
         int     ivl  = 0;
         //===========================================================
         public String toString() {
-            StringBuffer    sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("Command: ").append(commandNames[commandCode]).append("\n");
             if (endPoint!=null)
                 sb.append("endPoint: ").append(endPoint).append("\n");

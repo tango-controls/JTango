@@ -31,7 +31,7 @@ PACKAGE    =  fr/esrf/TangoApi/events
 TANGO_HOME =  /segfs/tango
 
 
-ZMQ_JAR = /segfs/tango/tmp/manu/jzmq/redhate4_64/share/java/zmq.jar
+ZMQ_JAR = /segfs/tango/tmp/manu/jzmq/centos5/share/java/zmq.jar
 # -----------------------------------------------------------------
 #
 #		The compiler flags
