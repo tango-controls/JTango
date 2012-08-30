@@ -79,13 +79,12 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ===================================================================
     public Database get_db_obj(final String tango_host) throws DevFailed {
-	final int i = tango_host.indexOf(":");
-	if (i <= 0) {
-	    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
-		    "Cannot parse port number", "ApiUtil.get_db_obj()");
-	}
-	return get_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
-
+        final int i = tango_host.indexOf(":");
+        if (i <= 0) {
+            Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
+                "Cannot parse port number", "ApiUtil.get_db_obj()");
+        }
+        return get_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
     }
 
     // ===================================================================
@@ -94,11 +93,11 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ===================================================================
     public Database get_default_db_obj() throws DevFailed {
-	if (default_dbase == null) {
-	    return get_db_obj();
-	} else {
-	    return default_dbase;
-	}
+        if (default_dbase == null) {
+            return get_db_obj();
+        } else {
+            return default_dbase;
+        }
     }
 
     // ===================================================================
@@ -107,22 +106,22 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ===================================================================
     public synchronized Database get_db_obj() throws DevFailed {
-	if (ApiUtil.getOrb() == null) {
-	    create_orb();
-	}
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
 
-	// If first time, create vector
-	// ---------------------------------------------------------------
-	if (db_list == null) {
-	    db_list = new ArrayList<Database>();
-	}
-	// If first time, create Database object
-	// -----------------------------------------------------------
-	if (default_dbase == null) {
-	    default_dbase = new Database();
-	    db_list.add(default_dbase);
-	}
-	return db_list.get(0);
+        // If first time, create vector
+        // ---------------------------------------------------------------
+        if (db_list == null) {
+            db_list = new ArrayList<Database>();
+        }
+        // If first time, create Database object
+        // -----------------------------------------------------------
+        if (default_dbase == null) {
+            default_dbase = new Database();
+            db_list.add(default_dbase);
+        }
+        return db_list.get(0);
     }
 
     // ===================================================================
@@ -850,7 +849,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
         return new String[] { host, strport };
     }
-
     // ===================================================================
     // ===================================================================
 }

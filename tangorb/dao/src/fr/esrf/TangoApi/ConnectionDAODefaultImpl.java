@@ -108,10 +108,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It makes a connection on database server.
      * 
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public void init(final Connection connection, final String host, final String port)
@@ -130,12 +128,9 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It makes a connection on database server.
      * 
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
-     * @param auto_reconnect
-     *            do not reconnect if false.
+     * @param host host where database is running.
+     * @param port port for database connection.
+     * @param auto_reconnect do not reconnect if false.
      */
     // ===================================================================
     public void init(final Connection connection, final String host, final String port,
@@ -154,8 +149,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It imports the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
+     * @param devname name of the device to be imported.
      */
     // ===================================================================
     public void init(final Connection connection, final String devname) throws DevFailed {
@@ -173,8 +167,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It imports the device.
      * 
-     * @param info
-     *            exported info of the device to be imported.
+     * @param info exported info of the device to be imported.
      */
     // ===================================================================
     public void init(final Connection connection, final DbDevImportInfo info) throws DevFailed {
@@ -200,10 +193,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It imports the device. And set check_access.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param check_access
-     *            set check_access value
+     * @param devname name of the device to be imported.
+     * @param check_access set check_access value
      */
     // ===================================================================
     public void init(final Connection connection, final String devname, final boolean check_access)
@@ -223,12 +214,9 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It imports the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param param
-     *            String parameter to import device.
-     * @param src
-     *            Source to import device (ior, dbase...)
+     * @param devname name of the device to be imported.
+     * @param param String parameter to import device.
+     * @param src Source to import device (ior, dbase...)
      */
     // ===================================================================
     public void init(final Connection connection, final String devname, final String param,
@@ -249,12 +237,9 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Connection constructor. It imports the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param devname name of the device to be imported.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public void init(final Connection connection, final String devname, final String host,
@@ -331,8 +316,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Ckeck the IDL revision and create the associated device.
      * 
-     * @param corba_str
-     *            IOR or corbaloc string.
+     * @param corba_str  IOR or corbaloc string.
      * @param connection the connection object
      * @throws fr.esrf.Tango.DevFailed if connection failed
      */
@@ -589,37 +573,37 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void connect_to_dbase(final Connection connection) throws DevFailed {
 		if (connection.device == null) {
 	    	try {
-			// Prepeare the connection string
-			// ----------------------------------
-			final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
-				+ connection.url.strport + "/database";
-			// And connect to database.
-			// ----------------------------
-			createDevice(connection, db_corbaloc);
-			connection.classname = "Database";
-			// System.out.println("Connected to " + db_corbaloc +
-			// "\ndevice: " +
-			// connection.device.name());
+                // Prepeare the connection string
+                // ----------------------------------
+                final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
+                    + connection.url.strport + "/database";
+                // And connect to database.
+                // ----------------------------
+                createDevice(connection, db_corbaloc);
+                connection.classname = "Database";
+                // System.out.println("Connected to " + db_corbaloc +
+                // "\ndevice: " +
+                // connection.device.name());
 	    	} catch (final SystemException ex) {
 				if (connection.transparent_reconnection) {
 		    		try {
-					final DbRedundancy dbr = DbRedundancy.get_instance();
-					final String th2 = dbr.get(connection.url.host + ":" + connection.url.port);
+                        final DbRedundancy dbr = DbRedundancy.get_instance();
+                        final String th2 = dbr.get(connection.url.host + ":" + connection.url.port);
 
-					// Prepeare the connection string
-					// ----------------------------------
-					final String db_corbaloc = "corbaloc:iiop:" + th2 + "/database";
-					// And connect to database.
-					// ----------------------------
-					createDevice(connection, db_corbaloc);
-					// System.out.println("Connected to " + db_corbaloc);
-		    		} catch (final SystemException e) {
-					// e.printStackTrace();
-					connection.device = null;
-					connection.ior = null;
-					Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
-						"Connection to database failed  !\n" + e, "connect_to_dbase("
-							+ connection.url.host + "," + connection.url.strport + ")");
+                        // Prepeare the connection string
+                        // ----------------------------------
+                        final String db_corbaloc = "corbaloc:iiop:" + th2 + "/database";
+                        // And connect to database.
+                        // ----------------------------
+                        createDevice(connection, db_corbaloc);
+                        // System.out.println("Connected to " + db_corbaloc);
+                    } catch (final SystemException e) {
+                        // e.printStackTrace();
+                        connection.device = null;
+                        connection.ior = null;
+                        Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
+                            "Connection to database failed  !\n" + e, "connect_to_dbase("
+                                + connection.url.host + "," + connection.url.strport + ")");
 		    		}
 				} else {
 		    		// e.printStackTrace();
@@ -816,6 +800,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * @throws DevFailed
      */
     // ===========================================================
+    private boolean firstTime = true;
     public DeviceData command_inout(final Connection connection, final String command,
 	    	final DeviceData argin) throws DevFailed {
 		Any received = null;
@@ -826,7 +811,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.protocol == TACO) {
 	    	return connection.taco_device.command_inout(command, argin);
 		}
-
 		//System.out.println(connection.devname + ".command_inout("+command + ") -----------> " +
 		//		((connection.access==TangoConst.ACCESS_READ)? "Read" : "Write"));
 
@@ -840,6 +824,11 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 				if (db.access_devfailed != null) {
 		    		throw db.access_devfailed;
 				}
+                //  Special case for first connection on database
+                if (firstTime && connection instanceof Database) {
+                    firstTime = false;
+                    return command_inout(connection, command, argin);
+                }
 				// ping the device to throw exception
 				// if failed (for reconnection)
 				ping(connection);
