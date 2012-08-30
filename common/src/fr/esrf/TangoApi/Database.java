@@ -1412,6 +1412,7 @@ public class Database extends Connection {
 	 * @param attname The attribute name.
 	 * @return the device aliases are stored in an array of strings.
      * @throws DevFailed in case of database access failed
+     * @deprecated use get_alias_from_attribute
 	 */
 	// ==========================================================================
 	public String get_attribute_alias(String attname) throws DevFailed {

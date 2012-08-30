@@ -192,18 +192,17 @@ public class DbDevice implements java.io.Serializable
 	 *	Get an alias for a device name
 	 */
 	//==========================================================================
-	public String get_alias()
-				throws DevFailed
+	public String get_alias() throws DevFailed
 	{
 		//	check if devname is already an alias.
 		if (devname.indexOf("/")<0)
 		{
 			//	if alias -> replace alias by real device name
-			devname = ApiUtil.get_db_obj().get_alias_device(devname);
+			devname = ApiUtil.get_db_obj().get_device_from_alias(devname);
 		}
 
 		//	Then query database for an alias for devname.
-		return dbase.get_device_alias(devname);
+		return dbase.get_alias_from_device(devname);
 	}
 	//==========================================================================
 	/**
