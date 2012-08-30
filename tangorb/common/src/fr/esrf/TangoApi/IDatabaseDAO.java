@@ -909,6 +909,54 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	//==========================================================================
 	public abstract String get_device_alias(Database database, String devname) throws DevFailed;
 
+    // ==========================================================================
+    /**
+     * Query the database for an alias for the specified device.
+     *
+     * @param database specified database object.
+     * @param deviceName device's name.
+     * @return the device alias found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAliasFromDevice(Database database, String deviceName) throws DevFailed;
+
+    // ==========================================================================
+    /**
+     * Query the database for a device name for the specified alias.
+     *
+     * @param database specified database object.
+     * @param alias alias name.
+     * @return the device name found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getDeviceFromAlias(Database database, String alias) throws DevFailed;
+
+    // ==========================================================================
+    /**
+     * Query the database for an alias for the specified attribute.
+     *
+     * @param database specified database object.
+     * @param  attName attribute name.
+     * @return the alias found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAliasFromAttribute(Database database, String attName) throws DevFailed;
+
+    // ==========================================================================
+    /**
+     * Query the database for an attribute name for the specified alias.
+     *
+     * @param database specified database object.
+     * @param  alias alias name.
+     * @return the attribute found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAttributeFromAlias(Database database, String alias) throws DevFailed;
+
 	//==========================================================================
 	/**
 	 *	Query the database a device for the specified alias.

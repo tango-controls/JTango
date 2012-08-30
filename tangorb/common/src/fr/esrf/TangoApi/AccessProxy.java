@@ -64,7 +64,7 @@ class  AccessProxy extends DeviceProxy
 	 */
 	protected Hashtable<String, String> dev_right_table = null;
 	/**
-	 *	Allowed Commands foe a class tacle.
+	 *	Allowed Commands for a class table.
 	 */
 	protected Hashtable<String, String[]> allowed_cmd_table = null;
 	//===============================================================
