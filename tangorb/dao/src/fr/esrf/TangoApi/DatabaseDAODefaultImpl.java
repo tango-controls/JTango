@@ -1746,6 +1746,74 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	//		Aliases management
 	//==========================================================================
 
+    // ==========================================================================
+    /**
+     * Query the database for an alias for the specified device.
+     *
+     * @param database specified database object.
+     * @param deviceName device's name.
+     * @return the device alias found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAliasFromDevice(Database database, String deviceName) throws DevFailed {
+        DeviceData	argin = new DeviceData();
+        argin.insert(deviceName);
+        DeviceData	argout = command_inout(database, "DbGetDeviceAlias", argin);
+        return argout.extractString();
+    }
+
+    // ==========================================================================
+    /**
+     * Query the database for a device name for the specified alias.
+     *
+     * @param database specified database object.
+     * @param alias alias name.
+     * @return the device name found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getDeviceFromAlias(Database database, String alias) throws DevFailed {
+        DeviceData	argin = new DeviceData();
+        argin.insert(alias);
+        DeviceData	argout = command_inout(database, "DbGetAliasDevice", argin);
+        return argout.extractString();
+    }
+
+    // ==========================================================================
+    /**
+     * Query the database for an alias for the specified attribute.
+     *
+     * @param database specified database object.
+     * @param  attName attribute name.
+     * @return the alias found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAliasFromAttribute(Database database, String attName) throws DevFailed {
+        DeviceData	argin = new DeviceData();
+        argin.insert(attName);
+        DeviceData	argout = command_inout(database, "DbGetAttributeAlias2", argin);
+        return argout.extractString();
+    }
+
+    // ==========================================================================
+    /**
+     * Query the database for an attribute name for the specified alias.
+     *
+     * @param database specified database object.
+     * @param  alias alias name.
+     * @return the attribute found.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public String getAttributeFromAlias(Database database, String alias) throws DevFailed {
+        DeviceData	argin = new DeviceData();
+        argin.insert(alias);
+        DeviceData	argout = command_inout(database, "DbGetAliasAttribute", argin);
+        return argout.extractString();
+    }
+
 	//==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_alias_list(java.lang.String)
