@@ -35,11 +35,7 @@
 package fr.esrf.TangoApi;
 
 import fr.esrf.TangoApi.events.EventConsumerUtil;
-import org.omg.CORBA.Any;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.Request;
-import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.*;
 
 import fr.esrf.Tango.AttributeConfig;
 import fr.esrf.Tango.AttributeConfig_2;
@@ -103,7 +99,6 @@ import fr.esrf.TangoDs.TangoConst;
  * @version $Revision$
  */
 
-@SuppressWarnings( { "ThrowInsideCatchBlockWhichIgnoresCaughtException", "NestedTryStatement" })
 public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implements ApiDefs,
 	IDeviceProxyDAO {
 
@@ -124,8 +119,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * DeviceProxy constructor. It will import the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
+     * @param devname name of the device to be imported.
      */
     // ===================================================================
     public void init(final DeviceProxy deviceProxy, final String devname) throws DevFailed {
@@ -137,10 +131,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * DeviceProxy constructor. It will import the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param check_access
-     *            set check_access value
+     * @param devname name of the device to be imported.
+     * @param check_access set check_access value
      */
     // ===================================================================
     public void init(final DeviceProxy deviceProxy, final String devname, final boolean check_access)
@@ -153,10 +145,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * TangoDevice constructor. It will import the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param ior
-     *            ior string used to import device
+     * @param devname name of the device to be imported.
+     * @param ior ior string used to import device
      */
     // ===================================================================
     public void init(final DeviceProxy deviceProxy, final String devname, final String ior)
@@ -169,12 +159,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * TangoDevice constructor. It will import the device.
      * 
-     * @param devname
-     *            name of the device to be imported.
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
+     * @param devname name of the device to be imported.
+     * @param host host where database is running.
+     * @param port port for database connection.
      */
     // ===================================================================
     public void init(final DeviceProxy deviceProxy, final String devname, final String host,
@@ -220,10 +207,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         // Get connection on administration device
         if (deviceProxy.getAdm_dev() == null) {
             if (DeviceProxyFactory.exists(info.name)) {
-            deviceProxy.setAdm_dev(DeviceProxyFactory.get(info.name));
+                deviceProxy.setAdm_dev(DeviceProxyFactory.get(info.name));
             } else {
             // If not exists, create it with info
-            deviceProxy.setAdm_dev(new DeviceProxy(info));
+                deviceProxy.setAdm_dev(new DeviceProxy(info));
             }
         }
     }
@@ -330,19 +317,19 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
             boolean done = false;
             for (int i = 0; i < retries && !done; i++) {
-            try {
-                //noinspection PointlessBooleanExpression
-                if (src == ApiDefs.FROM_ATTR) {
-                state = deviceProxy.device.state();
-                } else {
-                final DeviceData argout = deviceProxy.command_inout("State");
-                state = argout.extractDevState();
+                try {
+                    //noinspection PointlessBooleanExpression
+                    if (src == ApiDefs.FROM_ATTR) {
+                        state = deviceProxy.device.state();
+                    } else {
+                    final DeviceData argout = deviceProxy.command_inout("State");
+                    state = argout.extractDevState();
+                    }
+                    done = true;
+                } catch (final Exception e) {
+                    manageExceptionReconnection(deviceProxy,
+                            retries, i, e, this.getClass() + ".state");
                 }
-                done = true;
-            } catch (final Exception e) {
-                manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
-                    + ".state");
-            }
             }
             return state;
         } else {
@@ -1441,7 +1428,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		    done = true;
 		} catch (final DevFailed e) {
 		    // Except.print_exception(e);
-		    final StringBuffer sb = new StringBuffer(attnames[0]);
+		    final StringBuilder sb = new StringBuilder(attnames[0]);
 		    for (int j = 1; j < attnames.length; j++) {
 			sb.append(", ").append(attnames[j]);
 		    }
@@ -1663,6 +1650,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param objname command/attribute name to be polled.
      * @param objtype command or attribute.
      * @param period  polling period.
+     * @throws fr.esrf.Tango.DevFailed if command failed
      */
     // ==========================================================================
     private void poll_object(final DeviceProxy deviceProxy, final String objname,
@@ -1712,10 +1700,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Add a command to be polled for the device. If already polled, update its
      * polling period.
      * 
-     * @param cmdname
-     *            command name to be polled.
-     * @param period
-     *            polling period.
+     * @param cmdname command name to be polled.
+     * @param period polling period.
      */
     // ==========================================================================
     public void poll_command(final DeviceProxy deviceProxy, final String cmdname, final int period)
@@ -1728,10 +1714,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Add a attribute to be polled for the device. If already polled, update
      * its polling period.
      * 
-     * @param attname
-     *            attribute name to be polled.
-     * @param period
-     *            polling period.
+     * @param attname attribute name to be polled.
+     * @param period polling period.
      */
     // ==========================================================================
     public void poll_attribute(final DeviceProxy deviceProxy, final String attname, final int period)
@@ -1743,8 +1727,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Remove object of polled object list
      * 
+     * @param deviceProxy   the specified DeviceProxy object
      * @param objname object name to be removed of polled object list.
      * @param objtype object type (command or attribute).
+     * @throws fr.esrf.Tango.DevFailed if command failed
      */
     // ==========================================================================
     private void remove_poll_object(final DeviceProxy deviceProxy, final String objname,
@@ -1773,8 +1759,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Remove command of polled object list
      * 
-     * @param cmdname
-     *            command name to be removed of polled object list.
+     * @param cmdname command name to be removed of polled object list.
      */
     // ==========================================================================
     public void stop_poll_command(final DeviceProxy deviceProxy, final String cmdname)
@@ -1967,8 +1952,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Returns the polling period (in ms) for specified command.
      * 
-     * @param cmdname
-     *            specified attribute name.
+     * @param cmdname specified attribute name.
      */
     // ==========================================================================
     public int get_command_polling_period(final DeviceProxy deviceProxy, final String cmdname)
@@ -1990,10 +1974,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Asynchronous command_inout.
      * 
-     * @param cmdname
-     *            command name.
-     * @param data_in
-     *            input argument command.
+     * @param cmdname command name.
+     * @param data_in input argument command.
      */
     // ==========================================================================
     public int command_inout_asynch(final DeviceProxy deviceProxy, final String cmdname,
@@ -2029,6 +2011,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     /**
      * Add and set arguments to request for asynchronous command.
+     * @param request request object
+\    * @param data_in input value
+     * @param name command name
+     * @param src source CACHE/CACHE_DEV/DEV
+     * @param ident client identifier object
+     * @throws fr.esrf.Tango.DevFailed if command failed
      */
     // ==========================================================================
     private void setRequestArgsForCmd(final Request request, final String name,
@@ -2100,7 +2088,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             setRequestArgsForCmd(request, cmdname, data_in, null, null);
         }
 
-        // send it (defered or just one way)
+        // send it (deferred or just one way)
         int id = 0;
         // Else tango call
         boolean done = false;
@@ -2108,20 +2096,19 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
         for (int i = 0; i < retries && !done; i++) {
             try {
-            if (forget) {
-                request.send_oneway();
-            } else {
-                request.send_deferred();
-                // store request reference to read reply later
-                final String[] names = new String[1];
-                names[0] = cmdname;
-                id = ApiUtil.put_async_request(new AsyncCallObject(request, deviceProxy, CMD,
-                    names));
-            }
-            done = true;
+                if (forget) {
+                    request.send_oneway();
+                } else {
+                    request.send_deferred();
+                    // store request reference to read reply later
+                    final String[] names = new String[] { cmdname };
+                    id = ApiUtil.put_async_request(
+                            new AsyncCallObject(request, deviceProxy, CMD, names));
+                }
+                done = true;
             } catch (final Exception e) {
-            manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
-                + ".command_inout");
+                manageExceptionReconnection(deviceProxy,
+                        retries, i, e, this.getClass() + ".command_inout");
             }
         }
         return id;
@@ -2170,46 +2157,35 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param timeout number of millisonds to wait reply before throw an excption.
      */
     // ==========================================================================
-    public DeviceData command_inout_reply(final DeviceProxy deviceProxy, final int id,
-            final int timeout) throws DevFailed, AsynReplyNotArrived {
+    public DeviceData command_inout_reply(final DeviceProxy deviceProxy,
+                                          final int id, final int timeout) throws DevFailed {
         return command_inout_reply(deviceProxy, ApiUtil.get_async_object(id), timeout);
     }
-
     // ==========================================================================
     /**
      * Read Asynchronous command_inout reply.
      * 
      * @param aco asynchronous call Request instance
-     * @param timeout number of millisonds to wait reply before throw an excption.
+     * @param timeout number of milliseconds to wait reply before throw an exception.
      */
     // ==========================================================================
-    public DeviceData command_inout_reply(final DeviceProxy deviceProxy, final AsyncCallObject aco,
-            final int timeout) throws DevFailed, AsynReplyNotArrived {
+    public DeviceData command_inout_reply(final DeviceProxy deviceProxy,
+                                          final AsyncCallObject aco, final int timeout) throws DevFailed {
         DeviceData argout = null;
-        final int ms_to_sleep = 50;
+        final int ms_to_sleep = 10;
         AsynReplyNotArrived except = null;
         final long t0 = System.currentTimeMillis();
         long t1 = t0;
 
-        // System.out.println("command_inout_reply to= " + timeout + " ms");
         while ((t1 - t0 < timeout || timeout == 0) && argout == null) {
             try {
-            argout = command_inout_reply(deviceProxy, aco);
-            } catch (final AsynReplyNotArrived na) {
-            except = na;
-            // Wait a bit before retry
-            // GA
-            // this.sleep(ms_to_sleep);
-            try {
-                Thread.sleep(ms_to_sleep);
-            } catch (final InterruptedException e) {
-                // ignore
+                argout = command_inout_reply(deviceProxy, aco);
             }
-            // GA
-            t1 = System.currentTimeMillis();
-            // System.out.println(" " + (t1-t0) + " ms");
-            } catch (final DevFailed e) {
-            throw e;
+            catch (final AsynReplyNotArrived na) {
+                except = na;
+                // Wait a bit before retry
+                try { Thread.sleep(ms_to_sleep); } catch (final InterruptedException e) { /* */ }
+                t1 = System.currentTimeMillis();
             }
         }
         // If reply not arrived throw last exception
@@ -2240,24 +2216,47 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param aco asynchronous call Request instance
      */
     // ==========================================================================
-    public DeviceData command_inout_reply(final DeviceProxy deviceProxy, final AsyncCallObject aco)
-            throws DevFailed, AsynReplyNotArrived {
+    public DeviceData command_inout_reply(final DeviceProxy deviceProxy,
+                                          final AsyncCallObject aco) throws DevFailed {
         DeviceData data;
+        // toDo
+        try {
+            if (deviceProxy.device_4 != null) {
+                check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_4");
+            } else if (deviceProxy.device_2 != null) {
+                check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_2");
+            } else {
+                check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout");
+            }
+            // If no exception, extract the any from return value,
+            final Any any = aco.request.return_value().extract_any();
 
-        if (deviceProxy.device_4 != null) {
-            check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_4");
-        } else if (deviceProxy.device_2 != null) {
-            check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_2");
-        } else {
-            check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout");
+            // And put it in a DeviceData object
+            data = new DeviceData();
+            data.insert(any);
         }
+        catch (ConnectionFailed e) {
+            try {
+                //  If failed, retrieve data from request object
+                final NVList args = aco.request.arguments();
+                String command = args.item(0).value().extract_string(); // get command name
+                DeviceData  argin = null;
+                if (args.count()>1) {
+                    Any any = args.item(1).value().extract_any();
+                    argin = new DeviceData(any);
+                }
 
-        // If no exception, extract the any from return value,
-        final Any any = aco.request.return_value().extract_any();
-
-        // And put it in a DeviceData object
-        data = new DeviceData();
-        data.insert(any);
+                //  And do the synchronous command
+                if (argin==null)
+                    data = deviceProxy.command_inout(command);
+                else
+                    data = deviceProxy.command_inout(command, argin);
+            }
+            catch (org.omg.CORBA.Bounds e1) {
+                System.err.println(e1);
+                throw e;
+            }
+        }
         ApiUtil.remove_async_request(aco.id);
 
         return data;
@@ -2319,8 +2318,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         Request request;
         if (deviceProxy.device_4 != null) {
             request = deviceProxy.device_4._request("read_attributes_4");
-            setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy), DevLockManager
-                .getInstance().getClntIdent(), AttributeValueList_4Helper.type());
+            setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy),
+                    DevLockManager.getInstance().getClntIdent(), AttributeValueList_4Helper.type());
             request.exceptions().add(MultiDevFailedHelper.type());
         } else if (deviceProxy.device_3 != null) {
             request = deviceProxy.device_3._request("read_attributes_3");
@@ -2332,15 +2331,16 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 AttributeValueListHelper.type());
         } else {
             request = deviceProxy.device._request("read_attributes");
-            setRequestArgsForReadAttr(request, attnames, null, null, AttributeValueListHelper
-                .type());
+            setRequestArgsForReadAttr(request, attnames, null, null,
+                    AttributeValueListHelper.type());
         }
 
         // send it (defered or just one way)
         request.send_deferred();
+
         // store request reference to read reply later
-        return ApiUtil
-            .put_async_request(new AsyncCallObject(request, deviceProxy, ATT_R, attnames));
+        return ApiUtil.put_async_request(
+                new AsyncCallObject(request, deviceProxy, ATT_R, attnames));
     }
 
     // ==========================================================================
@@ -2351,20 +2351,19 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     public String get_asynch_idl_cmd(final DeviceProxy deviceProxy, final Request request,
 	        final String idl_cmd) {
         final NVList args = request.arguments();
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         try {
             if (idl_cmd.equals("command_inout")) {
-            return args.item(0).value().extract_string(); // get command
-            // name
+                return args.item(0).value().extract_string(); // get command name
             } else {
-            // read_attribute, get attribute names
-            final String[] s_array = DevVarStringArrayHelper.extract(args.item(0).value());
-            for (int i = 0; i < s_array.length; i++) {
-                sb.append(s_array[i]);
-                if (i < s_array.length - 1) {
-                sb.append(", ");
+                // read_attribute, get attribute names
+                final String[] s_array = DevVarStringArrayHelper.extract(args.item(0).value());
+                for (int i = 0; i < s_array.length; i++) {
+                    sb.append(s_array[i]);
+                    if (i < s_array.length - 1) {
+                        sb.append(", ");
+                    }
                 }
-            }
             }
         } catch (final org.omg.CORBA.Bounds e) {
             return "";
@@ -2382,7 +2381,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void check_asynch_reply(final DeviceProxy deviceProxy, final Request request,
-            final int id, final String idl_cmd) throws DevFailed, AsynReplyNotArrived {
+            final int id, final String idl_cmd) throws DevFailed {
         // Check if request object has been found
         if (request == null) {
             Except.throw_connection_failed("TangoApi_CommandFailed",
@@ -2390,55 +2389,60 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     + idl_cmd + "_reply()");
         } else {
             if (!request.operation().equals(idl_cmd)) {
-            Except.throw_connection_failed("TangoApi_CommandFailed",
-                "Asynchronous call id not for " + idl_cmd, deviceProxy.getFull_class_name()
-                    + "." + idl_cmd + "_reply()");
+                Except.throw_connection_failed("TangoApi_CommandFailed",
+                    "Asynchronous call id not for " + idl_cmd, deviceProxy.getFull_class_name()
+                        + "." + idl_cmd + "_reply()");
             }
 
             // Reply arrived ? Throw exception if not yet arrived
             if (!request.poll_response()) {
-            // System.out.println("Response not yet arrived");
-            Except.throw_asyn_reply_not_arrived("API_AsynReplyNotArrived", "Device "
-                + deviceProxy.devname + ": reply for asynchronous call (id = " + id
-                + ") is not yet arrived", deviceProxy.getFull_class_name() + "." + idl_cmd
-                + "_reply()");
+                Except.throw_asyn_reply_not_arrived("API_AsynReplyNotArrived", "Device "
+                    + deviceProxy.devname + ": reply for asynchronous call (id = " + id
+                    + ") is not yet arrived", deviceProxy.getFull_class_name() + "." + idl_cmd
+                    + "_reply()");
             } else {
-            // Check if an exception has been thrown
-            final Exception except = request.env().exception();
+                // Check if an exception has been thrown
+                final Exception except = request.env().exception();
 
-            if (except != null) {
-                ApiUtil.remove_async_request(id);
-                // Check if user exception (DevFailed).
-                if (except instanceof org.omg.CORBA.UnknownUserException) {
-                final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
-                MultiDevFailed ex = null;
-                try {
-                    ex = MultiDevFailedHelper.extract(any);
-                } catch (final Exception e) {
-                    // not a MultiDevFailed, is a DevFailed
-                    final DevFailed df = DevFailedHelper.extract(any);
-                    Except.throw_connection_failed(df, "TangoApi_CommandFailed",
-                        "Asynchronous command failed", deviceProxy.getFull_class_name()
-                            + "." + idl_cmd + "_reply("
-                            + get_asynch_idl_cmd(deviceProxy, request, idl_cmd)
+                if (except != null) {
+                    ApiUtil.remove_async_request(id);
+                    if (except instanceof org.omg.CORBA.TRANSIENT) {
+                        throw_dev_failed(deviceProxy, except,
+                                deviceProxy.getFull_class_name()
+                                    + "." + idl_cmd + "_reply("
+                                    + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
+                    }
+                    else
+                    // Check if user exception (DevFailed).
+                    if (except instanceof org.omg.CORBA.UnknownUserException) {
+                        final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
+                        MultiDevFailed ex = null;
+                        try {
+                            ex = MultiDevFailedHelper.extract(any);
+                        } catch (final Exception e) {
+                            // not a MultiDevFailed, is a DevFailed
+                            final DevFailed df = DevFailedHelper.extract(any);
+                            Except.throw_connection_failed(df, "TangoApi_CommandFailed",
+                                "Asynchronous command failed", deviceProxy.getFull_class_name()
+                                    + "." + idl_cmd + "_reply("
+                                    + get_asynch_idl_cmd(deviceProxy, request, idl_cmd)
+                                    + ")");
+                        }
+                        Except.throw_connection_failed(new DevFailed(ex.errors[0].err_list),
+                            "TangoApi_CommandFailed", "Asynchronous command failed",
+                            deviceProxy.getFull_class_name() + "." + idl_cmd + "_reply("
+                                + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")");
+                    } else {
+                        except.printStackTrace();
+                        // Another exception -> re-throw it as a DevFailed
+                        System.err.println(deviceProxy.getFull_class_name() + "." + idl_cmd
+                            + "_reply(" + get_asynch_idl_cmd(deviceProxy, request, idl_cmd)
                             + ")");
+                        throw_dev_failed(deviceProxy, except, deviceProxy.getFull_class_name()
+                            + "." + idl_cmd + "_reply("
+                            + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
+                    }
                 }
-                Except.throw_connection_failed(new DevFailed(ex.errors[0].err_list),
-                    "TangoApi_CommandFailed", "Asynchronous command failed",
-                    deviceProxy.getFull_class_name() + "." + idl_cmd + "_reply("
-                        + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")");
-                } else {
-                except.printStackTrace();
-                // Another exception -> re-throw it as a DevFailed
-                System.out.println(deviceProxy.getFull_class_name() + "." + idl_cmd
-                    + "_reply(" + get_asynch_idl_cmd(deviceProxy, request, idl_cmd)
-                    + ")");
-                throw_dev_failed(deviceProxy, except, deviceProxy.getFull_class_name()
-                    + "." + idl_cmd + "_reply("
-                    + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
-                }
-            }
-            // System.out.println("Reply is arrived !!!");
             }
         }
     }
@@ -2451,32 +2455,23 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param timeout number of millisonds to wait reply before throw an excption.
      */
     // ==========================================================================
-    public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy, final int id,
-            final int timeout) throws DevFailed, AsynReplyNotArrived {
+    public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
+                                                  final int id, final int timeout) throws DevFailed {
         DeviceAttribute[] argout = null;
-        final int ms_to_sleep = 50;
+        final int ms_to_sleep = 10;
         AsynReplyNotArrived except = null;
         final long t0 = System.currentTimeMillis();
         long t1 = t0;
 
         while ((t1 - t0 < timeout || timeout == 0) && argout == null) {
             try {
-            argout = read_attribute_reply(deviceProxy, id);
-            } catch (final AsynReplyNotArrived na) {
-            except = na;
-            // Wait a bit before retry
-            // GA
-            // this.sleep(ms_to_sleep);
-            try {
-                Thread.sleep(ms_to_sleep);
-            } catch (final InterruptedException e) {
-                // ignore
+                argout = read_attribute_reply(deviceProxy, id);
             }
-            // GA
-            t1 = System.currentTimeMillis();
-            // System.out.println(" " + (t1-t0) + " ms");
-            } catch (final DevFailed e) {
-            throw e;
+            catch (final AsynReplyNotArrived na) {
+                except = na;
+                // Wait a bit before retry
+                try { Thread.sleep(ms_to_sleep); } catch (final InterruptedException e) { /* */ }
+                t1 = System.currentTimeMillis();
             }
         }
         // If reply not arrived throw last exception
@@ -2495,8 +2490,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param id asynchronous call id (returned by read_attribute_asynch).
      */
     // ==========================================================================
-    public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy, final int id)
-            throws DevFailed, AsynReplyNotArrived {
+    // ToDo
+    public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
+                                                  final int id) throws DevFailed {
         DeviceAttribute[] data;
         AttributeValue[] attrval;
         AttributeValue_3[] attrval_3;
@@ -2505,33 +2501,50 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
         // If no exception, extract the any from return value,
         final Any any = request.return_value();
-        if (deviceProxy.device_4 != null) {
-            check_asynch_reply(deviceProxy, request, id, "read_attributes_4");
-            attrval_4 = AttributeValueList_4Helper.extract(any);
-            data = new DeviceAttribute[attrval_4.length];
-            for (int i = 0; i < attrval_4.length; i++) {
-            data[i] = new DeviceAttribute(attrval_4[i]);
+        try {
+            if (deviceProxy.device_4 != null) {
+                check_asynch_reply(deviceProxy, request, id, "read_attributes_4");
+                    attrval_4 = AttributeValueList_4Helper.extract(any);
+                    data = new DeviceAttribute[attrval_4.length];
+                    for (int i = 0; i < attrval_4.length; i++) {
+                        data[i] = new DeviceAttribute(attrval_4[i]);
+                }
+            } else if (deviceProxy.device_3 != null) {
+                check_asynch_reply(deviceProxy, request, id, "read_attributes_3");
+                    attrval_3 = AttributeValueList_3Helper.extract(any);
+                    data = new DeviceAttribute[attrval_3.length];
+                    for (int i = 0; i < attrval_3.length; i++) {
+                        data[i] = new DeviceAttribute(attrval_3[i]);
+                }
+            } else if (deviceProxy.device_2 != null) {
+                check_asynch_reply(deviceProxy, request, id, "read_attributes_2");
+                    attrval = AttributeValueListHelper.extract(any);
+                    data = new DeviceAttribute[attrval.length];
+                    for (int i = 0; i < attrval.length; i++) {
+                        data[i] = new DeviceAttribute(attrval[i]);
+                }
+            } else {
+                check_asynch_reply(deviceProxy, request, id, "read_attributes");
+                    attrval = AttributeValueListHelper.extract(any);
+                    data = new DeviceAttribute[attrval.length];
+                    for (int i = 0; i < attrval.length; i++) {
+                        data[i] = new DeviceAttribute(attrval[i]);
+                }
             }
-        } else if (deviceProxy.device_3 != null) {
-            check_asynch_reply(deviceProxy, request, id, "read_attributes_3");
-            attrval_3 = AttributeValueList_3Helper.extract(any);
-            data = new DeviceAttribute[attrval_3.length];
-            for (int i = 0; i < attrval_3.length; i++) {
-            data[i] = new DeviceAttribute(attrval_3[i]);
+        }
+        catch (ConnectionFailed e) {
+            try {
+                //  If failed, retrieve data from request object
+                final NVList args = request.arguments();
+                final String[] attributeNames =
+                        DevVarStringArrayHelper.extract(args.item(0).value());
+
+                //  And do the synchronous read_attributes
+                data = deviceProxy.read_attribute(attributeNames);
             }
-        } else if (deviceProxy.device_2 != null) {
-            check_asynch_reply(deviceProxy, request, id, "read_attributes_2");
-            attrval = AttributeValueListHelper.extract(any);
-            data = new DeviceAttribute[attrval.length];
-            for (int i = 0; i < attrval.length; i++) {
-            data[i] = new DeviceAttribute(attrval[i]);
-            }
-        } else {
-            check_asynch_reply(deviceProxy, request, id, "read_attributes");
-            attrval = AttributeValueListHelper.extract(any);
-            data = new DeviceAttribute[attrval.length];
-            for (int i = 0; i < attrval.length; i++) {
-            data[i] = new DeviceAttribute(attrval[i]);
+            catch (org.omg.CORBA.Bounds e1) {
+                System.err.println(e1);
+                throw e;
             }
         }
         ApiUtil.remove_async_request(id);
@@ -2647,10 +2660,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		if (deviceProxy.device_4 != null) {
 	    	final AttributeValue_4[] attrval_4 = new AttributeValue_4[attribs.length];
 	    	for (int i = 0; i < attribs.length; i++) {
-			attrval_4[i] = attribs[i].getAttributeValueObject_4();
-			attrval_4[i].err_list = new DevError[0];
-			attnames[i] = attrval_4[i].name;
-	    	}
+                attrval_4[i] = attribs[i].getAttributeValueObject_4();
+                attrval_4[i].err_list = new DevError[0];
+                attnames[i] = attrval_4[i].name;
+            }
 	    	request = deviceProxy.device_4._request("write_attributes_4");
 
 	    	any = request.add_in_arg();
@@ -2662,17 +2675,17 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		} else {
 	    	final AttributeValue[] attrval = new AttributeValue[attribs.length];
 	    	for (int i = 0; i < attribs.length; i++) {
-			attrval[i] = attribs[i].getAttributeValueObject_2();
-			attnames[i] = attrval[i].name;
+			    attrval[i] = attribs[i].getAttributeValueObject_2();
+			    attnames[i] = attrval[i].name;
 	    	}
 
 	    	// Create the request object
 	    	if (deviceProxy.device_3 != null) {
 			request = deviceProxy.device_3._request("write_attributes_3");
 	    	} else if (deviceProxy.device_2 != null) {
-			request = deviceProxy.device_2._request("write_attributes");
+	    		request = deviceProxy.device_2._request("write_attributes");
 	    	} else {
-			request = deviceProxy.device._request("write_attributes");
+    			request = deviceProxy.device._request("write_attributes");
 	    	}
 
 	    	any = request.add_in_arg();
@@ -2689,18 +2702,18 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
 		for (int i = 0; i < retries && !done; i++) {
 	    	try {
-			if (forget) {
-		    	request.send_oneway();
-			} else {
-		    	request.send_deferred();
-		    	// store request reference to read reply later
-		    	id = ApiUtil.put_async_request(new AsyncCallObject(request, deviceProxy, ATT_W,
-			    	attnames));
-			}
-			done = true;
+                if (forget) {
+                    request.send_oneway();
+                } else {
+                    request.send_deferred();
+                    // store request reference to read reply later
+                    id = ApiUtil.put_async_request(new AsyncCallObject(request, deviceProxy, ATT_W,
+                        attnames));
+                }
+                done = true;
 	    	} catch (final Exception e) {
-			manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
-				+ ".write_attribute_asynch");
+                manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
+                    + ".write_attribute_asynch");
 	    	}
 		}
 		return id;
@@ -2713,18 +2726,56 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param id  asynchronous call id (returned by read_attribute_asynch).
      */
     // ==========================================================================
+    //  ToDo
     public void write_attribute_reply(final DeviceProxy deviceProxy, final int id)
-		    throws DevFailed, AsynReplyNotArrived {
+		    throws DevFailed {
 		final Request request = ApiUtil.get_async_request(id);
-		if (deviceProxy.device_4 != null) {
-	    	check_asynch_reply(deviceProxy, request, id, "write_attributes_4");
-		} else if (deviceProxy.device_3 != null) {
-	    	check_asynch_reply(deviceProxy, request, id, "write_attributes_3");
-		} else if (deviceProxy.device_2 != null) {
-	    	check_asynch_reply(deviceProxy, request, id, "write_attributes");
-		} else {
-	    	check_asynch_reply(deviceProxy, request, id, "write_attributes");
-		}
+        try {
+            if (deviceProxy.device_4 != null) {
+                check_asynch_reply(deviceProxy, request, id, "write_attributes_4");
+            } else if (deviceProxy.device_3 != null) {
+                check_asynch_reply(deviceProxy, request, id, "write_attributes_3");
+            } else if (deviceProxy.device_2 != null) {
+                check_asynch_reply(deviceProxy, request, id, "write_attributes");
+            } else {
+                check_asynch_reply(deviceProxy, request, id, "write_attributes");
+            }
+        }
+        catch (ConnectionFailed e) {
+            DeviceAttribute[]   deviceAttributes;
+            try {
+                //  If failed, retrieve data from request object
+                final NVList args = request.arguments();
+                final Any any = args.item(0).value();
+
+                if (deviceProxy.idl_version>=4) {
+                    AttributeValue_4[]    attVal_4 =
+                            AttributeValueList_4Helper.extract(any);
+
+                    deviceAttributes = new DeviceAttribute[attVal_4.length];
+                    for (int i=0 ;  i<attVal_4.length ; i++) {
+                        deviceAttributes[i] = new DeviceAttribute(attVal_4[i]);
+                    }
+                }
+                else if (deviceProxy.idl_version>=3) {
+                    AttributeValue[]    attVal =
+                            AttributeValueListHelper.extract(any);
+                    deviceAttributes = new DeviceAttribute[attVal.length];
+                    for (int i=0 ;  i<attVal.length ; i++) {
+                        deviceAttributes[i] = new DeviceAttribute(attVal[i]);
+                    }
+                }
+                else
+                    throw e;
+            }
+            catch (org.omg.CORBA.Bounds e1) {
+                System.err.println(e1);
+                throw e;
+            }
+
+            //  And do the synchronous write_attributes
+            deviceProxy.write_attribute(deviceAttributes);
+        }
     }
 
     // ==========================================================================
@@ -2737,29 +2788,20 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public void write_attribute_reply(final DeviceProxy deviceProxy, final int id, final int timeout)
             throws DevFailed, AsynReplyNotArrived {
-        final int ms_to_sleep = 50;
+        final int ms_to_sleep = 10;
         AsynReplyNotArrived except = null;
         final long t0 = System.currentTimeMillis();
-        final long t1 = t0;
+        long t1 = t0;
         boolean done = false;
         while ((t1 - t0 < timeout || timeout == 0) && !done) {
             try {
-            write_attribute_reply(deviceProxy, id);
-            done = true;
+                write_attribute_reply(deviceProxy, id);
+                done = true;
             } catch (final AsynReplyNotArrived na) {
-            except = na;
-            // Wait a bit before retry
-            // GA
-            // this.sleep(ms_to_sleep);
-            try {
-                Thread.sleep(ms_to_sleep);
-            } catch (final InterruptedException e) {
-                // ignore
-            }
-            // GA t1 = System.currentTimeMillis();
-            // System.out.println(" " + (t1-t0) + " ms");
-            } catch (final DevFailed e) {
-            throw e;
+                except = na;
+                // Wait a bit before retry
+                try { Thread.sleep(ms_to_sleep); } catch (final InterruptedException e) { /* */ }
+                t1 = System.currentTimeMillis();
             }
         }
         // If reply not arrived throw last exception
@@ -3152,100 +3194,4 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
     // ==========================================================================
     // ==========================================================================
-
-    // ==========================================================================
-    /**
-     * Just a main method to check API methods.
-     */
-    // ==========================================================================
-    public void main(final String args[]) {
-        String devname = null;
-        String cmdname = null;
-        try {
-            cmdname = args[0];
-            devname = args[1];
-        } catch (final Exception e) {
-            if (cmdname == null) {
-            System.out.println("Usage :");
-            System.out.println("fr.esrf.TangoApi.DeviceProxy  cmdname devname");
-            System.out.println("	- cmdname : command name (ping, state, status, unexport...)");
-            System.out.println("	- devname : device name to send command.");
-            } else {
-            System.out.println("Device name ?");
-            }
-            System.exit(0);
-        }
-        try {
-            // Check if wildcard
-            String[] devnames;
-            DeviceProxy[] dev;
-            if (devname.indexOf("*") < 0) {
-                devnames = new String[1];
-                devnames[0] = devname;
-            } else {
-                devnames = ApiUtil.get_db_obj().getDevices(devname);
-            }
-
-            // Create DeviceProxy Objects
-            dev = new DeviceProxy[devnames.length];
-            for (int i = 0; i < devnames.length; i++) {
-                dev[i] = new DeviceProxy(devnames[i]);
-            }
-
-            if (cmdname.equals("ping")) {
-            // noinspection InfiniteLoopStatement
-            while (true) {
-                for (int i = 0; i < dev.length; i++) {
-                try {
-                    final long t = dev[i].ping();
-                    System.out.println(devnames[i] + " is alive  (" + t / 1000 + " ms)");
-                } catch (final DevFailed e) {
-                    System.out.println(devnames[i] + "  " + e.errors[0].desc);
-                }
-                }
-                if (dev.length > 1) {
-                System.out.println();
-                }
-                try { Thread.sleep(1000); } catch (final InterruptedException e) { /* */ }
-            }
-            } else if (cmdname.equals("status")) {
-            for (int i = 0; i < dev.length; i++) {
-                try {
-                System.out.println(devnames[i] + " - " + dev[i].status());
-                } catch (final DevFailed e) {
-                System.out.println(devnames[i] + "  " + e.errors[0].desc);
-                }
-            }
-            } else if (cmdname.equals("state")) {
-            for (int i = 0; i < dev.length; i++) {
-                try {
-                System.out
-                    .println(devnames[i] + " is " + ApiUtil.stateName(dev[i].state()));
-                /*
-                 * DeviceAttribute da = dev[i].read_attribute("State");
-                 * DevState st = da.extractDevStateArray()[0];
-                 * System.out.println(devnames[i] + " is " +
-                 * ApiUtil.stateName(st));
-                 */
-                } catch (final DevFailed e) {
-                System.out.println(devnames[i] + "  " + e.errors[0].desc);
-                }
-            }
-            } else if (cmdname.equals("unexport")) {
-            for (int i = 0; i < dev.length; i++) {
-                try {
-                dev[i].unexport_device();
-                System.out.println(devnames[i] + " unexported !");
-                } catch (final DevFailed e) {
-                System.out.println(devnames[i] + "  " + e.errors[0].desc);
-                }
-            }
-            } else {
-            System.out.println(cmdname + " ?   Unknow command !");
-            }
-        } catch (final DevFailed e) {
-            Except.print_exception(e);
-            // e.printStackTrace();
-        }
-    }
 }
