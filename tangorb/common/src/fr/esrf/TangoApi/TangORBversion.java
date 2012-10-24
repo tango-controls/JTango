@@ -61,13 +61,9 @@ public class TangORBversion implements java.io.Serializable {
      */
     public String ZMQ = null;
     /**
-     * logkit package version used.
+     *  package version used.
      */
-    public String logkit = null;
-    /**
-     * avalon package version used.
-     */
-    public String avalon = null;
+    public String slf4j = null;
 
     public String jarfile;
     private static final String[] packages = {
@@ -75,8 +71,7 @@ public class TangORBversion implements java.io.Serializable {
             "Tango",
             "JacORB",
             "ZMQ",
-            "logkit",
-            "avalon_framework",
+            "slf4j",
     };
 
     //========================================================================
@@ -175,12 +170,9 @@ public class TangORBversion implements java.io.Serializable {
                         ZMQ = vers.trim();
                         break;
                     case 4:
-                        logkit = vers.trim();
+                        slf4j = vers.trim();
                         break;
-                    case 5:
-                        avalon = vers.trim();
-                        break;
-                }
+               }
             }
         }
     }
@@ -217,10 +209,7 @@ public class TangORBversion implements java.io.Serializable {
                     str += ZMQ;
                     break;
                 case 4:
-                    str += logkit;
-                    break;
-                case 5:
-                    str += avalon;
+                    str += slf4j;
                     break;
             }
             if (i < packages.length - 1)

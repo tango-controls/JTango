@@ -208,7 +208,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable
             }
         }
 		//	Check char used
-		if (devname.indexOf('#') >=0 && devname.indexOf("->")>=0)
+		if (devname.indexOf('#') >=0 && devname.contains("->"))
 					Except.throw_wrong_syntax_exception("TangoApi_BAD_DEVICE_NAME",
 							"Device name ("+ devname + ") wrong definition.",
 							"TangoUrl.TangoUrl()");
@@ -239,7 +239,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable
 	{
 		String	env = TangoEnv.getTangoHost();
 		assert	env != null;
-		if (env.indexOf(":")<0)
+		if (!env.contains(":"))
 			Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
 									"Unknown \"TANGO_HOST\" property " + env,
 									"TangoUrl.TangoUrl()");
@@ -252,10 +252,15 @@ public class TangoUrl implements ApiDefs, java.io.Serializable
 	}
 	//===================================================================
 	//===================================================================
+    public String getTangoHost() {
+        return host+":"+port;
+    }
+	//===================================================================
+	//===================================================================
 	public String toString()
 	{
-		StringBuffer	sb =
-			new StringBuffer((protocol==TANGO)?"tango":"taco");
+		StringBuilder sb =
+			new StringBuilder((protocol==TANGO)?"tango":"taco");
 		sb.append("://").append(host).append(":").append(strport);
 		sb.append("/").append(devname);
 		if (!use_db)
