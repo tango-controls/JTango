@@ -1110,14 +1110,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	//==========================================================================
 	public abstract int get_rpc_protocol(DeviceProxy deviceProxy) throws DevFailed;
 
-	//==========================================================================
-	/**
-	 *	Just a main method to check API methods.
-	 */
-	//==========================================================================
-	public void main(String args[]);	
-	
-	
+
 	//===============================================================
 	//===============================================================
 	//TODO remove javadoc

@@ -36,6 +36,7 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevInfo_3;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoDs.Except;
@@ -1617,18 +1618,6 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 		return deviceProxy.get_rpc_protocol(this);
 	}
 
-	//==========================================================================
-	/**
-	 *	Just a main method to check API methods.
-	 */
-	//==========================================================================
-	public static void main (String args[])
-	{
-		IDeviceProxyDAO deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
-		// we call the main class of the implementation
-		deviceProxyDAO.main(args);
-	}
-
 	// ==========================================================================
 	/**
 	 * Subscribe to an event.
@@ -1874,8 +1863,6 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	 *	(Not referenced and Garbage collector called)
 	 */
 	//==========================================================================
-
-	int	factory_instance_counter = 1;
 	protected void finalize()
 	{
 		if (proxy_lock_cnt>0)
@@ -1885,5 +1872,176 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 		}
 		try { super.finalize(); } catch(Throwable e) {}
 	}
+
+
+
+    //===================================================================
+    //===================================================================
+    public int getTangoVersion() throws DevFailed {
+
+        //  Get idl for administrative device
+        int adminIdl = get_adm_dev().get_idl_version();
+
+        //  Get the command list
+        CommandInfo[] commandInfoList = get_adm_dev().command_list_query();
+
+        //  Check between idl and commands
+        switch (adminIdl) {
+            case 1: return 100;
+            case 2: return 200;
+            case 3:
+                //  IDL 3 is for Tango 5 and 6. Unfortunately,
+                //  there is no way from the client side to determmine if it is Tango 5 or 6.
+                //  The best we can do is to get the info that it is Tango 5.2 (or above)
+               for (CommandInfo commandInfo : commandInfoList) {
+                    if (commandInfo.cmd_name.equals("QueryWizardClassProperty"))
+                        return 520;
+                }
+                //  Not found
+                return 500;
+            case 4:
+                //  try if tango 8.1 (Confirm for several events)
+                for (CommandInfo commandInfo : commandInfoList) {
+                    if (commandInfo.cmd_name.equals("EventConfirmSubscription"))
+                        return 810;
+                }
+                //  try if tango 8.0 (ZMQ system)
+                for (CommandInfo commandInfo : commandInfoList) {
+                    if (commandInfo.cmd_name.equals("ZmqEventSubscriptionChange"))
+                        return 800;
+                }
+                return 700;
+        }
+
+        //  Not found
+        return 0;
+    }
+    //===================================================================
+    //===================================================================
+    public String toString() {
+        StringBuilder   sb = new StringBuilder();
+        try {
+            DeviceInfo  deviceInfo = get_info();
+            sb.append(deviceInfo).append('\n');
+            DevInfo_3   devInfo3   = info_3();
+            sb.append("Class:       ").append(devInfo3.dev_class).append('\n');
+            sb.append("Server:      ").append(devInfo3.server_id).append('\n');
+            sb.append("Host:        ").append(devInfo3.server_host).append('\n');
+            sb.append(devInfo3.doc_url).append('\n');
+            sb.append('\n');
+            sb.append("IDL:   ").append(get_idl_version()).append('\n');
+
+            int release = getTangoVersion();
+            sb.append("Tango: ").append(String.format("%1.1f", (0.01*release)));
+        }
+        catch (DevFailed e) {
+            sb.append("\n").append(e.errors[0].desc);
+        }
+        return sb.toString();
+    }
+
+    //==========================================================================
+    /**
+     *	Just a main method to check API methods.
+     */
+    //==========================================================================
+    public static void main (String args[])
+    {
+        String devname = null;
+        String cmdname = null;
+        try {
+            cmdname = args[0];
+            devname = args[1];
+        } catch (final Exception e) {
+            if (cmdname == null) {
+                System.out.println("Usage :");
+                System.out.println("fr.esrf.TangoApi.DeviceProxy  cmdname devname");
+                System.out.println("	- info : Display device info.");
+                System.out.println("	- cmdname : command name (ping, state, status, unexport...)");
+                System.out.println("	- devname : device name to send command.");
+            } else {
+                System.out.println("Device name ?");
+            }
+            System.exit(0);
+        }
+        try {
+            // Check if wildcard
+            String[] devnames;
+            DeviceProxy[] deviceProxies;
+            if (!devname.contains("*")) {
+                devnames = new String[1];
+                devnames[0] = devname;
+            } else {
+                devnames = ApiUtil.get_db_obj().getDevices(devname);
+            }
+
+            // Create DeviceProxy Objects
+            deviceProxies = new DeviceProxy[devnames.length];
+            for (int i = 0; i < devnames.length; i++) {
+                deviceProxies[i] = new DeviceProxy(devnames[i]);
+            }
+
+            if (cmdname.equals("info")) {
+                for (DeviceProxy deviceProxy : deviceProxies) {
+                    System.out.println(deviceProxy + "\n");
+                }
+            }
+            else
+            if (cmdname.equals("ping")) {
+                // noinspection InfiniteLoopStatement
+                while (true) {
+                    for (int i = 0; i < deviceProxies.length; i++) {
+                        try {
+                            final long t = deviceProxies[i].ping();
+                            System.out.println(devnames[i] + " is alive  (" + t / 1000 + " ms)");
+                        } catch (final DevFailed e) {
+                            System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                        }
+                    }
+                    if (deviceProxies.length > 1) {
+                        System.out.println();
+                    }
+                    try { Thread.sleep(1000); } catch (final InterruptedException e) { /* */ }
+                }
+            } else if (cmdname.equals("status")) {
+                for (int i = 0; i < deviceProxies.length; i++) {
+                    try {
+                        System.out.println(devnames[i] + " - " + deviceProxies[i].status());
+                    } catch (final DevFailed e) {
+                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                    }
+                }
+            } else if (cmdname.equals("state")) {
+                for (int i = 0; i < deviceProxies.length; i++) {
+                    try {
+                        System.out
+                                .println(devnames[i] + " is " + ApiUtil.stateName(deviceProxies[i].state()));
+                        /*
+                        * DeviceAttribute da = dev[i].read_attribute("State");
+                        * DevState st = da.extractDevStateArray()[0];
+                        * System.out.println(devnames[i] + " is " +
+                        * ApiUtil.stateName(st));
+                        */
+                    } catch (final DevFailed e) {
+                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                    }
+                }
+            } else if (cmdname.equals("unexport")) {
+                for (int i = 0; i < deviceProxies.length; i++) {
+                    try {
+                        deviceProxies[i].unexport_device();
+                        System.out.println(devnames[i] + " unexported !");
+                    } catch (final DevFailed e) {
+                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                    }
+                }
+            } else {
+                System.out.println(cmdname + " ?   Unknow command !");
+            }
+        } catch (final DevFailed e) {
+            Except.print_exception(e);
+            // e.printStackTrace();
+        }
+    }
 }
 
