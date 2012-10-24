@@ -2011,6 +2011,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	{
 		if (!database.isAccess_checked()) checkAccess(database);
 
+        //  Check if channel name i a full url
+        channel_name = new TangoUrl(channel_name).devname;
 		DeviceData	argin = new DeviceData();
 		argin.insert(channel_name);
 		DeviceData	argout = command_inout(database, "DbImportEvent", argin);

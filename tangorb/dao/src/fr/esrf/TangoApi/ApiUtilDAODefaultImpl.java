@@ -244,6 +244,11 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             final String str = checkORBgiopMaxMsgSize();
             // System.out.println("Set jacorb.maxManagedBufSize  to  " + str);
             props.put("jacorb.maxManagedBufSize", str);
+			
+			//	Check for max threads
+			final String nbThreads = System.getProperty("max_receptor_threads");
+			if (nbThreads!=null)
+				props.put("jacorb.connection.client.max_receptor_threads", nbThreads);
 
             // Set jacorb verbosity at minimum value
             props.put("jacorb.config.log.verbosity", "0");
@@ -455,14 +460,17 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	}
     }
 
+
     private static void removePendingReplies(final Delegate delegate) {
 	// try to solve a memory leak. pending_replies is still growing when
 	// server is in timeout
+/*****
+	Removed for JacORB-3
 	if (!delegate.get_pending_replies().isEmpty()) {
 	    delegate.get_pending_replies().clear();
 	}
+*/
     }
-
     public static void removePendingRepliesOfRequest(final Request request) {
 	final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
 		.target())._get_delegate();
