@@ -34,6 +34,7 @@
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.Tango.DevInfo_3;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 
@@ -42,6 +43,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
 
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**
@@ -59,7 +61,11 @@ import java.util.Vector;
  */
 
 public class ApiUtil {
+    public static String revNumber =
+            "Release 8.1.0  -  Wed Oct 24 14:28:58 CEST 2012";
+    
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
+    private static int  hwmValue = 0;
 
     public IApiUtilDAO getApiUtilDAO() {
 	    return apiutilDAO;
@@ -528,7 +534,6 @@ public class ApiUtil {
      * @param bufferSize the expected buffer size.
      */
 	//===============================================================
-    private static int  hwmValue = 0;
     public static void setEventBufferHWM(int bufferSize) {
         hwmValue = bufferSize;
     }
@@ -552,6 +557,48 @@ public class ApiUtil {
         }
 
     }
-    // ===================================================================
-    // ===================================================================
+    //===================================================================
+    /**
+     * Return the TangORB version as an integer like
+     *      803  for "Release 8.0.3"
+     *
+     * @return the TangORB version.
+     */
+    //===================================================================
+    public static int getVersionAsInteger() {
+        StringTokenizer stk = new StringTokenizer(revNumber);
+        String release = null;
+        for (int i=0 ; stk.hasMoreTokens() ; i++) {
+            String s = stk.nextToken();
+            if (i==1) {
+                release = s;
+                break;
+            }
+        }
+        stk = new StringTokenizer(release, ".");
+        release = "";
+        while (stk.hasMoreTokens()) {
+            release += stk.nextToken();
+        }
+        int version = 0;
+        try {
+            version = Integer.parseInt(release);
+        } catch (NumberFormatException e) {
+            //
+        }
+        return version;
+    }
+    //===================================================================
+    /**
+     * Return the TangORB version as a String like
+     *      "Release 8.0.3  -  Thu Oct 11 15:39:36 CEST 2012"
+     *
+     * @return the TangORB version as a String
+     */
+    //===================================================================
+    public static String getVersionAsString() {
+         return revNumber;
+    }
+    //===================================================================
+    //===================================================================
 }

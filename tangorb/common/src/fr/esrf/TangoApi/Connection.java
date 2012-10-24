@@ -290,6 +290,11 @@ public class Connection implements ApiDefs {
 	}
 	// ===================================================================
 	// ===================================================================
+    public TangoUrl getUrl() {
+        return url;
+    }
+	// ===================================================================
+	// ===================================================================
 	public synchronized void build_connection() throws DevFailed {
 		iConnection.build_connection(this);
 	}

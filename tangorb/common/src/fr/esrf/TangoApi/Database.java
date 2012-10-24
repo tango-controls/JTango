@@ -1288,7 +1288,6 @@ public class Database extends Connection {
 	public String[] get_device_alias_list(String wildcard) throws DevFailed {
 		return databaseDAO.get_device_alias_list(this, wildcard);
 	}
-    // ToDo
     // ==========================================================================
     /**
      * Query the database for an alias for the specified device.
@@ -1380,7 +1379,6 @@ public class Database extends Connection {
 		return databaseDAO.get_attribute_alias_list(this, wildcard);
 	}
 
-    //  ToDo
     // ==========================================================================
     /**
      * Query the database for an alias for the specified attribute.
