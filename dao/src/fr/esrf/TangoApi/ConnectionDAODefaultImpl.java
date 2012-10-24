@@ -63,6 +63,8 @@ import fr.esrf.TangoDs.TangoConst;
 
 public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
+    private boolean firstTime = true;
+
     // ===================================================================
     // ===================================================================
     public Device get_device(final Connection connection) {
@@ -96,7 +98,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		connection.url = new TangoUrl();
 		connection.setDevice_is_dbase(true);
 		connection.transparent_reconnection = true; // Always true for Database
-		// url.trace();
+		//connection.url.trace();
 
 		ApiUtil.get_orb();
 		connect_to_dbase(connection);
@@ -792,15 +794,12 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * Send a command to a device server.
      * 
      * @param connection the connection object
-     * @param command
-     *            Command name to send to the device.
-     * @param argin
-     *            input command argument.
+     * @param command Command name to send to the device.
+     * @param argin input command argument.
      * @return the output argument of the command.
      * @throws DevFailed
      */
     // ===========================================================
-    private boolean firstTime = true;
     public DeviceData command_inout(final Connection connection, final String command,
 	    	final DeviceData argin) throws DevFailed {
 		Any received = null;
@@ -1150,26 +1149,27 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
     // ==========================================================================
     /**
-     * return the administartion device name.
+     * return the administration device name.
      */
     // ==========================================================================
     public String adm_name(final Connection connection) throws DevFailed {
-	checkIfTango(connection, "adm_name");
+        checkIfTango(connection, "adm_name");
 
-	build_connection(connection);
+        build_connection(connection);
 
-	String name = null;
-	try {
-	    name = connection.device.adm_name();
-	} catch (final Exception e) {
-	    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(connection);
-	    throw_dev_failed(connection, e, "adm_name", false);
-	}
+        String name = null;
+        try {
+            name = connection.device.adm_name();
+        } catch (final Exception e) {
+            ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(connection);
+            throw_dev_failed(connection, e, "adm_name", false);
+        }
 
+        if (name !=null &&  !name.startsWith("tango://") && !name.startsWith("//"))
+            name = "tango://" + connection.url.host + ":" + connection.url.port + "/" + name;
 		// If no database, add syntax to be used in DeviceProxy constructor.
 		if (!connection.url.use_db) {
-	  	  name = "tango://" + connection.url.host + ":" + connection.url.port + "/" + name
-		 	   + "#dbase=no";
+            name += "#dbase=no";
 		}
 		return name;
     }
