@@ -655,7 +655,8 @@ public class Database extends Connection {
 	 * 
 	 * @param name Object name.
 	 * @param propname list of property names.
-	 * @return property in DbDatum object.
+	 * @param forced force TAC if true.
+     * @return property in DbDatum object.
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
