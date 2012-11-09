@@ -81,27 +81,33 @@ public class TangoAttConfig extends EventDispatcher implements java.io.Serializa
 
     //=======================================================================
     //=======================================================================
-    public void dispatch_event(final EventData event_data) {
-        final TangoAttConfig tg = this;
-        Runnable do_work_later = new Runnable() {
-            public void run() {
-                TangoAttConfigEvent change_event = new TangoAttConfigEvent(tg, event_data);
-                fireTangoAttConfigEvent(change_event);
-            }
-        };
-        SwingUtilities.invokeLater(do_work_later);
-    }
+    public void dispatch_event(final EventData eventData) {
+        final TangoAttConfig tangoAttConfig = this;
+        if (EventUtil.graphicAvailable()) {
+            //   Causes doRun.run() to be executed asynchronously
+            //      on the AWT event dispatching thread.
+            Runnable do_work_later = new Runnable() {
+                public void run() {
+                    fireTangoAttConfigEvent(tangoAttConfig,eventData);
+                }
+            };
+            SwingUtilities.invokeLater(do_work_later);
+        }
+        else
+            fireTangoAttConfigEvent(tangoAttConfig, eventData);
+   }
 
     //=======================================================================
     //=======================================================================
-    private void fireTangoAttConfigEvent(TangoAttConfigEvent att_config_event) {
+    private void fireTangoAttConfigEvent(TangoAttConfig tangoAttConfig, EventData eventData) {
+        TangoAttConfigEvent tangoAttConfigEvent = new TangoAttConfigEvent(tangoAttConfig, eventData);
         // Guaranteed to return a non null array
         Object[] listeners = event_listeners.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == ITangoAttConfigListener.class) {
-                ((ITangoAttConfigListener) listeners[i + 1]).attConfig(att_config_event);
+                ((ITangoAttConfigListener) listeners[i + 1]).attConfig(tangoAttConfigEvent);
             }
         }
     }

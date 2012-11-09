@@ -81,27 +81,34 @@ public class TangoQualityChange extends EventDispatcher implements java.io.Seria
     }
 	//==============================================================
 	//==============================================================
-	public void dispatch_event(final EventData event_data) {
-		final TangoQualityChange tg = this;
-		Runnable do_work_later = new Runnable() {
-	        public void run() {
-				TangoQualityChangeEvent change_event = new TangoQualityChangeEvent(tg, event_data);
-				fireTangoQualityChangeEvent(change_event);
-			}
-		};
-	    SwingUtilities.invokeLater(do_work_later);
-    }
+	public void dispatch_event(final EventData eventData) {
+		final TangoQualityChange tangoQualityChange = this;
+        if (EventUtil.graphicAvailable()) {
+            //   Causes doRun.run() to be executed asynchronously
+            //      on the AWT event dispatching thread.
+            Runnable do_work_later = new Runnable() {
+                public void run() {
+                    fireTangoQualityChangeEvent(tangoQualityChange, eventData);
+                }
+            };
+            SwingUtilities.invokeLater(do_work_later);
+        }
+        else
+            fireTangoQualityChangeEvent(tangoQualityChange, eventData);
+}
 
  	//==============================================================
 	//==============================================================
-    private void fireTangoQualityChangeEvent(TangoQualityChangeEvent quality_change_event) {
+    private void fireTangoQualityChangeEvent(TangoQualityChange tangoQualityChange, EventData eventData) {
+        TangoQualityChangeEvent tangoQualityChangeEvent =
+                new TangoQualityChangeEvent(tangoQualityChange, eventData);
         // Guaranteed to return a non null array
         Object [] listeners = event_listeners.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
         for (int i = listeners.length-2 ; i>=0 ; i-=2 ) {
             if (listeners[i] == ITangoQualityChangeListener.class) {
-                ((ITangoQualityChangeListener)listeners[i+1]).qualityChange(quality_change_event);
+                ((ITangoQualityChangeListener)listeners[i+1]).qualityChange(tangoQualityChangeEvent);
             }
         }
     }
