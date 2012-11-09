@@ -37,6 +37,8 @@ package fr.esrf.TangoApi.events;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 
+import javax.swing.*;
+
 
 /**
  *
@@ -82,21 +84,33 @@ public class TangoUser extends EventDispatcher implements java.io.Serializable {
     
     //=======================================================================
     //=======================================================================
-    public void dispatch_event(EventData event_data) {
-            TangoUserEvent user_event = new TangoUserEvent(this,event_data);
-            fireTangoUserEvent(user_event);
+    public void dispatch_event(final EventData eventData) {
+        final TangoUser tangoUser = this;
+        if (EventUtil.graphicAvailable()) {
+            //   Causes doRun.run() to be executed asynchronously
+            //      on the AWT event dispatching thread.
+            Runnable do_work_later = new Runnable() {
+                public void run() {
+                    fireTangoUserEvent(tangoUser, eventData);
+                }
+            };
+            SwingUtilities.invokeLater(do_work_later);
+        }
+        else
+            fireTangoUserEvent(tangoUser , eventData);
     }
 
     //=======================================================================
     //=======================================================================
-    private void fireTangoUserEvent(TangoUserEvent user_event) {
+    private void fireTangoUserEvent(TangoUser tangoUser, EventData eventData) {
+        TangoUserEvent tangoUserEvent = new TangoUserEvent(tangoUser, eventData);
         // Guaranteed to return a non null array
         Object [] listeners = event_listeners.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
         for (int i = listeners.length-2 ; i>=0 ; i-=2 ) {
             if (listeners[i] == ITangoUserListener.class) {
-                ((ITangoUserListener)listeners[i+1]).user(user_event);
+                ((ITangoUserListener)listeners[i+1]).user(tangoUserEvent);
             }
         }
     }

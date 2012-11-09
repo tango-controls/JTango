@@ -81,31 +81,36 @@ public class TangoPeriodic extends EventDispatcher implements java.io.Serializab
     }
 	//==============================================================
 	//==============================================================
-	public void dispatch_event(final EventData event_data) {
-		final TangoPeriodic tg = this;
-		Runnable do_work_later = new Runnable() {
-	        public void run() {
-				TangoPeriodicEvent periodic_event = new TangoPeriodicEvent(tg, event_data);
-				fireTangoPeriodicEvent(periodic_event);
-			}
-		};
-	    SwingUtilities.invokeLater(do_work_later);
+	public void dispatch_event(final EventData eventData) {
+		final TangoPeriodic tangoPeriodic = this;
+        if (EventUtil.graphicAvailable()) {
+                //   Causes doRun.run() to be executed asynchronously
+                //      on the AWT event dispatching thread.
+            Runnable do_work_later = new Runnable() {
+                public void run() {
+                    fireTangoPeriodicEvent(tangoPeriodic, eventData);
+                }
+            };
+            SwingUtilities.invokeLater(do_work_later);
+        }
+        else
+            fireTangoPeriodicEvent(tangoPeriodic, eventData);
     }
 
 	//==============================================================
 	//==============================================================
-    private void fireTangoPeriodicEvent(TangoPeriodicEvent periodic_event) {
+    private void fireTangoPeriodicEvent(TangoPeriodic tangoPeriodic, EventData eventData) {
+        TangoPeriodicEvent tangoPeriodicEvent = new TangoPeriodicEvent(tangoPeriodic, eventData);
         // Guaranteed to return a non null array
         Object [] listeners = event_listeners.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
         for (int i = listeners.length-2 ; i>=0 ; i-=2 ) {
             if (listeners[i] == ITangoPeriodicListener.class) {
-                ((ITangoPeriodicListener)listeners[i+1]).periodic(periodic_event);
+                ((ITangoPeriodicListener)listeners[i+1]).periodic(tangoPeriodicEvent);
             }
         }
     }
-    
 	//==============================================================
 	//==============================================================
 
