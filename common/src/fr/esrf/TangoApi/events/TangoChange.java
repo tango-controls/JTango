@@ -84,20 +84,26 @@ public class TangoChange extends EventDispatcher implements java.io.Serializable
 
     //=======================================================================
     //=======================================================================
-    public void dispatch_event(final EventData event_data) {
-        final TangoChange tg = this;
-        Runnable do_work_later = new Runnable() {
-            public void run() {
-                TangoChangeEvent change_event = new TangoChangeEvent(tg, event_data);
-                fireTangoChangeEvent(change_event);
-            }
-        };
-        SwingUtilities.invokeLater(do_work_later);
+    public void dispatch_event(final EventData eventData) {
+        final TangoChange tangoChange = this;
+        if (EventUtil.graphicAvailable()) {
+            //   Causes doRun.run() to be executed asynchronously
+            //      on the AWT event dispatching thread.
+            Runnable do_work_later = new Runnable() {
+                public void run() {
+                    fireTangoChangeEvent(tangoChange, eventData);
+                }
+            };
+            SwingUtilities.invokeLater(do_work_later);
+        }
+        else
+            fireTangoChangeEvent(tangoChange, eventData);
     }
 
     //=======================================================================
     //=======================================================================
-    private void fireTangoChangeEvent(TangoChangeEvent change_event) {
+    private void fireTangoChangeEvent(TangoChange tangoChange, EventData eventData) {
+        TangoChangeEvent change_event = new TangoChangeEvent(tangoChange, eventData);
         // Guaranteed to return a non null array
         Object[] listeners = event_listeners.getListenerList();
         // Process the listeners last to first, notifying
