@@ -96,8 +96,9 @@ public class TangoChange extends EventDispatcher implements java.io.Serializable
             };
             SwingUtilities.invokeLater(do_work_later);
         }
-        else
+        else {
             fireTangoChangeEvent(tangoChange, eventData);
+        }
     }
 
     //=======================================================================
