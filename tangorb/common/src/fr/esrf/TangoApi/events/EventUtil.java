@@ -34,6 +34,10 @@
 
 package fr.esrf.TangoApi.events;
 
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Class Description: Utility methods for event classes
  * 
@@ -45,6 +49,7 @@ public class EventUtil {
 
     private static boolean graphicIsAvailable = true;
     private static boolean graphicAvailableChecked = false;
+    private static final Object  monitor = new Object();
 
     //===================================================================
     /**
@@ -55,15 +60,21 @@ public class EventUtil {
      */
     //===================================================================
     public static boolean graphicAvailable() {
-        if (!graphicAvailableChecked) {
-            try {
-                java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
-            }
-            catch(InternalError e) {
-                //System.err.println(e + "\n" + "Graphics Environment not available");
-                graphicIsAvailable = false;
-            }
-            graphicAvailableChecked = true;
+        synchronized (monitor) {
+            if (!graphicAvailableChecked) {
+                try {
+                    java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+                }
+                catch(InternalError e) {
+                    graphicIsAvailable = false;
+                    //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
+                }
+                catch(Exception e) {
+                    graphicIsAvailable = false;
+                    //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
+                }
+                graphicAvailableChecked = true;
+           }
         }
         return graphicIsAvailable;
     }
