@@ -259,8 +259,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     // ===================================================================
     public synchronized void build_connection(final Connection connection) throws DevFailed {
-		if (connection.device == null && connection.device_2 == null && connection.device_3 == null
-			&& connection.device_4 == null) {
+		if (connection.device == null && connection.device_2 == null &&
+                connection.device_3 == null && connection.device_4 == null) {
 	    		if (connection.devname != null) {
 
 				final long t = System.currentTimeMillis();
@@ -506,7 +506,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		} else {
 	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
 		}
-
 		// Check if device must be imported directly from IOR
         String  local_ior = null;
         boolean ior_read  = false;
@@ -516,8 +515,9 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                  local_ior = info.ior;
                  ior_read = true;
 	    	} else {
-                Except.throw_connection_failed("TangoApi_DEVICE_NOT_EXPORTED", connection.devname
-                    + " Not Exported !", "Connection(" + connection.devname + ")");
+                Except.throw_connection_failed("TangoApi_DEVICE_NOT_EXPORTED",
+                        connection.devname + " Not Exported !",
+                        "Connection(" + connection.devname + ")");
              }
 		} else {
 	    	local_ior = connection.ior;
@@ -654,14 +654,31 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     // ===================================================================
     private void set_obj_timeout(final Connection connection, final int millis) {
+
 		// Change Jacorb policy for timeout
-		final org.omg.CORBA.Policy p = new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(
-			10000 * millis);
-		connection.getObj()._set_policy_override(new Policy[] { p },
-			org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
+		final org.omg.CORBA.Policy p =
+			new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
+		org.omg.CORBA.Object    obj = connection.getObj()._set_policy_override(
+                new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
+
+        //  Set new instances to connection object
+        connection.setObj(obj);
+        switch (connection.idl_version) {
+            case 4:
+                connection.device_4 = Device_4Helper.narrow(obj);
+                break;
+            case 3:
+                connection.device_3 = Device_3Helper.narrow(obj);
+                break;
+            case 2:
+                connection.device_2 = Device_2Helper.narrow(obj);
+                break;
+            default:
+                connection.device = DeviceHelper.narrow(obj);
+                break;
+        }
 
 		// Save new timeout value
-		// ---------------------------------
 		connection.setDev_timeout(millis);
     }
 
@@ -669,10 +686,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     /**
      * Change the timeout value for a device call.
      * 
-     * @param millis
-     *            New value of the timeout in milliseconds.
-     * @throws DevFailed
-     *             if orb.create_policy throws an org.omg.CORBA.PolicyError
+     * @param millis  New value of the timeout in milliseconds.
+     * @throws DevFailed  if orb.create_policy throws an org.omg.CORBA.PolicyError
      *             exception.
      */
     // ===================================================================
