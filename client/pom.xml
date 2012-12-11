@@ -78,10 +78,6 @@
       <version>3.1.1</version>
     </dependency>
     <dependency>
-      <groupId>commons-math</groupId>
-      <artifactId>commons-math</artifactId>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
