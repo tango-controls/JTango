@@ -19,6 +19,7 @@ public final class Properties {
      * 
      * @see RetriableTask
      * @param delay
+     *            delay in ms
      */
     public static void setDelay(final int delay) {
 	Properties.delay = delay;
