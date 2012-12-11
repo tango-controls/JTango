@@ -27,6 +27,7 @@ public final class DatabaseCache implements ICachableDatabase {
     private boolean isCacheAvailable;
     private final NoCacheDatabase dbDevice;
     private final String version;
+    private final Connection database;
 
     public DatabaseCache(final Connection database, final NoCacheDatabase dbDevice) throws DevFailed {
 	this.dbDevice = dbDevice;
@@ -39,12 +40,14 @@ public final class DatabaseCache implements ICachableDatabase {
 	} else {
 	    isCacheAvailable = false;
 	}
-	serverCache = new ServerCache(database);
+	this.database = database;
+
     }
 
     @Override
     public void loadCache(final String serverName, final String hostName) throws DevFailed {
 	if (isCacheAvailable) {
+	    serverCache = new ServerCache(database);
 	    serverCache.fillCache(serverName, hostName);
 	}
     }
