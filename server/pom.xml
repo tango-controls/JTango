@@ -124,11 +124,6 @@
       <artifactId>JTangoCommons</artifactId>
     </dependency>
     <dependency>
-      <groupId>jacorb</groupId>
-      <artifactId>jacorb</artifactId>
-      <version>2.3.1jboss.patch01-brew</version>
-    </dependency>
-    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.0.0</version>
