@@ -302,10 +302,9 @@ public class NotifdEventConsumer extends EventConsumer
 
             if (dbase != null) {
                 //	Check if info have been set to the device
-                adminDevice = DeviceProxyFactory.get(channelName);
+                adminDevice = DeviceProxyFactory.get(channelName, dbase.getUrl().getTangoHost());
                 received = adminDevice.get_evt_import_info();
                 if (received == null || !received.channel_exported) {
-                    //System.out.println("dbase.import_event("+channelName + ")");
                     received = dbase.import_event(channelName);
                 }
             } else {
@@ -325,8 +324,9 @@ public class NotifdEventConsumer extends EventConsumer
             //Except.print_exception(df);
             if (dbase != null)
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
-                        channelName + " has no event channel defined in the database\n"
-                                + " May be the server is not running.",
+                        channelName + " has no event channel defined in the database " +
+                                dbase.getUrl().getTangoHost() +
+                                "\nMay be the server is not running.",
                         "EventConsumer.connect_event_channel");
             else
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
@@ -362,6 +362,12 @@ public class NotifdEventConsumer extends EventConsumer
             org.omg.CORBA.Object event_channel_obj = orb.string_to_object(received.channel_ior);
             try {
                 eventChannel = EventChannelHelper.narrow(event_channel_obj);
+                //  Set timeout on eventChannel
+                final org.omg.CORBA.Policy p =
+                        new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * 3000);
+                eventChannel._set_policy_override(
+                        new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
+
             } catch (RuntimeException e) {
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
                         "Failed to connect notification daemon (hint : make sure the notifd daemon is running on this host",
@@ -460,8 +466,9 @@ public class NotifdEventConsumer extends EventConsumer
         if (!channel_map.containsKey(channelName)) {
             if (device_proxy.use_db())
                 dbase = device_proxy.get_db_obj();
-            ConnectionStructure connectionStructure = new ConnectionStructure(
-                    channelName, deviceName, attributeName, eventName, dbase, deviceData, false);
+            ConnectionStructure connectionStructure =
+                    new ConnectionStructure(device_proxy.get_tango_host(), channelName,
+                        deviceName, attributeName, eventName, dbase, deviceData, false);
             connect_event_channel(connectionStructure);
         } else if (device_proxy.use_db()) {
             dbase = device_proxy.get_db_obj();
@@ -484,7 +491,8 @@ public class NotifdEventConsumer extends EventConsumer
     protected synchronized void connect_event_channel(ConnectionStructure cs) throws DevFailed {
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
-        DeviceProxy adminDevice = DeviceProxyFactory.get(cs.channelName);
+        DeviceProxy adminDevice = DeviceProxyFactory.get(
+                cs.channelName, cs.dbase.getUrl().getTangoHost());
         DbEventImportInfo received = getEventImportInfo(cs.channelName, cs.dbase, adminDevice);
 
         //	Keep host name without Fully Qualify Domain Name
@@ -739,7 +747,8 @@ public class NotifdEventConsumer extends EventConsumer
                 //	reset the event import info stored in DeviceProxy object
                 //	Until today, this feature is used only by Astor (import with external info).
                 try {
-                    DeviceProxyFactory.get(name).set_evt_import_info(null);
+                    DeviceProxyFactory.get(name,
+                            eventChannelStruct.dbase.getUrl().getTangoHost()).set_evt_import_info(null);
                 } catch (DevFailed e) {
                     System.err.println("API received a DevFailed :	" + e.errors[0].desc);
                 }
@@ -922,6 +931,7 @@ public class NotifdEventConsumer extends EventConsumer
                     EventChannelStruct event_channel_struct = channel_map.get(name);
                     event_channel_struct.adm_device_proxy.ping();
                     connect_event_channel(new ConnectionStructure(
+                            callback_struct.device.get_tango_host(),
                             name, event_channel_struct.dbase, true));
                     ret = true;
                 } catch (DevFailed e1) {
