@@ -1619,6 +1619,19 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	}
 
 	// ==========================================================================
+	// ==========================================================================
+	private static boolean useEvents = true;
+    private static boolean useEventsChecked = false;
+    private boolean useEvents() {
+        if (!useEventsChecked) {
+            String s = System.getenv("UseEvents");
+            if (s!=null && s.equals("false"))
+                useEvents = false;
+            useEventsChecked = true;
+        }
+        return useEvents;
+    }
+	// ==========================================================================
 	/**
 	 * Subscribe to an event.
 	 *
@@ -1630,6 +1643,8 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	public int subscribe_event(String attr_name, int event, CallBack callback, String[] filters)
 				throws DevFailed
 	{
+        if (!useEvents())
+            Except.throw_exception("NO_EVENT", "Event system not available", "DeviceProxy.subscribe_event()");
 		return deviceProxy.subscribe_event(this, attr_name, event, callback, filters, false);
 	}
 
@@ -1646,6 +1661,8 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	public int subscribe_event(String attr_name, int event, CallBack callback, String[] filters, boolean stateless)
 				throws DevFailed
 	{
+        if (!useEvents())
+            Except.throw_exception("NO_EVENT", "Event system not available", "DeviceProxy.subscribe_event()");
 		return deviceProxy.subscribe_event(this, attr_name, event, callback, filters, stateless);
 	}
 	// ==========================================================================
@@ -1661,6 +1678,8 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	public int subscribe_event(String attr_name, int event, int max_size, String[] filters, boolean stateless)
 				throws DevFailed
 	{
+        if (!useEvents())
+            Except.throw_exception("NO_EVENT", "Event system not available", "DeviceProxy.subscribe_event()");
 		return deviceProxy.subscribe_event(this, attr_name, event, max_size, filters, stateless);
 	}
 	// ==========================================================================
