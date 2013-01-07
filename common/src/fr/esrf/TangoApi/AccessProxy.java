@@ -35,14 +35,14 @@
 package fr.esrf.TangoApi;
 
 
-/** 
+/**
  *	This class is extends TangoApi.DeviceProxy 
  *	to manage Tango access device.
  *	 - Check if control access is requested.
  *	 - Check who is the user and the host.
  *	 - Check access for this user, this host and the specified device.
  *
- * @author  verdier
+ * @author verdier
  */
 
 import fr.esrf.Tango.DevFailed;
@@ -53,179 +53,171 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 
-class  AccessProxy extends DeviceProxy
-{
-	protected static String		user      = null;
-	protected static String		hostAddr  = null;
-	protected boolean			forced    = false;
+class AccessProxy extends DeviceProxy {
+    protected static String user = null;
+    protected static String hostAddr = null;
+    protected boolean forced = false;
     private static boolean muliIP = true;
-	/**
-	 *	Device rights table
-	 */
-	protected Hashtable<String, String> dev_right_table = null;
-	/**
-	 *	Allowed Commands for a class table.
-	 */
-	protected Hashtable<String, String[]> allowed_cmd_table = null;
-	//===============================================================
-	/**
-	 *	Constructor for Access device proxy
-	 *
-	 *	@param devname	access device name
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed on access device
-	 */
-	//===============================================================
-	AccessProxy(String devname) throws DevFailed
-	{
-		//	Build device proxy and check if present.
-		super(devname, false);
+    /**
+     * Device rights table
+     */
+    protected Hashtable<String, String> dev_right_table = null;
+    /**
+     * Allowed Commands for a class table.
+     */
+    protected Hashtable<String, String[]> allowed_cmd_table = null;
+    //===============================================================
 
-		//	Check if forced mode
-		forced = TangoEnv.isSuperTango();
-		dev_right_table = new Hashtable<String, String>();
-		allowed_cmd_table = new Hashtable<String, String[]>();
-		System.out.println(devname + " -> Forced to write access = " + forced);
+    /**
+     * Constructor for Access device proxy
+     *
+     * @param devname access device name
+     * @throws fr.esrf.Tango.DevFailed in case of connection failed on access device
+     */
+    //===============================================================
+    AccessProxy(String devname) throws DevFailed {
+        //	Build device proxy and check if present.
+        super(devname, false);
+
+        //	Check if forced mode
+        forced = TangoEnv.isSuperTango();
+        dev_right_table = new Hashtable<String, String>();
+        allowed_cmd_table = new Hashtable<String, String[]>();
+        System.out.println(devname + " -> Forced to write access = " + forced);
 
         if (!forced) {
             set_transparency_reconnection(false);
             ping();
             set_transparency_reconnection(true);
         }
-	}
-	//===============================================================
-	/**
-	 *	Check access for specified device
-	 *
-	 *	@param devname	device name to check access
+    }
+    //===============================================================
+
+    /**
+     * Check access for specified device
+     *
+     * @param devName device name to check access
      * @return the access mode found (TangoConst.ACCESS_WRITE or TangoConst.ACCESS_RAED)
      * @throws fr.esrf.Tango.DevFailed in case of connection failed on access device
-	 */
-	//===============================================================
-	private static Object monitor = new Object();
-	int checkAccessControl(String devname) throws DevFailed
-	{
-		if (forced)
-			return TangoConst.ACCESS_WRITE;
+     */
+    //===============================================================
+    int checkAccessControl(String devName) throws DevFailed {
+        if (forced)
+            return TangoConst.ACCESS_WRITE;
 
-		synchronized (monitor) {
-			//	Check if already tested.
-			String	str = dev_right_table.get(devname);
-			if (str!=null) {
-				//System.out.println(devname + " AccessControl already checked.");
-				if (str.equals("write"))
-					return TangoConst.ACCESS_WRITE;
-				else
-					return TangoConst.ACCESS_READ;
-			}
-			//else
-			//	System.out.println("Check AccessControl for " + devname);
+        synchronized (monitor) {
+            //	Check if already tested.
+            String str = dev_right_table.get(devName);
+            if (str != null) {
+                //System.out.println(devname + " AccessControl already checked.");
+                if (str.equals("write"))
+                    return TangoConst.ACCESS_WRITE;
+                else
+                    return TangoConst.ACCESS_READ;
+            }
+            //else
+            //	System.out.println("Check AccessControl for " + devname);
 
-			try {
-				//	If not already done check user name
-				if (user==null)
-					user = System.getProperty("user.name").toLowerCase();
-            	hostAddr = ApiUtil.getHostAddress();
+            try {
+                //	If not already done check user name
+                if (user == null)
+                    user = System.getProperty("user.name").toLowerCase();
+                hostAddr = ApiUtil.getHostAddress();
 
-				DeviceData	argin = new DeviceData();
-            	String      rights;
-            	if (muliIP) {
-                	Vector<String>  addresses = ApiUtil.getHostAddresses();
-                	String[]    array = new String[addresses.size()+2];
-                	int i = 0;
-                	array[i++] = user;
-                	array[i++] = devname;
-                	for (String address : addresses) {
-                    	//System.out.println(" Checcking for : " + address);
-                    	array[i++] = address;
-                	}
+                DeviceData argin = new DeviceData();
+                String rights;
+                if (muliIP) {
+                    Vector<String> addresses = ApiUtil.getHostAddresses();
+                    String[] array = new String[addresses.size() + 2];
+                    int i = 0;
+                    array[i++] = user;
+                    array[i++] = devName;
+                    for (String address : addresses) {
+                        //System.out.println(" Checcking for : " + address);
+                        array[i++] = address;
+                    }
 
-                	argin.insert(array);
-                	rights = command_inout("GetAccessForMultiIP", argin).extractString();
-            	}
+                    argin.insert(array);
+                    rights = command_inout("GetAccessForMultiIP", argin).extractString();
+                } else {
+                    argin.insert(new String[]{user, hostAddr, devName});
+                    rights = command_inout("GetAccess", argin).extractString();
+                }
+                //	Check for user and host rights on specified device
+                dev_right_table.put(devName, rights);
+                if (rights.equals("write")) {
+                    return TangoConst.ACCESS_WRITE;
+                } else {
+                    return TangoConst.ACCESS_READ;
+                }
+            } catch (DevFailed e) {
+                if (e.errors[0].reason.equals("TangoApi_DEVICE_NOT_EXPORTED"))
+                    Except.re_throw_exception(e,
+                            "TangoApi_CANNOT_CHECK_ACCESS_CONTROL",
+                            "Cannot import Access Control device !",
+                            "AccessProxy.checkAccessControl()");
+                else if (muliIP && e.errors[0].reason.equals("API_CommandNotFound")) {
+                    System.err.println(e.errors[0].desc + "  -  TAC server is an old version");
+                    muliIP = false;
+                    return checkAccessControl(devName);
+                } else
+                    throw e;
+            }
+        }
+        return TangoConst.ACCESS_READ;
+    }
 
-            	else {
-                	argin.insert(new String[] { user, hostAddr, devname });
-                	rights = command_inout("GetAccess", argin).extractString();
-            	}
-            	//	Check for user and host rights on specified device
-				dev_right_table.put(devname, rights);
-				if (rights.equals("write")) {
-					return TangoConst.ACCESS_WRITE;
-				}
-				else {
-					return TangoConst.ACCESS_READ;
-				}
-			}
-			catch (DevFailed e) {
-				if (e.errors[0].reason.equals("TangoApi_DEVICE_NOT_EXPORTED"))
-					Except.re_throw_exception(e, 
-						"TangoApi_CANNOT_CHECK_ACCESS_CONTROL",
-						"Cannot import Access Control device !",
-						"AccessProxy.checkAccessControl()");
-				else
-				if (muliIP && e.errors[0].reason.equals("API_CommandNotFound")) {
-					System.err.println(e.errors[0].desc + "  -  TAC server is an old version");
-					muliIP = false;
-					return checkAccessControl(devname);
-				}
-				else
-					throw e;
-			}
-		}
-		return TangoConst.ACCESS_READ;
-	}
-	//===============================================================
-	/**
-	 *	Check for specified device, the specified command is allowed.
-	 *
-	 *	@param	classname Specified class name.
-	 *	@param	cmd Specified command name.
-     * @return  true if command is allowed.
-	 */
-	//===============================================================
-	boolean isCommandAllowed(String classname, String cmd)
-	{
-		String[]	allowed = allowed_cmd_table.get(classname);
+    private static final Object monitor = new Object();
+    //===============================================================
 
-		//	Check if allowed commands already read
-		if (allowed==null)
-			allowed = getAllowedCommands(classname);
+    /**
+     * Check for specified device, the specified command is allowed.
+     *
+     * @return true if command is allowed.
+     * @param    classname Specified class name.
+     * @param    cmd Specified command name.
+     */
+    //===============================================================
+    boolean isCommandAllowed(String classname, String cmd) {
+        String[] allowed = allowed_cmd_table.get(classname);
 
-		//	If no cmd allowed returns false
-		if (allowed.length==0)
-			return false;
+        //	Check if allowed commands already read
+        if (allowed == null)
+            allowed = getAllowedCommands(classname);
 
-		//	Else, check is specified one is allowed
-		for (String anAllowed : allowed)
-			if (anAllowed.toLowerCase().equals(cmd.toLowerCase()))
-				return true;
-		return false;
-	}
-	//===============================================================
-	/**
-	 *	query access device to know allowed commands for the device and for a specified class
-     *  @param classname specified class name
+        //	If no cmd allowed returns false
+        if (allowed.length == 0)
+            return false;
+
+        //	Else, check is specified one is allowed
+        for (String anAllowed : allowed)
+            if (anAllowed.toLowerCase().equals(cmd.toLowerCase()))
+                return true;
+        return false;
+    }
+    //===============================================================
+
+    /**
+     * query access device to know allowed commands for the device and for a specified class
+     *
+     * @param classname specified class name
      * @return allowed command list fod specifid class.
-	 */
-	//===============================================================
-	protected String[] getAllowedCommands(String classname)
-	{
-		try
-		{
-			DeviceData	argin = new DeviceData();
-			argin.insert(classname);
-			DeviceData	argout = command_inout("GetAllowedCommands", argin);
-			String[] allowed = argout.extractStringArray();
-			allowed_cmd_table.put(classname, allowed);
-			return allowed;
-		}
-		catch (DevFailed e)
-		{
-			String[]	dummy = new String[0];
-			allowed_cmd_table.put(classname, dummy);
-			return dummy;
-		}
-	}
-	//===============================================================
-	//===============================================================
+     */
+    //===============================================================
+    protected String[] getAllowedCommands(String classname) {
+        try {
+            DeviceData argin = new DeviceData();
+            argin.insert(classname);
+            DeviceData argout = command_inout("GetAllowedCommands", argin);
+            String[] allowed = argout.extractStringArray();
+            allowed_cmd_table.put(classname, allowed);
+            return allowed;
+        } catch (DevFailed e) {
+            String[] dummy = new String[0];
+            allowed_cmd_table.put(classname, dummy);
+            return dummy;
+        }
+    }
+    //===============================================================
+    //===============================================================
 }
