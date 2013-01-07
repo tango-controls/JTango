@@ -54,34 +54,36 @@
 
 	<dependencies>
 
+		<!-- <dependency> <groupId>jacorb</groupId> <artifactId>jacorb</artifactId> 
+			<version>2.3.1jboss.patch01-brew</version> </dependency> -->
+
 		<dependency>
-			<groupId>jacorb</groupId>
+			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb</artifactId>
-			<version>2.3.1jboss.patch01-brew</version>
+			<version>3.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jacorb</groupId>
+			<artifactId>jacorb-services</artifactId>
+			<version>3.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jzmq</artifactId>
 			<version>2.1.10-ESRF</version>
 		</dependency>
 
-		<!-- org.slf4j needed by 2.3.1jboss.patch01-brew but not provided as a transitive dependency! -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
+			<version>1.6.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB-javacommon</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
