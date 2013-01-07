@@ -1155,5 +1155,10 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 *	@param	cmd Specified command name.
 	 */	
 	public boolean isCommandAllowed(Database database, String classname, String cmd) throws DevFailed;
-	
+    //===================================================================
+    /**
+     * @return the list of possible TANGO_HOST (e.g. orion:10000, orion:11000)
+     */
+    //===================================================================
+	public String[] getPossibleTangoHosts(Database database);
 }

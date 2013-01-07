@@ -148,13 +148,7 @@ public class TangORBversion implements java.io.Serializable {
         for (int i = 0; i < packages.length; i++) {
             String target = packages[i] + "-Version";
             String vers = attr.getValue(target);
-            /*
-               if (vers == null)
-                   Except.throw_exception("TangORB_ManifestError",
-                               target + " version not found in manifest.",
-                               "TangORBversion.initObject()");
-               else
-               */
+            if (vers != null)
             {
                 switch (i) {
                     case 0:
