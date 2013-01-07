@@ -62,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "Release 8.1.2  -  Fri Nov 09 12:49:05 CET 2012";
+            "Release 8.2.0  -  Mon Jan 07 15:37:29 CET 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -598,6 +598,18 @@ public class ApiUtil {
     //===================================================================
     public static String getVersionAsString() {
          return revNumber;
+    }
+    //===================================================================
+    /**
+     * Convert a signed int to a unsigne value in a long
+     * @param intValue    signed integer value to convert
+     * @return the unsigned value in a long
+     */
+    //===================================================================
+    public static long toLongUnsigned(int intValue) {
+        long mask = 0x7fffffff;
+        mask += (long) 1 << 31;
+        return (intValue & mask);
     }
     //===================================================================
     //===================================================================
