@@ -253,7 +253,9 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             // Set jacorb verbosity at minimum value
             props.put("jacorb.config.log.verbosity", "0");
 
-            System.setProperties(props);
+            props.put("jacorb.disableClientOrbPolicies", "off");
+
+			System.setProperties(props);
 
             // Initialize ORB
             // -----------------------------

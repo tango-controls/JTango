@@ -2322,6 +2322,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
 	//===================================================================
 	private boolean	access_service_read = false;
+    private static final Object monitor = new Object();
 	/**
 	 *	Check Tango Access.
 	 *	 - Check if control access is requested.
@@ -2336,66 +2337,68 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	//===================================================================
 	public int checkAccessControl(Database database, String devname, TangoUrl devUrl)
 	{
-		if (database.devname==null)
-			database.devname = database.device.name();
-		if (devname.equals(database.devname) && database.isAccess_checked())
-			return database.access;
-		int	access = TangoConst.ACCESS_WRITE;
-		try {
-			//	Else create proxy
-			//	Check if AccessProxy object already exists 
-			if (/*!database.isAccess_checked() &&*/ database.getAccess_proxy()==null) {
-				//	Check if access devname is from env (for tests)
-				String	access_devname = ApiUtil.getAccessDevname();
-				if (access_devname==null || access_devname.length()==0) {
-					 if (access_service_read)
-						if (!database.check_access)
-							return  TangoConst.ACCESS_WRITE;
+        int	access = TangoConst.ACCESS_WRITE;
+        synchronized (monitor) {
+            if (database.devname==null)
+                database.devname = database.device.name();
+            if (devname.equals(database.devname) && database.isAccess_checked())
+                return database.access;
+            try {
+                //	Else create proxy
+                //	Check if AccessProxy object already exists
+                if (/*!database.isAccess_checked() &&*/ database.getAccess_proxy()==null) {
+                    //	Check if access devname is from env (for tests)
+                    String	access_devname = ApiUtil.getAccessDevname();
+                    if (access_devname==null || access_devname.length()==0) {
+                         if (access_service_read)
+                            if (!database.check_access)
+                                return  TangoConst.ACCESS_WRITE;
 
-					//	Get Access service
-					String[]	services =
-						getServices(database, TangoConst.ACCESS_SERVICE, "*");
-				if (services.length>0)
-						access_devname = services[0];
-					else {
-						//	if not set --> No check
-						//System.out.println("No Access Service Found !");
-						database.check_access = false;
-						access_service_read   = true;
-						return  TangoConst.ACCESS_WRITE;
-					}
-				}
-                // If tango_host not from env -> add tango_host as header for access device name
-                //  Check if header not already in access_devname :-)
-                if (!devUrl.fromEnv  &&  !access_devname.startsWith("tango://"))
-                    access_devname = "tango://" + devUrl.host + ":" + devUrl.port + "/" + access_devname;
+                        //	Get Access service
+                        String[]	services =
+                            getServices(database, TangoConst.ACCESS_SERVICE, "*");
+                    if (services.length>0)
+                            access_devname = services[0];
+                        else {
+                            //	if not set --> No check
+                            //System.out.println("No Access Service Found !");
+                            database.check_access = false;
+                            access_service_read   = true;
+                            return  TangoConst.ACCESS_WRITE;
+                        }
+                    }
+                    // If tango_host not from env -> add tango_host as header for access device name
+                    //  Check if header not already in access_devname :-)
+                    if (!devUrl.fromEnv  &&  !access_devname.startsWith("tango://"))
+                        access_devname = "tango://" + devUrl.host + ":" + devUrl.port + "/" + access_devname;
 
-				//	Then build Tango Access Control Proxy
-				database.setAccess_proxy(new AccessProxy(access_devname));
-			}
-			if (database.getAccess_proxy()!=null) {
-				access = database.getAccess_proxy().checkAccessControl(devname);
-			}
+                    //	Then build Tango Access Control Proxy
+                    database.setAccess_proxy(new AccessProxy(access_devname));
+                }
+                if (database.getAccess_proxy()!=null) {
+                    access = database.getAccess_proxy().checkAccessControl(devname);
+                }
 
-			//	if database access not already checked, and not first import -> do it now
-			if (!database.isAccess_checked())
-				if (!devname.equals(database.device.name()))
-					checkAccess(database);
-			
-		}
-		catch (DevFailed e) {
-			//	In case of failure, returns always TangoConst.ACCESS_READ
-			access = TangoConst.ACCESS_READ;
-			//	if cannot import AccessProxy
-			//	-> change description to be more explicit
-			if (e.errors.length>1)
-				if (e.errors[1].reason.equals("TangoApi_CANNOT_IMPORT_DEVICE"))
-					e.errors[0].desc +=
-						"\nControlled access service defined in Db but unreachable --> Read Only access given to all devices...";
+                //	if database access not already checked, and not first import -> do it now
+                if (!database.isAccess_checked())
+                    if (!devname.equals(database.device.name()))
+                        checkAccess(database);
 
-			database.setAccess_devfailed(e);
-			//Except.print_exception(e);
-		}
+            }
+            catch (DevFailed e) {
+                //	In case of failure, returns always TangoConst.ACCESS_READ
+                access = TangoConst.ACCESS_READ;
+                //	if cannot import AccessProxy
+                //	-> change description to be more explicit
+                if (e.errors.length>1)
+                    if (e.errors[1].reason.equals("TangoApi_CANNOT_IMPORT_DEVICE"))
+                        e.errors[0].desc +=
+                            "\nControlled access service defined in Db but unreachable --> Read Only access given to all devices...";
+
+                database.setAccess_devfailed(e);
+                //Except.print_exception(e);
+            }
+        }
 		return access;
 	}
 	//===================================================================
@@ -2418,6 +2421,29 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 		else
 			return database.getAccess_proxy().isCommandAllowed(classname, cmd);
 	}
+	//===================================================================
+	//===================================================================
+    public String[] getPossibleTangoHosts(Database database) {
+        String[]    tangoHosts = null;
+        try {
+            DeviceData  deviceData =  database.command_inout("DbGetCSDbServerList");
+            tangoHosts = deviceData.extractStringArray();
+        }
+        catch(DevFailed e) {
+            String  desc = e.errors[0].desc.toLowerCase();
+            try {
+                if (desc.startsWith("command ") && desc.endsWith("not found")) {
+                    tangoHosts = new String[] { database.getFullTangoHost() };
+                }
+                else
+                    System.err.println(e.errors[0].desc);
+            }
+            catch (DevFailed e2) {
+                System.err.println(e2.errors[0].desc);
+            }
+        }
+        return tangoHosts;
+    }
 	//===================================================================
 	//===================================================================
 }
