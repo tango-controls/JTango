@@ -24,9 +24,9 @@
  */
 package org.tango.server.testserver;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.StringContains.containsString;
 
 import org.junit.Test;
 import org.tango.server.PolledObjectType;
