@@ -265,6 +265,7 @@ public class  ZMQutils {
 	//===============================================================
     /**
      *
+     * @param tangoHost     specified tango host
      * @param deviceName    specified device name
      * @param attributeName specified attribute name
      * @param eventName     specified event name
@@ -272,38 +273,48 @@ public class  ZMQutils {
      * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
-    static String getFullAttributeName(String deviceName, String attributeName, String eventName) throws DevFailed {
-        return ("tango://" + ApiUtil.get_db_obj().getFullTangoHost() +
+    static String getFullAttributeName(String tangoHost, String deviceName, String attributeName,
+                                       String eventName) throws DevFailed {
+        return ("tango://" + tangoHost +
                 "/" + deviceName + "/" + attributeName + "."+ eventName).toLowerCase();
     }
 	//===============================================================
     /**
      *
+     * @param tangoHost    specified tango host
      * @param deviceName    specified device name
      * @return the full heartbeat name with tango host
      * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
-    static String getFullHeartBeatName(String deviceName) throws DevFailed {
-        return ("tango://" + ApiUtil.get_db_obj().getFullTangoHost() +
-                "/" + deviceName + ".heartbeat");
+    static String getFullHeartBeatName(String tangoHost, String deviceName) throws DevFailed {
+        return ("tango://" + tangoHost + "/" + deviceName + ".heartbeat");
     }
 	//===============================================================
     /**
      * Request to control to disconnect event
+     * @param tgHost        specified device tango_host
      * @param deviceName    specified device
      * @param attributeName specified attribute
      * @param eventName     specified event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    static void  disConnectEvent(String deviceName, String attributeName, String eventName) throws DevFailed{
-        byte[]  buffer = getBufferToDisConnectEvent(deviceName, attributeName, eventName);
-        sendToZmqControlSocket(buffer);
+    static void  disConnectEvent(String tgHost, String deviceName, String attributeName,
+                                 String eventName) throws DevFailed{
+        String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
+        if (tangoHosts!=null) {
+            for (String tangoHost : tangoHosts) {
+                byte[]  buffer = getBufferToDisConnectEvent(
+                        tangoHost, deviceName, attributeName, eventName);
+                sendToZmqControlSocket(buffer);
+            }
+        }
     }
 	//===============================================================
     /**
      * Build the buffer to request to control to disconnect event
+     * @param tangoHost     specified tango host
      * @param deviceName    specified device
      * @param attributeName specified attribute
      * @param eventName     specified event
@@ -311,38 +322,51 @@ public class  ZMQutils {
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    private static byte[] getBufferToDisConnectEvent(String deviceName, String attributeName, String eventName) throws DevFailed{
+    private static byte[] getBufferToDisConnectEvent(String tangoHost, String deviceName,
+                         String attributeName, String eventName) throws DevFailed{
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
-            stringList.add(getFullAttributeName(deviceName, attributeName, eventName));    //  Event name
+            stringList.add(getFullAttributeName(tangoHost,
+                                deviceName, attributeName, eventName));
             buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_EVENT, stringList);
         }
         catch (Exception e) {
             e.printStackTrace();
             Except.throw_exception("API_ConversionFailed",
-                    e.toString(), "ZMQtest.codeBufferToConnectHeartbeat()");
+                    e.toString(), "ZMQtest.codeBufferToDisConnectEvent()");
         }
         return buffer;
     }
 	//===============================================================
     /**
      * Request to control to connect event
+     * @param tgHost        specified device tango_host
      * @param deviceName    specified device
      * @param attributeName specified attribute
-     * @param lsa   the subscription parameters
+     * @param lsa           the subscription parameters
      * @param eventName     specified event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    static void connectEvent(String deviceName, String attributeName, DevVarLongStringArray lsa, String eventName) throws DevFailed{
-        byte[] buffer = ZMQutils.getBufferToConnectEvent(
-                deviceName, attributeName, lsa, eventName);
-        sendToZmqControlSocket(buffer);
+    static void connectEvent(String tgHost, String deviceName, String attributeName,
+                   DevVarLongStringArray lsa, String eventName) throws DevFailed {
+        String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
+        if (tangoHosts!=null) {
+            for (String tangoHost : tangoHosts) {
+                byte[] buffer = ZMQutils.getBufferToConnectEvent(tangoHost,
+                    deviceName, attributeName, lsa, eventName);
+                sendToZmqControlSocket(buffer);
+            }
+        }
+        else
+            Except.throw_exception("Api_NoTangoHost",
+                "No TANGO_HOST defined", "ZMQutils.connectEvent()" );
     }
 	//===============================================================
     /**
      * Build a buffer to request to control to connect event
+     * @param tangoHost     specified tango host
      * @param deviceName    specified device
      * @param attributeName specified attribute
      * @param lsa   the subscription parameters
@@ -351,12 +375,14 @@ public class  ZMQutils {
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    private static byte[] getBufferToConnectEvent(String deviceName, String attributeName, DevVarLongStringArray lsa, String eventName) throws DevFailed{
+    private static byte[] getBufferToConnectEvent(String tangoHost, String deviceName,
+                                String attributeName, DevVarLongStringArray lsa,
+                                String eventName) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(lsa.svalue[1]);                          //  EndPoint
-            stringList.add(getFullAttributeName(deviceName, attributeName, eventName));    //  Event name
+            stringList.add(getFullAttributeName(tangoHost, deviceName, attributeName, eventName));    //  Event name
             ArrayList<Integer>  intList = new ArrayList<Integer>();
             intList.add(lsa.lvalue[0]);     //  Tango release
             intList.add(lsa.lvalue[1]);     //  IDL version
@@ -378,31 +404,39 @@ public class  ZMQutils {
 	//===============================================================
     /**
      * Request to control to connect heartbeat
+     * @param tgHost    specified admin device tango_host
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    static void connectHeartbeat(String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed{
-        //  Build the buffer to connect heartbeat and send it
-        byte[]  buffer = getBufferToConnectHeartbeat(adminDeviceName, lsa);
-        sendToZmqControlSocket(buffer);
+    static void connectHeartbeat(String tgHost, String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed{
+        String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
+        if (tangoHosts!=null) {
+            for (String tangoHost : tangoHosts) {
+                //  Build the buffer to connect heartbeat and send it
+                byte[]  buffer = getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa);
+                sendToZmqControlSocket(buffer);
+            }
+        }
     }
 	//===============================================================
     /**
      * RBuild buffer to request to control to connect heartbeat
+     * @param tangoHost    specified tango host
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
      * @return the buffer built to connect heartbeat
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    private static byte[] getBufferToConnectHeartbeat(String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed{
+    private static byte[] getBufferToConnectHeartbeat(String tangoHost,
+                          String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(lsa.svalue[0]);                          //  EndPoint
-            stringList.add(getFullHeartBeatName(adminDeviceName));  //  Heartbeat name
+            stringList.add(getFullHeartBeatName(tangoHost, adminDeviceName));  //  Heartbeat name
             buffer = buildTheBuffer((byte)ZMQ_CONNECT_HEARTBEAT, stringList);
         }
         catch (DevFailed e) {
@@ -417,17 +451,19 @@ public class  ZMQutils {
 	//===============================================================
     /**
      * RBuild buffer to request to control to disconnect heartbeat
+     * @param tangoHost    specified tango host
      * @param deviceName    specified admin device
      * @return the buffer built to disconnect heartbeat
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     @SuppressWarnings({"UnusedDeclaration"})
-    private static byte[] getBufferToDisconnectHeartbeat(String deviceName) throws DevFailed{
+    private static byte[] getBufferToDisconnectHeartbeat(String tangoHost,
+                                                         String deviceName) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
-            stringList.add(getFullHeartBeatName(deviceName));   //  Heartbeat name
+            stringList.add(getFullHeartBeatName(tangoHost, deviceName));   //  Heartbeat name
             buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_HEARTBEAT, stringList);
         }
         catch (DevFailed e) {
@@ -468,7 +504,52 @@ public class  ZMQutils {
     }
 	//===============================================================
     /**
-     * De Marshall data from a receve byte buffer
+     * De Marshall data from a receive byte buffer
+     * @param recData   receive data
+     * @param littleIndian endianness to de marshall
+     * @return the data after de marshaling
+     * @throws DevFailed in case of de marshaling failed
+     */
+	//===============================================================
+    static DevError[] deMarshallErrorList(byte[] recData, boolean littleIndian) throws DevFailed {
+        try {
+            //  Remove the 4 first bytes (added for c++ alignment)
+            byte[]  buffer = new byte[recData.length-4];
+            System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
+            return DevErrorListHelper.read(is);
+        }
+        catch (Exception e) {
+            Except.throw_exception("Api_ConversionFailed",
+                    "An exception " + e + " has been catch",
+                    "ZMQutils.deMarshallErrorList()");
+            return null;    //  Cannot occur
+        }
+    }
+	//===============================================================
+    /**
+     * De Marshall data from a receive byte buffer
+     * @param recData   receive data
+     * @param littleIndian endianness to de marshall
+     * @return the data after de marshaling
+     * @throws DevFailed in case of de marshaling failed
+     */
+	//===============================================================
+    static ZmqCallInfo deMarshallZmqCallInfo(byte[] recData, boolean littleIndian) throws DevFailed {
+        try {
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), recData, littleIndian);
+            return ZmqCallInfoHelper.read(is);
+        }
+        catch (Exception e) {
+            Except.throw_exception("Api_ConversionFailed",
+                    "An exception " + e + " has been catch",
+                    "ZMQutils.deMarshallZmqCallInfo()");
+            return null;    //  Cannot occur
+        }
+    }
+	//===============================================================
+    /**
+     * De Marshall data from a receive byte buffer
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
@@ -480,7 +561,7 @@ public class  ZMQutils {
             //  Remove the 4 first bytes (added for c++ alignment)
             byte[]  buffer = new byte[recData.length-4];
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
-            CDRInputStream is = new CDRInputStream(null, buffer, littleIndian);
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
             return AttDataReadyHelper.read(is);
         }
         catch (Exception e) {
@@ -504,7 +585,7 @@ public class  ZMQutils {
             //  Remove the 4 first bytes (added for c++ alignment)
             byte[]  buffer = new byte[recData.length-4];
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
-            CDRInputStream is = new CDRInputStream(null, buffer, littleIndian);
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
             AttributeConfig_3 attributeConfig_3 = AttributeConfig_3Helper.read(is);
             return new AttributeInfoEx(attributeConfig_3);
         }
@@ -529,8 +610,10 @@ public class  ZMQutils {
         try {
             //  Remove the 4 first bytes (added for c++ alignment)
             byte[]  buffer = new byte[recData.length-4];
+            //for (byte b : recData)
+            //    System.out.println(b&0xff);
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
-            CDRInputStream is = new CDRInputStream(null, buffer, littleIndian);
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
 
             //  Check device IDL
             if (idl<4) {
@@ -662,6 +745,13 @@ public class  ZMQutils {
 
         //  Else return default value from input
         return ctrlValue;
+    }
+	//===============================================================
+	//===============================================================
+    static void zmqEventTrace(String s) {
+        String  env = System.getenv("ZmqTrace");
+        if (env!=null && env.equals("true"))
+            System.out.println(s);
     }
 	//===============================================================
 	//===============================================================

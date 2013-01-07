@@ -119,18 +119,22 @@ public class EventConsumerUtil {
      */
     //===============================================================
     public static boolean isZmqLoadable(){
+        //  ToDo invalid ZMQ
+        //return false;
+         /*******************/
         if (!zmqTested) {
 		
-			String	zmqEnable = System.getenv("ZMQ_ENABLE");
+			String	zmqEnable = System.getenv("ZMQ_DISABLE");
 			if (zmqEnable==null)
-				zmqEnable = System.getProperty("ZMQ_ENABLE");
+				zmqEnable = System.getProperty("ZMQ_DISABLE");
 
-			if (zmqEnable!=null && zmqEnable.equals("true")) {
+			if (zmqEnable==null || !zmqEnable.equals("true")) {
             	try {
                 	ZMQutils.getInstance();
+                    System.out.println("====================== You are using ZMQ event system ============================");
             	}
             	catch(java.lang.NoClassDefFoundError error) {
-                	System.err.println("======================================================================");
+                    System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
                 	System.err.println("======================================================================");
@@ -154,7 +158,8 @@ public class EventConsumerUtil {
             zmqTested = true;
         }
         return zmqLoadable;
-    }
+        /********************/
+   }
 
     //===============================================================
     /**
@@ -226,14 +231,17 @@ public class EventConsumerUtil {
                                int max_size,
                                String[] filters,
                                boolean stateless) throws DevFailed {
-
+        ApiUtil.printTrace("trying to subscribe_event to " + device.name() + "/" + attribute);
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
+        ApiUtil.printTrace("consumer = " + consumer);
         if (consumer!=null) {
             id = consumer.subscribe_event(device,
                     attribute, event, callback, max_size, filters, stateless);
         }
+        //  ToDo invalid ZMQ
+        /*******************/
         else
         if (isZmqLoadable()) {
             try {
@@ -253,6 +261,7 @@ public class EventConsumerUtil {
                     throw e;
             }
         }
+        /*************************/
         else {
             //  If there is no ZMQ jni library loadable, try on notifd system.
             id = subscribeEventWithNotifd(device, attribute,

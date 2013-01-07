@@ -148,7 +148,12 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         };
         DeviceData argin = new DeviceData();
         argin.insert(info);
-        DeviceData argout = device.get_adm_dev().command_inout(getEventSubscriptionCommandName(), argin);
+        String cmdName = getEventSubscriptionCommandName();
+        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
+                    cmdName + "\")");
+        DeviceData argout =
+                device.get_adm_dev().command_inout(cmdName, argin);
+        ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
         checkDeviceConnection(device, attribute, argout, event_name);
@@ -189,8 +194,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
         //	Set the event name;
         String event_name = eventNames[event];
-        //System.out.println("=============> subscribe for " + device.name() + "/" +
-        //        attribute + "/" +event_name);
+        ApiUtil.printTrace("=============> subscribing for " + device.name() + "/" +
+                attribute + "/" +event_name);
 
         //	Check if already connected
         checkIfAlreadyConnected(device, attribute, event_name, callback, max_size, stateless);
@@ -209,7 +214,9 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         String callback_key = device_name.toLowerCase() + "/" + attribute + "." + event_name;
         try {
             //	Inform server that we want to subscribe and try to connect
+            ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
             callEventSubscriptionAndConnect(device, attribute.toLowerCase(), event_name);
+            ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             if (!stateless || e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found"))
                 throw e;
@@ -305,10 +312,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 }
             }
             else {
-                //  ToDo  Pb to re connect!
                 //System.err.println("====================================================");
                 //System.err.println("callback_struct.consumer=null  for " + callbackKey);
                 //  Never connected. Do not know if ZMQ or Notifd.
+                //  ToDo invalid ZMQ
+                /********************/
                 if (EventConsumerUtil.isZmqLoadable()) {
                     try {
                         //  Try for zmq
@@ -340,7 +348,9 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         }
                     }
                 }
-                else {
+                else
+                /***************************/
+                {
                     try {
                         //  Try for notifd
                         eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
@@ -558,19 +568,18 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
         //===============================================================
         public void run() {
-            //	Sleep to do it a bit later
-            try { sleep(10); } catch (Exception e) { /*  Do Nothing */ }
-
             //	Then read attribute
-            DeviceAttribute da = null;
+            DeviceAttribute deviceAttribute = null;
             AttributeInfoEx info = null;
             DevError[] err = null;
-            String domain_name = cb_struct.device.name() + "/" + cb_struct.attr_name.toLowerCase();
+            String eventName = cb_struct.device.name() + "/" + cb_struct.attr_name.toLowerCase();
             try {
-                if (cb_struct.event_type==ATT_CONF_EVENT)
+                if (cb_struct.event_type==ATT_CONF_EVENT) {
                     info = cb_struct.device.get_attribute_info_ex(cb_struct.attr_name);
-                else
-                    da = cb_struct.device.read_attribute(cb_struct.attr_name);
+                }
+                else {
+                    deviceAttribute = cb_struct.device.read_attribute(cb_struct.attr_name);
+                }
             } catch (DevFailed e) {
                 err = e.errors;
             }
@@ -579,15 +588,18 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             int eventSource = (cb_struct.consumer instanceof NotifdEventConsumer)?
                     EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
             EventData event_data =
-                    new EventData(cb_struct.device, domain_name,
+                    new EventData(cb_struct.device,
+                            eventName,
                             cb_struct.event_name,
-                            cb_struct.event_type, eventSource,
-                            da, info, null, err);
+                            cb_struct.event_type,
+                            eventSource,
+                            deviceAttribute, info, null, err);
             if (cb_struct.use_ev_queue) {
                 EventQueue ev_queue = cb_struct.device.getEventQueue();
                 ev_queue.insert_event(event_data);
             } else
                 cb_struct.callback.push_event(event_data);
+            cb_struct.setSynchronousDone(true);
         }
     }
     //===============================================================
@@ -600,6 +612,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     //===============================================================
     //===============================================================
     protected class ConnectionStructure {
+        String      tangoHost;
         String      channelName;
         String      attributeName;
         String      deviceName;
@@ -608,13 +621,15 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceData  deviceData = null;
         boolean     reconnect = false;
         //===========================================================
-        ConnectionStructure(String channelName,
+        ConnectionStructure(String tangoHost,
+                            String channelName,
                             String deviceName,
                             String attributeName,
                             String eventName,
                             Database dbase,
                             DeviceData deviceData,
                             boolean reconnect) {
+            this.tangoHost      = tangoHost;
             this.channelName    = channelName;
             this.deviceName     = deviceName;
             this.attributeName  = attributeName;
@@ -624,8 +639,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             this.reconnect      = reconnect;
         }
         //===========================================================
-        ConnectionStructure(String name, Database dbase, boolean reconnect) {
-            this(name, null, null, null, dbase, null, reconnect);
+        ConnectionStructure(String tangoHost, String name, Database dbase, boolean reconnect) {
+            this(tangoHost, name, null, null, null, dbase, null, reconnect);
         }
         //===========================================================
         public String toString() {

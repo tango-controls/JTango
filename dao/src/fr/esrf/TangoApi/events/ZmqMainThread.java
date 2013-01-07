@@ -42,12 +42,9 @@ package fr.esrf.TangoApi.events;
  * @author  verdier
  */
 
-import fr.esrf.Tango.AttDataReady;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.AttributeInfoEx;
-import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
@@ -70,6 +67,12 @@ public class ZmqMainThread extends Thread {
     private ZMQ.Poller  items;
     private boolean     stop = false;
     private ArrayList<String> connected = new ArrayList<String>();
+
+    private static final int NameIdx    = 0;
+    private static final int EndianIdx  = 1;
+    private static final int ZmqInfoIdx = 2;
+    private static final int ValueIdx   = 3;
+    private static final int NbFields   = ValueIdx+1;
     //===============================================================
     /**
      * Default constructor
@@ -87,6 +90,17 @@ public class ZmqMainThread extends Thread {
         controlSocket.bind("inproc://control");
         heartbeatSocket.setLinger(0);
         eventSocket.setLinger(0);
+
+        try {
+            heartbeatSocket.setReconnectIVL(-1);
+            eventSocket.setReconnectIVL(-1);
+        }
+        catch(Exception e) {
+            //  Not supported in ZMQ-3.1
+            long    longDelay = 1000*300;
+            heartbeatSocket.setReconnectIVL(longDelay);
+            eventSocket.setReconnectIVL(longDelay);
+        }
 
         // Initialize poll set
         items = context.poller(3);
@@ -212,53 +226,175 @@ public class ZmqMainThread extends Thread {
     //===============================================================
     private void manageEvent(byte[][] inputs) throws DevFailed {
 
-        boolean littleEndian = (inputs[1][0]!=0);
-        String  eventName = getEventName(inputs[0]);
-        String  deviceName = getDeviceName(eventName);
-        int eventType = ZMQutils.getEventType(eventName);
+        //  Check if input data are coherent
+        if (inputs.length<NbFields) {   // || inputs[EndianIdx].length==0) {
+            String name = "unknown";
+            if (inputs.length>0)
+                name = getEventName(inputs[0]);
+            System.out.println("NbFields=" + NbFields);
+            if (inputs.length>0) System.out.println("name=" + name);
+            if (inputs.length>1) System.out.println("endian length=" + inputs[1].length);
+
+            Except.throw_exception("Api_BadParameterException",
+                    "Cannot decode event on " + name + " attribute",
+                    "ZmqMainThread.manageEvent()");
+        }
+        // ToDo
+        try {
+            //  Decode receive data parts
+            String  eventName = getEventName(inputs[NameIdx]);
+            boolean littleEndian = true;
+            if (inputs[EndianIdx].length>0) {
+                //  Sometimes inputs[EndianIdx] could be empty (fixed in c++ 8.1)
+                littleEndian = (inputs[EndianIdx][0]!=0);
+            }
+            ZmqCallInfo zmqCallInfo =
+                    ZMQutils.deMarshallZmqCallInfo(inputs[ZmqInfoIdx], littleEndian);
+            manageEventValue(eventName, ApiUtil.toLongUnsigned(zmqCallInfo.ctr),
+                    inputs[ValueIdx], littleEndian, zmqCallInfo.call_is_except);
+        }
+        catch (Exception e) {
+            if (e instanceof DevFailed)
+                throw (DevFailed) e;
+            e.printStackTrace();
+            Except.throw_exception("Api_CatchException",
+                    "API catch a " + e.toString() + " exception",
+                    "ZmqMainThread.manageEvent()");
+        }
+    }
+    //===============================================================
+    //===============================================================
+    private void manageEventValue(String eventName,
+                                  long eventCounter,
+                                  byte[] recData,
+                                  boolean littleEndian,
+                                  boolean isExcept) throws  DevFailed {
 
         Hashtable<String, EventCallBackStruct> callbackMap = ZmqEventConsumer.getEventCallbackMap();
         if (callbackMap.containsKey(eventName)) {
             EventCallBackStruct callBackStruct = callbackMap.get(eventName);
-            CallBack callback = callBackStruct.callback;
             DeviceAttribute attributeValue  = null;
             AttributeInfoEx attributeConfig = null;
             AttDataReady    dataReady       = null;
-            DevError[]      dev_err_list    = null;
-            switch (eventType) {
-                case TangoConst.ATT_CONF_EVENT:
-                    attributeConfig = ZMQutils.deMarshallAttributeConfig(inputs[3], littleEndian);
-                    break;
-                case TangoConst.DATA_READY_EVENT:
-                    dataReady = ZMQutils.deMarshallAttDataReady(inputs[3], littleEndian);
-                    break;
-                default:
-                    //  ToDo needs idl version
-                    Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
-                    EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
-                    if (eventChannelStruct!=null) {
-                        int idl = eventChannelStruct.getIdlVersion();
-                        attributeValue =
-                                ZMQutils.deMarshallAttribute(inputs[3], littleEndian, idl);
-                    }
+            DevError[]      devErrorList    = null;
+
+            //  Manage ZMQ counter (queue has reached HWM ?)
+            boolean pushTheEvent =
+                    manageEventCounter(callBackStruct, eventName, eventCounter);
+            ZMQutils.zmqEventTrace("ZMQ event from " + eventName);
+
+            //  Check if Value part is a DevFailed
+            if (isExcept) {
+                devErrorList = ZMQutils.deMarshallErrorList(recData, littleEndian);
             }
-            //	And build event data
-            EventData event_data =
-                    new EventData(callBackStruct.device,
-                            deviceName, eventName,
-                            callBackStruct.event_type, EventData.ZMQ_EVENT,
-                            attributeValue, attributeConfig, dataReady, dev_err_list);
-
-
-            if (callBackStruct.use_ev_queue) {
-                EventQueue ev_queue = callBackStruct.device.getEventQueue();
-                ev_queue.insert_event(event_data);
-            } else if (callback != null) {
-                callback.push_event(event_data);
+            else {
+                //  Else check event type
+                switch (ZMQutils.getEventType(eventName)) {
+                    case TangoConst.ATT_CONF_EVENT:
+                        attributeConfig = ZMQutils.deMarshallAttributeConfig(recData, littleEndian);
+                        break;
+                    case TangoConst.DATA_READY_EVENT:
+                        dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
+                        break;
+                    default:
+                        //  ToDo needs idl version
+                        Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
+                        EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
+                        if (eventChannelStruct!=null) {
+                            int idl = eventChannelStruct.getIdlVersion();
+                            attributeValue =
+                                    ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
+                        }
+                }
+            }
+            if (pushTheEvent) {
+                //	Build and push event data
+                String  deviceName = getDeviceName(eventName);
+                pushEventData(callBackStruct,
+                        new EventData(callBackStruct.device,
+                                deviceName, eventName,
+                                callBackStruct.event_type, EventData.ZMQ_EVENT,
+                                attributeValue, attributeConfig, dataReady, devErrorList));
             }
         }
         else
             System.err.println(eventName + " ?  NOT FOUND");
+    }
+    //===============================================================
+    /**
+     * Manage the event counter
+     * @param callBackStruct    the event callback structure
+     * @param eventName         the event name
+     * @param eventCounter    the event counter to manage
+     * @return true if the event must be pushed.
+     * @throws DevFailed if at least one event has been lost
+     */
+    //===============================================================
+    private boolean manageEventCounter(EventCallBackStruct callBackStruct,
+                                    String eventName,
+                                    long eventCounter) throws DevFailed {
+        long    previousCounter = callBackStruct.getZmqCounter();
+        //  Is it the first call ?
+        if (previousCounter==Long.MAX_VALUE) {
+            callBackStruct.setZmqCounter(eventCounter);
+            //  To be sure to have first event after synchronous call,
+            //      wait the event pushed in dedicated thread.
+            while (!callBackStruct.isSynchronousDone()) {
+                try { Thread.sleep(1); } catch (InterruptedException e) { /* */ }
+            }
+            return true;
+        }
+
+        long    delta = eventCounter - previousCounter;
+        //  If delta==0 --> already receive (ZMQ bug)
+        if (delta==0) {
+            callBackStruct.setZmqCounter(eventCounter);
+            return false;
+        }
+
+        //  If delta==1 -> It is OK nothing lost
+        if (delta==1) {
+            callBackStruct.setZmqCounter(eventCounter);
+            return true;
+        }
+
+        //  if delta<0  --> integer overflow
+        if (delta<0) {
+            long    maxCounter = ApiUtil.toLongUnsigned(-1);
+            long    delta2 = maxCounter - delta;
+            //  If delta2==1 -> It is OK nothing lost
+            if (delta2==1) {
+                callBackStruct.setZmqCounter(eventCounter);
+                return true;
+            }
+        }
+        //  Else
+        //  At least one event has been lost, push a DevError event
+        DevError[]      devErrorList    = new DevError[] {
+                    new DevError("Api_MissedEvents", ErrSeverity.ERR,
+                        "Missed some events ! ZMQ queue has reached HWM ?",
+                        "ZmqMainThread.manageEventCounter()") };
+
+        //	Build and push event data
+        String  deviceName = getDeviceName(eventName);
+        pushEventData(callBackStruct,
+                new EventData(callBackStruct.device,
+                        deviceName, eventName,
+                        callBackStruct.event_type, EventData.ZMQ_EVENT,
+                        null, null, null, devErrorList));
+        callBackStruct.setZmqCounter(eventCounter);
+        return true;
+    }
+    //===============================================================
+    //===============================================================
+    private void pushEventData(EventCallBackStruct callBackStruct, EventData eventData) {
+
+        if (callBackStruct.use_ev_queue) {
+            EventQueue ev_queue = callBackStruct.device.getEventQueue();
+            ev_queue.insert_event(eventData);
+        } else if (callBackStruct.callback != null) {
+            callBackStruct.callback.push_event(eventData);
+        }
     }
     //===============================================================
     /**
@@ -271,11 +407,11 @@ public class ZmqMainThread extends Thread {
 
         //  First part is heartbeat name
         String  name = new String(inputs[0]);
-        ApiUtil.printTrace("Receive Heartbeat");
         //  Get only device name
         int start = name.indexOf("dserver/");
         int end   = name.lastIndexOf('.');
         name = name.substring(start, end);
+        ApiUtil.printTrace("Receive Heartbeat for " + name);
         ZmqEventConsumer.getInstance().push_structured_event_heartbeat(name);
         /*  NOT USED
         //  Second one is endian
