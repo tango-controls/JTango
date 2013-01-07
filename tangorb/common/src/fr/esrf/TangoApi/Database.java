@@ -38,6 +38,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
 
+
 /**
  * Class Description: This class is the main class for TANGO database API. The
  * TANGO database is implemented as a TANGO device server. To access it, the
@@ -76,6 +77,8 @@ public class Database extends Connection {
 	protected boolean access_checked = false;
 
 	DevFailed access_devfailed = null;
+    
+    protected String[] possibleTangoHosts = null;
 	
 	
 	// ===================================================================
@@ -1609,6 +1612,13 @@ public class Database extends Connection {
 	public boolean isCommandAllowed(String classname, String cmd) throws DevFailed {
 		return databaseDAO.isCommandAllowed(this, classname, cmd);
 	}
+	// ===================================================================
+	// ===================================================================
+    public String[] getPossibleTangoHosts() {
+        if (possibleTangoHosts==null)
+            possibleTangoHosts = databaseDAO.getPossibleTangoHosts(this);
+        return possibleTangoHosts;
+    }
 	// ===================================================================
 	// ===================================================================
 
