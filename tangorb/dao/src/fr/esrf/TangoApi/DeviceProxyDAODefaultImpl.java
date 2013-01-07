@@ -1683,10 +1683,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		} catch (final DevFailed e) {
 	    	// check : if already polled, just update period polling
 	    	for (final DevError error : e.errors) {
-			if (error.reason.equals("API_AlreadyPolled")) {
-		    	deviceProxy.getAdm_dev().command_inout("UpdObjPollingPeriod", argin);
-		    	return;
-			}
+				if (error.reason.equals("API_AlreadyPolled")) {
+		    		deviceProxy.getAdm_dev().command_inout("UpdObjPollingPeriod", argin);
+		    		return;
+				}
 	    	}
 	    	// Not this exception then re-throw it
 	    	Except.throw_communication_failed(e, "TangoApi_CANNOT_POLL_OBJECT",
