@@ -24,9 +24,9 @@
  */
 package org.tango.server.testserver;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
 
 import org.junit.After;
 import org.junit.Test;
@@ -126,7 +126,8 @@ public class BuildTests {
 	ServerManager.getInstance().addClass(deviceClass.getCanonicalName(), deviceClass);
 	ServerManager.getInstance().startError(new String[] { noDbInstanceName, "-nodb", "-dlist", noDbDeviceName },
 		deviceClass.getCanonicalName());
-	// adminName = "tango://localhost:" + noDbGiopPort + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
+	// adminName = "tango://localhost:" + noDbGiopPort + "/" +
+	// Constants.ADMIN_DEVICE_DOMAIN + "/"
 	// + ServerManager.getInstance().getServerName() + "#dbase=no";
     }
 
