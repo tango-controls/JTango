@@ -33,6 +33,7 @@ import org.jacorb.orb.ParsedIOR;
 import org.jacorb.orb.iiop.IIOPAddress;
 import org.jacorb.orb.iiop.IIOPProfile;
 import org.omg.CORBA.ORB;
+import org.omg.ETF.Profile;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -67,33 +68,58 @@ public final class IORDump {
     /**
      * Make the IOR analyse
      */
-    @SuppressWarnings("unchecked")
     private void iorAnalysis() throws DevFailed {
 	if (!iorString.startsWith("IOR:")) {
-	    DevFailedUtils.throwDevFailed("CORBA_ERROR", "not an IOR");
+	    DevFailedUtils.throwDevFailed("CORBA_ERROR", iorString + " not an IOR");
 	}
 	final ORB orb = ORBManager.getOrb();
 	final ParsedIOR pior = new ParsedIOR((org.jacorb.orb.ORB) orb, iorString);
 	final org.omg.IOP.IOR ior = pior.getIOR();
 	typeId = ior.type_id;
-	final List<IIOPProfile> profiles = pior.getProfiles();
-	for (int i = 0; i < profiles.size(); i++) {
-	    final IIOPProfile p = profiles.get(i).to_GIOP_1_0();
-	    iiopVersion = (int) p.version().major + "." + (int) p.version().minor;
-	    final String name = ((IIOPAddress) p.getAddress()).getOriginalHost();
-	    java.net.InetAddress iadd = null;
-	    try {
-		iadd = java.net.InetAddress.getByName(name);
-	    } catch (final UnknownHostException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    }
-	    hostName = iadd.getHostName();
+	final List<Profile> profiles = pior.getProfiles();
+	for (Profile profile : profiles) {
+	    if (profile instanceof IIOPProfile) {
+		IIOPProfile iiopProfile = ((IIOPProfile) profile).to_GIOP_1_0();
+		iiopVersion = (int) iiopProfile.version().major + "." + (int) iiopProfile.version().minor;
+		final String name = ((IIOPAddress) iiopProfile.getAddress()).getOriginalHost();
+		java.net.InetAddress iadd = null;
+		try {
+		    iadd = java.net.InetAddress.getByName(name);
+		} catch (final UnknownHostException e) {
+		    DevFailedUtils.throwDevFailed(e);
+		}
+		hostName = iadd.getHostName();
 
-	    port = ((IIOPAddress) p.getAddress()).getPort();
-	    if (port < 0) {
-		port += 65536;
+		port = ((IIOPAddress) iiopProfile.getAddress()).getPort();
+		if (port < 0) {
+		    port += 65536;
+		}
+
+	    } else {
+		DevFailedUtils.throwDevFailed("CORBA_ERROR", iorString + " not an IOR");
 	    }
 	}
+	// code for old jacorb 2.3
+	// final List<IIOPProfile> profiles = pior.getProfiles();
+	// for (IIOPProfile profile : profiles) {
+	// iiopVersion = (int) profile.version().major + "." + (int)
+	// p.version().minor;
+	// final String name = ((IIOPAddress)
+	// profile.getAddress()).getOriginalHost();
+	// java.net.InetAddress iadd = null;
+	// try {
+	// iadd = java.net.InetAddress.getByName(name);
+	// } catch (final UnknownHostException e) {
+	// DevFailedUtils.throwDevFailed(e);
+	// }
+	// hostName = iadd.getHostName();
+	//
+	// port = ((IIOPAddress) profile.getAddress()).getPort();
+	// if (port < 0) {
+	// port += 65536;
+	// }
+	// }
+
     }
 
     public String getTypeId() {
