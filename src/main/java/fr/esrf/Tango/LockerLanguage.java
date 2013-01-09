@@ -1,34 +1,16 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 /**
- *	Generated from IDL definition of enum "LockerLanguage"
- *	@author JacORB IDL compiler 
+ * Generated from IDL enum "LockerLanguage".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class LockerLanguage
 	implements org.omg.CORBA.portable.IDLEntity
 {
+	/** Serial version UID. */
+	private static final long serialVersionUID = 1L;
 	private int value = -1;
 	public static final int _CPP = 0;
 	public static final LockerLanguage CPP = new LockerLanguage(_CPP);
@@ -46,10 +28,24 @@ public final class LockerLanguage
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
+	public String toString()
+	{
+		switch (value) {
+			case _CPP: return "CPP";
+			case _JAVA: return "JAVA";
+			default: throw new org.omg.CORBA.BAD_PARAM();
+		}
+	}
 	protected LockerLanguage(int i)
 	{
 		value = i;
 	}
+	/**
+	 * Designate replacement object when deserialized from stream. See
+	 * http://www.omg.org/docs/ptc/02-01-03.htm#Issue4271
+	 *
+	 * @throws java.io.ObjectStreamException
+	 */
 	java.lang.Object readResolve()
 	throws java.io.ObjectStreamException
 	{

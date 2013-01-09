@@ -1,35 +1,31 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 
 /**
- *	Generated from IDL interface "Device_3"
- *	@author JacORB IDL compiler V 2.2, 7-May-2004
+ * Generated from IDL interface "Device_3".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class Device_3Helper
 {
+	private volatile static org.omg.CORBA.TypeCode _type;
+	public static org.omg.CORBA.TypeCode type ()
+	{
+		if (_type == null)
+		{
+			synchronized(Device_3Helper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_interface_tc("IDL:Tango/Device_3:1.0", "Device_3");
+				}
+			}
+		}
+		return _type;
+	}
+
 	public static void insert (final org.omg.CORBA.Any any, final fr.esrf.Tango.Device_3 s)
 	{
 			any.insert_Object(s);
@@ -38,68 +34,56 @@ public final class Device_3Helper
 	{
 		return narrow(any.extract_Object()) ;
 	}
-	public static org.omg.CORBA.TypeCode type()
-	{
-		return org.omg.CORBA.ORB.init().create_interface_tc("IDL:Tango/Device_3:1.0", "Device_3");
-	}
 	public static String id()
 	{
 		return "IDL:Tango/Device_3:1.0";
 	}
 	public static Device_3 read(final org.omg.CORBA.portable.InputStream in)
 	{
-		return narrow(in.read_Object());
+		return narrow(in.read_Object(fr.esrf.Tango._Device_3Stub.class));
 	}
 	public static void write(final org.omg.CORBA.portable.OutputStream _out, final fr.esrf.Tango.Device_3 s)
 	{
 		_out.write_Object(s);
 	}
-	public static fr.esrf.Tango.Device_3 narrow(final java.lang.Object obj)
-	{
-		if (obj instanceof fr.esrf.Tango.Device_3)
-		{
-			return (fr.esrf.Tango.Device_3)obj;
-		}
-		else if (obj instanceof org.omg.CORBA.Object)
-		{
-			return narrow((org.omg.CORBA.Object)obj);
-		}
-		throw new org.omg.CORBA.BAD_PARAM("Failed to narrow in helper");
-	}
 	public static fr.esrf.Tango.Device_3 narrow(final org.omg.CORBA.Object obj)
 	{
 		if (obj == null)
+		{
 			return null;
-		try
+		}
+		else if (obj instanceof fr.esrf.Tango.Device_3)
 		{
 			return (fr.esrf.Tango.Device_3)obj;
 		}
-		catch (ClassCastException c)
+		else if (obj._is_a("IDL:Tango/Device_3:1.0"))
 		{
-			if (obj._is_a("IDL:Tango/Device_3:1.0"))
-			{
-				fr.esrf.Tango._Device_3Stub stub;
-				stub = new fr.esrf.Tango._Device_3Stub();
-				stub._set_delegate(((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate());
-				return stub;
-			}
+			fr.esrf.Tango._Device_3Stub stub;
+			stub = new fr.esrf.Tango._Device_3Stub();
+			stub._set_delegate(((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate());
+			return stub;
 		}
-		throw new org.omg.CORBA.BAD_PARAM("Narrow failed");
+		else
+		{
+			throw new org.omg.CORBA.BAD_PARAM("Narrow failed");
+		}
 	}
 	public static fr.esrf.Tango.Device_3 unchecked_narrow(final org.omg.CORBA.Object obj)
 	{
 		if (obj == null)
+		{
 			return null;
-		try
+		}
+		else if (obj instanceof fr.esrf.Tango.Device_3)
 		{
 			return (fr.esrf.Tango.Device_3)obj;
 		}
-		catch (ClassCastException c)
+		else
 		{
-				fr.esrf.Tango._Device_3Stub stub;
-				stub = new fr.esrf.Tango._Device_3Stub();
-				stub._set_delegate(((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate());
-				return stub;
+			fr.esrf.Tango._Device_3Stub stub;
+			stub = new fr.esrf.Tango._Device_3Stub();
+			stub._set_delegate(((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate());
+			return stub;
 		}
 	}
 }
