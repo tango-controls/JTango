@@ -1,71 +1,65 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
-/**
- *	Generated from IDL interface "Device_2"
- *	@author JacORB IDL compiler V 2.2, 7-May-2004
- */
 
+/**
+ * Generated from IDL interface "Device_2".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
+ */
 
 public abstract class Device_2POA
 	extends org.omg.PortableServer.Servant
 	implements org.omg.CORBA.portable.InvokeHandler, fr.esrf.Tango.Device_2Operations
 {
-	static private final java.util.Hashtable m_opsHash = new java.util.Hashtable();
+	static private final java.util.HashMap<String,Integer> m_opsHash = new java.util.HashMap<String,Integer>();
 	static
 	{
-		m_opsHash.put ( "info", new java.lang.Integer(0));
-		m_opsHash.put ( "_get_status", new java.lang.Integer(1));
-		m_opsHash.put ( "_get_name", new java.lang.Integer(2));
-		m_opsHash.put ( "read_attributes", new java.lang.Integer(3));
-		m_opsHash.put ( "read_attributes_2", new java.lang.Integer(4));
-		m_opsHash.put ( "_get_adm_name", new java.lang.Integer(5));
-		m_opsHash.put ( "get_attribute_config", new java.lang.Integer(6));
-		m_opsHash.put ( "command_inout_2", new java.lang.Integer(7));
-		m_opsHash.put ( "read_attribute_history_2", new java.lang.Integer(8));
-		m_opsHash.put ( "get_attribute_config_2", new java.lang.Integer(9));
-		m_opsHash.put ( "command_list_query", new java.lang.Integer(10));
-		m_opsHash.put ( "command_list_query_2", new java.lang.Integer(11));
-		m_opsHash.put ( "_get_state", new java.lang.Integer(12));
-		m_opsHash.put ( "command_inout_history_2", new java.lang.Integer(13));
-		m_opsHash.put ( "ping", new java.lang.Integer(14));
-		m_opsHash.put ( "write_attributes", new java.lang.Integer(15));
-		m_opsHash.put ( "command_inout", new java.lang.Integer(16));
-		m_opsHash.put ( "command_query", new java.lang.Integer(17));
-		m_opsHash.put ( "command_query_2", new java.lang.Integer(18));
-		m_opsHash.put ( "_get_description", new java.lang.Integer(19));
-		m_opsHash.put ( "black_box", new java.lang.Integer(20));
-		m_opsHash.put ( "set_attribute_config", new java.lang.Integer(21));
+		m_opsHash.put ( "info", Integer.valueOf(0));
+		m_opsHash.put ( "_get_status", Integer.valueOf(1));
+		m_opsHash.put ( "_get_name", Integer.valueOf(2));
+		m_opsHash.put ( "read_attributes", Integer.valueOf(3));
+		m_opsHash.put ( "read_attributes_2", Integer.valueOf(4));
+		m_opsHash.put ( "_get_adm_name", Integer.valueOf(5));
+		m_opsHash.put ( "get_attribute_config", Integer.valueOf(6));
+		m_opsHash.put ( "command_inout_2", Integer.valueOf(7));
+		m_opsHash.put ( "read_attribute_history_2", Integer.valueOf(8));
+		m_opsHash.put ( "get_attribute_config_2", Integer.valueOf(9));
+		m_opsHash.put ( "command_list_query", Integer.valueOf(10));
+		m_opsHash.put ( "command_list_query_2", Integer.valueOf(11));
+		m_opsHash.put ( "_get_state", Integer.valueOf(12));
+		m_opsHash.put ( "command_inout_history_2", Integer.valueOf(13));
+		m_opsHash.put ( "ping", Integer.valueOf(14));
+		m_opsHash.put ( "write_attributes", Integer.valueOf(15));
+		m_opsHash.put ( "command_inout", Integer.valueOf(16));
+		m_opsHash.put ( "command_query", Integer.valueOf(17));
+		m_opsHash.put ( "command_query_2", Integer.valueOf(18));
+		m_opsHash.put ( "_get_description", Integer.valueOf(19));
+		m_opsHash.put ( "black_box", Integer.valueOf(20));
+		m_opsHash.put ( "set_attribute_config", Integer.valueOf(21));
 	}
 	private String[] ids = {"IDL:Tango/Device_2:1.0","IDL:Tango/Device:1.0"};
 	public fr.esrf.Tango.Device_2 _this()
 	{
-		return fr.esrf.Tango.Device_2Helper.narrow(_this_object());
+		org.omg.CORBA.Object __o = _this_object() ;
+		fr.esrf.Tango.Device_2 __r = fr.esrf.Tango.Device_2Helper.narrow(__o);
+		if (__o != null && __o != __r)
+		{
+			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
+
+		}
+		return __r;
 	}
 	public fr.esrf.Tango.Device_2 _this(org.omg.CORBA.ORB orb)
 	{
-		return fr.esrf.Tango.Device_2Helper.narrow(_this_object(orb));
+		org.omg.CORBA.Object __o = _this_object(orb) ;
+		fr.esrf.Tango.Device_2 __r = fr.esrf.Tango.Device_2Helper.narrow(__o);
+		if (__o != null && __o != __r)
+		{
+			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
+
+		}
+		return __r;
 	}
 	public org.omg.CORBA.portable.OutputStream _invoke(String method, org.omg.CORBA.portable.InputStream _input, org.omg.CORBA.portable.ResponseHandler handler)
 		throws org.omg.CORBA.SystemException
@@ -95,13 +89,15 @@ public abstract class Device_2POA
 			case 1: // _get_status
 			{
 			_out = handler.createReply();
-			_out.write_string(status());
+			java.lang.String tmpResult97 = status();
+_out.write_string( tmpResult97 );
 				break;
 			}
 			case 2: // _get_name
 			{
 			_out = handler.createReply();
-			_out.write_string(name());
+			java.lang.String tmpResult98 = name();
+_out.write_string( tmpResult98 );
 				break;
 			}
 			case 3: // read_attributes
@@ -138,7 +134,8 @@ public abstract class Device_2POA
 			case 5: // _get_adm_name
 			{
 			_out = handler.createReply();
-			_out.write_string(adm_name());
+			java.lang.String tmpResult99 = adm_name();
+_out.write_string( tmpResult99 );
 				break;
 			}
 			case 6: // get_attribute_config
@@ -332,7 +329,8 @@ public abstract class Device_2POA
 			case 19: // _get_description
 			{
 			_out = handler.createReply();
-			_out.write_string(description());
+			java.lang.String tmpResult100 = description();
+_out.write_string( tmpResult100 );
 				break;
 			}
 			case 20: // black_box
