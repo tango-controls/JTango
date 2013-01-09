@@ -1,35 +1,38 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 /**
- *	Generated from IDL definition of union "ClntIdent"
- *	@author JacORB IDL compiler 
+ * Generated from IDL union "ClntIdent".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class ClntIdentHelper
 {
-	private static org.omg.CORBA.TypeCode _type;
+	private volatile static org.omg.CORBA.TypeCode _type;
+	public static org.omg.CORBA.TypeCode type ()
+	{
+		if (_type == null)
+		{
+			synchronized(ClntIdentHelper.class)
+			{
+				if (_type == null)
+				{
+			org.omg.CORBA.UnionMember[] members = new org.omg.CORBA.UnionMember[2];
+			org.omg.CORBA.Any label_any;
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.LockerLanguageHelper.insert(label_any, fr.esrf.Tango.LockerLanguage.CPP);
+			members[0] = new org.omg.CORBA.UnionMember ("cpp_clnt", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.CppClntIdentHelper.id(), "CppClntIdent",org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(5))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.LockerLanguageHelper.insert(label_any, fr.esrf.Tango.LockerLanguage.JAVA);
+			members[1] = new org.omg.CORBA.UnionMember ("java_clnt", label_any, fr.esrf.Tango.JavaClntIdentHelper.type(),null);
+			 _type = org.omg.CORBA.ORB.init().create_union_tc(id(),"ClntIdent",org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.LockerLanguageHelper.id(),"LockerLanguage",new String[]{"CPP","JAVA"}), members);
+				}
+			}
+		}
+			return _type;
+	}
+
 	public static void insert (final org.omg.CORBA.Any any, final fr.esrf.Tango.ClntIdent s)
 	{
 		any.type(type());
@@ -38,7 +41,22 @@ public final class ClntIdentHelper
 
 	public static fr.esrf.Tango.ClntIdent extract (final org.omg.CORBA.Any any)
 	{
-		return read(any.create_input_stream());
+		org.omg.CORBA.portable.InputStream in = any.create_input_stream();
+		try
+		{
+			return read (in);
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (java.io.IOException e)
+			{
+			throw new RuntimeException("Unexpected exception " + e.toString() );
+			}
+		}
 	}
 
 	public static String id()
@@ -47,8 +65,9 @@ public final class ClntIdentHelper
 	}
 	public static ClntIdent read (org.omg.CORBA.portable.InputStream in)
 	{
-		ClntIdent result = new ClntIdent ();
-		fr.esrf.Tango.LockerLanguage disc = fr.esrf.Tango.LockerLanguage.from_int(in.read_long());
+		ClntIdent result = new ClntIdent();
+		fr.esrf.Tango.LockerLanguage disc;
+		disc = fr.esrf.Tango.LockerLanguage.from_int(in.read_long());
 		switch (disc.value ())
 		{
 			case fr.esrf.Tango.LockerLanguage._CPP:
@@ -84,21 +103,5 @@ public final class ClntIdentHelper
 				break;
 			}
 		}
-	}
-	public static org.omg.CORBA.TypeCode type ()
-	{
-		if (_type == null)
-		{
-			org.omg.CORBA.UnionMember[] members = new org.omg.CORBA.UnionMember[2];
-			org.omg.CORBA.Any label_any;
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.LockerLanguageHelper.insert(label_any, fr.esrf.Tango.LockerLanguage.CPP);
-			members[1] = new org.omg.CORBA.UnionMember ("cpp_clnt", label_any, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(5)),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.LockerLanguageHelper.insert(label_any, fr.esrf.Tango.LockerLanguage.JAVA);
-			members[0] = new org.omg.CORBA.UnionMember ("java_clnt", label_any, fr.esrf.Tango.JavaClntIdentHelper.type(),null);
-			 _type = org.omg.CORBA.ORB.init().create_union_tc(id(),"ClntIdent",fr.esrf.Tango.LockerLanguageHelper.type(), members);
-		}
-		return _type;
 	}
 }

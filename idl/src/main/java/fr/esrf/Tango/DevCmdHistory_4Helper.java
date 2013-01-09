@@ -1,41 +1,27 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 
 /**
- *	Generated from IDL definition of struct "DevCmdHistory_4"
- *	@author JacORB IDL compiler 
+ * Generated from IDL struct "DevCmdHistory_4".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class DevCmdHistory_4Helper
 {
-	private static org.omg.CORBA.TypeCode _type = null;
+	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
 	{
 		if (_type == null)
 		{
-			_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.DevCmdHistory_4Helper.id(),"DevCmdHistory_4",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("dates", fr.esrf.Tango.TimeValListHelper.type(), null),new org.omg.CORBA.StructMember("value", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(11)), null),new org.omg.CORBA.StructMember("dims", fr.esrf.Tango.AttributeDimListHelper.type(), null),new org.omg.CORBA.StructMember("dims_array", fr.esrf.Tango.EltInArrayListHelper.type(), null),new org.omg.CORBA.StructMember("errors", fr.esrf.Tango.DevErrorListListHelper.type(), null),new org.omg.CORBA.StructMember("errors_array", fr.esrf.Tango.EltInArrayListHelper.type(), null),new org.omg.CORBA.StructMember("cmd_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)});
+			synchronized(DevCmdHistory_4Helper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.DevCmdHistory_4Helper.id(),"DevCmdHistory_4",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("dates", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.TimeValListHelper.id(), "TimeValList",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.TimeValHelper.id(),"TimeVal",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("tv_sec", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("tv_usec", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("tv_nsec", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)}))), null),new org.omg.CORBA.StructMember("value", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(11)), null),new org.omg.CORBA.StructMember("dims", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.AttributeDimListHelper.id(), "AttributeDimList",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.AttributeDimHelper.id(),"AttributeDim",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("dim_x", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("dim_y", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)}))), null),new org.omg.CORBA.StructMember("dims_array", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.EltInArrayListHelper.id(), "EltInArrayList",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.EltInArrayHelper.id(),"EltInArray",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("start", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("nb_elt", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)}))), null),new org.omg.CORBA.StructMember("errors", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevErrorListListHelper.id(), "DevErrorListList",org.omg.CORBA.ORB.init().create_sequence_tc(0, fr.esrf.Tango.DevErrorListHelper.type())), null),new org.omg.CORBA.StructMember("errors_array", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.EltInArrayListHelper.id(), "EltInArrayList",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.EltInArrayHelper.id(),"EltInArray",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("start", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("nb_elt", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)}))), null),new org.omg.CORBA.StructMember("cmd_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null)});
+				}
+			}
 		}
 		return _type;
 	}
@@ -48,7 +34,22 @@ public final class DevCmdHistory_4Helper
 
 	public static fr.esrf.Tango.DevCmdHistory_4 extract (final org.omg.CORBA.Any any)
 	{
-		return read(any.create_input_stream());
+		org.omg.CORBA.portable.InputStream in = any.create_input_stream();
+		try
+		{
+			return read (in);
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (java.io.IOException e)
+			{
+			throw new RuntimeException("Unexpected exception " + e.toString() );
+			}
+		}
 	}
 
 	public static String id()

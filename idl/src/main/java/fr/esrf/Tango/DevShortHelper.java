@@ -1,52 +1,37 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 /**
- *	Generated from IDL definition of alias "DevShort"
- *	@author JacORB IDL compiler 
+ * Generated from IDL alias "DevShort".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class DevShortHelper
 {
-	private static org.omg.CORBA.TypeCode _type = null;
+	private volatile static org.omg.CORBA.TypeCode _type;
 
 	public static void insert (org.omg.CORBA.Any any, short s)
 	{
-		any.type (type ());
-		write (any.create_output_stream (), s);
+		any.insert_short(s);
 	}
 
 	public static short extract (final org.omg.CORBA.Any any)
 	{
-		return read (any.create_input_stream ());
+		return any.extract_short();
 	}
 
 	public static org.omg.CORBA.TypeCode type ()
 	{
 		if (_type == null)
 		{
-			_type = org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevShortHelper.id(), "DevShort",org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(2)));
+			synchronized(DevShortHelper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevShortHelper.id(), "DevShort",org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(2)));
+				}
+			}
 		}
 		return _type;
 	}

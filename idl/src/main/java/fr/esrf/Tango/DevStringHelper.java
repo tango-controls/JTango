@@ -1,35 +1,15 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 /**
- *	Generated from IDL definition of alias "DevString"
- *	@author JacORB IDL compiler 
+ * Generated from IDL alias "DevString".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class DevStringHelper
 {
-	private static org.omg.CORBA.TypeCode _type = null;
+	private volatile static org.omg.CORBA.TypeCode _type;
 
 	public static void insert (org.omg.CORBA.Any any, java.lang.String s)
 	{
@@ -39,6 +19,10 @@ public final class DevStringHelper
 
 	public static java.lang.String extract (final org.omg.CORBA.Any any)
 	{
+		if ( any.type().kind() == org.omg.CORBA.TCKind.tk_null)
+		{
+			throw new org.omg.CORBA.BAD_OPERATION ("Can't extract from Any with null type.");
+		}
 		return read (any.create_input_stream ());
 	}
 
@@ -46,7 +30,13 @@ public final class DevStringHelper
 	{
 		if (_type == null)
 		{
-			_type = org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevStringHelper.id(), "DevString",org.omg.CORBA.ORB.init().create_string_tc(0));
+			synchronized(DevStringHelper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevStringHelper.id(), "DevString",org.omg.CORBA.ORB.init().create_string_tc(0));
+				}
+			}
 		}
 		return _type;
 	}
@@ -64,6 +54,7 @@ public final class DevStringHelper
 
 	public static void write (final org.omg.CORBA.portable.OutputStream _out, java.lang.String _s)
 	{
-		_out.write_string(_s);
+		java.lang.String tmpResult0 = _s;
+_out.write_string( tmpResult0 );
 	}
 }

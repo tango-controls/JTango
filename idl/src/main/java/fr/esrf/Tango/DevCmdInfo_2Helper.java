@@ -1,41 +1,27 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 
 /**
- *	Generated from IDL definition of struct "DevCmdInfo_2"
- *	@author JacORB IDL compiler 
+ * Generated from IDL struct "DevCmdInfo_2".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class DevCmdInfo_2Helper
 {
-	private static org.omg.CORBA.TypeCode _type = null;
+	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
 	{
 		if (_type == null)
 		{
-			_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.DevCmdInfo_2Helper.id(),"DevCmdInfo_2",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("cmd_name", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("level", fr.esrf.Tango.DispLevelHelper.type(), null),new org.omg.CORBA.StructMember("cmd_tag", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("in_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("out_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("in_type_desc", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("out_type_desc", org.omg.CORBA.ORB.init().create_string_tc(0), null)});
+			synchronized(DevCmdInfo_2Helper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.DevCmdInfo_2Helper.id(),"DevCmdInfo_2",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("cmd_name", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("level", org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.DispLevelHelper.id(),"DispLevel",new String[]{"OPERATOR","EXPERT"}), null),new org.omg.CORBA.StructMember("cmd_tag", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("in_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("out_type", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("in_type_desc", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("out_type_desc", org.omg.CORBA.ORB.init().create_string_tc(0), null)});
+				}
+			}
 		}
 		return _type;
 	}
@@ -48,7 +34,22 @@ public final class DevCmdInfo_2Helper
 
 	public static fr.esrf.Tango.DevCmdInfo_2 extract (final org.omg.CORBA.Any any)
 	{
-		return read(any.create_input_stream());
+		org.omg.CORBA.portable.InputStream in = any.create_input_stream();
+		try
+		{
+			return read (in);
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (java.io.IOException e)
+			{
+			throw new RuntimeException("Unexpected exception " + e.toString() );
+			}
+		}
 	}
 
 	public static String id()
@@ -69,12 +70,15 @@ public final class DevCmdInfo_2Helper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.DevCmdInfo_2 s)
 	{
-		out.write_string(s.cmd_name);
+		java.lang.String tmpResult7 = s.cmd_name;
+out.write_string( tmpResult7 );
 		fr.esrf.Tango.DispLevelHelper.write(out,s.level);
 		out.write_long(s.cmd_tag);
 		out.write_long(s.in_type);
 		out.write_long(s.out_type);
-		out.write_string(s.in_type_desc);
-		out.write_string(s.out_type_desc);
+		java.lang.String tmpResult8 = s.in_type_desc;
+out.write_string( tmpResult8 );
+		java.lang.String tmpResult9 = s.out_type_desc;
+out.write_string( tmpResult9 );
 	}
 }

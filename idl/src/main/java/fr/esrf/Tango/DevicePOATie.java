@@ -1,32 +1,12 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 import org.omg.PortableServer.POA;
 
 /**
- *	Generated from IDL interface "Device"
- *	@author JacORB IDL compiler V 2.2, 7-May-2004
+ * Generated from IDL interface "Device".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public class DevicePOATie
@@ -46,11 +26,25 @@ public class DevicePOATie
 	}
 	public fr.esrf.Tango.Device _this()
 	{
-		return fr.esrf.Tango.DeviceHelper.narrow(_this_object());
+		org.omg.CORBA.Object __o = _this_object() ;
+		fr.esrf.Tango.Device __r = fr.esrf.Tango.DeviceHelper.narrow(__o);
+		if (__o != null && __o != __r)
+		{
+			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
+
+		}
+		return __r;
 	}
 	public fr.esrf.Tango.Device _this(org.omg.CORBA.ORB orb)
 	{
-		return fr.esrf.Tango.DeviceHelper.narrow(_this_object(orb));
+		org.omg.CORBA.Object __o = _this_object(orb) ;
+		fr.esrf.Tango.Device __r = fr.esrf.Tango.DeviceHelper.narrow(__o);
+		if (__o != null && __o != __r)
+		{
+			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
+
+		}
+		return __r;
 	}
 	public DeviceOperations _delegate()
 	{
@@ -66,10 +60,7 @@ public class DevicePOATie
 		{
 			return _poa;
 		}
-		else
-		{
-			return super._default_POA();
-		}
+		return super._default_POA();
 	}
 	public void write_attributes(fr.esrf.Tango.AttributeValue[] values) throws fr.esrf.Tango.DevFailed
 	{

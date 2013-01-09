@@ -1,35 +1,77 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 /**
- *	Generated from IDL definition of union "AttrValUnion"
- *	@author JacORB IDL compiler 
+ * Generated from IDL union "AttrValUnion".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class AttrValUnionHelper
 {
-	private static org.omg.CORBA.TypeCode _type;
+	private volatile static org.omg.CORBA.TypeCode _type;
+	public static org.omg.CORBA.TypeCode type ()
+	{
+		if (_type == null)
+		{
+			synchronized(AttrValUnionHelper.class)
+			{
+				if (_type == null)
+				{
+			org.omg.CORBA.UnionMember[] members = new org.omg.CORBA.UnionMember[15];
+			org.omg.CORBA.Any label_any;
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_BOOL);
+			members[0] = new org.omg.CORBA.UnionMember ("bool_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarBooleanArrayHelper.id(), "DevVarBooleanArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_SHORT);
+			members[1] = new org.omg.CORBA.UnionMember ("short_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarShortArrayHelper.id(), "DevVarShortArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(2)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_LONG);
+			members[2] = new org.omg.CORBA.UnionMember ("long_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarLongArrayHelper.id(), "DevVarLongArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_LONG64);
+			members[3] = new org.omg.CORBA.UnionMember ("long64_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarLong64ArrayHelper.id(), "DevVarLong64Array",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(23)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_FLOAT);
+			members[4] = new org.omg.CORBA.UnionMember ("float_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarFloatArrayHelper.id(), "DevVarFloatArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(6)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_DOUBLE);
+			members[5] = new org.omg.CORBA.UnionMember ("double_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarDoubleArrayHelper.id(), "DevVarDoubleArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(7)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_UCHAR);
+			members[6] = new org.omg.CORBA.UnionMember ("uchar_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarCharArrayHelper.id(), "DevVarCharArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(10)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_USHORT);
+			members[7] = new org.omg.CORBA.UnionMember ("ushort_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarUShortArrayHelper.id(), "DevVarUShortArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(4)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ULONG);
+			members[8] = new org.omg.CORBA.UnionMember ("ulong_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarULongArrayHelper.id(), "DevVarULongArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(5)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ULONG64);
+			members[9] = new org.omg.CORBA.UnionMember ("ulong64_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarULong64ArrayHelper.id(), "DevVarULong64Array",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(24)))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_STRING);
+			members[10] = new org.omg.CORBA.UnionMember ("string_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarStringArrayHelper.id(), "DevVarStringArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_string_tc(0))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_STATE);
+			members[11] = new org.omg.CORBA.UnionMember ("state_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarStateArrayHelper.id(), "DevVarStateArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.DevStateHelper.id(),"DevState",new String[]{"ON","OFF","CLOSE","OPEN","INSERT","EXTRACT","MOVING","STANDBY","FAULT","INIT","RUNNING","ALARM","DISABLE","UNKNOWN"}))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.DEVICE_STATE);
+			members[12] = new org.omg.CORBA.UnionMember ("dev_state_att", label_any, fr.esrf.Tango.DevStateHelper.type(),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ENCODED);
+			members[13] = new org.omg.CORBA.UnionMember ("encoded_att_value", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarEncodedArrayHelper.id(), "DevVarEncodedArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.DevEncodedHelper.id(),"DevEncoded",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("encoded_format", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevStringHelper.id(), "DevString",org.omg.CORBA.ORB.init().create_string_tc(0)), null),new org.omg.CORBA.StructMember("encoded_data", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarCharArrayHelper.id(), "DevVarCharArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(10)))), null)}))),null);
+			label_any = org.omg.CORBA.ORB.init().create_any ();
+			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.NO_DATA);
+			members[14] = new org.omg.CORBA.UnionMember ("union_no_data", label_any, org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevBooleanHelper.id(), "DevBoolean",org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8))),null);
+			 _type = org.omg.CORBA.ORB.init().create_union_tc(id(),"AttrValUnion",org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.AttributeDataTypeHelper.id(),"AttributeDataType",new String[]{"ATT_BOOL","ATT_SHORT","ATT_LONG","ATT_LONG64","ATT_FLOAT","ATT_DOUBLE","ATT_UCHAR","ATT_USHORT","ATT_ULONG","ATT_ULONG64","ATT_STRING","ATT_STATE","DEVICE_STATE","ATT_ENCODED","NO_DATA"}), members);
+				}
+			}
+		}
+			return _type;
+	}
+
 	public static void insert (final org.omg.CORBA.Any any, final fr.esrf.Tango.AttrValUnion s)
 	{
 		any.type(type());
@@ -38,7 +80,22 @@ public final class AttrValUnionHelper
 
 	public static fr.esrf.Tango.AttrValUnion extract (final org.omg.CORBA.Any any)
 	{
-		return read(any.create_input_stream());
+		org.omg.CORBA.portable.InputStream in = any.create_input_stream();
+		try
+		{
+			return read (in);
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (java.io.IOException e)
+			{
+			throw new RuntimeException("Unexpected exception " + e.toString() );
+			}
+		}
 	}
 
 	public static String id()
@@ -47,8 +104,9 @@ public final class AttrValUnionHelper
 	}
 	public static AttrValUnion read (org.omg.CORBA.portable.InputStream in)
 	{
-		AttrValUnion result = new AttrValUnion ();
-		fr.esrf.Tango.AttributeDataType disc = fr.esrf.Tango.AttributeDataType.from_int(in.read_long());
+		AttrValUnion result = new AttrValUnion();
+		fr.esrf.Tango.AttributeDataType disc;
+		disc = fr.esrf.Tango.AttributeDataType.from_int(in.read_long());
 		switch (disc.value ())
 		{
 			case fr.esrf.Tango.AttributeDataType._ATT_BOOL:
@@ -240,60 +298,5 @@ public final class AttrValUnionHelper
 				break;
 			}
 		}
-	}
-	public static org.omg.CORBA.TypeCode type ()
-	{
-		if (_type == null)
-		{
-			org.omg.CORBA.UnionMember[] members = new org.omg.CORBA.UnionMember[15];
-			org.omg.CORBA.Any label_any;
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_BOOL);
-			members[14] = new org.omg.CORBA.UnionMember ("bool_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_SHORT);
-			members[13] = new org.omg.CORBA.UnionMember ("short_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(2))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_LONG);
-			members[12] = new org.omg.CORBA.UnionMember ("long_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_LONG64);
-			members[11] = new org.omg.CORBA.UnionMember ("long64_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(23))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_FLOAT);
-			members[10] = new org.omg.CORBA.UnionMember ("float_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(6))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_DOUBLE);
-			members[9] = new org.omg.CORBA.UnionMember ("double_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(7))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_UCHAR);
-			members[8] = new org.omg.CORBA.UnionMember ("uchar_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(10))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_USHORT);
-			members[7] = new org.omg.CORBA.UnionMember ("ushort_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(4))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ULONG);
-			members[6] = new org.omg.CORBA.UnionMember ("ulong_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(5))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ULONG64);
-			members[5] = new org.omg.CORBA.UnionMember ("ulong64_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(24))),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_STRING);
-			members[4] = new org.omg.CORBA.UnionMember ("string_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().create_string_tc(0)),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_STATE);
-			members[3] = new org.omg.CORBA.UnionMember ("state_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, fr.esrf.Tango.DevStateHelper.type()),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.DEVICE_STATE);
-			members[2] = new org.omg.CORBA.UnionMember ("dev_state_att", label_any, fr.esrf.Tango.DevStateHelper.type(),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.ATT_ENCODED);
-			members[1] = new org.omg.CORBA.UnionMember ("encoded_att_value", label_any, org.omg.CORBA.ORB.init().create_sequence_tc(0, fr.esrf.Tango.DevEncodedHelper.type()),null);
-			label_any = org.omg.CORBA.ORB.init().create_any ();
-			fr.esrf.Tango.AttributeDataTypeHelper.insert(label_any, fr.esrf.Tango.AttributeDataType.NO_DATA);
-			members[0] = new org.omg.CORBA.UnionMember ("union_no_data", label_any, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8)),null);
-			 _type = org.omg.CORBA.ORB.init().create_union_tc(id(),"AttrValUnion",fr.esrf.Tango.AttributeDataTypeHelper.type(), members);
-		}
-		return _type;
 	}
 }

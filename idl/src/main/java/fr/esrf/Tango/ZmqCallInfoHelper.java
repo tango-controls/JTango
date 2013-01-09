@@ -1,41 +1,27 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 
 
 /**
- *	Generated from IDL definition of struct "ZmqCallInfo"
- *	@author JacORB IDL compiler 
+ * Generated from IDL struct "ZmqCallInfo".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class ZmqCallInfoHelper
 {
-	private static org.omg.CORBA.TypeCode _type = null;
+	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
 	{
 		if (_type == null)
 		{
-			_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.ZmqCallInfoHelper.id(),"ZmqCallInfo",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("version", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("method_name", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("oid", fr.esrf.Tango.DevVarCharArrayHelper.type(), null),new org.omg.CORBA.StructMember("call_is_except", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8)), null)});
+			synchronized(ZmqCallInfoHelper.class)
+			{
+				if (_type == null)
+				{
+					_type = org.omg.CORBA.ORB.init().create_struct_tc(fr.esrf.Tango.ZmqCallInfoHelper.id(),"ZmqCallInfo",new org.omg.CORBA.StructMember[]{new org.omg.CORBA.StructMember("version", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(3)), null),new org.omg.CORBA.StructMember("ctr", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(5)), null),new org.omg.CORBA.StructMember("method_name", org.omg.CORBA.ORB.init().create_string_tc(0), null),new org.omg.CORBA.StructMember("oid", org.omg.CORBA.ORB.init().create_alias_tc(fr.esrf.Tango.DevVarCharArrayHelper.id(), "DevVarCharArray",org.omg.CORBA.ORB.init().create_sequence_tc(0, org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(10)))), null),new org.omg.CORBA.StructMember("call_is_except", org.omg.CORBA.ORB.init().get_primitive_tc(org.omg.CORBA.TCKind.from_int(8)), null)});
+				}
+			}
 		}
 		return _type;
 	}
@@ -48,7 +34,22 @@ public final class ZmqCallInfoHelper
 
 	public static fr.esrf.Tango.ZmqCallInfo extract (final org.omg.CORBA.Any any)
 	{
-		return read(any.create_input_stream());
+		org.omg.CORBA.portable.InputStream in = any.create_input_stream();
+		try
+		{
+			return read (in);
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (java.io.IOException e)
+			{
+			throw new RuntimeException("Unexpected exception " + e.toString() );
+			}
+		}
 	}
 
 	public static String id()
@@ -59,6 +60,7 @@ public final class ZmqCallInfoHelper
 	{
 		fr.esrf.Tango.ZmqCallInfo result = new fr.esrf.Tango.ZmqCallInfo();
 		result.version=in.read_long();
+		result.ctr=in.read_ulong();
 		result.method_name=in.read_string();
 		result.oid = fr.esrf.Tango.DevVarCharArrayHelper.read(in);
 		result.call_is_except=in.read_boolean();
@@ -67,7 +69,9 @@ public final class ZmqCallInfoHelper
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.ZmqCallInfo s)
 	{
 		out.write_long(s.version);
-		out.write_string(s.method_name);
+		out.write_ulong(s.ctr);
+		java.lang.String tmpResult84 = s.method_name;
+out.write_string( tmpResult84 );
 		fr.esrf.Tango.DevVarCharArrayHelper.write(out,s.oid);
 		out.write_boolean(s.call_is_except);
 	}

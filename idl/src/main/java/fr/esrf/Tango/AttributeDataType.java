@@ -1,34 +1,16 @@
-/**
- * Copyright (C) :     2004
- *
- *     European Synchrotron Radiation Facility
- *     BP 220, Grenoble 38043
- *     FRANCE
- *
- * This file is part of Tango.
- *
- * Tango is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Tango is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
- */
 package fr.esrf.Tango;
 /**
- *	Generated from IDL definition of enum "AttributeDataType"
- *	@author JacORB IDL compiler 
+ * Generated from IDL enum "AttributeDataType".
+ *
+ * @author JacORB IDL compiler V 3.1, 19-Aug-2012
+ * @version generated at Dec 11, 2012 4:18:48 PM
  */
 
 public final class AttributeDataType
 	implements org.omg.CORBA.portable.IDLEntity
 {
+	/** Serial version UID. */
+	private static final long serialVersionUID = 1L;
 	private int value = -1;
 	public static final int _ATT_BOOL = 0;
 	public static final AttributeDataType ATT_BOOL = new AttributeDataType(_ATT_BOOL);
@@ -85,10 +67,37 @@ public final class AttributeDataType
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
+	public String toString()
+	{
+		switch (value) {
+			case _ATT_BOOL: return "ATT_BOOL";
+			case _ATT_SHORT: return "ATT_SHORT";
+			case _ATT_LONG: return "ATT_LONG";
+			case _ATT_LONG64: return "ATT_LONG64";
+			case _ATT_FLOAT: return "ATT_FLOAT";
+			case _ATT_DOUBLE: return "ATT_DOUBLE";
+			case _ATT_UCHAR: return "ATT_UCHAR";
+			case _ATT_USHORT: return "ATT_USHORT";
+			case _ATT_ULONG: return "ATT_ULONG";
+			case _ATT_ULONG64: return "ATT_ULONG64";
+			case _ATT_STRING: return "ATT_STRING";
+			case _ATT_STATE: return "ATT_STATE";
+			case _DEVICE_STATE: return "DEVICE_STATE";
+			case _ATT_ENCODED: return "ATT_ENCODED";
+			case _NO_DATA: return "NO_DATA";
+			default: throw new org.omg.CORBA.BAD_PARAM();
+		}
+	}
 	protected AttributeDataType(int i)
 	{
 		value = i;
 	}
+	/**
+	 * Designate replacement object when deserialized from stream. See
+	 * http://www.omg.org/docs/ptc/02-01-03.htm#Issue4271
+	 *
+	 * @throws java.io.ObjectStreamException
+	 */
 	java.lang.Object readResolve()
 	throws java.io.ObjectStreamException
 	{
