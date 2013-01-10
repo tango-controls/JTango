@@ -80,11 +80,7 @@ public final class DatabaseCache implements ICachableDatabase {
 
     @Override
     public String[] getDeviceList(final String serverName, final String className) throws DevFailed {
-	if (serverCache == null) {
-	    return dbDevice.getDeviceList(serverName, className);
-	} else {
-	    return serverCache.getDeviceList(serverName, className);
-	}
+	return dbDevice.getDeviceList(serverName, className);
     }
 
     @Override
