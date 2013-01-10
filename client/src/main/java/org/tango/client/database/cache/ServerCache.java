@@ -52,7 +52,7 @@ public final class ServerCache {
     }
 
     public void fillCache(final String serverName, final String hostName) throws DevFailed {
-	if (!servers.containsKey(servers)) {
+	if (!servers.containsKey(serverName)) {
 	    final DeviceData in = new DeviceData();
 	    in.insert(new String[] { serverName, hostName });
 
@@ -62,7 +62,8 @@ public final class ServerCache {
 		DevFailedUtils.throwDevFailed("cache for " + serverName + " not found");
 	    }
 	    int i = 0;
-	    // 1 - Admin device import paramters (2 or 8 elts - 2 when admin device not defined in db (second one being
+	    // 1 - Admin device import paramters (2 or 8 elts - 2 when admin
+	    // device not defined in db (second one being
 	    // "Not found"))
 	    // admin device name - 0
 	    adminDeviceName = out[i++];
@@ -88,7 +89,8 @@ public final class ServerCache {
 		classCaches.put(adminClassName, adminCache);
 	    }
 	    logger.debug("filling cache, adminInfos = {} ", adminInfos);
-	    // 2 - Event channel factory import event parameters (2 or 6 elts - 2 when event channel factory not found
+	    // 2 - Event channel factory import event parameters (2 or 6 elts -
+	    // 2 when event channel factory not found
 	    // in DB
 	    // (second = "Not found")) - TODO when event will be supported
 	    // notifd/factory/...
@@ -98,7 +100,8 @@ public final class ServerCache {
 	    } else {
 		i = i + 5;
 	    }
-	    // 3 - DS event channel import event parameters (2 or 6 elts - 2 when event channel factory not found in DB
+	    // 3 - DS event channel import event parameters (2 or 6 elts - 2
+	    // when event channel factory not found in DB
 	    // (second
 	    // = "Not found"))
 	    i++;
@@ -227,7 +230,8 @@ public final class ServerCache {
 			}
 			logger.debug("{} device cache is {}", deviceName, deviceCache);
 			classCache.addDeviceCache(deviceCache);
-			// 11 - <Dev> device attribute properties (at least 2 elts)
+			// 11 - <Dev> device attribute properties (at least 2
+			// elts)
 			i++;
 			final int attrPropertiesNr = Integer.parseInt(out[i++]);
 			for (int l = 0; l < attrPropertiesNr; l++) {
@@ -257,7 +261,8 @@ public final class ServerCache {
 	    }
 
 	    // TODO 12 - CtrlSystem free object properties (at least 2 elts)
-	    // TODO 13 - TAC device import parameters (2 or 8 elts - 2 when admin device not defined in db (second one
+	    // TODO 13 - TAC device import parameters (2 or 8 elts - 2 when
+	    // admin device not defined in db (second one
 	    // being "Not found"))
 	}
     }
