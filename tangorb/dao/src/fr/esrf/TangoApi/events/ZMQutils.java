@@ -47,6 +47,7 @@ import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.jacorb.orb.CDRInputStream;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
 
@@ -251,7 +252,16 @@ public class  ZMQutils {
 	//===============================================================
     static void sendToZmqControlSocket(byte[] buffer) throws DevFailed {
         ZMQ.Socket  controlSocket = context.socket(ZMQ.REQ);
-        controlSocket.connect("inproc://control");
+        try {
+            controlSocket.connect("inproc://control");
+        }
+        catch(ZMQException e) {
+            if (e.toString().contains("Connection refused")) {
+                //  Retry after a while
+                try { Thread.sleep(10); } catch (InterruptedException e1) { /* */ }
+                controlSocket.connect("inproc://control");
+            }
+        }
         controlSocket.send(buffer, 0);
         byte[]  resp = controlSocket.recv(0);
         controlSocket.close();
