@@ -9,7 +9,6 @@
 		<version>7.4.7-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.tango</groupId>
 	<artifactId>TangORB</artifactId>
 
 	<name>Java DAO</name>
@@ -52,12 +51,16 @@
 		</resources>
 	</build>
 
+	<properties>
+		<jacorb.version>3.2</jacorb.version>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb</artifactId>
-				<version>3.2</version>
+				<version>${jacorb.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
@@ -69,7 +72,7 @@
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb-services</artifactId>
-				<version>3.2</version>
+				<version>${jacorb.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
