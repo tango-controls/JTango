@@ -42,7 +42,7 @@
 		<developerConnection>${scm.developerConnection.svn.tango-cs}/api/java/common/IDL/trunk</developerConnection>
 		<url>${scm.url.svn.tango-cs}/api/java/common/IDL/trunk</url>
 	</scm>
-	<build>
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
@@ -66,7 +66,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 	<dependencies>
 		<dependency>
 			<groupId>org.jacorb</groupId>
