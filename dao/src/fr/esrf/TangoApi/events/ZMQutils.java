@@ -111,27 +111,30 @@ public class  ZMQutils {
      * Build the buffer to be send
      *
      * @param command       command name
+     * @param forceConnect  force connection if true
      * @param stringList    device, attribute, event....
      * @return the buffer built
      */
 	//===============================================================
-    private static byte[] buildTheBuffer(int command, ArrayList<String> stringList) {
-        return buildTheBuffer(command, stringList, null);
+    private static byte[] buildTheBuffer(int command, boolean forceConnect, ArrayList<String> stringList) {
+        return buildTheBuffer(command, forceConnect, stringList, null);
     }
 	//===============================================================
     /**
      * Build the buffer to be send
      *
      * @param command       command name
+     * @param forceConnect  force connection if true
      * @param stringList    device, attribute, event....
      * @param intList       Sub HWM, Rate, IVL
      * @return the buffer built
      */
 	//===============================================================
-    private static byte[] buildTheBuffer(int command, ArrayList<String> stringList, ArrayList<Integer> intList) {
+    private static byte[] buildTheBuffer(int command, boolean forceConnect,
+                                         ArrayList<String> stringList, ArrayList<Integer> intList) {
 
         //  Check size to allocate
-        int size = 1; //    for Command
+        int size = 2; //    for Command + forceConnect
         if (stringList.size()>0) {
             for (String s : stringList) {
                 size += s.length()+1;   //  +1 for '\0' separator
@@ -145,6 +148,7 @@ public class  ZMQutils {
         //  Then fill it with command first
         int idx = 0;
         buffer[idx++] = (byte)command;
+        buffer[idx++] = (byte) ((forceConnect)? '1':'0');
         for (String s : stringList) {
             //  And with string bytes
             byte[]  bytes = s.getBytes();
@@ -339,7 +343,7 @@ public class  ZMQutils {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(getFullAttributeName(tangoHost,
                                 deviceName, attributeName, eventName));
-            buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_EVENT, stringList);
+            buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_EVENT, false, stringList);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -356,16 +360,17 @@ public class  ZMQutils {
      * @param attributeName specified attribute
      * @param lsa           the subscription parameters
      * @param eventName     specified event
+     * @param forceConnect   Force reconenction if true
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     static void connectEvent(String tgHost, String deviceName, String attributeName,
-                   DevVarLongStringArray lsa, String eventName) throws DevFailed {
+                   DevVarLongStringArray lsa, String eventName, boolean forceConnect) throws DevFailed {
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
             for (String tangoHost : tangoHosts) {
                 byte[] buffer = ZMQutils.getBufferToConnectEvent(tangoHost,
-                    deviceName, attributeName, lsa, eventName);
+                    deviceName, attributeName, lsa, eventName, forceConnect);
                 sendToZmqControlSocket(buffer);
             }
         }
@@ -381,13 +386,14 @@ public class  ZMQutils {
      * @param attributeName specified attribute
      * @param lsa   the subscription parameters
      * @param eventName     specified event
+     * @param forceConnect   Force reconenction if true
      * @return the beffer built to connect event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     private static byte[] getBufferToConnectEvent(String tangoHost, String deviceName,
                                 String attributeName, DevVarLongStringArray lsa,
-                                String eventName) throws DevFailed {
+                                String eventName, boolean forceConnect) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
@@ -399,7 +405,7 @@ public class  ZMQutils {
             intList.add(lsa.lvalue[2]);     //  Sub HWM
             intList.add(lsa.lvalue[3]);     //  Rate
             intList.add(lsa.lvalue[4]);     //  IVL
-            buffer = buildTheBuffer((byte)ZMQ_CONNECT_EVENT, stringList, intList);
+            buffer = buildTheBuffer((byte)ZMQ_CONNECT_EVENT, forceConnect, stringList, intList);
         }
         catch (DevFailed e) {
             throw e;
@@ -417,15 +423,16 @@ public class  ZMQutils {
      * @param tgHost    specified admin device tango_host
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
+     * @param forceConnect   Force reconenction if true
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    static void connectHeartbeat(String tgHost, String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed{
+    static void connectHeartbeat(String tgHost, String adminDeviceName, DevVarLongStringArray lsa, boolean forceConnect) throws DevFailed{
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
             for (String tangoHost : tangoHosts) {
                 //  Build the buffer to connect heartbeat and send it
-                byte[]  buffer = getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa);
+                byte[]  buffer = getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa,forceConnect);
                 sendToZmqControlSocket(buffer);
             }
         }
@@ -442,12 +449,27 @@ public class  ZMQutils {
 	//===============================================================
     private static byte[] getBufferToConnectHeartbeat(String tangoHost,
                           String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed {
+        return getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa, false);
+    }
+	//===============================================================
+    /**
+     * RBuild buffer to request to control to connect heartbeat
+     * @param tangoHost    specified tango host
+     * @param adminDeviceName    specified admin device
+     * @param lsa   the subscription parameters
+     * @param forceConnect   Force reconenction if true
+     * @return the buffer built to connect heartbeat
+     * @throws DevFailed    in case of internal communication problem.
+     */
+	//===============================================================
+    private static byte[] getBufferToConnectHeartbeat(String tangoHost,
+                          String adminDeviceName, DevVarLongStringArray lsa, boolean forceConnect) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(lsa.svalue[0]);                          //  EndPoint
             stringList.add(getFullHeartBeatName(tangoHost, adminDeviceName));  //  Heartbeat name
-            buffer = buildTheBuffer((byte)ZMQ_CONNECT_HEARTBEAT, stringList);
+            buffer = buildTheBuffer((byte)ZMQ_CONNECT_HEARTBEAT, forceConnect, stringList);
         }
         catch (DevFailed e) {
             throw e;
@@ -474,7 +496,7 @@ public class  ZMQutils {
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(getFullHeartBeatName(tangoHost, deviceName));   //  Heartbeat name
-            buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_HEARTBEAT, stringList);
+            buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_HEARTBEAT, false, stringList);
         }
         catch (DevFailed e) {
             throw e;
@@ -689,7 +711,8 @@ public class  ZMQutils {
 
         int idx = 0;
         int sizeOfInt = 4;
-        controlStructure.commandCode  = bytes[idx++];
+        controlStructure.commandCode        = bytes[idx++];
+        controlStructure.forceReconnection  = (bytes[idx++]!='0');
 
         switch (controlStructure.commandCode) {
             case ZMQ_END:
@@ -786,6 +809,7 @@ public class  ZMQutils {
         int commandCode = -1;
         String  endPoint;
         String  eventName;
+        boolean forceReconnection = false;
         int     tango = 0;
         int     idl   = 0;
         int     hwm  = HWM_DEFAULT;
