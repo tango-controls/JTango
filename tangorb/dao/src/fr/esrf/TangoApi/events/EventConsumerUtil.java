@@ -235,7 +235,6 @@ public class EventConsumerUtil {
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
-        ApiUtil.printTrace("consumer = " + consumer);
         if (consumer!=null) {
             id = consumer.subscribe_event(device,
                     attribute, event, callback, max_size, filters, stateless);
@@ -248,7 +247,6 @@ public class EventConsumerUtil {
                 //  If ZMQ jni library can be loaded, try to connect on ZMQ event system
                 id = ZmqEventConsumer.getInstance().subscribe_event(device,
                         attribute, event, callback, max_size, filters, stateless);
-                ApiUtil.printTrace(device.name() + "/" + attribute + "  connected to ZMQ event system");
             }
             catch (DevFailed e) {
                 ApiUtil.printTrace(e.errors[0].desc);
