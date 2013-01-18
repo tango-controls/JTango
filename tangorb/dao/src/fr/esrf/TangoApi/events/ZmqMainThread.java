@@ -51,6 +51,8 @@ import fr.esrf.TangoDs.TangoConst;
 import org.zeromq.ZMQ;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 
@@ -66,13 +68,18 @@ public class ZmqMainThread extends Thread {
     private ZMQ.Socket  eventSocket;
     private ZMQ.Poller  items;
     private boolean     stop = false;
-    private ArrayList<String> connected = new ArrayList<String>();
+    /**
+     * Map<endPoint, eventName>
+     */
+    private Hashtable<String,String> connectedMap = new Hashtable<String, String>();
 
     private static final int NameIdx    = 0;
     private static final int EndianIdx  = 1;
     private static final int ZmqInfoIdx = 2;
     private static final int ValueIdx   = 3;
     private static final int NbFields   = ValueIdx+1;
+
+    private static final long SendHwmSocket = 10000;
     //===============================================================
     /**
      * Default constructor
@@ -90,6 +97,7 @@ public class ZmqMainThread extends Thread {
         controlSocket.bind("inproc://control");
         heartbeatSocket.setLinger(0);
         eventSocket.setLinger(0);
+        eventSocket.setSndHWM(SendHwmSocket);
 
         try {
             heartbeatSocket.setReconnectIVL(-1);
@@ -107,7 +115,6 @@ public class ZmqMainThread extends Thread {
         items.register(controlSocket,   ZMQ.Poller.POLLIN);
         items.register(heartbeatSocket, ZMQ.Poller.POLLIN);
         items.register(eventSocket,     ZMQ.Poller.POLLIN);
-
     }
     //===============================================================
     /**
@@ -231,15 +238,15 @@ public class ZmqMainThread extends Thread {
             String name = "unknown";
             if (inputs.length>0)
                 name = getEventName(inputs[0]);
-            System.out.println("NbFields=" + NbFields);
-            if (inputs.length>0) System.out.println("name=" + name);
-            if (inputs.length>1) System.out.println("endian length=" + inputs[1].length);
+            System.err.println("NbFields=" + NbFields);
+            if (inputs.length>0) System.err.println("name=" + name);
+            if (inputs.length>1) System.err.println("endian length=" + inputs[1].length);
 
             Except.throw_exception("Api_BadParameterException",
                     "Cannot decode event on " + name + " attribute",
                     "ZmqMainThread.manageEvent()");
         }
-        // ToDo
+
         try {
             //  Decode receive data parts
             String  eventName = getEventName(inputs[NameIdx]);
@@ -351,6 +358,11 @@ public class ZmqMainThread extends Thread {
             callBackStruct.setZmqCounter(eventCounter);
             return false;
         }
+        //  eventCounter==0  -> reconnection
+        if (eventCounter==0) {
+            callBackStruct.setZmqCounter(eventCounter);
+            return false;
+        }
 
         //  If delta==1 -> It is OK nothing lost
         if (delta==1) {
@@ -372,7 +384,8 @@ public class ZmqMainThread extends Thread {
         //  At least one event has been lost, push a DevError event
         DevError[]      devErrorList    = new DevError[] {
                     new DevError("Api_MissedEvents", ErrSeverity.ERR,
-                        "Missed some events ! ZMQ queue has reached HWM ?",
+                        "Missed some events ("  + eventCounter + "-" + previousCounter + ") ! ZMQ queue has reached " +
+                                "HWM ?",
                         "ZmqMainThread.manageEventCounter()") };
 
         //	Build and push event data
@@ -410,7 +423,10 @@ public class ZmqMainThread extends Thread {
         //  Get only device name
         int start = name.indexOf("dserver/");
         int end   = name.lastIndexOf('.');
-        name = name.substring(start, end);
+        if (end>start)
+            name = name.substring(start, end);
+        else
+            name = name.substring(start);
         ApiUtil.printTrace("Receive Heartbeat for " + name);
         ZmqEventConsumer.getInstance().push_structured_event_heartbeat(name);
         /*  NOT USED
@@ -422,24 +438,24 @@ public class ZmqMainThread extends Thread {
         */
     }
     //===============================================================
-    /**
-     * Remove the connection
-     * @param endpoint connection endpoint
-     */
     //===============================================================
-    @SuppressWarnings({"UnusedDeclaration"})
-    void removeConnection(String endpoint) {
-        System.out.println("---------------> Removing " + endpoint);
-        connected.remove(endpoint);
+    private ArrayList<String> getConnectedEndPoints(String eventName) {
+        //  Returns endpoints for specified eventName
+        ArrayList<String> list = new ArrayList<String>();
+        Enumeration<String> keys = connectedMap.keys();
+        while (keys.hasMoreElements()) {
+            String  key = keys.nextElement();
+            String  event = connectedMap.get(key);
+            if (event.equals(eventName)) {
+                list.add(key);
+            }
+        }
+        return list;
     }
     //===============================================================
     //===============================================================
     private boolean alreadyConnected(String endPoint) {
-        for (String connectedEndPoint : connected) {
-            if (connectedEndPoint.equals(endPoint))
-                return true;
-        }
-        return false;
+        return connectedMap.containsKey(endPoint);
     }
     //===============================================================
     /**
@@ -459,47 +475,85 @@ public class ZmqMainThread extends Thread {
                 break;
 
             case ZMQutils.ZMQ_CONNECT_HEARTBEAT:
-                //  Check if not already connected
-                if (alreadyConnected(controlStructure.endPoint)) {
-                    ApiUtil.printTrace("heartbeatSocket already connected to " +
-                            controlStructure.endPoint);
-                }
-                else {
-                    ApiUtil.printTrace("Connect heartbeatSocket to "+ controlStructure.endPoint);
-                    heartbeatSocket.connect(controlStructure.endPoint);
-                    connected.add(controlStructure.endPoint);
-                }
+                connectIfNotDone(heartbeatSocket, controlStructure);
                 heartbeatSocket.subscribe(controlStructure.eventName.getBytes());
                 break;
 
 
             case ZMQutils.ZMQ_DISCONNECT_HEARTBEAT:
-                heartbeatSocket.unsubscribe(controlStructure.eventName.getBytes());
+                disconnect(heartbeatSocket, controlStructure.eventName);
                 break;
 
             case ZMQutils.ZMQ_CONNECT_EVENT:
-                //  Check if not already connected
-                if (alreadyConnected(controlStructure.endPoint)) {
-                    ApiUtil.printTrace(
-                            "Event already connected to " + controlStructure.endPoint);
-                }
-                else {
-                    ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
-                    eventSocket.setHWM(controlStructure.hwm);
-                    eventSocket.connect(controlStructure.endPoint);
-                    connected.add(controlStructure.endPoint);
-                    ApiUtil.printTrace("Connect   eventSocket to "+ controlStructure.endPoint);
-                }
+                connectIfNotDone(eventSocket, controlStructure);
                 eventSocket.subscribe(controlStructure.eventName.getBytes());
-                ApiUtil.printTrace("subscribe eventSocket to "+ controlStructure.eventName);
+                if (!controlStructure.forceReconnection)
+                    traceZmqSubscription(controlStructure.eventName, true);
                 break;
 
             case ZMQutils.ZMQ_DISCONNECT_EVENT:
-                eventSocket.unsubscribe(controlStructure.eventName.getBytes());
+                disconnect(eventSocket, controlStructure.eventName);
+                traceZmqSubscription(controlStructure.eventName, false);
                 break;
 
         }
     }
     //===============================================================
     //===============================================================
+    private void connectIfNotDone(ZMQ.Socket socket, ZMQutils.ControlStructure controlStructure){
+        //  Check if not already connected or forced (re connection)
+        if (controlStructure.forceReconnection || !alreadyConnected(controlStructure.endPoint)) {
+            ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
+            //  Check if it ia a reconnection -> disconnect before connection
+            //  Not available in ZMQ 3.1
+            //if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint))
+            //    socket.disconnect(controlStructure.endPoint);
+
+            //  Do the connection
+            socket.setHWM(controlStructure.hwm);
+            socket.connect(controlStructure.endPoint);
+            if (!alreadyConnected(controlStructure.endPoint))
+                connectedMap.put(controlStructure.endPoint, controlStructure.eventName);
+        }
+        else {
+            ApiUtil.printTrace(
+                    ((controlStructure.commandCode==ZMQutils.ZMQ_CONNECT_EVENT)? "Event" : "Heartbeat") +
+                    " already connected to " + controlStructure.endPoint);
+        }
+    }
+    //===============================================================
+    //===============================================================
+    private void disconnect(ZMQ.Socket socket, String eventName){
+        ArrayList<String>   endpoints = getConnectedEndPoints(eventName);
+        socket.unsubscribe(eventName.getBytes());
+        for (String endpoint : endpoints) {
+            //  Not available in ZMQ 3.1
+            //socket.disconnect(endpoint);
+            connectedMap.remove(endpoint);
+        }
+    }
+    //===============================================================
+    //===============================================================
+    private static int zmqSubscribeCounter = 0;
+    private boolean traceZmqSub = false;
+    private boolean traceZmqSubRead = false;
+    private void traceZmqSubscription(String eventName, boolean increase) {
+        if (!traceZmqSubRead) {
+            String s = System.getenv("TraceSubscribe");
+            traceZmqSub = (s!=null && s.equals("true"));
+            traceZmqSubRead = true;
+        }
+        if (traceZmqSub) {
+            String action;
+            if (increase) {
+                zmqSubscribeCounter++;
+                action = "subscribe";
+            }  else {
+                zmqSubscribeCounter--;
+                action = "unsubscribe";
+            }
+            System.out.println(new Date() + ":  #### " +
+                    zmqSubscribeCounter + " -> " + action + " eventSocket to " + eventName);
+        }
+    }
 }
