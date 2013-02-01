@@ -96,6 +96,7 @@ public final class ServerManager {
 	    /**
 	     * shutdown hook
 	     */
+	    @Override
 	    public void run() {
 		MDC.put(SERVER_NAME_LOGGING, serverName);
 		logger.error("Shutdown hook unregister " + serverName);
@@ -129,8 +130,10 @@ public final class ServerManager {
     }
 
     /**
-     * Starts a Tango server. The system property TANGO_HOST is mandatory if using the tango database. If the tango db
-     * is not used, the system property OAPort(for jacorb) must be set. The errors occurred will be only logged.
+     * Starts a Tango server. The system property TANGO_HOST is mandatory if
+     * using the tango database. If the tango db is not used, the system
+     * property OAPort(for jacorb) must be set. The errors occurred will be only
+     * logged.
      * 
      * <pre>
      * ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
@@ -138,7 +141,8 @@ public final class ServerManager {
      * </pre>
      * 
      * @param args
-     *            The arguments to pass. instanceName [-v[trace level]] [-nodb [-dlist <device name list>]]
+     *            The arguments to pass. instanceName [-v[trace level]] [-nodb
+     *            [-dlist <device name list>]]
      * @param execName
      *            The name of the server as defined by Tango.
      * @see ServerManager#addClass(String, Class)
@@ -154,7 +158,8 @@ public final class ServerManager {
     }
 
     /**
-     * Idem as start but throw exceptions. @see ServerManager#start(String[], String)
+     * Idem as start but throw exceptions. @see ServerManager#start(String[],
+     * String)
      * 
      * @param args
      * @param execName
@@ -168,18 +173,21 @@ public final class ServerManager {
     }
 
     /**
-     * Starts a Tango server. The system property TANGO_HOST is mandatory if using the tango database. If the tango db
-     * is not used the system property OAPort(for jacorb) must be set. The errors occurred will be only logged.
+     * Starts a Tango server. The system property TANGO_HOST is mandatory if
+     * using the tango database. If the tango db is not used the system property
+     * OAPort(for jacorb) must be set. The errors occurred will be only logged.
      * 
      * <pre>
      * ServerManager.getInstance().start(new String[] { &quot;1&quot; }, JTangoTest.class);
      * </pre>
      * 
      * @param args
-     *            The arguments to pass. instanceName [-v[trace level]] [-nodb [-dlist <device name list>]]
+     *            The arguments to pass. instanceName [-v[trace level]] [-nodb
+     *            [-dlist <device name list>]]
      * @param deviceClass
-     *            The class of the device. The server name and class name must be defined in tango db with
-     *            deviceClass.getSimpleName to be started with this method.
+     *            The class of the device. The server name and class name must
+     *            be defined in tango db with deviceClass.getSimpleName to be
+     *            started with this method.
      * @see ServerManager#addClass(String, Class)
      */
     public synchronized void start(final String[] args, final Class<?> deviceClass) {
@@ -238,8 +246,10 @@ public final class ServerManager {
 	try {
 	    if (isStarted.get()) {
 		tangoClasses.clear();
-		tangoExporter.clearClass();
-		tangoExporter.unexportAll();
+		if (tangoExporter != null) {
+		    tangoExporter.clearClass();
+		    tangoExporter.unexportAll();
+		}
 	    }
 	} finally {
 	    ORBManager.shutdown();
@@ -259,8 +269,8 @@ public final class ServerManager {
     }
 
     /**
-     * Check the command line arguments. The first one is mandatory and is the server name. A -v option is authorized
-     * with an optional argument.
+     * Check the command line arguments. The first one is mandatory and is the
+     * server name. A -v option is authorized with an optional argument.
      * 
      * @param argv
      * @throws DevFailed
@@ -320,7 +330,8 @@ public final class ServerManager {
     }
 
     /**
-     * Configure {@link DatabaseFactory} without a tango db and a file for properties
+     * Configure {@link DatabaseFactory} without a tango db and a file for
+     * properties
      * 
      * @param argv
      * @param arg
@@ -416,7 +427,8 @@ public final class ServerManager {
     }
 
     /**
-     * Get the started devices of this server. WARNING: result is filled after server has been started
+     * Get the started devices of this server. WARNING: result is filled after
+     * server has been started
      * 
      * @param tangoClass
      * @return The devices
