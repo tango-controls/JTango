@@ -113,11 +113,9 @@ import fr.esrf.Tango.Device_4POA;
 import fr.esrf.Tango.MultiDevFailed;
 
 /**
- * 
  * The CORBA servant for a tango device server in IDL 4.
  * 
  * @author ABEILLE
- * 
  */
 public final class DeviceImpl extends Device_4POA {
 
@@ -557,7 +555,9 @@ public final class DeviceImpl extends Device_4POA {
 		configurePolling(command);
 	    }
 	    synchronized (DeviceImpl.this) {
-		isCorrectlyInit = init.isInitDoneCorrectly();
+		if (init != null) {
+		    isCorrectlyInit = init.isInitDoneCorrectly();
+		}
 	    }
 
 	}
@@ -581,8 +581,11 @@ public final class DeviceImpl extends Device_4POA {
 
 	private void configurePolling(final AttributeImpl attribute) throws DevFailed {
 	    if (pollAttributes.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-		// start polling
+		// configuration comes from tango db
 		attribute.configurePolling(pollAttributes.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
+	    }
+	    if (attribute.isPolled()) {
+		// start polling
 		if (attribute.getName().equals(DeviceImpl.STATE_NAME)
 			|| attribute.getName().equals(DeviceImpl.STATUS_NAME)) {
 		    // command is also set as polled
@@ -602,7 +605,6 @@ public final class DeviceImpl extends Device_4POA {
 
     private synchronized void doInit() {
 	isCorrectlyInit = false;
-
 	try {
 	    if (deviceScheduler != null) {
 		deviceScheduler.triggerJob();
@@ -632,6 +634,18 @@ public final class DeviceImpl extends Device_4POA {
 	if (init != null) {
 	    init.execute(stateImpl, statusImpl, new InitFinishedHandler());
 	} else {
+	    try {
+		new InitFinishedHandler().initDone();
+	    } catch (DevFailed e) {
+		isCorrectlyInit = false;
+		try {
+		    stateImpl.stateMachine(DeviceState.FAULT);
+		    statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
+		} catch (final DevFailed e1) {
+		    // ignore
+		    logger.debug("not important", e1);
+		}
+	    }
 	    isCorrectlyInit = true;
 	}
     }
@@ -716,7 +730,6 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
-     * 
      * @throws DevFailed
      */
     private void checkInitialization() throws DevFailed {
@@ -1235,7 +1248,6 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
-     * 
      * @param values
      * @return The read values
      * @throws DevFailed
@@ -1595,7 +1607,6 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
-     * 
      * @param commandName
      * @param inAny
      * @param fromCache
