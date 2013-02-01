@@ -61,7 +61,6 @@ import fr.esrf.Tango.EventProperties;
  * Tango attribute
  * 
  * @author ABEILLE
- * 
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable {
 
@@ -243,6 +242,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	}
     }
 
+    @Override
     public String getLastDevFailed() {
 	return PollingUtils.toString(lastError);
     }
@@ -264,12 +264,18 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	isDeltaAlarm = false;
 	final AttrQuality currentQuality = returnedValue.getQuality();
 	readValue.setQuality(currentQuality);
+	AttributePropertiesImpl props = config.getAttributeProperties();
+	boolean isAlarmNotConfigured = props.getMaxAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
+		&& props.getMinAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
+		&& props.getMaxWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
+		&& props.getMinWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
+		&& props.getDeltaT().equals(AttributePropertiesImpl.NOT_SPECIFIED);
 	if (currentQuality.equals(AttrQuality.ATTR_VALID) && !config.getWritable().equals(AttrWriteType.WRITE)
-		&& isNumber()) {
-	    final double maxAlarm = config.getAttributeProperties().getMaxAlarmDouble();
-	    final double minAlarm = config.getAttributeProperties().getMinAlarmDouble();
-	    final double maxWarning = config.getAttributeProperties().getMaxWarningDouble();
-	    final double minWarning = config.getAttributeProperties().getMinWarningDouble();
+		&& isNumber() && !isAlarmNotConfigured) {
+	    final double maxAlarm = props.getMaxAlarmDouble();
+	    final double minAlarm = props.getMinAlarmDouble();
+	    final double maxWarning = props.getMaxWarningDouble();
+	    final double minWarning = props.getMinWarningDouble();
 	    final long deltaT = config.getAttributeProperties().getDeltaTLong();
 	    if (config.getFormat().equals(AttrDataFormat.SCALAR)) {
 		checkScalarQuality(returnedValue, maxAlarm, minAlarm, maxWarning, minWarning, deltaT);
@@ -487,6 +493,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	setAttributePropertiesInDb(properties);
     }
 
+    @Override
     public String getName() {
 	return name;
     }
@@ -551,10 +558,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	return history;
     }
 
+    @Override
     public int getPollingPeriod() {
 	return config.getPollingPeriod();
     }
 
+    @Override
     public boolean isPolled() {
 	return config.isPolled();
     }
@@ -563,6 +572,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	return config.getTangoType();
     }
 
+    @Override
     public void configurePolling(final int pollingPeriod) throws DevFailed {
 	// PollingUtils.configurePolling(pollingPeriod, config, attributePropertiesManager);
 	history.clear();
@@ -570,6 +580,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	config.setPollingPeriod(Math.abs(pollingPeriod));
     }
 
+    @Override
     public void resetPolling() throws DevFailed {
 	config.setPolled(false);
 	config.setPollingPeriod(0);
@@ -711,10 +722,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 	return isDeltaAlarm;
     }
 
+    @Override
     public int getPollRingDepth() {
 	return history.getMaxSize();
     }
 
+    @Override
     public void setPollRingDepth(final int pollRingDepth) {
 	history.setMaxSize(pollRingDepth);
     }
