@@ -78,6 +78,11 @@
 						<groupId>org.slf4j</groupId>
 						<artifactId>slf4j-jdk14</artifactId>
 					</exclusion>
+					<!-- conflict with jdk classes -->
+					<exclusion>
+						<artifactId>xml-apis</artifactId>
+						<groupId>xml-apis</groupId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 		</dependencies>
