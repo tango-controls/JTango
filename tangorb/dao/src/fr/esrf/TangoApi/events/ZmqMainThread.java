@@ -59,9 +59,9 @@ import java.util.Hashtable;
 //===============================================================
 //===============================================================
 public class ZmqMainThread extends Thread {
-    private static final int    ControlSock  = 0;
-    private static final int    HearBeatSock = 1;
-    private static final int    EventSock    = 2;
+    private static final int    HearBeatSock = 0;
+    private static final int    EventSock    = 1;
+    private static final int    ControlSock  = 2;
 
     private ZMQ.Socket  controlSocket;
     private ZMQ.Socket  heartbeatSocket;
@@ -112,9 +112,9 @@ public class ZmqMainThread extends Thread {
 
         // Initialize poll set
         items = context.poller(3);
-        items.register(controlSocket,   ZMQ.Poller.POLLIN);
         items.register(heartbeatSocket, ZMQ.Poller.POLLIN);
         items.register(eventSocket,     ZMQ.Poller.POLLIN);
+        items.register(controlSocket,   ZMQ.Poller.POLLIN);
     }
     //===============================================================
     /**
@@ -419,9 +419,20 @@ public class ZmqMainThread extends Thread {
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
 
         //  First part is heartbeat name
-        String  name = new String(inputs[0]);
-        //  Get only device name
+        String  name = new String(inputs[NameIdx]);
+
+        //  Check if name is coherent
         int start = name.indexOf("dserver/");
+        if (start<0) {
+            //  ToDo
+            long    t = System.currentTimeMillis();
+            double d = (double)t/1000;
+            System.err.println(d + ":\nheartbeat: " + name + " cannot be parsed !");
+            ZMQutils.dump(inputs[NameIdx]);
+            return;
+        }
+
+        //  Get only device name
         int end   = name.lastIndexOf('.');
         if (end>start)
             name = name.substring(start, end);
@@ -429,13 +440,17 @@ public class ZmqMainThread extends Thread {
             name = name.substring(start);
         ApiUtil.printTrace("Receive Heartbeat for " + name);
         ZmqEventConsumer.getInstance().push_structured_event_heartbeat(name);
-        /*  NOT USED
-        //  Second one is endian
-        boolean littleEndian = (inputs[1][0]!=0);
 
-        System.out.println(heartbeatName + ":   little="+littleEndian);
-        //ZMQutils.dump(b2);
-        */
+        /*  NOT USED */
+        //  Second one is endianess
+        if (inputs[EndianIdx].length>0) {
+            //boolean littleEndian = (inputs[EndianIdx][0]!=0);
+            //System.out.println("heartbeat "+ name + ":   little="+littleEndian);
+        }
+        else {
+            System.out.println("heartbeat "+ name + ":   endianess is missing !!!");
+        }
+        /* */
     }
     //===============================================================
     //===============================================================
