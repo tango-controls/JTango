@@ -127,7 +127,7 @@ public class NotifdEventConsumer extends EventConsumer
     }
     //===============================================================
     /**
-     * activate POA and go into endless lopp waiting for events to be pushed
+     * activate POA and go into endless loop waiting for events to be pushed
      */
     //===============================================================
     public void run() {

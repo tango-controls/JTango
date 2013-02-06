@@ -44,6 +44,7 @@ import fr.esrf.TangoDs.TangoConst;
 import org.omg.CosEventComm.Disconnected;
 import org.omg.CosNotification.StructuredEvent;
 
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 
@@ -152,10 +153,47 @@ public class ZmqEventConsumer extends EventConsumer
         device_channel_map.put(deviceName, channelName);
     }
     //===============================================================
+    //ToDo
+    /*
+     *  Due to a problem when there is more than one network card,
+     *  The address for ZMQ ports, must be the same than 
+     *  host where deviceProxy is running.
+     */
+   //===============================================================
+    private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
+        DevVarLongStringArray   lsa = deviceData.extractLongStringArray();
+        try {
+            java.net.InetAddress iadd =
+                    java.net.InetAddress.getByName(deviceProxy.get_host_name());
+            String hostAddress = iadd.getHostAddress();
+            if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
+                //System.err.println("Host address is      " + hostAddress);
+                //System.err.println("Server returns " + lsa.svalue[0]);
+                int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
+                if (idx>0) {
+                    lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
+                    lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
+                    System.out.println("---> "+lsa.svalue[0]);
+                    deviceData = new DeviceData();
+                    deviceData.insert(lsa);
+                }
+            }
+        }
+        catch (UnknownHostException e) {
+            Except.throw_exception("UnknownHostException", 
+                    e.toString(), "ZmqEventConsumer.checkZmqAddress()");
+        }
+        return deviceData;
+    }
+    
+    //===============================================================
     //===============================================================
     @Override
     protected  void checkDeviceConnection(DeviceProxy deviceProxy,
                         String attribute, DeviceData deviceData, String event_name) throws DevFailed {
+
+        //  Check if address is coherent (??)
+        deviceData = checkZmqAddress(deviceData, deviceProxy);
 
         String deviceName = deviceProxy.name();
         ApiUtil.printTrace("checkDeviceConnection for " + deviceName);
@@ -178,7 +216,6 @@ public class ZmqEventConsumer extends EventConsumer
     //===============================================================
     @Override
     protected synchronized void connect_event_channel(ConnectionStructure cs) throws DevFailed {
-        //ToDo
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
         DeviceProxy adminDevice = DeviceProxyFactory.get(cs.channelName);
