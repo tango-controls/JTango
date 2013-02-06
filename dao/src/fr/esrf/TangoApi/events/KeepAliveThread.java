@@ -75,15 +75,22 @@ class KeepAliveThread extends TimerTask implements TangoConst {
         if (System.currentTimeMillis() - scheduledExecutionTime() >= MAX_TARDINESS) {
             return; // Too late, skip this execution
         }
-        EventConsumer.subscribeIfNotDone();
-        resubscribe_if_needed();
+        try {
+            EventConsumer.subscribeIfNotDone();
+            resubscribe_if_needed();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        catch (Error err) {
+            err.printStackTrace();
+        }
     }
     //===============================================================
     //===============================================================
     static boolean heartbeatHasBeenSkipped(EventChannelStruct eventChannelStruct) {
         long now = System.currentTimeMillis();
         return ((now - eventChannelStruct.last_heartbeat) > EVENT_HEARTBEAT_PERIOD);
-
     }
     //===============================================================
     //===============================================================
