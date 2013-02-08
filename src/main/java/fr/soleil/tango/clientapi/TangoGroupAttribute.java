@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.Group.AttributeGroup;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
@@ -23,7 +24,6 @@ public final class TangoGroupAttribute {
     }
 
     /**
-     * 
      * @param groupName
      * @param throwExceptions
      * @param attributeNames
@@ -124,6 +124,14 @@ public final class TangoGroupAttribute {
      */
     public DeviceAttribute[] getReadAsyncReplies() throws DevFailed {
 	return group.getReadReplies();
+    }
+
+    /**
+     * @return The attributes configuration @see {@link AttributeInfoEx}
+     * @throws DevFailed
+     */
+    public AttributeInfoEx[] getConfig() throws DevFailed {
+	return group.getConfig();
     }
 
     @Override
