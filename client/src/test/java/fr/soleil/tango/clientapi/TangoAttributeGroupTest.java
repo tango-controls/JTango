@@ -7,25 +7,14 @@ import org.junit.Test;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
-import fr.esrf.TangoApi.DeviceProxy;
 
 @Ignore
 public class TangoAttributeGroupTest {
 
-    public static void main(final String[] args) {
-	System.setProperty("TANGO_HOST", "calypso:20001");
-	try {
-	    final DeviceProxy dev = new DeviceProxy("katy/gs/enumeratedcommandd");
-	    System.out.println(dev.read_attribute("Status").extractString());
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	}
-    }
-
-    @Test
+    // @Test
     public void test() throws DevFailed {
-	System.setProperty("TANGO_HOST", "calypso:20001");
 	try {
 	    final TangoGroupAttribute group = new TangoGroupAttribute("tango/tangotest/1/short_spectrum",
 		    "tango/tangotest/2/short_spectrum", "raphael/test/tangotestrg1/double_spectrum");
@@ -50,7 +39,6 @@ public class TangoAttributeGroupTest {
 
     // @Test
     public void testAsync() throws DevFailed {
-	System.setProperty("TANGO_HOST", "calypso:20001");
 	try {
 	    final TangoGroupAttribute group = new TangoGroupAttribute("tango/tangotest/1/short_spectrum",
 		    "tango/tangotest/2/short_spectrum", "tango/tangotest/1/double_spectrum");
@@ -66,6 +54,23 @@ public class TangoAttributeGroupTest {
 		for (int i = 0; i < Array.getLength(tmpReadValue); i++) {
 		    System.out.println(Array.get(tmpReadValue, i));
 		}
+	    }
+	} catch (final DevFailed e) {
+	    DevFailedUtils.printDevFailed(e);
+	    throw e;
+	}
+    }
+
+    @Test
+    public void testConfig() throws DevFailed {
+	try {
+	    final TangoGroupAttribute group = new TangoGroupAttribute("tango/tangotest/1/short_spectrum",
+		    "tango/tangotest/2/short_spectrum", "tango/tangotest/1/double_spectrum");
+	    // write
+	    AttributeInfoEx[] result = group.getConfig();
+	    for (AttributeInfoEx attributeInfoEx : result) {
+		System.out.println(attributeInfoEx.name);
+		System.out.println(attributeInfoEx.format);
 	    }
 	} catch (final DevFailed e) {
 	    DevFailedUtils.printDevFailed(e);
