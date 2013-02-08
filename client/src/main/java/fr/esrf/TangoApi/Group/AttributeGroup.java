@@ -11,6 +11,7 @@ import org.tango.utils.TangoUtil;
 
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
@@ -19,7 +20,6 @@ import fr.soleil.tango.clientapi.factory.ProxyFactory;
  * Tentative to manage group of Attributes.
  * 
  * @author ABEILLE
- * 
  */
 public final class AttributeGroup {
     private String[] userAttributesNames;
@@ -257,6 +257,41 @@ public final class AttributeGroup {
     public synchronized void write(final DeviceAttribute value) throws DevFailed {
 	writeAsync(value);
 	getWriteReplies();
+    }
+
+    public synchronized AttributeInfoEx[] getConfig() throws DevFailed {
+	AttributeInfoEx[] result = new AttributeInfoEx[userAttributesNames.length];
+	DevError[] allErrors = new DevError[0];
+	final Map<String, AttributeInfoEx> replies = new HashMap<String, AttributeInfoEx>();
+	for (final String deviceName : devicesMap.keySet()) {
+	    final List<String> attributeNames = attributesMap.get(deviceName);
+	    final DeviceProxy devElement = devicesMap.get(deviceName);
+	    try {
+		final AttributeInfoEx[] subReply = devElement.get_attribute_info_ex(attributeNames
+			.toArray(new String[attributeNames.size()]));
+		int i = 0;
+		// order reply per attribute
+		for (final String attribute : attributeNames) {
+		    replies.put(deviceName + "/" + attribute, subReply[i++]);
+		}
+	    } catch (final DevFailed e) {
+		final DevError[] errors = e.errors;
+		for (final DevError error : errors) {
+		    allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
+		}
+	    }
+	}
+
+	if (allErrors.length > 0 && throwExceptions) {
+	    throw new DevFailed(allErrors);
+	} else {
+	    // send back all replies in user order
+	    int i = 0;
+	    for (final String userAttributesName : userAttributesNames) {
+		result[i++] = replies.get(userAttributesName);
+	    }
+	}
+	return result;
     }
 
     public DeviceProxy getDeviceProxy(final String attributeName) {
