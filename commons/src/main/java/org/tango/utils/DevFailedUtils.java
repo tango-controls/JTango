@@ -112,6 +112,34 @@ public final class DevFailedUtils {
 	return buffer.toString();
     }
 
+    /**
+     * Convert a DevFailed to a String
+     * 
+     * @param e
+     * @return
+     */
+    public static void logDevFailed(final DevFailed e, final Logger logger) {
+	if (e.errors != null) {
+	    for (int i = 0; i < e.errors.length; i++) {
+		logger.error("Error Level {} :", i);
+		logger.error("\t - desc: {}", e.errors[i].desc);
+		logger.error("\t - origin: {}", e.errors[i].origin);
+		logger.error("\t - reason: {}", e.errors[i].reason);
+		String sev = "";
+		if (e.errors[i].severity.value() == ErrSeverity.ERR.value()) {
+		    sev = "ERROR";
+		} else if (e.errors[i].severity.value() == ErrSeverity.PANIC.value()) {
+		    sev = "PANIC";
+		} else if (e.errors[i].severity.value() == ErrSeverity.WARN.value()) {
+		    sev = "WARN";
+		}
+		logger.error("\t - severity: {}", sev);
+	    }
+	} else {
+	    logger.error("EMPTY DevFailed");
+	}
+    }
+
     public static void printDevFailed(final DevFailed e) {
 	System.err.println(toString(e));
     }
