@@ -239,6 +239,14 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	public String name() {
 		return deviceProxy.name(this);
 	}
+	// ===========================================================
+	/**
+	 * return the device name with url.
+	 */
+	// ===========================================================
+	public String fullName() {
+        return this.getUrl().toString();
+	}
 
 	// ===========================================================
 	/**
