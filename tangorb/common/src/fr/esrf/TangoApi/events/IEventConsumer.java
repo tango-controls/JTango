@@ -66,16 +66,4 @@ public interface IEventConsumer {
 	// ===============================================================
 	// ===============================================================
 	public void unsubscribe_event(final int event_id) throws DevFailed;
-
-	// ===============================================================
-	// ===============================================================
-	//public void connect(final DeviceProxy device_proxy) throws DevFailed;
-
-	// ===============================================================
-	/**
-	 * activate POA and go into endless lopp waiting for events to be pushed
-	 */
-	// ===============================================================
-	public void run();
-
 }
