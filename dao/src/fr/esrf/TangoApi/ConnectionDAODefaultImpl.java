@@ -286,7 +286,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 						//			connection.devname +":	" + delay + " ms");
 			    		connection.setPrev_failed_t0(t);
 
-			    		// Check if connection with databse or without
+			    		// Check if connection with database or without
 			    		if (connection.url.use_db) {
 							dev_import(connection);
 			    		} else {
@@ -363,21 +363,21 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device = connection.device_3;
 	    	connection.idl_version = 3;
 		} else if (connection.getObj()._is_a("IDL:Tango/Device_2:1.0")) {
-	    	// System.out.println("Device is a Tango/Device_2:1.0 !!!!!!!!!");
+	    	System.err.println("Device " + connection.get_name() + " is a Tango/Device_2:1.0 !!!!!!!!!");
 	    	connection.device_4 = null;
 	    	connection.device_3 = null;
 	    	connection.device_2 = Device_2Helper.narrow(connection.getObj());
 	    	connection.device = connection.device_2;
 	    	connection.idl_version = 2;
 		} else if (connection.getObj()._is_a("IDL:Tango/Device:1.0")) {
-	    	// System.out.println("Device is a Tango/Device:1.0 !!!!!!!!!");
+	    	System.err.println("Device " + connection.get_name() + " is a Tango/Device:1.0 !!!!!!!!!");
 	    	connection.device_4 = null;
 	    	connection.device_3 = null;
 	    	connection.device_2 = null;
 	    	connection.device = DeviceHelper.narrow(connection.getObj());
 	    	connection.idl_version = 1;
 		} else {
-	    	System.out.println("TangoApi_DEVICE_IDL_UNKNOWN!");
+	    	System.err.println("TangoApi_DEVICE_IDL_UNKNOWN!");
 	    	Except.throw_non_supported_exception("TangoApi_DEVICE_IDL_UNKNOWN", connection.devname
 		    	+ " has an IDL revision not supported !", "Connection.createDevice("
 		    	+ connection.devname + ")");

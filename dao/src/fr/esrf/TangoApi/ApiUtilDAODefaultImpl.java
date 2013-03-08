@@ -62,7 +62,7 @@ import java.util.*;
 
 public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     static private ArrayList<Database> db_list = null;
-    static private Database default_dbase = null;
+    static private Database defaultDatabase = null;
 
     static private Hashtable<Integer, AsyncCallObject> async_request_table =
             new Hashtable<Integer, AsyncCallObject>();
@@ -93,11 +93,19 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ===================================================================
     public Database get_default_db_obj() throws DevFailed {
-        if (default_dbase == null) {
+        if (defaultDatabase == null) {
             return get_db_obj();
         } else {
-            return default_dbase;
+            return defaultDatabase;
         }
+    }
+    // ===================================================================
+    /**
+     * Return tru if the database object has been created.
+     */
+    // ===================================================================
+    public boolean default_db_obj_exists() throws DevFailed {
+        return  (defaultDatabase != null);
     }
 
     // ===================================================================
@@ -117,9 +125,9 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
         // If first time, create Database object
         // -----------------------------------------------------------
-        if (default_dbase == null) {
-            default_dbase = new Database();
-            db_list.add(default_dbase);
+        if (defaultDatabase == null) {
+            defaultDatabase = new Database();
+            db_list.add(defaultDatabase);
         }
         return db_list.get(0);
     }
@@ -147,17 +155,17 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         final String tango_host = host + ":" + port;
 
         // Search if database object already created for this host and port
-        if (default_dbase != null) {
-            if (default_dbase.get_tango_host().equals(tango_host)) {
-                return default_dbase;
+        if (defaultDatabase != null) {
+            if (defaultDatabase.get_tango_host().equals(tango_host)) {
+                return defaultDatabase;
             }
         }
 
-            for (final Database dbase : db_list) {
-                if (dbase.get_tango_host().equals(tango_host)) {
-                    return dbase;
-                }
+        for (final Database dbase : db_list) {
+            if (dbase.get_tango_host().equals(tango_host)) {
+                return dbase;
             }
+        }
 
         // Else, create a new database object
         final Database dbase = new Database(host, port);
@@ -180,7 +188,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         // And set it at first vector element as default Dbase
         db_list.remove(dbase);
         db_list.add(0, dbase);
-        default_dbase = dbase;
+        defaultDatabase = dbase;
         return dbase;
     }
 
