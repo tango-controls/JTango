@@ -51,14 +51,12 @@ import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.CosNotifyFilter.FilterNotFound;
 
 import java.util.Enumeration;
-import java.util.Timer;
 
 
 /**
  * @author pascal_verdier
  */
-public class NotifdEventConsumer extends EventConsumer
-                    implements TangoConst, Runnable, IEventConsumer {
+public class NotifdEventConsumer extends EventConsumer implements TangoConst, Runnable, IEventConsumer {
 
     private static NotifdEventConsumer instance = null;
     private EventChannel eventChannel;
@@ -67,7 +65,6 @@ public class NotifdEventConsumer extends EventConsumer
 
     private ORB orb;
     private Thread runner;
-    private Timer keepAliveTimer;
     private boolean orbRunning = false;
 
     //===============================================================
@@ -97,21 +94,21 @@ public class NotifdEventConsumer extends EventConsumer
 
         super();
         orb = ApiUtil.get_orb();
-        keepAliveTimer = new Timer();
         runner = new Thread(this);
+        runner.setName("NotifdEventConsumer");
 
         //	Create a thread and start it
         Runtime.getRuntime().addShutdownHook(
 
                 new Thread() {
                     public void run() {
-                        keepAliveTimer.cancel();
+                        System.out.println("======== Shutting down notifd event system =======");
                         cleanup_heartbeat_filters();
                         cleanup_event_filters();
                         cleanup_heartbeat_proxies();
+                        KeepAliveThread.getInstance().stopThread();
                         if (orbRunning) {
-                            // Shutdown the ORB and wait for
-                            // Completion
+                            // Shutdown the ORB and wait for Completion
                             orb.shutdown(true);
                             try {
                                 runner.join();
@@ -131,11 +128,9 @@ public class NotifdEventConsumer extends EventConsumer
      */
     //===============================================================
     public void run() {
+
         try {
             if (!ApiUtil.in_server()) {
-                keepAliveTimer.schedule(new KeepAliveThread(),
-                        2000L,//Delay 2s
-                        KeepAliveThread.getEventHeartbeatPeriod());
                 // We need to serialize here as the event subscription
                 // thread needs also to access the poa
                 synchronized (this) {
@@ -150,16 +145,13 @@ public class NotifdEventConsumer extends EventConsumer
                 orbRunning = true;
                 orb.run();
                 orb.destroy();
-            } else
-                keepAliveTimer.schedule(new KeepAliveThread(),
-                        2000L,//Delay 2s
-                        KeepAliveThread.getEventHeartbeatPeriod());
-
+            }
         } catch (org.omg.CORBA.UserException ex) {
             System.out.println("EventConsumer.run() : Unable to start orb");
             ex.printStackTrace();
             System.exit(1);
         }
+
     }
     //===============================================================
     //===============================================================

@@ -39,7 +39,6 @@ import fr.esrf.TangoDs.TangoConst;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.TimerTask;
 
 
 /**
@@ -54,48 +53,77 @@ import java.util.TimerTask;
  * A class inherited from TimerTask class
  */
 //===============================================================
-class KeepAliveThread extends TimerTask implements TangoConst {
+class KeepAliveThread extends Thread implements TangoConst {
 
     private static final long EVENT_RESUBSCRIBE_PERIOD = 600000;
     private static final long EVENT_HEARTBEAT_PERIOD = 10000;
-
+    private static boolean stop = false;
+    private static KeepAliveThread  instance = null;
     //===============================================================
     /**
      * Creates a new instance of EventConsumer.KeepAliveThread
      */
     //===============================================================
-    public KeepAliveThread() {
+    private KeepAliveThread() {
         super();
+        this.setName("KeepAliveThread");
     }
 
     //===============================================================
     //===============================================================
     public void run() {
-        long MAX_TARDINESS = EVENT_HEARTBEAT_PERIOD * 3 / 2;
-        if (System.currentTimeMillis() - scheduledExecutionTime() >= MAX_TARDINESS) {
-            return; // Too late, skip this execution
+
+        while (!stop) {
+            long t0 = System.currentTimeMillis();
+
+            try {
+                EventConsumer.subscribeIfNotDone();
+                resubscribe_if_needed();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            catch (Error err) {
+                err.printStackTrace();
+            }
+
+            long msToSleep = EVENT_HEARTBEAT_PERIOD - (System.currentTimeMillis() - t0);
+            if (msToSleep<5)
+                msToSleep = 5;
+            waitNextLoop(msToSleep);
         }
+    }
+    //===============================================================
+    //===============================================================
+    private synchronized void waitNextLoop(long ms) {
         try {
-            EventConsumer.subscribeIfNotDone();
-            resubscribe_if_needed();
+            wait(ms);
+        } catch (InterruptedException e) {
+            System.err.println(e);
         }
-        catch (Exception e) {
-            e.printStackTrace();
+    }
+    //===============================================================
+    //===============================================================
+    synchronized void stopThread() {
+        stop = true;
+        if (instance!=null)
+            notify();
+        instance = null;
+    }
+    //===============================================================
+    //===============================================================
+    static KeepAliveThread getInstance() {
+        if (instance==null) {
+            instance = new KeepAliveThread();
+            instance.start();
         }
-        catch (Error err) {
-            err.printStackTrace();
-        }
+        return instance;
     }
     //===============================================================
     //===============================================================
     static boolean heartbeatHasBeenSkipped(EventChannelStruct eventChannelStruct) {
         long now = System.currentTimeMillis();
         return ((now - eventChannelStruct.last_heartbeat) > EVENT_HEARTBEAT_PERIOD);
-    }
-    //===============================================================
-    //===============================================================
-    static long getEventHeartbeatPeriod() {
-        return EVENT_HEARTBEAT_PERIOD;
     }
     //===============================================================
     //===============================================================
