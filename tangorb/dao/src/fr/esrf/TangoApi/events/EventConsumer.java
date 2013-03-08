@@ -50,7 +50,7 @@ import java.util.Hashtable;
  * @author pascal_verdier
  */
 abstract public class EventConsumer extends StructuredPushConsumerPOA
-        implements TangoConst, Runnable, IEventConsumer {
+        implements TangoConst, IEventConsumer {
 
     protected static int subscribe_event_id = 0;
     protected static Hashtable<String, EventChannelStruct>   channel_map        = new Hashtable<String, EventChannelStruct>();
@@ -88,6 +88,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     //===============================================================
     protected EventConsumer() throws DevFailed {
         //  Default constructor
+        //  Start the KeepAliveThread loop
+        KeepAliveThread.getInstance();
     }
     //===============================================================
     //===============================================================
@@ -353,6 +355,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 {
                     try {
                         //  Try for notifd
+                        System.out.println("eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();");
                         eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
                         subscribeIfNotDone(eventCallBackStruct, callbackKey);
                         return;
@@ -504,11 +507,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
      * Read attribute and push result as event.
      */
     //===============================================================
-    void readAttributeAndPush(EventChannelStruct event_channel_struct, EventCallBackStruct callback_struct) {
+    void readAttributeAndPush(EventChannelStruct eventChannelStruct, EventCallBackStruct callbackStruct) {
         //	Check if known event name
         boolean found = false;
         for (int i = 0; !found && i < eventNames.length; i++)
-            found = callback_struct.event_name.equals(eventNames[i]);
+            found = callbackStruct.event_name.equals(eventNames[i]);
         if (!found)
             return;
 
@@ -516,39 +519,49 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceAttribute da = null;
         AttributeInfoEx info = null;
         DevError[] err = null;
-        String domain_name = callback_struct.device.name() + "/" + callback_struct.attr_name;
-        boolean old_transp = callback_struct.device.get_transparency_reconnection();
-        callback_struct.device.set_transparency_reconnection(true);
+        String domain_name = callbackStruct.device.name() + "/" + callbackStruct.attr_name;
+        boolean old_transp = callbackStruct.device.get_transparency_reconnection();
+        callbackStruct.device.set_transparency_reconnection(true);
         try {
-            if (callback_struct.event_name.equals(eventNames[ATT_CONF_EVENT]))
-                info = callback_struct.device.get_attribute_info_ex(callback_struct.attr_name);
+            if (callbackStruct.event_name.equals(eventNames[ATT_CONF_EVENT]))
+                info = callbackStruct.device.get_attribute_info_ex(callbackStruct.attr_name);
             else
-                da = callback_struct.device.read_attribute(callback_struct.attr_name);
+                da = callbackStruct.device.read_attribute(callbackStruct.attr_name);
 
             // The reconnection worked fine. The heartbeat should come back now,
             // when the notifd has not closed the connection.
             // Increase the counter to detect when the heartbeat is not coming back.
-            event_channel_struct.has_notifd_closed_the_connection++;
+            eventChannelStruct.has_notifd_closed_the_connection++;
         } catch (DevFailed e) {
             err = e.errors;
         }
-        callback_struct.device.set_transparency_reconnection(old_transp);
-        int eventSource = (event_channel_struct.consumer instanceof NotifdEventConsumer)?
-                EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
-        EventData event_data =
-                new EventData(callback_struct.device, domain_name,
-                        callback_struct.event_name, eventSource,
-                        callback_struct.event_type, da, info, null, err);
+        callbackStruct.device.set_transparency_reconnection(old_transp);
 
-        if (callback_struct.use_ev_queue) {
-            EventQueue ev_queue = callback_struct.device.getEventQueue();
-            ev_queue.insert_event(event_data);
-        } else
-            callback_struct.callback.push_event(event_data);
+        //  Build event data and push it.
+        EventData eventData =
+                new EventData(callbackStruct.device,
+                        domain_name,
+                        callbackStruct.event_name,
+                        callbackStruct.event_type,
+                        getSource(eventChannelStruct.consumer),
+                        da, info, null, err);
+
+        if (callbackStruct.use_ev_queue) {
+            EventQueue ev_queue = callbackStruct.device.getEventQueue();
+            ev_queue.insert_event(eventData);
+        } else {
+            callbackStruct.callback.push_event(eventData);
+        }
     }
 
 
 
+    //===============================================================
+    //===============================================================
+    private int getSource(EventConsumer consumer) {
+        return (consumer instanceof NotifdEventConsumer) ?
+            EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
+    }
     //===============================================================
     /**
      * Thread to read the attribute by a simple synchronous call and

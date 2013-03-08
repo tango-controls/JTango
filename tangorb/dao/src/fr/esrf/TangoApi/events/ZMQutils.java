@@ -360,7 +360,7 @@ public class  ZMQutils {
      * @param attributeName specified attribute
      * @param lsa           the subscription parameters
      * @param eventName     specified event
-     * @param forceConnect   Force reconenction if true
+     * @param forceConnect   Force reconnection if true
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
@@ -368,9 +368,11 @@ public class  ZMQutils {
                    DevVarLongStringArray lsa, String eventName, boolean forceConnect) throws DevFailed {
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
+            int n = 0;
             for (String tangoHost : tangoHosts) {
+                boolean reallyForce = (n++ == 0) && forceConnect; //  Force only first one
                 byte[] buffer = ZMQutils.getBufferToConnectEvent(tangoHost,
-                    deviceName, attributeName, lsa, eventName, forceConnect);
+                    deviceName, attributeName, lsa, eventName, reallyForce);
                 sendToZmqControlSocket(buffer);
             }
         }
@@ -386,7 +388,7 @@ public class  ZMQutils {
      * @param attributeName specified attribute
      * @param lsa   the subscription parameters
      * @param eventName     specified event
-     * @param forceConnect   Force reconenction if true
+     * @param forceConnect   Force reconnection if true
      * @return the beffer built to connect event
      * @throws DevFailed    in case of internal communication problem.
      */
@@ -423,16 +425,19 @@ public class  ZMQutils {
      * @param tgHost    specified admin device tango_host
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
-     * @param forceConnect   Force reconenction if true
+     * @param forceConnect   Force reconnection if true
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     static void connectHeartbeat(String tgHost, String adminDeviceName, DevVarLongStringArray lsa, boolean forceConnect) throws DevFailed{
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
+            int n = 0;
             for (String tangoHost : tangoHosts) {
+                boolean reallyForce = (n++ == 0) && forceConnect; //  Force only first one
                 //  Build the buffer to connect heartbeat and send it
-                byte[]  buffer = getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa,forceConnect);
+                byte[]  buffer = getBufferToConnectHeartbeat(tangoHost,
+                        adminDeviceName, lsa, reallyForce);
                 sendToZmqControlSocket(buffer);
             }
         }
@@ -443,21 +448,7 @@ public class  ZMQutils {
      * @param tangoHost    specified tango host
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
-     * @return the buffer built to connect heartbeat
-     * @throws DevFailed    in case of internal communication problem.
-     */
-	//===============================================================
-    private static byte[] getBufferToConnectHeartbeat(String tangoHost,
-                          String adminDeviceName, DevVarLongStringArray lsa) throws DevFailed {
-        return getBufferToConnectHeartbeat(tangoHost, adminDeviceName, lsa, false);
-    }
-	//===============================================================
-    /**
-     * RBuild buffer to request to control to connect heartbeat
-     * @param tangoHost    specified tango host
-     * @param adminDeviceName    specified admin device
-     * @param lsa   the subscription parameters
-     * @param forceConnect   Force reconenction if true
+     * @param forceConnect   Force reconnection if true
      * @return the buffer built to connect heartbeat
      * @throws DevFailed    in case of internal communication problem.
      */
@@ -528,6 +519,8 @@ public class  ZMQutils {
     static DevVarLongStringArray getEventSubscriptionInfoFromAdmDevice(DeviceProxy adminDevice,
             String deviceName, String attributeName, String eventName) throws DevFailed {
 
+        //System.out.println("ZmqEventSubscriptionChange for\n -" +
+        //        deviceName + "\n - " + attributeName + "\n - " + eventName);
         DeviceData argin    = new DeviceData();
         String[]	strArray = { deviceName, attributeName, "subscribe", eventName};
         argin.insert(strArray);
