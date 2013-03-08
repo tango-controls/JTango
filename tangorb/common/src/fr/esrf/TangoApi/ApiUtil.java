@@ -62,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "Release 8.2.0  -  Mon Jan 07 15:37:29 CET 2013";
+            "8.2.0  -  Tue Mar 05 15:43:07 CET 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -108,6 +108,14 @@ public class ApiUtil {
     // ===================================================================
     public static Database get_default_db_obj() throws DevFailed {
 	    return apiutilDAO.get_default_db_obj();
+    }
+    // ===================================================================
+    /**
+     * Return tru if the database object has been created.
+     */
+    // ===================================================================
+    public static boolean default_db_obj_exists() throws DevFailed {
+	    return apiutilDAO.default_db_obj_exists();
     }
 
     // ===================================================================
@@ -521,8 +529,7 @@ public class ApiUtil {
 
     // ===================================================================
     /**
-     * Returns the ORBgiopMaxMsgSize found in JVM, environment, tangorc
-     * file,....
+     * @return the ORBgiopMaxMsgSize found in JVM, environment, tangorb file,....
      */
     // ===================================================================
     public static String getORBgiopMaxMsgSize() {
