@@ -141,12 +141,18 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
             //  Check if database already connected
             Database db = null;
             try {
-                //  if tango_host is unknown --> get it from environment
-                setFromEnv();
-                if (host!=null && !host.isEmpty())
-                    db = ApiUtil.get_db_obj(host, strport);
-                else
-                    db = ApiUtil.get_db_obj();
+                //  If default database already create, get it
+                if (ApiUtil.default_db_obj_exists()) {
+                    db = ApiUtil.get_default_db_obj();
+                }
+                else {
+                    //  if tango_host is unknown --> get it from environment
+                    setFromEnv();
+                    if (host!=null && !host.isEmpty())
+                        db = ApiUtil.get_db_obj(host, strport);
+                    else
+                        db = ApiUtil.get_db_obj();
+                }
             }
             catch (DevFailed e) { /* */ }
             if (db != null)

@@ -61,6 +61,13 @@ public interface IApiUtilDAO {
 
     // ===================================================================
     /**
+     * Return tru if the database object has been created.
+     */
+    // ===================================================================
+    public boolean default_db_obj_exists() throws DevFailed;
+
+    // ===================================================================
+    /**
      * Return the database object created with TANGO_HOST environment variable .
      */
     // ===================================================================
