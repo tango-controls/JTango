@@ -79,6 +79,7 @@ public class EventConsumerUtil {
      */
     //===============================================================
     private EventConsumerUtil() {
+        /*
         try {
             //  To start KeepAliveThread.
             NotifdEventConsumer.getInstance();
@@ -86,6 +87,7 @@ public class EventConsumerUtil {
         catch (DevFailed e) {
             //  Nothing
         }
+        */
     }
     //===============================================================
     /**

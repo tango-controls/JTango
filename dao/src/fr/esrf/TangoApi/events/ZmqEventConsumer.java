@@ -51,8 +51,8 @@ import java.util.Enumeration;
 /**
  * @author pascal_verdier
  */
-public class ZmqEventConsumer extends EventConsumer
-                    implements TangoConst, Runnable, IEventConsumer {
+public class ZmqEventConsumer extends EventConsumer implements
+        TangoConst, Runnable, IEventConsumer {
 
     private static ZmqEventConsumer instance = null;
 
@@ -78,18 +78,36 @@ public class ZmqEventConsumer extends EventConsumer
         //  Start ZMQ main thread
         ZmqMainThread zmqMainThread = new ZmqMainThread(ZMQutils.getContext());
         zmqMainThread.start();
+        addShutdownHook();
+    }
+   //===============================================================
+   //===============================================================
+    private Thread runner;
+    private void addShutdownHook(){
+        runner = new Thread(this);
+        runner.setName("ZmqEventConsumer");
+        //	Create a thread and start it
+        Runtime.getRuntime().addShutdownHook(
+
+                new Thread() {
+                    public void run() {
+                        System.out.println("======== Shutting down ZMQ event system ==========");
+                        KeepAliveThread.getInstance().stopThread();
+                        try {
+                            runner.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
+        runner.start();
     }
    //===============================================================
    //===============================================================
     public void run() {
 
-        //keepAliveTimer.schedule(new KeepAliveThread(),
-        //        2000L,//Delay 2s
-//        /        KeepAliveThread.EVENT_HEARTBEAT_PERIOD);
     }
-   //===============================================================
-   //===============================================================
-
 
    //===============================================================
    //===============================================================
@@ -120,8 +138,15 @@ public class ZmqEventConsumer extends EventConsumer
     private void connect(DeviceProxy deviceProxy, String attributeName, String eventName, DeviceData deviceData) throws DevFailed {
         String deviceName = deviceProxy.name();
         String adm_name = null;
+        int tangoVersion = 0;
         try {
-            adm_name = deviceProxy.adm_name();
+            adm_name = deviceProxy.adm_name();  //.toLowerCase();
+            //  Since Tango 8.1, heartbeat is sent in lower case.
+            tangoVersion = new DeviceProxy(adm_name).getTangoVersion();
+            if (tangoVersion>=810)
+                adm_name = adm_name.toLowerCase();
+
+
         } catch (DevFailed e) {
             Except.throw_event_system_failed("API_BadConfigurationProperty",
                     "Can't subscribe to event for device " + deviceName
@@ -130,6 +155,7 @@ public class ZmqEventConsumer extends EventConsumer
         }
 
         String channelName = adm_name;
+
         // If no connection exists to this channel, create it
         Database dbase = null;
         if (!channel_map.containsKey(channelName)) {
@@ -146,9 +172,10 @@ public class ZmqEventConsumer extends EventConsumer
                         attributeName, deviceData.extractLongStringArray(), eventName,false);
         }
         EventChannelStruct eventChannelStruct = channel_map.get(channelName);
-        eventChannelStruct.adm_device_proxy = deviceProxy.get_adm_dev();
+        eventChannelStruct.adm_device_proxy =  new DeviceProxy(adm_name);
         eventChannelStruct.use_db = deviceProxy.use_db();
         eventChannelStruct.dbase = dbase;
+        eventChannelStruct.setTangoRelease(tangoVersion);
 
         device_channel_map.put(deviceName, channelName);
     }
@@ -169,11 +196,12 @@ public class ZmqEventConsumer extends EventConsumer
             if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
                 //System.err.println("Host address is      " + hostAddress);
                 //System.err.println("Server returns " + lsa.svalue[0]);
+                String  wrongAdd = lsa.svalue[0];
                 int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
                 if (idx>0) {
                     lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
                     lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
-                    System.out.println("---> "+lsa.svalue[0]);
+                    System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
                     deviceData = new DeviceData();
                     deviceData.insert(lsa);
                 }
@@ -264,17 +292,23 @@ public class ZmqEventConsumer extends EventConsumer
             DevVarLongStringArray   lsa =
                 ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                         channelStruct.adm_device_proxy,
-                        eventCallBackStruct.device.name(), eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
+                        eventCallBackStruct.device.name(),
+                        eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
 
             //  Update the heartbeat time
-            push_structured_event_heartbeat(channelStruct.adm_device_proxy.name());
+            String  admDeviceName = channelStruct.adm_device_proxy.name();  //.toLowerCase();
+            //  Since Tango 8.1, heartbeat is sent in lower case.
+            if (channelStruct.getTangoRelease()>=810)
+                admDeviceName = admDeviceName.toLowerCase();
+            push_structured_event_heartbeat(admDeviceName);
             channelStruct.heartbeat_skipped = false;
             channelStruct.last_subscribed = System.currentTimeMillis();
             channelStruct.setTangoRelease(lsa.lvalue[0]);
             channelStruct.setIdlVersion(lsa.lvalue[1]);
             eventCallBackStruct.last_subscribed = channelStruct.last_subscribed;
             done = true;
-        }catch(DevFailed e) {
+        }
+        catch(DevFailed e) {
             /* */
         }
         return done;
@@ -298,8 +332,11 @@ public class ZmqEventConsumer extends EventConsumer
 
             DevError    dev_error = null;
             try{
-                channelStruct.adm_device_proxy =
-                    new DeviceProxy(channelStruct.adm_device_proxy.name());
+                String  admDeviceName = channelStruct.adm_device_proxy.fullName();  //.toLowerCase();
+                //  Since Tango 8.1, heartbeat is sent in lower case.
+                if (channelStruct.getTangoRelease()>=810)
+                    admDeviceName = admDeviceName.toLowerCase();
+                channelStruct.adm_device_proxy = new DeviceProxy(admDeviceName);
                 channelStruct.adm_device_proxy.ping();
                 reconnectToChannel(name);
             }
@@ -353,14 +390,19 @@ public class ZmqEventConsumer extends EventConsumer
             DevVarLongStringArray   lsa =
                 ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                         channelStruct.adm_device_proxy,
-                        callBackStruct.device.name(), callBackStruct.attr_name, callBackStruct.event_name);
+                        callBackStruct.device.name(),
+                        callBackStruct.attr_name,
+                        callBackStruct.event_name);
 
             //  Build the buffer to connect event and send it
-            ZMQutils.connectEvent(callBackStruct.device.get_tango_host(), callBackStruct.device.name(),
-                    callBackStruct.attr_name, lsa, callBackStruct.event_name, true);
+            ZMQutils.connectEvent(callBackStruct.device.get_tango_host(),
+                    callBackStruct.device.name(),
+                    callBackStruct.attr_name, lsa,
+                    callBackStruct.event_name, true);
             reConnected = true;
         }
         catch (DevFailed e) {
+            System.err.println(e.errors[0].desc);
             reConnected = false;
         }
         return reConnected;
