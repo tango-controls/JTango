@@ -368,6 +368,23 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 		argin.insert(servname);
 		command_inout(database, "DbDeleteServerInfo", argin);
 	}
+    // ==========================================================================
+    /* (non-Javadoc)
+     * Rename server name/instance in databse.
+     *
+     * @param srcServerName existing server name.
+     * @param newServerName new server name.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void rename_server(Database database, String srcServerName, String newServerName) throws DevFailed {
+
+        if (!database.isAccess_checked()) checkAccess(database);
+
+        DeviceData	argin = new DeviceData();
+        argin.insert(new String[] { srcServerName, newServerName } );
+        command_inout(database, "DbRenameServer", argin);
+    }
 
 	//**************************************
 	//       DEVICES MANAGEMENT
