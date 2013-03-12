@@ -178,6 +178,20 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_server_info(Database database, String servname) throws DevFailed;
+    // ==========================================================================
+    /**
+     * Rename server name/instance in databse.
+     *
+     * @param srcServerName existing server name.
+     * @param newServerName new server name.
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void rename_server(Database database, String srcServerName, String newServerName) throws DevFailed;
+
+
+
+
 
 	//==========================================================================
 	/**

@@ -332,7 +332,7 @@ public class Database extends Connection {
 
 	// ==========================================================================
 	/**
-	 * Add/update server information in databse.
+	 * Add/update server information in database.
 	 * 
 	 * @param info Server information for the specified server in a DbServInfo object.
      * @throws DevFailed in case of database access failed
@@ -344,7 +344,7 @@ public class Database extends Connection {
 
 	// ==========================================================================
 	/**
-	 * Delete server information in databse.
+	 * Delete server information in database.
 	 * 
 	 * @param servname Server name.
      * @throws DevFailed in case of database access failed
@@ -353,6 +353,22 @@ public class Database extends Connection {
 	public void delete_server_info(String servname) throws DevFailed {
 		databaseDAO.delete_server_info(this, servname);
 	}
+	// ==========================================================================
+	/**
+	 * Rename server name/instance in database.
+	 *
+	 * @param srcServerName existing server name.
+	 * @param newServerName new server name.
+     * @throws DevFailed in case of database access failed
+	 */
+	// ==========================================================================
+	public void rename_server(String srcServerName, String newServerName) throws DevFailed {
+		databaseDAO.rename_server(this, srcServerName, newServerName);
+	}
+
+
+
+
 
 	// **************************************
 	// DEVICES MANAGEMENT
