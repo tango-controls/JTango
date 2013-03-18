@@ -220,7 +220,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             callEventSubscriptionAndConnect(device, attribute.toLowerCase(), event_name);
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
-            if (stateless && e.errors[0].reason.contains("CANNOT_IMPORT_DEVICE")) {
+            //  re throw if not stateless
+            if (!stateless || e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+                throw e;
+            }
+            else {
                 //	Build Event CallBack Structure and add it to map
                 subscribe_event_id++;
                 EventCallBackStruct new_event_callback_struct =
@@ -239,8 +243,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 failed_event_callback_map.put(callback_key, new_event_callback_struct);
                 return subscribe_event_id;
             }
-            else
-                throw e;
         }
 
         //	Prepare filters for heartbeat events on channel_name
