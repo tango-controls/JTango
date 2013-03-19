@@ -34,6 +34,11 @@
 package fr.esrf.TangoApi;
 
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.Except;
+
+import java.util.ArrayList;
+
 /** 
  *	This class is able to define a Tango server structure,
  *	loaded from database (classes, devices, properties,...)
@@ -42,11 +47,6 @@ package fr.esrf.TangoApi;
  *
  * @author  verdier
  */
-
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoDs.Except;
-
-import java.util.ArrayList;
 
 
 public class DbServerStructure {
@@ -77,7 +77,7 @@ public class DbServerStructure {
 	}
 	//===============================================================
     /**
-     *
+     *  Returns the server name
      * @return the server name
      */
 	//===============================================================
@@ -86,7 +86,7 @@ public class DbServerStructure {
     }
 	//===============================================================
     /**
-     *
+     *  Returns list of Tango classes for server
      * @return list of Tango classes for server
      */
 	//===============================================================

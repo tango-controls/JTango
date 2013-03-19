@@ -543,8 +543,9 @@ public class Connection implements ApiDefs {
 	}
 	// ==========================================================================
 	/**
-	 * @returns the name of connection (host:port)
-     * host will be returns with its full qualified domain name
+	 * Returns the name of connection (host:port),
+	 * @return the name of connection (host:port),
+     * 	host name will be returned with its full qualified domain name
 	 */
 	// ==========================================================================
 	public String getFullTangoHost() throws DevFailed {
