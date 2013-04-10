@@ -52,7 +52,7 @@ public final class TangoAttribute {
      *            http://mockito.org
      * @throws DevFailed
      */
-    public TangoAttribute(final MockAttribute attribute) throws DevFailed {
+    public TangoAttribute(final ITangoAttribute attribute) throws DevFailed {
 	attributeImpl = attribute;
     }
 
@@ -240,7 +240,6 @@ public final class TangoAttribute {
     }
 
     /**
-     * 
      * @param values
      *            The values to insert
      */

@@ -33,7 +33,7 @@ public final class TangoCommand {
      *            http://mockito.org
      * @throws DevFailed
      */
-    public TangoCommand(final MockCommand command) throws DevFailed {
+    public TangoCommand(final ITangoCommand command) throws DevFailed {
 	this.command = command;
     }
 
@@ -84,7 +84,6 @@ public final class TangoCommand {
     }
 
     /**
-     * 
      * @param deviceName
      *            The device tango (e.g. domain/family/member)
      * @param commandName
@@ -96,7 +95,6 @@ public final class TangoCommand {
     }
 
     /**
-     * 
      * @param commandName
      *            The device and command name in 4 fields (e.g. domain/family/member/commandName)
      * @throws DevFailed
