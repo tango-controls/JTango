@@ -337,6 +337,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                 if (channelStruct.getTangoRelease()>=810)
                     admDeviceName = admDeviceName.toLowerCase();
                 channelStruct.adm_device_proxy = new DeviceProxy(admDeviceName);
+                channelStruct.adm_device_proxy.set_timeout_millis(300);
                 channelStruct.adm_device_proxy.ping();
                 reconnectToChannel(name);
             }
