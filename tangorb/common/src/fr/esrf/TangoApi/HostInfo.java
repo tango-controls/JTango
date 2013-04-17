@@ -45,10 +45,13 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
-import fr.esrf.TangoDs.TangoConst;
 
-import java.net.*;
-import java.util.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 
 class  HostInfo
@@ -60,51 +63,70 @@ class  HostInfo
 	//===============================================================
 	private HostInfo()  throws DevFailed
 	{
+        String env = System.getenv("TraceAddresses");
+        boolean trace = (env!=null && env.equals("true"));
 		try {
 		
 			Enumeration<NetworkInterface> enet = NetworkInterface.getNetworkInterfaces();
-			while ( enet.hasMoreElements() && (name == null)) {
+			while ( enet.hasMoreElements() ) {
 				NetworkInterface net = enet.nextElement();
 
 				//	Only on JDK 1.6
-				//if ( net.isLoopback() )
-				//	continue;
+                //  To do not have 127.x.x.x
+				if ( net.isLoopback() )
+					continue;
 
 				Enumeration<InetAddress> eaddr = net.getInetAddresses();
-				while ( eaddr.hasMoreElements() ) 	{
-					InetAddress inet = eaddr.nextElement();
-					/*
-                    System.out.println("---------------------------------------------");
-                    System.out.println(inet.getCanonicalHostName());
-                    System.out.println(inet.getHostName());
-                    System.out.println(inet.getHostAddress());
-					*/
-
-                    //  Check if not loachost
-                    if ( ! inet.getCanonicalHostName().startsWith("local")) {
-    					//  Check if name is not the address (???)
-                        if ( ! inet.getCanonicalHostName().equalsIgnoreCase(inet.getHostAddress()) ) {
-
-                            addresses.add(inet.getHostAddress());
-
-                            //  Check if IPV 4 address
-                            if (isIPV4adress(inet.getHostAddress())) {
-                                name    = inet.getCanonicalHostName();
-                                address = inet.getHostAddress();
-                                //System.out.println(name+":	" + address);
-							    break;
-                            }
-                        }
-					}
+                if (trace) System.out.println("----------------- " + net.getName() + " --------------------");
+				while ( eaddr.hasMoreElements() ) {
+					InetAddress inetAddress = eaddr.nextElement();
+                    if (trace) {
+                        System.out.println("getCanonicalHostName(): " + inetAddress.getCanonicalHostName());
+                        System.out.println("getHostName():          " + inetAddress.getHostName());
+                        System.out.println("getHostAddress():       " + inetAddress.getHostAddress());
+                    }
+                    if (checkInetAddress(inetAddress))
+                        break;
 				}
 			}
+            if (name==null || address==null)
+                System.err.println("Host name/address cannot be determined !");
+                Except.throw_exception("TangoApi_NetworkSystemException",
+                        "Host name/address cannot be determined !",
+                        "HostInfo.HostInfo()");
 		}
 		catch(SocketException e) {
+            System.err.println(e.toString());
 			Except.throw_exception("TangoApi_SockectException",
 				e.toString(), "HostInfo.HostInfo()");
 		}
 	}
 
+	//===============================================================
+	//===============================================================
+    private boolean checkInetAddress(InetAddress inetAddress) {
+
+        //  Check if not local host
+        if ( ! inetAddress.getCanonicalHostName().startsWith("local")) {
+            //  Check if name is not the address (???)
+            if ( ! inetAddress.getCanonicalHostName().equalsIgnoreCase(inetAddress.getHostAddress()) ) {
+
+                addresses.add(inetAddress.getHostAddress());
+
+                //  Check if IPV 4 address
+                if (isIPV4adress(inetAddress.getHostAddress())) {
+                    name    = inetAddress.getCanonicalHostName();
+                    address = inetAddress.getHostAddress();
+                    //System.out.println(name+":	" + address);
+                    return true;
+                }
+            }
+            else
+                System.err.println(
+                        "Warning: at least one getCanonicalHostName() returns " + inetAddress.getCanonicalHostName());
+        }
+        return false;
+    }
 	//===============================================================
 	//===============================================================
 	private boolean isIPV4adress(String address)
@@ -135,7 +157,7 @@ class  HostInfo
 	//===============================================================
 	static Vector<String> getAddresses() throws DevFailed
 	{
-		if (address==null)
+        if (address==null)
 			new HostInfo();
 		return addresses;
 	}
