@@ -85,21 +85,21 @@ class  HostInfo
                         System.out.println("getHostName():          " + inetAddress.getHostName());
                         System.out.println("getHostAddress():       " + inetAddress.getHostAddress());
                     }
-                    if (checkInetAddress(inetAddress))
-                        break;
+                    checkInetAddress(inetAddress);
 				}
 			}
-            if (name==null || address==null)
-                System.err.println("Host name/address cannot be determined !");
-                Except.throw_exception("TangoApi_NetworkSystemException",
-                        "Host name/address cannot be determined !",
-                        "HostInfo.HostInfo()");
 		}
 		catch(SocketException e) {
             System.err.println(e.toString());
 			Except.throw_exception("TangoApi_SockectException",
 				e.toString(), "HostInfo.HostInfo()");
 		}
+        if (name==null || address==null) {
+            System.err.println("Host name/address cannot be determined !");
+            Except.throw_exception("TangoApi_NetworkSystemException",
+                "Host name/address cannot be determined !",
+                "HostInfo.HostInfo()");
+        }
 	}
 
 	//===============================================================
