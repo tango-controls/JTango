@@ -90,6 +90,7 @@ public class DbServerStructure {
      * @return list of Tango classes for server
      */
 	//===============================================================
+    @SuppressWarnings("UnusedDeclaration")
     public ArrayList<TangoClass> getClasses() {
         return classes;
     }
@@ -289,10 +290,12 @@ public class DbServerStructure {
             return name;
         }
         //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
         public ArrayList<TangoProperty> getProperties() {
             return properties;
         }
         //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
         public ArrayList<TangoAttribute> getAttributes() {
             return attributes;
         }
@@ -412,10 +415,12 @@ public class DbServerStructure {
             return name;
         }
         //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
         public ArrayList<TangoProperty> getProperties() {
             return properties;
         }
         //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
         public ArrayList<TangoAttribute> getAttributes() {
             return attributes;
         }
