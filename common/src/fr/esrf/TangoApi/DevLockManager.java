@@ -70,7 +70,7 @@ class DevLockManager {
 	
 	//	java.lang.management.ManagementFactory and
 	//	java.lang.management.RuntimeMXBean
-	//	     Not available on Andoid JVM
+	//	     Not available on Android JVM
 	static private boolean	hasManagementClases = true;
 
     // ===============================================================
