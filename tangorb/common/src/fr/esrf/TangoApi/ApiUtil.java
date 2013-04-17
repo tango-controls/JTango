@@ -34,7 +34,6 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.DevInfo_3;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 
@@ -67,12 +66,6 @@ public class ApiUtil {
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
 
-    public IApiUtilDAO getApiUtilDAO() {
-	    return apiutilDAO;
-    }
-
-    public void setApiUtilDAO(final IApiUtilDAO databaseDAO) {
-    }
 
     /**
      * ORB object reference for connection.
