@@ -50,10 +50,7 @@ import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.zeromq.ZMQ;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 
 
 //===============================================================
@@ -130,14 +127,22 @@ public class ZmqMainThread extends Thread {
     public void run() {
 
         while (!stop) {
-            //  Poll the sockets inputs
-            items.poll();
+            try {
+                //  Poll the sockets inputs
+                items.poll();
 
-            //  read the speaking one
-            for (int i=0 ; i<items.getSize() ; i++) {
-                if (items.pollin(i)) {
-                    manageInputBuffer(i);
+                //  read the speaking one
+                for (int i=0 ; i<items.getSize() ; i++) {
+                    if (items.pollin(i)) {
+                        manageInputBuffer(i);
+                    }
                 }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            catch (Error e) {
+                e.printStackTrace();
             }
         }
         ApiUtil.printTrace("------------ End of ZmqMainThread ---------------");
@@ -414,8 +419,8 @@ public class ZmqMainThread extends Thread {
             callBackStruct.setZmqCounter(eventCounter);
             return false;
         }
-        //  eventCounter==0  -> reconnection
-        if (eventCounter==0) {
+        //  eventCounter<=0  -> reconnection
+        if (eventCounter<=0) {
             callBackStruct.setZmqCounter(eventCounter);
             return false;
         }
@@ -474,8 +479,10 @@ public class ZmqMainThread extends Thread {
      * @throws DevFailed if cannot get ZmqEventConsumer instance
      */
     //===============================================================
+    private static String   dbg = System.getenv("CheckApi");
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
-
+            if (dbg!=null && dbg.equals("true"))
+                System.out.println("CheckApi=true");
         //  First part is heartbeat name
         String  name = new String(inputs[NameIdx]);
 
@@ -484,8 +491,8 @@ public class ZmqMainThread extends Thread {
         if (start<0) {
             //  ToDo
             long    t = System.currentTimeMillis();
-            double d = (double)t/1000;
-            System.err.println(d + ":\n heartbeat: " + name + " cannot be parsed !");
+            System.err.println(formatTime(t) + ":\n heartbeat: " + name +
+                    " cannot be parsed ! length=" + inputs[NameIdx].length);
             ZMQutils.dump(inputs[NameIdx]);
 
             //  Check if endianess or specif
@@ -512,7 +519,7 @@ public class ZmqMainThread extends Thread {
             //System.out.println("heartbeat "+ name + ":   little="+littleEndian);
         }
         else {
-            System.out.println("heartbeat "+ name + ":   endianess is missing !!!");
+            System.err.println("heartbeat "+ name + ":   endianess is missing !!!");
         }
         /* */
     }
@@ -682,6 +689,21 @@ public class ZmqMainThread extends Thread {
     }
     //===============================================================
     //===============================================================
+    private static String formatTime(long ms)
+    {
+        StringTokenizer st = new StringTokenizer(new Date(ms).toString());
+        ArrayList<String>	arrayList = new ArrayList<String>();
+        while (st.hasMoreTokens())
+            arrayList.add(st.nextToken());
+
+        String  time  = arrayList.get(3);
+        double d = (double)ms/1000;
+        long   l = ms/1000;
+        d = (d - l) * 1000;
+        ms = (long) d;
+
+        return time + "." + ms;
+    }
 
 
     //===============================================================
