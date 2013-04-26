@@ -61,7 +61,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.2.0  -  Fri Mar 08 10:17:02 CET 2013";
+            "8.2.2  -  Wed Apr 17 11:18:35 CEST 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -72,6 +72,15 @@ public class ApiUtil {
      */
     static protected ORB orb = null;
 
+    // ===================================================================
+    // ===================================================================
+    public IApiUtilDAO getApiUtilDAO() {
+        return apiutilDAO;
+    }
+    // ===================================================================
+    // ===================================================================
+    public void setApiUtilDAO(final IApiUtilDAO databaseDAO) {
+    }
     // ===================================================================
     /**
      * @return true if use the default factory (new ObjectDAODefaultImpl or
