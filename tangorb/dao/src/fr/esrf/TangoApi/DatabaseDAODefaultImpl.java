@@ -435,7 +435,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 		try {
 			//	Check if device alive before delete
 			//------------------------------------------
-			DeviceProxy	d = new DeviceProxy(devname);
+            String  fullDeviceName = "tango://"+database.get_tango_host()+"/"+devname;
+			DeviceProxy	d = new DeviceProxy(fullDeviceName);
 			d.ping();
 			//	If device alive do not delete
 			//------------------------------------------
