@@ -10,7 +10,7 @@
 	<version>4.0.1-SNAPSHOT</version>
 	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
 	<inceptionYear>2004</inceptionYear>
-	
+
 	<developers>
 		<developer>
 			<id>verdier</id>
@@ -35,13 +35,34 @@
 			<timezone>1</timezone>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<connection>scm:svn:https://svn.code.sf.net/p/tango-ds/code/api/java/common/IDL/trunk</connection>
 		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/common/IDL/trunk</developerConnection>
 		<url>https://svn.code.sf.net/p/tango-ds/code/api/java/common/IDL/trunk</url>
 	</scm>
-	
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.repositories.server</id>
+			<name>Java Releases</name>
+			<url>http://${maven.repositories.server}${maven.repositories.home}/java-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>maven.repositories.server</id>
+			<name>Java Snapshots</name>
+			<url>http://${maven.repositories.server}${maven.repositories.home}/java-snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>maven.web.server</id>
+			<name>Java Website</name>
+			<url>scpexe://${maven.web.server}${maven.web.home}/java</url>
+		</site>
+
+	</distributionManagement>
+
+
 	<build>
 		<plugins>
 			<plugin>
@@ -68,32 +89,13 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<!-- <build>
-		<plugins>
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<header>src/main/template/header.txt</header>
-					<excludes>
-						<exclude>**/*.txt</exclude>
-					</excludes>
-					<strictCheck>true</strictCheck>
-					<properties>
-						<year>${project.inceptionYear}</year>
-					</properties>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build> -->
+
+	<!-- <build> <plugins> <plugin> <groupId>com.mycila.maven-license-plugin</groupId> 
+		<artifactId>maven-license-plugin</artifactId> <executions> <execution> <goals> 
+		<goal>check</goal> </goals> </execution> </executions> <configuration> <header>src/main/template/header.txt</header> 
+		<excludes> <exclude>**/*.txt</exclude> </excludes> <strictCheck>true</strictCheck> 
+		<properties> <year>${project.inceptionYear}</year> </properties> </configuration> 
+		</plugin> </plugins> </build> -->
 	<dependencies>
 		<dependency>
 			<groupId>org.jacorb</groupId>
