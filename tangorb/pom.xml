@@ -47,8 +47,42 @@
 		<module>common</module>
 	</modules>
 
+	<properties>
+		<maven.repositories.server>calypso</maven.repositories.server>
+		<maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
+
+		<maven.web.server>calypso</maven.web.server>
+		<maven.web.home>/usr/Local/apache/docs</maven.web.home>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.repositories.server</id>
+			<name>Java Releases</name>
+			<url>http://${maven.repositories.server}${maven.repositories.home}/java-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>maven.repositories.server</id>
+			<name>Java 
+		Snapshots</name>
+			<url>http://${maven.repositories.server}${maven.repositories.home}/java-snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>maven.web.server</id>
+			<name>Java Website</name>
+			<url>scpexe://${maven.web.server}${maven.web.home}/java</url>
+		</site>
+	</distributionManagement>
+
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
