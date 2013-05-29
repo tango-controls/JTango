@@ -42,6 +42,14 @@
 		<url>https://svn.code.sf.net/p/tango-ds/code/api/java/common/IDL/trunk</url>
 	</scm>
 
+	<properties>
+		<maven.repositories.server>calypso</maven.repositories.server>
+		<maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
+
+		<maven.web.server>calypso</maven.web.server>
+		<maven.web.home>/usr/Local/apache/docs</maven.web.home>
+	</properties>
+
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
@@ -51,7 +59,8 @@
 		</repository>
 		<snapshotRepository>
 			<id>maven.repositories.server</id>
-			<name>Java Snapshots</name>
+			<name>Java 
+		Snapshots</name>
 			<url>http://${maven.repositories.server}${maven.repositories.home}/java-snapshots</url>
 		</snapshotRepository>
 		<site>
@@ -59,12 +68,16 @@
 			<name>Java Website</name>
 			<url>scpexe://${maven.web.server}${maven.web.home}/java</url>
 		</site>
-
 	</distributionManagement>
-
 
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
