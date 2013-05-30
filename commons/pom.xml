@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tango</groupId>
 	<artifactId>JTangoCommons</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>JTango's Commons</name>
 	<description>commons for java tango</description>
 	
