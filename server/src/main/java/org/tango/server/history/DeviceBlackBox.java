@@ -46,106 +46,108 @@ import fr.esrf.Tango.LockerLanguage;
 
 public final class DeviceBlackBox {
     private final Logger logger = LoggerFactory.getLogger(DeviceBlackBox.class);
+    private final Logger clientRequestsLogger = LoggerFactory.getLogger("TangoClientRequests");
     private final Queue<String> blackbox = new ArrayDeque<String>(Constants.QUEUE_CAPACITY);
 
     public String[] toArray(final int size) throws DevFailed {
-	if (blackbox.size() == 0) {
-	    DevFailedUtils.throwDevFailed(ExceptionMessages.BLACK_BOX_EMPTY, "blackbox is emty");
-	}
-	final String[] blackboxArray = blackbox.toArray(new String[blackbox.size()]);
-	String[] result;
-	if (size < Constants.QUEUE_CAPACITY && size < blackbox.size()) {
-	    result = new String[size];
-	    System.arraycopy(blackboxArray, blackboxArray.length - size, result, 0, result.length);
-	} else {
-	    result = blackboxArray;
-	}
-	ArrayUtils.reverse(result);
-	return result;
+        if (blackbox.size() == 0) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.BLACK_BOX_EMPTY, "blackbox is emty");
+        }
+        final String[] blackboxArray = blackbox.toArray(new String[blackbox.size()]);
+        String[] result;
+        if (size < Constants.QUEUE_CAPACITY && size < blackbox.size()) {
+            result = new String[size];
+            System.arraycopy(blackboxArray, blackboxArray.length - size, result, 0, result.length);
+        } else {
+            result = blackboxArray;
+        }
+        ArrayUtils.reverse(result);
+        return result;
     }
 
     public void insertInblackBox(final String message) {
-	final StringBuilder sb = new StringBuilder(message);
-	sb.append(insertHostName());
-	offerInblackBox(sb.toString());
+        final StringBuilder sb = new StringBuilder(message);
+        sb.append(insertHostName());
+        offerInblackBox(sb.toString());
     }
 
     private synchronized void offerInblackBox(final String message) {
-	while (blackbox.size() >= Constants.QUEUE_CAPACITY - 1) {
-	    blackbox.poll();
-	}
-	final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
-	final StringBuilder sb = new StringBuilder(dateFormat.format(new Date()));
-	sb.append(" : ");
-	sb.append(message);
-	final boolean isInserted = blackbox.offer(sb.toString());
-	if (!isInserted) {
-	    logger.debug("{} not inserted in black box queue ", sb);
-	}
+        while (blackbox.size() >= Constants.QUEUE_CAPACITY - 1) {
+            blackbox.poll();
+        }
+        final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+        final StringBuilder sb = new StringBuilder(dateFormat.format(new Date()));
+        sb.append(" : ");
+        sb.append(message);
+        clientRequestsLogger.info(message);
+        final boolean isInserted = blackbox.offer(sb.toString());
+        if (!isInserted) {
+            logger.debug("{} not inserted in black box queue ", sb);
+        }
     }
 
     public void insertInblackBox(final String message, final DevSource devSource) {
-	final StringBuilder sb = insertSource(message, devSource);
-	offerInblackBox(sb.toString());
+        final StringBuilder sb = insertSource(message, devSource);
+        offerInblackBox(sb.toString());
     }
 
     public void insertInblackBox(final String message, final DevSource devSource, final ClntIdent clt) {
-	final StringBuilder sb = insertSource(message, devSource);
-	String cli = "";
-	try {
-	    if (clt.discriminator() == LockerLanguage.CPP) {
-		cli = "(CPP/Python client with PID " + Integer.valueOf(clt.cpp_clnt()).toString() + ")";
-	    } else {
-		cli = "(Java client with main class " + clt.java_clnt().MainClass + ")";
-	    }
-	} catch (final BAD_OPERATION e) {
-	    // ignore
-	    logger.debug("{}", e);
-	}
-	sb.append(insertHostName());
-	sb.append(" ");
-	sb.append(cli);
-	offerInblackBox(sb.toString());
+        final StringBuilder sb = insertSource(message, devSource);
+        String cli = "";
+        try {
+            if (clt.discriminator() == LockerLanguage.CPP) {
+                cli = "(CPP/Python client with PID " + Integer.valueOf(clt.cpp_clnt()).toString() + ")";
+            } else {
+                cli = "(Java client with main class " + clt.java_clnt().MainClass + ")";
+            }
+        } catch (final BAD_OPERATION e) {
+            // ignore
+            logger.debug("{}", e);
+        }
+        sb.append(insertHostName());
+        sb.append(" ");
+        sb.append(cli);
+        offerInblackBox(sb.toString());
     }
 
     private StringBuilder insertHostName() {
-	final StringBuilder sb = new StringBuilder();
-	sb.append(" requested from ");
-	sb.append(ServerRequestInterceptor.getInstance().getClientHostName());
-	return sb;
+        final StringBuilder sb = new StringBuilder();
+        sb.append(" requested from ");
+        sb.append(ServerRequestInterceptor.getInstance().getClientHostName());
+        return sb;
     }
 
     private StringBuilder insertSource(final String message, final DevSource devSource) {
-	String src = "";
-	if (devSource.value() == DevSource._CACHE) {
-	    src = "cache";
-	} else if (devSource.value() == DevSource._DEV) {
-	    src = "device";
-	} else if (devSource.value() == DevSource._CACHE_DEV) {
-	    src = "cache_device";
-	}
-	final StringBuilder sb = new StringBuilder(message);
-	sb.append(" from ");
-	sb.append(src);
-	return sb;
+        String src = "";
+        if (devSource.value() == DevSource._CACHE) {
+            src = "cache";
+        } else if (devSource.value() == DevSource._DEV) {
+            src = "device";
+        } else if (devSource.value() == DevSource._CACHE_DEV) {
+            src = "cache_device";
+        }
+        final StringBuilder sb = new StringBuilder(message);
+        sb.append(" from ");
+        sb.append(src);
+        return sb;
     }
 
     public void insertInblackBox(final String message, final ClntIdent clt) {
-	String cli = "";
-	try {
-	    if (clt.discriminator() == LockerLanguage.CPP) {
-		cli = Integer.valueOf(clt.cpp_clnt()).toString();
-	    } else {
-		cli = clt.java_clnt().MainClass;
-	    }
-	} catch (final BAD_OPERATION e) {
-	    // ignore
-	    logger.debug("{}", e);
-	}
-	final StringBuilder sb = new StringBuilder(message);
-	sb.append(" from  \"");
-	sb.append(cli);
-	sb.append("\"");
-	offerInblackBox(sb.toString());
+        String cli = "";
+        try {
+            if (clt.discriminator() == LockerLanguage.CPP) {
+                cli = Integer.valueOf(clt.cpp_clnt()).toString();
+            } else {
+                cli = clt.java_clnt().MainClass;
+            }
+        } catch (final BAD_OPERATION e) {
+            // ignore
+            logger.debug("{}", e);
+        }
+        final StringBuilder sb = new StringBuilder(message);
+        sb.append(" from  \"");
+        sb.append(cli);
+        sb.append("\"");
+        offerInblackBox(sb.toString());
     }
 }
