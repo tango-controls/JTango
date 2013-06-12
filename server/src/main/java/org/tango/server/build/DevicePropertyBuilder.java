@@ -60,44 +60,44 @@ final class DevicePropertyBuilder {
      * @throws DevFailed
      */
     public void build(final Class<?> clazz, final Field field, final DeviceImpl device, final Object businessObject)
-	    throws DevFailed {
-	xlogger.entry();
-	try {
-	    // Inject each device property
-	    final DeviceProperty annot = field.getAnnotation(DeviceProperty.class);
-	    final String fieldName = field.getName();
-	    String propName;
-	    if (annot.name().equals("")) {
-		propName = fieldName;
-	    } else {
-		propName = annot.name();
-	    }
-	    logger.debug("Has a DeviceProperty : {}", propName);
-	    BuilderUtils.checkStatic(field);
-	    String setterName = BuilderUtils.SET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		    + fieldName.substring(1);
-	    Method setter = null;
-	    try {
-		setter = businessObject.getClass().getMethod(setterName, field.getType());
-	    } catch (final NoSuchMethodException e) {
-		if (fieldName.startsWith(BuilderUtils.IS)) {
-		    setterName = BuilderUtils.SET + fieldName.substring(2);
-		    try {
-			setter = businessObject.getClass().getMethod(setterName, field.getType());
-		    } catch (final NoSuchMethodException e1) {
-			DevFailedUtils.throwDevFailed(e);
-		    }
-		} else {
-		    DevFailedUtils.throwDevFailed(e);
-		}
-	    }
-	    final DevicePropertyImpl property = new DevicePropertyImpl(propName, annot.description(), setter,
-		    businessObject, device.getName(), device.getClassName(), annot.defaultValue());
-	    device.addDeviceProperty(property);
-	} catch (final IllegalArgumentException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
-	xlogger.exit();
+            throws DevFailed {
+        xlogger.entry();
+        try {
+            // Inject each device property
+            final DeviceProperty annot = field.getAnnotation(DeviceProperty.class);
+            final String fieldName = field.getName();
+            String propName;
+            if (annot.name().equals("")) {
+                propName = fieldName;
+            } else {
+                propName = annot.name();
+            }
+            logger.debug("Has a DeviceProperty : {}", propName);
+            BuilderUtils.checkStatic(field);
+            String setterName = BuilderUtils.SET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                    + fieldName.substring(1);
+            Method setter = null;
+            try {
+                setter = businessObject.getClass().getMethod(setterName, field.getType());
+            } catch (final NoSuchMethodException e) {
+                if (fieldName.startsWith(BuilderUtils.IS)) {
+                    setterName = BuilderUtils.SET + fieldName.substring(2);
+                    try {
+                        setter = businessObject.getClass().getMethod(setterName, field.getType());
+                    } catch (final NoSuchMethodException e1) {
+                        DevFailedUtils.throwDevFailed(e);
+                    }
+                } else {
+                    DevFailedUtils.throwDevFailed(e);
+                }
+            }
+            final DevicePropertyImpl property = new DevicePropertyImpl(propName, annot.description(), setter,
+                    businessObject, device.getName(), device.getClassName(), annot.isMandatory(), annot.defaultValue());
+            device.addDeviceProperty(property);
+        } catch (final IllegalArgumentException e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
+        xlogger.exit();
     }
 
 }
