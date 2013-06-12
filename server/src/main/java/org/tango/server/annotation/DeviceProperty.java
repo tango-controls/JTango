@@ -65,4 +65,12 @@ public @interface DeviceProperty {
      * @return the default value
      */
     String[] defaultValue() default "";
+
+    /**
+     * Define if the property is mandatory
+     * 
+     * @return true or false
+     */
+    boolean isMandatory() default false;
+
 }

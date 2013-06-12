@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -41,36 +42,41 @@ public final class DevicePropertyImpl {
     private final String className;
     private final String name;
     private final String[] defaultValue;
+    private final boolean isMandatory;
 
     public DevicePropertyImpl(final String propertyName, final String description, final Method propertyMethod,
-	    final Object businessObject, final String deviceName, final String className, final String... defaultValue)
-	    throws DevFailed {
-	this.description = description;
-	name = propertyName;
-	this.propertyMethod = propertyMethod;
-	this.businessObject = businessObject;
-	this.deviceName = deviceName;
-	this.className = className;
-	this.defaultValue = defaultValue.length == 0 ? new String[] { "" } : defaultValue;
+            final Object businessObject, final String deviceName, final String className, boolean isMandatory,
+            final String... defaultValue) throws DevFailed {
+        this.description = description;
+        name = propertyName;
+        this.propertyMethod = propertyMethod;
+        this.businessObject = businessObject;
+        this.deviceName = deviceName;
+        this.className = className;
+        this.isMandatory = isMandatory;
+        this.defaultValue = defaultValue.length == 0 ? new String[] { "" } : defaultValue;
     }
 
     public void update() throws DevFailed {
-	xlogger.entry(name);
-	final String[] property = PropertiesUtils.getDeviceProperty(deviceName, className, name);
-	PropertiesUtils.injectProperty(name, propertyMethod, property, businessObject, defaultValue);
-	xlogger.exit();
+        xlogger.entry(name);
+        final String[] property = PropertiesUtils.getDeviceProperty(deviceName, className, name);
+        if (isMandatory && (property.length == 0 || property[0].isEmpty())) {
+            DevFailedUtils.throwDevFailed(name + " device property is mandatory");
+        }
+        PropertiesUtils.injectProperty(name, propertyMethod, property, businessObject, defaultValue);
+        xlogger.exit();
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public String[] getDefaultValue() {
-	return Arrays.copyOf(defaultValue, defaultValue.length);
+        return Arrays.copyOf(defaultValue, defaultValue.length);
     }
 
 }
