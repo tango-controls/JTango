@@ -58,36 +58,21 @@ public final class InitImpl extends DeviceBehaviorObject {
     private static final String INIT_FAILED = "Init failed";
     private final Logger logger = LoggerFactory.getLogger(InitImpl.class);
 
-    /**
-     * interface to be notified when init is done
-     * 
-     * @author ABEILLE
-     * 
-     */
-    public interface IInitFinished {
-	/**
-	 * Called when init finished
-	 * 
-	 * @throws DevFailed
-	 */
-	void initDone() throws DevFailed;
-    }
-
     private final Method initMethod;
     private final boolean isLazy;
     private final Object businessObject;
 
     private static class ThreadFact implements ThreadFactory {
-	private final String name;
+        private final String name;
 
-	ThreadFact(final String name) {
-	    this.name = name;
-	}
+        ThreadFact(final String name) {
+            this.name = name;
+        }
 
-	@Override
-	public Thread newThread(final Runnable r) {
-	    return new Thread(r, name + " Init");
-	}
+        @Override
+        public Thread newThread(final Runnable r) {
+            return new Thread(r, name + " Init");
+        }
     }
 
     private final ExecutorService executor;
@@ -102,11 +87,11 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @param businessObject
      */
     public InitImpl(final String deviceName, final Method initMethod, final boolean isLazy, final Object businessObject) {
-	super();
-	this.initMethod = initMethod;
-	this.isLazy = isLazy;
-	this.businessObject = businessObject;
-	executor = Executors.newSingleThreadExecutor(new ThreadFact(deviceName));
+        super();
+        this.initMethod = initMethod;
+        this.isLazy = isLazy;
+        this.businessObject = businessObject;
+        executor = Executors.newSingleThreadExecutor(new ThreadFact(deviceName));
     }
 
     /**
@@ -116,23 +101,22 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @param statusImpl
      * @throws DevFailed
      */
-    public synchronized void execute(final StateImpl stateImpl, final StatusImpl statusImpl,
-	    final IInitFinished finishedHandler) {
-	if (isLazy && !isInitInProgress()) {
-	    final Callable<Void> initRunnable = new Callable<Void>() {
-		@Override
-		public Void call() throws DevFailed {
-		    logger.debug("Lazy init in");
-		    doInit(stateImpl, statusImpl, finishedHandler);
-		    logger.debug("Lazy init out");
-		    return null;
-		}
-	    };
+    public synchronized void execute(final StateImpl stateImpl, final StatusImpl statusImpl) {
+        if (isLazy && !isInitInProgress()) {
+            final Callable<Void> initRunnable = new Callable<Void>() {
+                @Override
+                public Void call() throws DevFailed {
+                    logger.debug("Lazy init in");
+                    doInit(stateImpl, statusImpl);
+                    logger.debug("Lazy init out");
+                    return null;
+                }
+            };
 
-	    future = executor.submit(initRunnable);
-	} else {
-	    doInit(stateImpl, statusImpl, finishedHandler);
-	}
+            future = executor.submit(initRunnable);
+        } else {
+            doInit(stateImpl, statusImpl);
+        }
     }
 
     /**
@@ -141,11 +125,11 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @return true if init is in progress
      */
     public synchronized boolean isInitInProgress() {
-	boolean isInitInProgress = false;
-	if (future != null) {
-	    isInitInProgress = !future.isDone();
-	}
-	return isInitInProgress;
+        boolean isInitInProgress = false;
+        if (future != null) {
+            isInitInProgress = !future.isDone();
+        }
+        return isInitInProgress;
     }
 
     /**
@@ -154,7 +138,7 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @return true if init was done without errors
      */
     public boolean isInitDoneCorrectly() {
-	return isInitDoneCorrectly.get();
+        return isInitDoneCorrectly.get();
     }
 
     /**
@@ -163,89 +147,77 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @param statusImpl
      * @param finishedHandler
      */
-    private void doInit(final StateImpl stateImpl, final StatusImpl statusImpl, final IInitFinished finishedHandler) {
-	isInitDoneCorrectly.set(false);
-	try {
-	    stateImpl.stateMachine(DeviceState.INIT);
-	    statusImpl.statusMachine("Init in progress", DeviceState.INIT);
-	    initMethod.invoke(businessObject);
-	    if (getEndState() != null) {
-		// state changed by @StateMachine
-		stateImpl.stateMachine(getEndState());
-	    } else if (stateImpl.isDefaultState()) {
-		stateImpl.stateMachine(DeviceState.UNKNOWN);
-	    }
-	    isInitDoneCorrectly.set(true);
-	} catch (final IllegalArgumentException e) {
-	    manageError(stateImpl, statusImpl, e);
-	} catch (final IllegalAccessException e) {
-	    manageError(stateImpl, statusImpl, e);
-	} catch (final InvocationTargetException e) {
-	    manageInitError(stateImpl, statusImpl, e);
-	} catch (final DevFailed e) {
-	    logger.error(INIT_FAILED, e);
-	    try {
-		stateImpl.stateMachine(DeviceState.FAULT);
-		statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
-	    } catch (final DevFailed e1) {
-		logger.debug(DevFailedUtils.toString(e1));
-	    }
-	} finally {
-	    try {
-		finishedHandler.initDone();
-	    } catch (final DevFailed e) {
-		logger.error(INIT_FAILED, e);
-		try {
-		    stateImpl.stateMachine(DeviceState.FAULT);
-		    statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
-		} catch (final DevFailed e1) {
-		    logger.debug(DevFailedUtils.toString(e1));
-		}
-	    }
-	}
+    private void doInit(final StateImpl stateImpl, final StatusImpl statusImpl) {
+        isInitDoneCorrectly.set(false);
+        try {
+            stateImpl.stateMachine(DeviceState.INIT);
+            statusImpl.statusMachine("Init in progress", DeviceState.INIT);
+            initMethod.invoke(businessObject);
+            if (getEndState() != null) {
+                // state changed by @StateMachine
+                stateImpl.stateMachine(getEndState());
+            } else if (stateImpl.isDefaultState()) {
+                stateImpl.stateMachine(DeviceState.UNKNOWN);
+            }
+            isInitDoneCorrectly.set(true);
+        } catch (final IllegalArgumentException e) {
+            manageError(stateImpl, statusImpl, e);
+        } catch (final IllegalAccessException e) {
+            manageError(stateImpl, statusImpl, e);
+        } catch (final InvocationTargetException e) {
+            manageInitError(stateImpl, statusImpl, e);
+        } catch (final DevFailed e) {
+            logger.error(INIT_FAILED, e);
+            try {
+                stateImpl.stateMachine(DeviceState.FAULT);
+                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
+            } catch (final DevFailed e1) {
+                logger.debug(DevFailedUtils.toString(e1));
+            }
+        }
     }
 
     private void manageInitError(final StateImpl stateImpl, final StatusImpl statusImpl,
-	    final InvocationTargetException e) {
-	try {
-	    logger.error(INIT_FAILED, e.getCause());
-	    stateImpl.stateMachine(DeviceState.FAULT);
-	    if (e.getCause() instanceof DevFailed) {
-		logger.error("Tango error at Init: {}", DevFailedUtils.toString((DevFailed) e.getCause()));
-		statusImpl.statusMachine("Init failed: " + DevFailedUtils.toString((DevFailed) e.getCause()),
-			DeviceState.FAULT);
-	    } else {
-		final StringWriter sw = new StringWriter();
-		e.getCause().printStackTrace(new PrintWriter(sw));
-		final String stacktrace = sw.toString();
-		statusImpl.statusMachine("Init failed: " + stacktrace, DeviceState.FAULT);
-	    }
-	} catch (final DevFailed e1) {
-	    logger.error(DevFailedUtils.toString(e1));
-	}
+            final InvocationTargetException e) {
+        try {
+            logger.error(INIT_FAILED, e.getCause());
+            stateImpl.stateMachine(DeviceState.FAULT);
+            if (e.getCause() instanceof DevFailed) {
+                logger.error("Tango error at Init: {}", DevFailedUtils.toString((DevFailed) e.getCause()));
+                statusImpl.statusMachine("Init failed: " + DevFailedUtils.toString((DevFailed) e.getCause()),
+                        DeviceState.FAULT);
+            } else {
+                final StringWriter sw = new StringWriter();
+                e.getCause().printStackTrace(new PrintWriter(sw));
+                final String stacktrace = sw.toString();
+                statusImpl.statusMachine("Init failed: " + stacktrace, DeviceState.FAULT);
+            }
+        } catch (final DevFailed e1) {
+            logger.error(DevFailedUtils.toString(e1));
+        }
     }
 
     private void manageError(final StateImpl stateImpl, final StatusImpl statusImpl, final Exception e) {
-	try {
-	    stateImpl.stateMachine(DeviceState.FAULT);
-	    final StringWriter sw = new StringWriter();
-	    if (e.getCause() != null) {
-		e.getCause().printStackTrace(new PrintWriter(sw));
-	    } else {
-		e.printStackTrace(new PrintWriter(sw));
-	    }
-	    final String stacktrace = sw.toString();
-	    statusImpl.statusMachine(stacktrace, DeviceState.FAULT);
-	} catch (final DevFailed e1) {
-	    logger.debug(DevFailedUtils.toString(e1));
-	}
+        try {
+            stateImpl.stateMachine(DeviceState.FAULT);
+            final StringWriter sw = new StringWriter();
+            if (e.getCause() != null) {
+                e.getCause().printStackTrace(new PrintWriter(sw));
+            } else {
+                e.printStackTrace(new PrintWriter(sw));
+            }
+            final String stacktrace = sw.toString();
+            statusImpl.statusMachine(stacktrace, DeviceState.FAULT);
+        } catch (final DevFailed e1) {
+            logger.debug(DevFailedUtils.toString(e1));
+        }
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	builder.append("name", initMethod);
-	builder.append("device class", businessObject.getClass());
-	return builder.toString();
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("name", initMethod);
+        builder.append("device class", businessObject.getClass());
+        return builder.toString();
     }
 }

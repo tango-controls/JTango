@@ -54,7 +54,7 @@ public final class StatusImpl {
     private final XLogger xlogger = XLoggerFactory.getXLogger(StatusImpl.class);
     private final Method getStatusMethod;
     private final Method setStatusMethod;
-    private String status = "default value";
+    private String status = "";
     private final Object businessObject;
     private final Map<String, String> attributeAlarm = new HashMap<String, String>();
 
@@ -66,9 +66,10 @@ public final class StatusImpl {
      * @param setStatusMethod
      */
     public StatusImpl(final Object businessObject, final Method getStatusMethod, final Method setStatusMethod) {
-	this.getStatusMethod = getStatusMethod;
-	this.setStatusMethod = setStatusMethod;
-	this.businessObject = businessObject;
+        this.getStatusMethod = getStatusMethod;
+        this.setStatusMethod = setStatusMethod;
+        this.businessObject = businessObject;
+        status = "";
     }
 
     /**
@@ -78,31 +79,32 @@ public final class StatusImpl {
      * @throws DevFailed
      */
     public String updateStatus(final DeviceState state) throws DevFailed {
-	xlogger.entry();
-	if (getStatusMethod != null) {
-	    try {
-		status = (String) getStatusMethod.invoke(businessObject);
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		if (e.getCause() instanceof DevFailed) {
-		    throw (DevFailed) e.getCause();
-		} else {
-		    DevFailedUtils.throwDevFailed("INVOCATION_ERROR", ExceptionUtils.getFullStackTrace(e.getCause())
-			    + " InvocationTargetException");
-		}
-	    }
-	} else {
-	    status = "The device is in " + state + " state.";
-	}
-	StringBuilder statusAlarm = new StringBuilder();
-	for (final String string : attributeAlarm.values()) {
-	    statusAlarm = statusAlarm.append(string);
-	}
+        xlogger.entry();
+        if (getStatusMethod != null) {
+            try {
+                status = (String) getStatusMethod.invoke(businessObject);
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    throw (DevFailed) e.getCause();
+                } else {
+                    DevFailedUtils.throwDevFailed("INVOCATION_ERROR", ExceptionUtils.getFullStackTrace(e.getCause())
+                            + " InvocationTargetException");
+                }
+            }
+        } else {
+            if (status.isEmpty())
+                status = "The device is in " + state + " state.";
+        }
+        StringBuilder statusAlarm = new StringBuilder();
+        for (final String string : attributeAlarm.values()) {
+            statusAlarm = statusAlarm.append(string);
+        }
 
-	return status + statusAlarm;
+        return status + statusAlarm;
     }
 
     /**
@@ -112,58 +114,58 @@ public final class StatusImpl {
      * @throws DevFailed
      */
     public synchronized void statusMachine(final String status, final DeviceState state) throws DevFailed {
-	if (status != null) {
-	    logger.debug("Changing status to: {}", status);
-	    this.status = status;
-	    if (setStatusMethod != null) {
-		try {
-		    setStatusMethod.invoke(businessObject, status);
-		} catch (final IllegalArgumentException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		} catch (final IllegalAccessException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		} catch (final InvocationTargetException e) {
-		    if (e.getCause() instanceof DevFailed) {
-			throw (DevFailed) e.getCause();
-		    } else {
-			DevFailedUtils.throwDevFailed(e.getCause());
-		    }
-		}
-	    }
-	}
+        if (status != null) {
+            logger.debug("Changing status to: {}", status);
+            this.status = status;
+            if (setStatusMethod != null) {
+                try {
+                    setStatusMethod.invoke(businessObject, status);
+                } catch (final IllegalArgumentException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                } catch (final IllegalAccessException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                } catch (final InvocationTargetException e) {
+                    if (e.getCause() instanceof DevFailed) {
+                        throw (DevFailed) e.getCause();
+                    } else {
+                        DevFailedUtils.throwDevFailed(e.getCause());
+                    }
+                }
+            }
+        }
     }
 
     public void addAttributeAlarm(final String attributeName, final boolean isTooHigh) throws DevFailed {
-	String alarmStatus;
-	if (isTooHigh) {
-	    alarmStatus = "\nAlarm : Value too high for " + attributeName;
-	} else {
-	    alarmStatus = "\nAlarm : Value too low for " + attributeName;
-	}
-	attributeAlarm.put(attributeName, alarmStatus);
-	// statusMachine(status + alarmStatus, DeviceState.ALARM);
+        String alarmStatus;
+        if (isTooHigh) {
+            alarmStatus = "\nAlarm : Value too high for " + attributeName;
+        } else {
+            alarmStatus = "\nAlarm : Value too low for " + attributeName;
+        }
+        attributeAlarm.put(attributeName, alarmStatus);
+        // statusMachine(status + alarmStatus, DeviceState.ALARM);
     }
 
     public void addDeltaAttributeAlarm(final String attributeName) throws DevFailed {
-	final String alarmStatus = "\nAlarm : RDS (R-W delta) for " + attributeName;
-	attributeAlarm.put(attributeName, alarmStatus);
-	// statusMachine(status + alarmStatus, DeviceState.ALARM);
+        final String alarmStatus = "\nAlarm : RDS (R-W delta) for " + attributeName;
+        attributeAlarm.put(attributeName, alarmStatus);
+        // statusMachine(status + alarmStatus, DeviceState.ALARM);
     }
 
     public void removeAttributeAlarm(final String attributeName) {
-	attributeAlarm.remove(attributeName);
+        attributeAlarm.remove(attributeName);
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	builder.append("getStatusMethod", getStatusMethod);
-	builder.append("setStatusMethod", setStatusMethod);
-	builder.append("device class", businessObject.getClass());
-	return builder.toString();
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("getStatusMethod", getStatusMethod);
+        builder.append("setStatusMethod", setStatusMethod);
+        builder.append("device class", businessObject.getClass());
+        return builder.toString();
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 }
