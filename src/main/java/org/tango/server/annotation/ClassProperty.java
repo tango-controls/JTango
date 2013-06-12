@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
- * Define a tango device property.
+ * Define a tango class property.
  * </p>
  * 
  * <pre>
