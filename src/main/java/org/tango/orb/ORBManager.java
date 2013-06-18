@@ -98,78 +98,81 @@ public final class ORBManager {
      * @throws DevFailed
      */
     public static synchronized void init(final boolean useDb, final String adminDeviceName) throws DevFailed {
-	// Modified properties fo ORB usage.
-	final Properties props = System.getProperties();
-	props.put("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
-	props.put("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
-	// register interceptors
-	props.put("org.omg.PortableInterceptor.ORBInitializerClass.ForwardInit",
-		InterceptorInitializer.class.getCanonicalName());
-	// Set retry properties
-	props.put("jacorb.retries", "0");
-	props.put("jacorb.retry_interval", "100");
+        // Modified properties fo ORB usage.
+        final Properties props = System.getProperties();
+        props.put("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
+        props.put("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
+        // register interceptors
+        props.put("org.omg.PortableInterceptor.ORBInitializerClass.ForwardInit",
+                InterceptorInitializer.class.getCanonicalName());
+        // Set retry properties
+        props.put("jacorb.retries", "0");
+        props.put("jacorb.retry_interval", "100");
 
-	// Initial timeout for establishing a connection.
-	props.put("jacorb.connection.client.connect_timeout", "5000");
+        props.put("jacorb.codeset", true);
 
-	// Set the Largest transfert.
-	final String str = checkORBgiopMaxMsgSize();
-	props.put("jacorb.maxManagedBufSize", str);
+        // Initial timeout for establishing a connection.
+        props.put("jacorb.connection.client.connect_timeout", "5000");
 
-	// Set jacorb verbosity at minimum value
-	props.put("jacorb.config.log.verbosity", "0");
+        // Set the Largest transfert.
+        final String str = checkORBgiopMaxMsgSize();
+        props.put("jacorb.maxManagedBufSize", str);
 
-	// only used for no db device
-	props.setProperty("jacorb.implname", SERVER_IMPL_NAME);
-	// System.setProperties(props);
-	// props.setProperty("jacorb.net.tcp_listener", ConnectionListener.class.getName());
+        // Set jacorb verbosity at minimum value
+        props.put("jacorb.config.log.verbosity", "0");
 
-	// Initialize ORB
-	orb = ORB.init(new String[] {}, props);
+        // only used for no db device
+        props.setProperty("jacorb.implname", SERVER_IMPL_NAME);
+        // System.setProperties(props);
+        // props.setProperty("jacorb.net.tcp_listener",
+        // ConnectionListener.class.getName());
 
-	try {
-	    poa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
-	    // boot_manager =
-	    // BootManagerHelper.narrow(orb.resolve_initial_references("BootManager"));
-	} catch (final InvalidName e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final INITIALIZE e) {
-	    // ignore occurs when starting several times a server that failed
-	}
+        // Initialize ORB
+        orb = ORB.init(new String[] {}, props);
 
-	try {
-	    if (!useDb) {
-		// If the database is not used, create a POA with the
-		// USER_ID policy
-		final org.omg.CORBA.Policy[] policies = new org.omg.CORBA.Policy[2];
-		policies[0] = poa.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID);
-		policies[1] = poa.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
-		final org.omg.PortableServer.POAManager manager = poa.the_POAManager();
-		poa = poa.create_POA(NODB_POA, manager, policies);
-	    }
-	} catch (final org.omg.PortableServer.POAPackage.AdapterAlreadyExists e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final org.omg.PortableServer.POAPackage.InvalidPolicy e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
+        try {
+            poa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            // boot_manager =
+            // BootManagerHelper.narrow(orb.resolve_initial_references("BootManager"));
+        } catch (final InvalidName e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final INITIALIZE e) {
+            // ignore occurs when starting several times a server that failed
+        }
 
-	final POAManager manager = poa.the_POAManager();
-	try {
-	    manager.activate();
-	} catch (final org.omg.PortableServer.POAManagerPackage.AdapterInactive ex) {
-	    DevFailedUtils.throwDevFailed("API_CantActivatePOAManager", "The POA activate method throws an exception");
-	}
+        try {
+            if (!useDb) {
+                // If the database is not used, create a POA with the
+                // USER_ID policy
+                final org.omg.CORBA.Policy[] policies = new org.omg.CORBA.Policy[2];
+                policies[0] = poa.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID);
+                policies[1] = poa.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
+                final org.omg.PortableServer.POAManager manager = poa.the_POAManager();
+                poa = poa.create_POA(NODB_POA, manager, policies);
+            }
+        } catch (final org.omg.PortableServer.POAPackage.AdapterAlreadyExists e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final org.omg.PortableServer.POAPackage.InvalidPolicy e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
 
-	if (useDb) {
+        final POAManager manager = poa.the_POAManager();
+        try {
+            manager.activate();
+        } catch (final org.omg.PortableServer.POAManagerPackage.AdapterInactive ex) {
+            DevFailedUtils.throwDevFailed("API_CantActivatePOAManager", "The POA activate method throws an exception");
+        }
 
-	    // Build device name and try to import it from database
-	    final DeviceImportInfo importInfo = DatabaseFactory.getDatabase().importDevice(adminDeviceName);
-	    if (importInfo.isExported()) {
-		LOGGER.debug("{} is set as exported in tango db - checking if it is already running", adminDeviceName);
-		// if is exported, try to connect to it
-		ORBManager.checkServerRunning(importInfo, adminDeviceName);
-	    }
-	}
+        if (useDb) {
+
+            // Build device name and try to import it from database
+            final DeviceImportInfo importInfo = DatabaseFactory.getDatabase().importDevice(adminDeviceName);
+            if (importInfo.isExported()) {
+                LOGGER.debug("{} is set as exported in tango db - checking if it is already running", adminDeviceName);
+                // if is exported, try to connect to it
+                ORBManager.checkServerRunning(importInfo, adminDeviceName);
+            }
+        }
     }
 
     /**
@@ -179,7 +182,7 @@ public final class ORBManager {
      * @throws DevFailed
      */
     public static Any createAny() throws DevFailed {
-	return orb.create_any();
+        return orb.create_any();
     }
 
     /**
@@ -190,213 +193,216 @@ public final class ORBManager {
      * @throws DevFailed
      */
     private static void checkServerRunning(final DeviceImportInfo importInfo, final String toBeImported)
-	    throws DevFailed {
-	XLOGGER.entry();
-	Device_4 devIDL4 = null;
-	Device_3 devIDL3 = null;
-	Device_2 devIDL2 = null;
-	Device devIDL1 = null;
-	try {
-	    // try IDL4
-	    try {
-		devIDL4 = narrowIDL4(importInfo);
-	    } catch (final BAD_PARAM e) {
-		// maybe another IDL is currently running
-		// try IDL3
-		try {
-		    devIDL3 = narrowIDL3(importInfo);
-		} catch (final BAD_PARAM e1) {
-		    // maybe another IDL is currently running
-		    // try IDL2
-		    try {
-			devIDL2 = narrowIDL2(importInfo);
-		    } catch (final BAD_PARAM e2) {
-			// maybe another IDL is currently running
-			// try IDL1
-			try {
-			    devIDL1 = narrowIDL1(importInfo);
-			} catch (final BAD_PARAM e3) {
-			    // may not occur, unknown CORBA server
-			    DevFailedUtils.throwDevFailed(e);
-			}
-		    }
-		}
-	    }
-	    if (devIDL4 == null && devIDL3 == null && devIDL2 == null && devIDL1 == null) {
-		LOGGER.debug("out, device is not running");
-	    } else {
-		checkDeviceName(toBeImported, devIDL4, devIDL3, devIDL2, devIDL1);
-	    }
-	} catch (final org.omg.CORBA.TIMEOUT e) {
-	    // Receive a Timeout exception ---> It is not running !!!!
-	    LOGGER.debug("out on TIMEOUT");
-	} catch (final BAD_OPERATION e) {
-	    // System.err.println("Can't pack/unpack data sent to/from database in/to Any object");
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final TRANSIENT e) {
-	    LOGGER.debug("out on TRANSIENT, device is not running");
-	} catch (final OBJECT_NOT_EXIST e) {
-	    LOGGER.debug("out on OBJECT_NOT_EXIST, device is not running");
-	} catch (final COMM_FAILURE e) {
-	    LOGGER.debug("out on COMM_FAILURE,, device is not running");
-	} catch (final BAD_INV_ORDER e) {
-	    LOGGER.debug("out on BAD_INV_ORDER,, device is not running");
-	}
+            throws DevFailed {
+        XLOGGER.entry();
+        Device_4 devIDL4 = null;
+        Device_3 devIDL3 = null;
+        Device_2 devIDL2 = null;
+        Device devIDL1 = null;
+        try {
+            // try IDL4
+            try {
+                devIDL4 = narrowIDL4(importInfo);
+            } catch (final BAD_PARAM e) {
+                // maybe another IDL is currently running
+                // try IDL3
+                try {
+                    devIDL3 = narrowIDL3(importInfo);
+                } catch (final BAD_PARAM e1) {
+                    // maybe another IDL is currently running
+                    // try IDL2
+                    try {
+                        devIDL2 = narrowIDL2(importInfo);
+                    } catch (final BAD_PARAM e2) {
+                        // maybe another IDL is currently running
+                        // try IDL1
+                        try {
+                            devIDL1 = narrowIDL1(importInfo);
+                        } catch (final BAD_PARAM e3) {
+                            // may not occur, unknown CORBA server
+                            DevFailedUtils.throwDevFailed(e);
+                        }
+                    }
+                }
+            }
+            if (devIDL4 == null && devIDL3 == null && devIDL2 == null && devIDL1 == null) {
+                LOGGER.debug("out, device is not running");
+            } else {
+                checkDeviceName(toBeImported, devIDL4, devIDL3, devIDL2, devIDL1);
+            }
+        } catch (final org.omg.CORBA.TIMEOUT e) {
+            // Receive a Timeout exception ---> It is not running !!!!
+            LOGGER.debug("out on TIMEOUT");
+        } catch (final BAD_OPERATION e) {
+            // System.err.println("Can't pack/unpack data sent to/from database in/to Any object");
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final TRANSIENT e) {
+            LOGGER.debug("out on TRANSIENT, device is not running");
+        } catch (final OBJECT_NOT_EXIST e) {
+            LOGGER.debug("out on OBJECT_NOT_EXIST, device is not running");
+        } catch (final COMM_FAILURE e) {
+            LOGGER.debug("out on COMM_FAILURE,, device is not running");
+        } catch (final BAD_INV_ORDER e) {
+            LOGGER.debug("out on BAD_INV_ORDER,, device is not running");
+        }
 
-	XLOGGER.exit();
+        XLOGGER.exit();
     }
 
     private static void checkDeviceName(final String toBeImported, final Device_4 devIDL4, final Device_3 devIDL3,
-	    final Device_2 devIDL2, final Device devIDL1) throws DevFailed {
-	// get the device name from the server
-	try {
-	    if (devIDL4 != null) {
-		checkDev(toBeImported, devIDL4.name(), "4");
-	    } else if (devIDL3 != null) {
-		checkDev(toBeImported, devIDL3.name(), "3");
-	    } else if (devIDL2 != null) {
-		checkDev(toBeImported, devIDL2.name(), "2");
-	    } else if (devIDL1 != null) {
-		checkDev(toBeImported, devIDL1.name(), "1");
-	    }
+            final Device_2 devIDL2, final Device devIDL1) throws DevFailed {
+        // get the device name from the server
+        try {
+            if (devIDL4 != null) {
+                checkDev(toBeImported, devIDL4.name(), "4");
+            } else if (devIDL3 != null) {
+                checkDev(toBeImported, devIDL3.name(), "3");
+            } else if (devIDL2 != null) {
+                checkDev(toBeImported, devIDL2.name(), "2");
+            } else if (devIDL1 != null) {
+                checkDev(toBeImported, devIDL1.name(), "1");
+            }
 
-	} catch (final NO_RESPONSE e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final COMM_FAILURE e) {
-	    LOGGER.debug("out on COMM_FAILURE, device is not running");
-	} catch (final OBJECT_NOT_EXIST e) {
-	    LOGGER.debug("out on OBJECT_NOT_EXIST, device is not running");
-	} catch (final TRANSIENT e) {
-	    LOGGER.debug("out on TRANSIENT, device is not running");
-	} catch (final BAD_INV_ORDER e) {
-	    LOGGER.debug("out on BAD_INV_ORDER, device is not running");
-	}
+        } catch (final NO_RESPONSE e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final COMM_FAILURE e) {
+            LOGGER.debug("out on COMM_FAILURE, device is not running");
+        } catch (final OBJECT_NOT_EXIST e) {
+            LOGGER.debug("out on OBJECT_NOT_EXIST, device is not running");
+        } catch (final TRANSIENT e) {
+            LOGGER.debug("out on TRANSIENT, device is not running");
+        } catch (final BAD_INV_ORDER e) {
+            LOGGER.debug("out on BAD_INV_ORDER, device is not running");
+        }
     }
 
     private static void checkDev(final String toBeImported, final String deviceName, final String version)
-	    throws DevFailed {
-	if (deviceName.equals(toBeImported)) {
-	    DevFailedUtils.throwDevFailed(INIT_ERROR, "This server is already running in IDL" + version + ", exiting!");
-	}
+            throws DevFailed {
+        if (deviceName.equals(toBeImported)) {
+            DevFailedUtils.throwDevFailed(INIT_ERROR, "This server is already running in IDL" + version + ", exiting!");
+        }
     }
 
     private static Device_4 narrowIDL4(final DeviceImportInfo importInfo) throws DevFailed {
-	Device_4 dev = null;
-	final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
-	LOGGER.debug("try narrow {} as IDL4 with PID {} because it is exported ", importInfo.getName(),
-		importInfo.getPid());
-	dev = Device_4Helper.narrow(obj);
-	LOGGER.debug("narrow IDL4 done");
-	return dev;
+        Device_4 dev = null;
+        final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
+        LOGGER.debug("try narrow {} as IDL4 with PID {} because it is exported ", importInfo.getName(),
+                importInfo.getPid());
+        dev = Device_4Helper.narrow(obj);
+        LOGGER.debug("narrow IDL4 done");
+        return dev;
     }
 
     private static Device_3 narrowIDL3(final DeviceImportInfo importInfo) throws DevFailed {
-	Device_3 dev = null;
-	final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
-	LOGGER.debug("try narrow {} as IDL3 with PID {}", importInfo.getName(), importInfo.getPid());
-	dev = Device_3Helper.narrow(obj);
-	LOGGER.debug("narrow IDL3 done");
-	return dev;
+        Device_3 dev = null;
+        final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
+        LOGGER.debug("try narrow {} as IDL3 with PID {}", importInfo.getName(), importInfo.getPid());
+        dev = Device_3Helper.narrow(obj);
+        LOGGER.debug("narrow IDL3 done");
+        return dev;
     }
 
     private static Device_2 narrowIDL2(final DeviceImportInfo importInfo) throws DevFailed {
-	Device_2 dev = null;
-	final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
-	LOGGER.debug("try narrow {} as IDL2 with PID {}", importInfo.getName(), importInfo.getPid());
-	dev = Device_2Helper.narrow(obj);
-	LOGGER.debug("narrow IDL2 done");
-	return dev;
+        Device_2 dev = null;
+        final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
+        LOGGER.debug("try narrow {} as IDL2 with PID {}", importInfo.getName(), importInfo.getPid());
+        dev = Device_2Helper.narrow(obj);
+        LOGGER.debug("narrow IDL2 done");
+        return dev;
     }
 
     private static Device narrowIDL1(final DeviceImportInfo importInfo) throws DevFailed {
-	Device dev = null;
-	final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
-	LOGGER.debug("try narrow {} as IDL1 with PID {}", importInfo.getName(), importInfo.getPid());
-	dev = DeviceHelper.narrow(obj);
-	LOGGER.debug("narrow IDL1 done");
-	return dev;
+        Device dev = null;
+        final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
+        LOGGER.debug("try narrow {} as IDL1 with PID {}", importInfo.getName(), importInfo.getPid());
+        dev = DeviceHelper.narrow(obj);
+        LOGGER.debug("narrow IDL1 done");
+        return dev;
     }
 
     /**
      * Start the ORB. Blocks until stopped.
      */
     private static void start() {
-	if (orb != null) {
-	    orb.run();
-	}
+        if (orb != null) {
+            orb.run();
+        }
     }
 
     /**
      * Start the ORB. non blocking.
      */
     public static void startDetached() {
-	Executors.newSingleThreadExecutor(new ThreadFactory() {
-	    @Override
-	    public Thread newThread(final Runnable r) {
-		return new Thread(r, "ORB run");
-	    }
-	}).submit(new StartTask());
-	LOGGER.debug("ORB started");
+        Executors.newSingleThreadExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(final Runnable r) {
+                return new Thread(r, "ORB run");
+            }
+        }).submit(new StartTask());
+        LOGGER.debug("ORB started");
     }
 
     private static class StartTask implements Callable<Void> {
-	@Override
-	public Void call() {
-	    ORBManager.start();
-	    return null;
-	}
+        @Override
+        public Void call() {
+            ORBManager.start();
+            return null;
+        }
     }
 
     /**
-     * Check if the checkORBgiopMaxMsgSize has been set. This environment variable should be set in Mega bytes.
+     * Check if the checkORBgiopMaxMsgSize has been set. This environment
+     * variable should be set in Mega bytes.
      */
     private static String checkORBgiopMaxMsgSize() {
-	/*
-	 * JacORB definition (see jacorb.properties file):
-	 * 
-	 * This is NOT the maximum buffer size that can be used, but just the largest size of buffers that will be kept
-	 * and managed. This value will be added to an internal constant of 5, so the real value in bytes is
-	 * 2**(5+maxManagedBufSize-1). You only need to increase this value if you are dealing with LOTS of LARGE data
-	 * structures. You may decrease it to make the buffer manager release large buffers immediately rather than
-	 * keeping them for later reuse.
-	 */
-	String str = "20"; // Set to 16 Mbytes
+        /*
+         * JacORB definition (see jacorb.properties file):
+         * 
+         * This is NOT the maximum buffer size that can be used, but just the
+         * largest size of buffers that will be kept and managed. This value
+         * will be added to an internal constant of 5, so the real value in
+         * bytes is 2**(5+maxManagedBufSize-1). You only need to increase this
+         * value if you are dealing with LOTS of LARGE data structures. You may
+         * decrease it to make the buffer manager release large buffers
+         * immediately rather than keeping them for later reuse.
+         */
+        String str = "20"; // Set to 16 Mbytes
 
-	// Check if environment ask for bigger size.
-	final String tmp = System.getProperty("ORBgiopMaxMsgSize");
-	if (tmp != null && checkBufferSize(tmp) != null) {
-	    str = tmp;
-	}
-	return str;
+        // Check if environment ask for bigger size.
+        final String tmp = System.getProperty("ORBgiopMaxMsgSize");
+        if (tmp != null && checkBufferSize(tmp) != null) {
+            str = tmp;
+        }
+        return str;
     }
 
     private static String checkBufferSize(final String str) {
-	String result = null;
-	// try to get value
-	int nbMega = 0;
-	try {
-	    nbMega = Integer.parseInt(str);
-	} catch (final NumberFormatException e) {
-	}
+        String result = null;
+        // try to get value
+        int nbMega = 0;
+        try {
+            nbMega = Integer.parseInt(str);
+        } catch (final NumberFormatException e) {
+        }
 
-	// Compute the real size and the power of 2
-	final long size = (long) nbMega * 1024 * 1024;
-	long l = size;
-	int cnt;
-	for (cnt = 0; l > 0; cnt++) {
-	    l >>= 1;
-	}
-	cnt--;
+        // Compute the real size and the power of 2
+        final long size = (long) nbMega * 1024 * 1024;
+        long l = size;
+        int cnt;
+        for (cnt = 0; l > 0; cnt++) {
+            l >>= 1;
+        }
+        cnt--;
 
-	// Check if number ob Mb is not power of 2
-	if (Math.pow(2, cnt) < size) {
-	    cnt++;
-	}
-	// System.out.println(nb_mega + " Mbytes  (2^" + cnt + ")");
+        // Check if number ob Mb is not power of 2
+        if (Math.pow(2, cnt) < size) {
+            cnt++;
+        }
+        // System.out.println(nb_mega + " Mbytes  (2^" + cnt + ")");
 
-	final int jacorbSize = cnt - 4;
-	result = Integer.toString(jacorbSize);
-	return result;
+        final int jacorbSize = cnt - 4;
+        result = Integer.toString(jacorbSize);
+        return result;
     }
 
     /**
@@ -406,10 +412,10 @@ public final class ORBManager {
      * @throws DevFailed
      */
     public static ORB getOrb() throws DevFailed {
-	if (orb == null) {
-	    DevFailedUtils.throwDevFailed("ORB not initialized");
-	}
-	return orb;
+        if (orb == null) {
+            DevFailedUtils.throwDevFailed("ORB not initialized");
+        }
+        return orb;
     }
 
     /**
@@ -419,20 +425,20 @@ public final class ORBManager {
      * @throws DevFailed
      */
     public static POA getPoa() throws DevFailed {
-	if (poa == null) {
-	    DevFailedUtils.throwDevFailed("ORB not initialized");
-	}
-	return poa;
+        if (poa == null) {
+            DevFailedUtils.throwDevFailed("ORB not initialized");
+        }
+        return poa;
     }
 
     /**
      * Shutdown the ORB
      */
     public static void shutdown() {
-	if (orb != null) {
-	    orb.shutdown(true);
-	    LOGGER.debug("ORB shutdown");
-	}
+        if (orb != null) {
+            orb.shutdown(true);
+            LOGGER.debug("ORB shutdown");
+        }
     }
 
 }
