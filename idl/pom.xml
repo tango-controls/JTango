@@ -59,8 +59,7 @@
 		</repository>
 		<snapshotRepository>
 			<id>maven.repositories.server</id>
-			<name>Java 
-		Snapshots</name>
+			<name>Java Snapshots</name>
 			<url>http://${maven.repositories.server}${maven.repositories.home}/java-snapshots</url>
 		</snapshotRepository>
 		<site>
