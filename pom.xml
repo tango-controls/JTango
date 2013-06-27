@@ -6,7 +6,7 @@
 
 	<groupId>org.tango</groupId>
 	<artifactId>JavaAPI</artifactId>
-	<version>8.2.4</version>
+	<version>8.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Tango API</name>
 	<description>Java Tango API</description>
