@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>org.tango</groupId>
 		<artifactId>JTangoParent</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	
+
 	<artifactId>JTangoCommons</artifactId>
 	<version>1.0.3</version>
-	
+
 	<name>JTango's Commons</name>
 	<description>commons for java tango</description>
 
@@ -35,13 +35,27 @@
 		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</developerConnection>
 		<url>https://svn.code.sf.net/p/tango-ds/code/api/java/common/JTangoCommons/trunk</url>
 	</scm>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>TangORB</artifactId>
+				<version>8.2.4</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>log4j</artifactId>
+						<groupId>log4j</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
-			<version>8.2.4</version>
 		</dependency>
 	</dependencies>
 </project>
