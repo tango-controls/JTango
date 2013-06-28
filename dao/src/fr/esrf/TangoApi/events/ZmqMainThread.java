@@ -479,7 +479,6 @@ public class ZmqMainThread extends Thread {
      * @throws DevFailed if cannot get ZmqEventConsumer instance
      */
     //===============================================================
-    private static String   dbg = System.getenv("CheckApi");
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
             if (dbg!=null && dbg.equals("true"))
                 System.out.println("CheckApi=true");
@@ -523,6 +522,7 @@ public class ZmqMainThread extends Thread {
         }
         /* */
     }
+    private static String   dbg = System.getenv("CheckApi");
     //===============================================================
     //===============================================================
     private String getConnectedEndPoint(String eventName) {
@@ -602,21 +602,22 @@ public class ZmqMainThread extends Thread {
     private void connectIfNotDone(ZMQ.Socket socket, ZMQutils.ControlStructure controlStructure){
 
         //  To replace following problem in waiting ZMQ 3.2
-        if (controlStructure.forceReconnection)
-            controlStructure.forceReconnection = isForcedJustified(controlStructure);
-        else
-            traceZmqSubscription(controlStructure.eventName, true);
-        
+        if (ApiUtil.getZmqVersion()<3.20) {
+            if (controlStructure.forceReconnection)
+                controlStructure.forceReconnection = isForcedJustified(controlStructure);
+            else
+                traceZmqSubscription(controlStructure.eventName, true);
+        }
       //  Check if not already connected or forced (re connection)
         if (controlStructure.forceReconnection || !alreadyConnected(controlStructure.endPoint)) {
             ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
 
             //  Check if it ia a reconnection -> disconnect before connection
             //  Not available in ZMQ 3.1
-            //if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint))
-            //    socket.disconnect(controlStructure.endPoint);
-
-
+            if (ApiUtil.getZmqVersion()>=3.20) {
+                if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint))
+                    socket.disconnect(controlStructure.endPoint);
+            }
 
             //  Do the connection
             //System.out.println("Connect for " + controlStructure.endPoint);

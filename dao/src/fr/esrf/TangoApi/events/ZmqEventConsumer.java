@@ -246,7 +246,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     protected synchronized void connect_event_channel(ConnectionStructure cs) throws DevFailed {
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
-        DeviceProxy adminDevice = DeviceProxyFactory.get(cs.channelName);
+        DeviceProxy adminDevice = new DeviceProxy(cs.channelName);
         DevVarLongStringArray   lsa = cs.deviceData.extractLongStringArray();
         ApiUtil.printTrace("connect_event_channel for " + cs.channelName);
 
