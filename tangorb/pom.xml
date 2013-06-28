@@ -4,7 +4,12 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.tango</groupId>
+	<parent>
+		<groupId>org.tango</groupId>
+		<artifactId>JTangoParent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	
 	<artifactId>JavaAPI</artifactId>
 	<version>8.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -47,66 +52,6 @@
 		<module>common</module>
 	</modules>
 
-	<properties>
-		<maven.repositories.server>calypso</maven.repositories.server>
-		<maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
-
-		<maven.web.server>calypso</maven.web.server>
-		<maven.web.home>/usr/Local/apache/docs</maven.web.home>
-	</properties>
-
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven.repositories.server</id>
-			<name>Java Releases</name>
-			<url>http://${maven.repositories.server}${maven.repositories.home}/java-releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>maven.repositories.server</id>
-			<name>Java 
-		Snapshots</name>
-			<url>http://${maven.repositories.server}${maven.repositories.home}/java-snapshots</url>
-		</snapshotRepository>
-		<site>
-			<id>maven.web.server</id>
-			<name>Java Website</name>
-			<url>scpexe://${maven.web.server}${maven.web.home}/java</url>
-		</site>
-	</distributionManagement>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<showDeprecation>true</showDeprecation>
-					<showWarnings>true</showWarnings>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencyManagement>
 		<dependencies>
