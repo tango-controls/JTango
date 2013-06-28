@@ -42,6 +42,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -61,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.2.2  -  Wed Apr 17 11:18:35 CEST 2013";
+            "8.2.4  -  Tue Apr 30 14:42:13 CEST 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -608,6 +609,40 @@ public class ApiUtil {
     public static String getVersionAsString() {
          return revNumber;
     }
+    //===================================================================
+    /**
+     * Return the zmq version as a double like
+     *         3.22 for "3.2.2" or 0.0 if zmq not available
+     *
+     * @return the TangORB version as a String
+     */
+    //===================================================================
+    public static double getZmqVersion() {
+        if (zmqVersion<0.0) {   //  Not already checked.
+            zmqVersion = 0.0;
+            try {
+                String  strVersion = org.zeromq.ZMQ.getVersionString();
+                StringTokenizer stk = new StringTokenizer(strVersion, ".");
+                ArrayList<String>   list = new ArrayList<String>();
+                while (stk.hasMoreTokens())
+                    list.add(stk.nextToken());
+
+                strVersion = list.get(0) + "." + list.get(1);
+                if (list.size()>2)
+                    strVersion += list.get(2);
+                try {
+                    zmqVersion = Double.parseDouble(strVersion);
+                }
+                catch (NumberFormatException e) {
+                    System.err.println(e);
+                }
+            }
+            catch (Exception e) { /*System.err.println(e);*/  }
+            catch (Error e)     { /*System.err.println(e);*/  }
+        }
+        return zmqVersion;
+    }
+    private static double  zmqVersion = -1.0;
     //===================================================================
     /**
      * Convert a signed int to a unsigne value in a long
