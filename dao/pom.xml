@@ -51,48 +51,9 @@
 		</resources>
 	</build>
 
-	<properties>
-		<jacorb.version>3.2</jacorb.version>
-	</properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.jacorb</groupId>
-				<artifactId>jacorb</artifactId>
-				<version>${jacorb.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-jdk14</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-			<dependency>
-				<groupId>org.jacorb</groupId>
-				<artifactId>jacorb-services</artifactId>
-				<version>${jacorb.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-jdk14</artifactId>
-					</exclusion>
-					<!-- conflict with jdk classes -->
-					<exclusion>
-						<artifactId>xml-apis</artifactId>
-						<groupId>xml-apis</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
+	
 	<dependencies>
-
-		<!-- <dependency> <groupId>jacorb</groupId> <artifactId>jacorb</artifactId> 
-			<version>2.3.1jboss.patch01-brew</version> </dependency> -->
-
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb</artifactId>
