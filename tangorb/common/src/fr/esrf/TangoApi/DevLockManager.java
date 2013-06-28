@@ -71,17 +71,21 @@ class DevLockManager {
 	//	java.lang.management.ManagementFactory and
 	//	java.lang.management.RuntimeMXBean
 	//	     Not available on Android JVM
-	static private boolean	hasManagementClases = true;
+	static private boolean hasManagementClasses = true;
 
     // ===============================================================
     // ===============================================================
 	static {
         //  Check if java.lang.management classes can be loaded
 		try {
-			Class c = java.lang.management.ManagementFactory.class;
+            //noinspection UnusedDeclaration
+            Class c = java.lang.management.ManagementFactory.class;
 		}
 		catch (Exception e) {
-			hasManagementClases = false;	//	Not available
+			hasManagementClasses = false;	//	Not available
+		}
+		catch (Error e) {
+			hasManagementClasses = false;	//	Not available
 		}
 	}
     // ===============================================================
@@ -110,7 +114,7 @@ class DevLockManager {
 
         // Try to get Process ID
         String pid = null;
-        if (hasManagementClases) {
+        if (hasManagementClasses) {
             //	Do it only if class available
             final java.lang.management.RuntimeMXBean mx =
                     java.lang.management.ManagementFactory.getRuntimeMXBean();
@@ -171,6 +175,7 @@ class DevLockManager {
      * @return the java client identifier object
      */
     // ===============================================================
+    @SuppressWarnings("UnusedDeclaration")
     JavaClntIdent getJavaClntIdent() {
 	    return j_ident;
     }
