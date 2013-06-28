@@ -39,6 +39,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.EventListener;
 
 /**
  * @author pascal_verdier
@@ -74,7 +76,7 @@ public class TangoArchive extends EventDispatcher implements java.io.Serializabl
     public void removeTangoArchiveListener(ITangoArchiveListener listener)
             throws DevFailed {
         event_listeners.remove(ITangoArchiveListener.class, listener);
-        if (event_listeners.getListenerCount() == 0)
+        if (event_listeners.size() == 0)
             unsubscribe_event(event_identifier);
     }
 
@@ -100,16 +102,11 @@ public class TangoArchive extends EventDispatcher implements java.io.Serializabl
     //=======================================================================
     //=======================================================================
     private void fireTangoArchiveEvent(TangoArchive tangoArchive, EventData eventData) {
-
         TangoArchiveEvent archiveEvent = new TangoArchiveEvent(tangoArchive, eventData);
-        // Guaranteed to return a non null array
-        Object[] listeners = event_listeners.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == ITangoArchiveListener.class) {
-                ((ITangoArchiveListener) listeners[i + 1]).archive(archiveEvent);
-            }
+        // Notifying those that are interested in this event
+        ArrayList<EventListener> listeners = event_listeners.getListeners(ITangoArchiveListener.class);
+        for (EventListener eventListener : listeners) {
+            ((ITangoArchiveListener) eventListener).archive(archiveEvent);
         }
     }
     //=======================================================================

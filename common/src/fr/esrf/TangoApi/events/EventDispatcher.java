@@ -40,8 +40,6 @@ import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.TangoConst;
 
-import javax.swing.event.EventListenerList;
-
 /**
  * @author pascal_verdier
  */
@@ -54,7 +52,8 @@ public abstract class EventDispatcher extends CallBack
      */
     public EventDispatcher(DeviceProxy device_proxy) {
         event_supplier = device_proxy;
-        event_listeners = new EventListenerList();
+        //event_listeners = new EventListenerList();
+        event_listeners = new TangoEventListenerList();
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -134,7 +133,8 @@ public abstract class EventDispatcher extends CallBack
 
     public abstract void dispatch_event(EventData event_data);
 
-    protected EventListenerList event_listeners = null;
+    //protected EventListenerList event_listeners = null;
+    protected TangoEventListenerList event_listeners = null;
     protected DeviceProxy event_supplier = null;
 
 }

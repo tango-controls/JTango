@@ -65,7 +65,7 @@ public class EventUtil {
                 try {
                     java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
                 }
-                catch(InternalError e) {
+                catch(Error e) {
                     graphicIsAvailable = false;
                     //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
                 }
