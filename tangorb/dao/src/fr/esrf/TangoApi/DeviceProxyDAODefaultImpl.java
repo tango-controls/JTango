@@ -228,7 +228,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
         // Get connection on administration device
         if (deviceProxy.getAdm_dev() == null) {
-            deviceProxy.setAdm_dev(DeviceProxyFactory.get(adm_name(deviceProxy)));
+            deviceProxy.setAdm_dev(DeviceProxyFactory.get(
+                    adm_name(deviceProxy), deviceProxy.getUrl().getTangoHost()));
         }
     }
 
@@ -2205,7 +2206,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public DeviceData command_inout_reply(final DeviceProxy deviceProxy, final int id)
-            throws DevFailed, AsynReplyNotArrived {
+            throws DevFailed {
         return command_inout_reply(deviceProxy, ApiUtil.get_async_object(id));
     }
 
@@ -2219,7 +2220,6 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     public DeviceData command_inout_reply(final DeviceProxy deviceProxy,
                                           final AsyncCallObject aco) throws DevFailed {
         DeviceData data;
-        // toDo
         try {
             if (deviceProxy.device_4 != null) {
                 check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_4");
@@ -2418,6 +2418,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                         final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
                         MultiDevFailed ex = null;
                         try {
+                            //noinspection ThrowableResultOfMethodCallIgnored
                             ex = MultiDevFailedHelper.extract(any);
                         } catch (final Exception e) {
                             // not a MultiDevFailed, is a DevFailed
@@ -2428,10 +2429,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                                     + get_asynch_idl_cmd(deviceProxy, request, idl_cmd)
                                     + ")");
                         }
-                        Except.throw_connection_failed(new DevFailed(ex.errors[0].err_list),
-                            "TangoApi_CommandFailed", "Asynchronous command failed",
-                            deviceProxy.getFull_class_name() + "." + idl_cmd + "_reply("
-                                + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")");
+                        if (ex!=null)
+                            Except.throw_connection_failed(new DevFailed(
+                                    ex.errors[0].err_list),
+                                    "TangoApi_CommandFailed", "Asynchronous command failed",
+                                    deviceProxy.getFull_class_name() + "." + idl_cmd + "_reply("
+                                    + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")");
                     } else {
                         except.printStackTrace();
                         // Another exception -> re-throw it as a DevFailed
@@ -2490,7 +2493,6 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param id asynchronous call id (returned by read_attribute_asynch).
      */
     // ==========================================================================
-    // ToDo
     public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
                                                   final int id) throws DevFailed {
         DeviceAttribute[] data;
@@ -2726,7 +2728,6 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param id  asynchronous call id (returned by read_attribute_asynch).
      */
     // ==========================================================================
-    //  ToDo
     public void write_attribute_reply(final DeviceProxy deviceProxy, final int id)
 		    throws DevFailed {
 		final Request request = ApiUtil.get_async_request(id);
@@ -2787,7 +2788,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void write_attribute_reply(final DeviceProxy deviceProxy, final int id, final int timeout)
-            throws DevFailed, AsynReplyNotArrived {
+            throws DevFailed {
         final int ms_to_sleep = 10;
         AsynReplyNotArrived except = null;
         final long t0 = System.currentTimeMillis();
