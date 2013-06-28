@@ -39,6 +39,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.EventListener;
 
 /**
  *
@@ -76,7 +78,7 @@ public class TangoQualityChange extends EventDispatcher implements java.io.Seria
                 throws DevFailed
     {
         event_listeners.remove(ITangoQualityChangeListener.class,listener);
-        if ( event_listeners.getListenerCount() == 0 )
+        if ( event_listeners.size() == 0 )
            unsubscribe_event(event_identifier);
     }
 	//==============================================================
@@ -102,14 +104,10 @@ public class TangoQualityChange extends EventDispatcher implements java.io.Seria
     private void fireTangoQualityChangeEvent(TangoQualityChange tangoQualityChange, EventData eventData) {
         TangoQualityChangeEvent tangoQualityChangeEvent =
                 new TangoQualityChangeEvent(tangoQualityChange, eventData);
-        // Guaranteed to return a non null array
-        Object [] listeners = event_listeners.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length-2 ; i>=0 ; i-=2 ) {
-            if (listeners[i] == ITangoQualityChangeListener.class) {
-                ((ITangoQualityChangeListener)listeners[i+1]).qualityChange(tangoQualityChangeEvent);
-            }
+        // Notifying those that are interested in this event
+        ArrayList<EventListener> listeners = event_listeners.getListeners(ITangoQualityChangeListener.class);
+        for (EventListener eventListener : listeners) {
+            ((ITangoQualityChangeListener) eventListener).qualityChange(tangoQualityChangeEvent);
         }
     }
     

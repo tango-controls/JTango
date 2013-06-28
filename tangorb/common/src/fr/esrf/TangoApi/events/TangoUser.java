@@ -38,6 +38,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.EventListener;
 
 
 /**
@@ -77,7 +79,7 @@ public class TangoUser extends EventDispatcher implements java.io.Serializable {
                 throws DevFailed
     {
         event_listeners.remove(ITangoUserListener.class,listener);
-        if ( event_listeners.getListenerCount() == 0 )
+        if ( event_listeners.size() == 0 )
            unsubscribe_event(event_identifier);
 
     }
@@ -104,14 +106,10 @@ public class TangoUser extends EventDispatcher implements java.io.Serializable {
     //=======================================================================
     private void fireTangoUserEvent(TangoUser tangoUser, EventData eventData) {
         TangoUserEvent tangoUserEvent = new TangoUserEvent(tangoUser, eventData);
-        // Guaranteed to return a non null array
-        Object [] listeners = event_listeners.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length-2 ; i>=0 ; i-=2 ) {
-            if (listeners[i] == ITangoUserListener.class) {
-                ((ITangoUserListener)listeners[i+1]).user(tangoUserEvent);
-            }
+        // Notifying those that are interested in this event
+        ArrayList<EventListener> listeners = event_listeners.getListeners(ITangoUserListener.class);
+        for (EventListener eventListener : listeners) {
+            ((ITangoUserListener) eventListener).user(tangoUserEvent);
         }
     }
     
