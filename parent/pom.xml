@@ -15,9 +15,11 @@
 	<properties>
 		<maven.repositories.server>calypso</maven.repositories.server>
 		<maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
-
 		<maven.web.server>calypso</maven.web.server>
 		<maven.web.home>/usr/Local/apache/docs</maven.web.home>
+		<sonar.jdbc.url>jdbc:mysql://sonardb.ica:3306/sonar?useUnicode=true&amp;characterEncoding=utf8</sonar.jdbc.url>
+		<sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
+		<sonar.host.url>http://calypso.synchrotron-soleil.fr/sonar</sonar.host.url>
 	</properties>
 
 	<distributionManagement>
@@ -41,6 +43,11 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>1.0-beta-2</version>
+			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<configuration>
