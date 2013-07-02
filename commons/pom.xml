@@ -47,6 +47,10 @@
 						<artifactId>log4j</artifactId>
 						<groupId>log4j</groupId>
 					</exclusion>
+						<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
 				</exclusions>
 			</dependency>
 		</dependencies>
@@ -56,7 +60,6 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
-
 		</dependency>
 	</dependencies>
 </project>
