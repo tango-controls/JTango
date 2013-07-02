@@ -25,7 +25,7 @@ public final class TangoAttribute {
     private static final String ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE = "attribute must be spectrum or image";
     private static final String LOG_EXTRACTING = "extracting {}";
     private static final String LOG_INSERTING = "inserting {}";
-    private static final Logger LOGGER = LoggerFactory.getLogger(TangoAttribute.class);
+    private final Logger logger = LoggerFactory.getLogger(TangoAttribute.class);
     private static final String TANGO_WRONG_DATA_ERROR = "TANGO_WRONG_DATA_ERROR";
     private static final String THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER = "this attribute must be a java.lang.Number";
 
@@ -41,19 +41,19 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public TangoAttribute(final String name, final Object mockValue) throws DevFailed {
-	attributeImpl = new MockAttribute(name, mockValue);
+        attributeImpl = new MockAttribute(name, mockValue);
     }
 
     /**
      * Build a <b>mock</b> connection to a tango attribute.
      * 
      * @param attribute
-     *            The mock attribute behavior. Default behavior may be changed by using a mock library like
-     *            http://mockito.org
+     *            The mock attribute behavior. Default behavior may be changed
+     *            by using a mock library like http://mockito.org
      * @throws DevFailed
      */
     public TangoAttribute(final ITangoAttribute attribute) throws DevFailed {
-	attributeImpl = attribute;
+        attributeImpl = attribute;
     }
 
     /**
@@ -63,26 +63,26 @@ public final class TangoAttribute {
      *            the attribute name The full name of the attribute
      */
     public TangoAttribute(final String name) throws DevFailed {
-	attributeImpl = new RealAttribute(name);
+        attributeImpl = new RealAttribute(name);
     }
 
     public void write() throws DevFailed {
-	attributeImpl.write();
+        attributeImpl.write();
     }
 
     public void write(final Object value) throws DevFailed {
-	insert(value);
-	this.write();
+        insert(value);
+        this.write();
     }
 
     public void writeSpectrum(final Object... values) throws DevFailed {
-	insertSpectrum(values);
-	this.write();
+        insertSpectrum(values);
+        this.write();
     }
 
     public <T> void writeImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
-	insertImage(dimX, dimY, values);
-	this.write();
+        insertImage(dimX, dimY, values);
+        this.write();
     }
 
     /**
@@ -91,7 +91,7 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public void update() throws DevFailed {
-	attributeImpl.update();
+        attributeImpl.update();
     }
 
     /**
@@ -104,8 +104,8 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public <T> T read(final Class<T> type) throws DevFailed {
-	update();
-	return extract(type);
+        update();
+        return extract(type);
     }
 
     /**
@@ -114,37 +114,39 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public Object read() throws DevFailed {
-	update();
-	return extract();
+        update();
+        return extract();
     }
 
     /**
-     * Read the tango attribute with SCALAR format, but does not convert it. Does not works for String and Boolean
+     * Read the tango attribute with SCALAR format, but does not convert it.
+     * Does not works for String and Boolean
      * 
      * @return
      * @throws DevFailed
      */
     public Number readAsNumber() throws DevFailed {
-	update();
-	return extractNumber();
+        update();
+        return extractNumber();
     }
 
     /**
      * Read attribute and return result as array.
      * 
      * @param type
-     *            The requested output type, is the component type (double, Double...).
+     *            The requested output type, is the component type (double,
+     *            Double...).
      * @return
      * @throws DevFailed
      */
     public <T> Object readArray(final Class<T> type) throws DevFailed {
-	update();
-	return extractArray(type);
+        update();
+        return extractArray(type);
     }
 
     public <T> Object readWrittenArray(final Class<T> type) throws DevFailed {
-	update();
-	return extractWrittenArray(type);
+        update();
+        return extractWrittenArray(type);
     }
 
     /**
@@ -157,8 +159,8 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public <T> T readWritten(final Class<T> type) throws DevFailed {
-	update();
-	return extractWritten(type);
+        update();
+        return extractWritten(type);
     }
 
     /**
@@ -168,13 +170,13 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public Object readWritten() throws DevFailed {
-	update();
-	return extractWritten();
+        update();
+        return extractWritten();
     }
 
     public Number readWrittenAsNumber() throws DevFailed {
-	update();
-	return extractNumberWritten();
+        update();
+        return extractNumberWritten();
     }
 
     /**
@@ -186,30 +188,30 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public <T> T[] readSpecOrImage(final Class<T> type) throws DevFailed {
-	update();
-	return extractSpecOrImage(type);
+        update();
+        return extractSpecOrImage(type);
     }
 
     /**
-     * Read the tango attribute with SPECTRUM and IMAGE format, but does not convert it. Does not works for String and
-     * Boolean
+     * Read the tango attribute with SPECTRUM and IMAGE format, but does not
+     * convert it. Does not works for String and Boolean
      * 
      * @return
      * @throws DevFailed
      */
     public Number[] readSpecOrImageAsNumber() throws DevFailed {
-	update();
-	return extractNumberSpecOrImage();
+        update();
+        return extractNumberSpecOrImage();
     }
 
     public <T> T[] readWrittenSpecOrImage(final Class<T> type) throws DevFailed {
-	update();
-	return extractWrittenSpecOrImage(type);
+        update();
+        return extractWrittenSpecOrImage(type);
     }
 
     public Number[] readWrittenSpecOrImageAsNumber() throws DevFailed {
-	update();
-	return extractNumberWrittenSpecOrImage();
+        update();
+        return extractNumberWrittenSpecOrImage();
     }
 
     /**
@@ -223,20 +225,20 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public String readAsString(final String separator, final String endSeparator) throws DevFailed {
-	update();
-	return extractToString(separator, endSeparator);
+        update();
+        return extractToString(separator, endSeparator);
     }
 
     /**
-     * Insert scalar, spectrum or image. spectrum can be arrays of Objects or primitives. image can be 2D arrays of
-     * Objects or primitives
+     * Insert scalar, spectrum or image. spectrum can be arrays of Objects or
+     * primitives. image can be 2D arrays of Objects or primitives
      * 
      * @param value
      * @throws DevFailed
      */
     public void insert(final Object value) throws DevFailed {
-	LOGGER.debug(LOG_INSERTING, this);
-	attributeImpl.insert(value);
+        logger.debug(LOG_INSERTING, this);
+        attributeImpl.insert(value);
     }
 
     /**
@@ -244,28 +246,28 @@ public final class TangoAttribute {
      *            The values to insert
      */
     public void insertSpectrum(final Object... values) throws DevFailed {
-	LOGGER.debug(LOG_INSERTING, this);
-	attributeImpl.insertSpectrum(values);
+        logger.debug(LOG_INSERTING, this);
+        attributeImpl.insertSpectrum(values);
     }
 
     public void insertImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
-	LOGGER.debug(LOG_INSERTING, this);
-	attributeImpl.insertImage(dimX, dimY, values);
+        logger.debug(LOG_INSERTING, this);
+        attributeImpl.insertImage(dimX, dimY, values);
     }
 
     public <T> T extract(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extract(type);
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extract(type);
     }
 
     public <T> Object extractArray(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extractArray(type);
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extractArray(type);
     }
 
     public <T> Object extractWrittenArray(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extractWrittenArray(type);
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extractWrittenArray(type);
     }
 
     /**
@@ -275,89 +277,92 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public Number extractNumber() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	final Object result = attributeImpl.extract();
-	if (!Number.class.isAssignableFrom(result.getClass())) {
-	    DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
-	}
-	return (Number) result;
+        logger.debug(LOG_EXTRACTING, this);
+        final Object result = attributeImpl.extract();
+        if (!Number.class.isAssignableFrom(result.getClass())) {
+            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+        }
+        return (Number) result;
     }
 
     /**
-     * Extract read part without conversion. Spectrum attributes are returned as primitive array. Image attributes are
-     * returned as 2D array of primitives (e.g Double[][])
+     * Extract read part without conversion. Spectrum attributes are returned as
+     * primitive array. Image attributes are returned as 2D array of primitives
+     * (e.g Double[][])
      */
     public Object extract() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extract();
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extract();
     }
 
     /**
-     * Extract write part without conversion. Spectrum attributes are returned as primitive array. Image attributes are
-     * returned as 2D array of primitives (e.g Double[][])
+     * Extract write part without conversion. Spectrum attributes are returned
+     * as primitive array. Image attributes are returned as 2D array of
+     * primitives (e.g Double[][])
      */
     public Object extractWritten() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extractWritten();
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extractWritten();
     }
 
     public <T> T extractWritten(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extractWritten(type);
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extractWritten(type);
     }
 
     public Number extractNumberWritten() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	final Object result = attributeImpl.extractWritten();
-	if (!Number.class.isAssignableFrom(result.getClass())) {
-	    DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
-	}
-	return (Number) result;
+        logger.debug(LOG_EXTRACTING, this);
+        final Object result = attributeImpl.extractWritten();
+        if (!Number.class.isAssignableFrom(result.getClass())) {
+            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+        }
+        return (Number) result;
     }
 
     public <T> T[] extractSpecOrImage(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
-	    throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
-	}
-	return attributeImpl.extractSpecOrImage(type);
+        logger.debug(LOG_EXTRACTING, this);
+        if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
+            throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
+        }
+        return attributeImpl.extractSpecOrImage(type);
     }
 
     public Number[] extractNumberSpecOrImage() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
-	    throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
-	}
-	final Object result = attributeImpl.extractArray();
-	if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
-	    DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
-	}
-	return (Number[]) result;
+        logger.debug(LOG_EXTRACTING, this);
+        if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
+            throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
+        }
+        final Object result = attributeImpl.extractArray();
+        if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
+            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+        }
+        return (Number[]) result;
     }
 
     public <T> T[] extractWrittenSpecOrImage(final Class<T> type) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
-	    throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
-	}
-	return attributeImpl.extractSpecOrImage(type);
+        logger.debug(LOG_EXTRACTING, this);
+        if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
+            throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
+        }
+        return attributeImpl.extractSpecOrImage(type);
     }
 
     public Number[] extractNumberWrittenSpecOrImage() throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
-	    throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
-	}
-	final Object result = attributeImpl.extractWrittenArray();
-	if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
-	    DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
-	}
-	return (Number[]) result;
+        logger.debug(LOG_EXTRACTING, this);
+        if (attributeImpl.getDataFormat().equals(AttrDataFormat.SCALAR)) {
+            throw DevFailedUtils.newDevFailed(ATTRIBUTE_MUST_BE_SPECTRUM_OR_IMAGE);
+        }
+        final Object result = attributeImpl.extractWrittenArray();
+        if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
+            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+        }
+        return (Number[]) result;
     }
 
     /**
-     * Extract data and format it as followed :\n SCALAR: ex: 1 SPECTRUM: one line separated by separator. \n ex: 1 3 5
-     * IMAGE: x lines and y colums separated by endSeparator.\n ex: 3 5 8 5 6 9
+     * Extract data and format it as followed :\n SCALAR: ex: 1 SPECTRUM: one
+     * line separated by separator. \n ex: 1 3 5 IMAGE: x lines and y colums
+     * separated by endSeparator.\n ex: 3 5 8 5 6 9
      * 
      * @param separator
      * @param endSeparator
@@ -365,99 +370,99 @@ public final class TangoAttribute {
      * @throws DevFailed
      */
     public String extractToString(final String separator, final String endSeparator) throws DevFailed {
-	LOGGER.debug(LOG_EXTRACTING, this);
-	return attributeImpl.extractToString(separator, endSeparator);
+        logger.debug(LOG_EXTRACTING, this);
+        return attributeImpl.extractToString(separator, endSeparator);
     }
 
     public boolean isNumber() {
-	return attributeImpl.isNumber();
+        return attributeImpl.isNumber();
     }
 
     public boolean isBoolean() {
-	return attributeImpl.isBoolean();
+        return attributeImpl.isBoolean();
     }
 
     public boolean isString() {
-	return attributeImpl.isString();
+        return attributeImpl.isString();
     }
 
     public boolean isWritable() {
-	return attributeImpl.isWritable();
+        return attributeImpl.isWritable();
     }
 
     public boolean isScalar() {
-	return attributeImpl.isScalar();
+        return attributeImpl.isScalar();
     }
 
     public boolean isSpectrum() {
-	return attributeImpl.isSpectrum();
+        return attributeImpl.isSpectrum();
     }
 
     public boolean isImage() {
-	return attributeImpl.isImage();
+        return attributeImpl.isImage();
     }
 
     public AttributeProxy getAttributeProxy() {
-	return attributeImpl.getAttributeProxy();
+        return attributeImpl.getAttributeProxy();
     }
 
     public DeviceAttribute getDeviceAttribute() {
-	return attributeImpl.getDeviceAttribute();
+        return attributeImpl.getDeviceAttribute();
     }
 
     public int getDimX() throws DevFailed {
-	return attributeImpl.getDimX();
+        return attributeImpl.getDimX();
     }
 
     public int getDimY() throws DevFailed {
-	return attributeImpl.getDimY();
+        return attributeImpl.getDimY();
     }
 
     public int getWrittenDimX() throws DevFailed {
-	return attributeImpl.getWrittenDimX();
+        return attributeImpl.getWrittenDimX();
     }
 
     public int getWrittenDimY() throws DevFailed {
-	return attributeImpl.getWrittenDimY();
+        return attributeImpl.getWrittenDimY();
     }
 
     public int getDataType() throws DevFailed {
-	return attributeImpl.getDataType();
+        return attributeImpl.getDataType();
     }
 
     public AttrWriteType getWriteType() {
-	return attributeImpl.getWriteType();
+        return attributeImpl.getWriteType();
     }
 
     public long getTimestamp() throws DevFailed {
-	return attributeImpl.getTimestamp();
+        return attributeImpl.getTimestamp();
     }
 
     public AttrQuality getQuality() throws DevFailed {
-	return attributeImpl.getQuality();
+        return attributeImpl.getQuality();
     }
 
     public String getDeviceName() throws DevFailed {
-	return attributeImpl.getDeviceName();
+        return attributeImpl.getDeviceName();
     }
 
     public String getName() {
-	return attributeImpl.getAttributeName();
+        return attributeImpl.getAttributeName();
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder str = new ToStringBuilder(this);
-	str.append("name", attributeImpl.getAttributeName());
-	String typeString = "UNKOWN";
-	try {
-	    typeString = TangoConst.Tango_CmdArgTypeName[attributeImpl.getDataType()];
-	} catch (final DevFailed e) {
-	}
-	final String formatString = TangoConst.Tango_AttrDataFormatName[attributeImpl.getDataFormat().value()];
-	str.append("type", typeString);
-	str.append("format", formatString);
-	str.append("writeType", attributeImpl.getWriteType().value());
-	return str.toString();
+        final ToStringBuilder str = new ToStringBuilder(this);
+        str.append("name", attributeImpl.getAttributeName());
+        String typeString = "UNKOWN";
+        try {
+            typeString = TangoConst.Tango_CmdArgTypeName[attributeImpl.getDataType()];
+        } catch (final DevFailed e) {
+        }
+        final String formatString = TangoConst.Tango_AttrDataFormatName[attributeImpl.getDataFormat().value()];
+        str.append("type", typeString);
+        str.append("format", formatString);
+        str.append("writeType", attributeImpl.getWriteType().value());
+        return str.toString();
     }
 }
