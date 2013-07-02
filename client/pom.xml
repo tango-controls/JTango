@@ -9,9 +9,8 @@
 		<version>1.0.0</version>
 	</parent>
 
-	<groupId>org.tango</groupId>
 	<artifactId>JTangoClientLang</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 	<name>JTango Client Lang</name>
 	<description>Tango client utilities</description>
 	<developers>
