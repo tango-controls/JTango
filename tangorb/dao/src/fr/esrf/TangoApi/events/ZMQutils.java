@@ -50,6 +50,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 
 public class  ZMQutils {
@@ -76,6 +77,7 @@ public class  ZMQutils {
 
     private static ZMQ.Context     context = ZMQ.context(1);
 	private static ZMQutils instance = null;
+    private static double  zmqVersion = -1.0;
 
     private static final int HWM_DEFAULT = 1000;
 	//===============================================================
@@ -92,6 +94,31 @@ public class  ZMQutils {
     }
 	//===============================================================
 	//===============================================================
+    public static double getZmqVersion() {
+        if (zmqVersion<0.0) {   //  Not already checked.
+            zmqVersion = 0.0;
+            try {
+                String  strVersion = org.zeromq.ZMQ.getVersionString();
+                StringTokenizer stk = new StringTokenizer(strVersion, ".");
+                ArrayList<String>   list = new ArrayList<String>();
+                while (stk.hasMoreTokens())
+                    list.add(stk.nextToken());
+
+                strVersion = list.get(0) + "." + list.get(1);
+                if (list.size()>2)
+                    strVersion += list.get(2);
+                try {
+                    zmqVersion = Double.parseDouble(strVersion);
+                }
+                catch (NumberFormatException e) {
+                    System.err.println(e);
+                }
+            }
+            catch (Exception e) { /*System.err.println(e);*/  }
+            catch (Error e)     { /*System.err.println(e);*/  }
+        }
+        return zmqVersion;
+    }
 	//===============================================================
     /**
      *
