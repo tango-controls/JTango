@@ -42,12 +42,16 @@
 	</distributionManagement>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>1.0-beta-2</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>1.0-beta-2</version>
-			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<configuration>
@@ -123,6 +127,7 @@
 				</executions>
 			</plugin>
 		</plugins>
+
 		<!-- Filtering of resources -->
 		<resources>
 			<resource>
@@ -139,6 +144,7 @@
 				</excludes>
 			</resource>
 		</resources>
+
 	</build>
 	<dependencyManagement>
 		<dependencies>
