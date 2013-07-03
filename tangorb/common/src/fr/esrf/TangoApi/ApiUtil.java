@@ -62,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.2.4  -  Tue Apr 30 14:42:13 CEST 2013";
+            "8.3.1  -  Wed Jul 03 11:11:06 CEST 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -618,31 +618,8 @@ public class ApiUtil {
      */
     //===================================================================
     public static double getZmqVersion() {
-        if (zmqVersion<0.0) {   //  Not already checked.
-            zmqVersion = 0.0;
-            try {
-                String  strVersion = org.zeromq.ZMQ.getVersionString();
-                StringTokenizer stk = new StringTokenizer(strVersion, ".");
-                ArrayList<String>   list = new ArrayList<String>();
-                while (stk.hasMoreTokens())
-                    list.add(stk.nextToken());
-
-                strVersion = list.get(0) + "." + list.get(1);
-                if (list.size()>2)
-                    strVersion += list.get(2);
-                try {
-                    zmqVersion = Double.parseDouble(strVersion);
-                }
-                catch (NumberFormatException e) {
-                    System.err.println(e);
-                }
-            }
-            catch (Exception e) { /*System.err.println(e);*/  }
-            catch (Error e)     { /*System.err.println(e);*/  }
-        }
-        return zmqVersion;
+        return apiutilDAO.getZmqVersion();
     }
-    private static double  zmqVersion = -1.0;
     //===================================================================
     /**
      * Convert a signed int to a unsigne value in a long
