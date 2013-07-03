@@ -62,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.3.1  -  Wed Jul 03 11:11:06 CEST 2013";
+            "8.3.1  -  Wed Jul 03 11:22:33 CEST 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
