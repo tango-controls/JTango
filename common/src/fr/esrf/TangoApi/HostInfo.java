@@ -121,9 +121,11 @@ class  HostInfo
                     return true;
                 }
             }
+            /*
             else
                 System.err.println(
                         "Warning: at least one getCanonicalHostName() returns " + inetAddress.getCanonicalHostName());
+            */
         }
         return false;
     }
