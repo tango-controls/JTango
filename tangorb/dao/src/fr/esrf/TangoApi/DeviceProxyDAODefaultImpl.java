@@ -2455,7 +2455,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Read Asynchronous read_attribute reply.
      * 
      * @param id asynchronous call id (returned by read_attribute_asynch).
-     * @param timeout number of millisonds to wait reply before throw an excption.
+     * @param timeout number of milliseconds to wait reply before throw an excption.
      */
     // ==========================================================================
     public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
