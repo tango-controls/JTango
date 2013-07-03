@@ -11,7 +11,7 @@
 	
  
   <artifactId>JTangoServer</artifactId>
-  <version>1.0.2-alpha</version>
+  <version>1.0.3-SNAPSHOT</version>
   
   <name>JTango Server</name>
   <description>Library for Tango Server (ie. Tango Device) in Java</description>
