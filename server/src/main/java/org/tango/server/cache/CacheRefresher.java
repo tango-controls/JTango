@@ -1,28 +1,30 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.cache;
+
+import java.util.Locale;
 
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
@@ -36,22 +38,22 @@ public final class CacheRefresher implements Runnable {
     private final String name;
 
     public CacheRefresher(final SelfPopulatingCache cache, final String name) {
-	this.cache = cache;
-	this.name = name;
+        this.cache = cache;
+        this.name = name.toLowerCase(Locale.ENGLISH);
     }
 
     @Override
     public void run() {
-	logger.debug("refresh {}", cache.getName());
-	// final Profiler profiler = new Profiler("tangoCache");
-	// profiler.start(attribute.getName());
-	try {
-	    cache.get(name);
-	    cache.refresh();
-	} catch (final CacheException e) {
-	    logger.error("error {}", e.getCause());
-	}
+        logger.debug("refresh {}", cache.getName());
+        // final Profiler profiler = new Profiler("tangoCache");
+        // profiler.start(attribute.getName());
+        try {
+            cache.get(name);
+            cache.refresh();
+        } catch (final CacheException e) {
+            logger.error("error {}", e.getCause());
+        }
 
-	// profiler.stop().print();
+        // profiler.stop().print();
     }
 }

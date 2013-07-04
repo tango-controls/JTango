@@ -1,28 +1,30 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.cache;
+
+import java.util.Locale;
 
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
@@ -44,51 +46,51 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
     private long lastUpdateTime;
 
     public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock) {
-	this.deviceLock = deviceLock;
-	this.attribute = attribute;
+        this.deviceLock = deviceLock;
+        this.attribute = attribute;
     }
 
     @Override
     public Object createEntry(final Object key) throws DevFailed {
 
-	logger.debug("Creating entry for key = {} , attribute {} ", key, attribute.getName());
+        logger.debug("Creating entry for key = {} , attribute {} ", key, attribute.getName());
 
-	// profilerPeriod.stop().print();
-	// profilerPeriod = new Profiler("period");
-	// profilerPeriod.start(attribute.getName());
-	// if (element != null) {
-	// logger.debug("{} hint {}", element.getHitCount());
-	// System.out.println(element.getExpirationTime());
-	// }
-	// final Profiler profiler = new Profiler("read time");
-	// profiler.start(attribute.getName());
-	Object result = null;
-	if (key.equals(attribute.getName())) {
-	    deviceLock.lockAttribute();
-	    try {
-		synchronized (attribute) {
-		    final long time1 = System.nanoTime();
-		    attribute.updateValue();
-		    final long now = System.nanoTime();
-		    final long nowMilli = System.currentTimeMillis();
-		    final long deltaTime = now - lastUpdateTime;
-		    lastUpdateTime = now;
-		    final long executionDuration = lastUpdateTime - time1;
-		    attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-		    attribute.addToHistory();
-		    result = attribute.getReadValue();
-		}
-	    } catch (final DevFailed e) {
-		attribute.addErrorToHistory(e);
-		throw e;
-	    } finally {
-		deviceLock.unlockAttribute();
-	    }
-	}
+        // profilerPeriod.stop().print();
+        // profilerPeriod = new Profiler("period");
+        // profilerPeriod.start(attribute.getName());
+        // if (element != null) {
+        // logger.debug("{} hint {}", element.getHitCount());
+        // System.out.println(element.getExpirationTime());
+        // }
+        // final Profiler profiler = new Profiler("read time");
+        // profiler.start(attribute.getName());
+        Object result = null;
+        if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
+            deviceLock.lockAttribute();
+            try {
+                synchronized (attribute) {
+                    final long time1 = System.nanoTime();
+                    attribute.updateValue();
+                    final long now = System.nanoTime();
+                    final long nowMilli = System.currentTimeMillis();
+                    final long deltaTime = now - lastUpdateTime;
+                    lastUpdateTime = now;
+                    final long executionDuration = lastUpdateTime - time1;
+                    attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+                    attribute.addToHistory();
+                    result = attribute.getReadValue();
+                }
+            } catch (final DevFailed e) {
+                attribute.addErrorToHistory(e);
+                throw e;
+            } finally {
+                deviceLock.unlockAttribute();
+            }
+        }
 
-	// profiler.stop().print();
+        // profiler.stop().print();
 
-	return result;
+        return result;
     }
     // @Override
     // public void updateEntryValue(final Object key, final Object value) throws
