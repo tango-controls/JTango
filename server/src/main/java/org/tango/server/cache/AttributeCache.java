@@ -24,6 +24,7 @@
  */
 package org.tango.server.cache;
 
+import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -45,42 +46,42 @@ public final class AttributeCache {
     private final AttributeImpl attribute;
 
     public AttributeCache(final CacheManager manager, final AttributeImpl attr, final String deviceName,
-	    final DeviceLock deviceLock) {
-	attribute = attr;
-	final String cacheName = "attrTangoPollingCache." + deviceName + "/" + attr.getName();
-	Cache defaultCache = manager.getCache(cacheName);
-	if (defaultCache == null) {
-	    manager.addCache(cacheName);
-	    defaultCache = manager.getCache(cacheName);
-	    // defaultCache.setStatisticsEnabled(true);
-	}
-	defaultCache.flush();
-	cache = new SelfPopulatingCache(defaultCache, new AttributeCacheEntryFactory(attr, deviceLock));
-	cache.getCacheConfiguration().setTimeToLiveSeconds(60);
+            final DeviceLock deviceLock) {
+        attribute = attr;
+        final String cacheName = "attrTangoPollingCache." + deviceName + "/" + attr.getName();
+        Cache defaultCache = manager.getCache(cacheName);
+        if (defaultCache == null) {
+            manager.addCache(cacheName);
+            defaultCache = manager.getCache(cacheName);
+            // defaultCache.setStatisticsEnabled(true);
+        }
+        defaultCache.flush();
+        cache = new SelfPopulatingCache(defaultCache, new AttributeCacheEntryFactory(attr, deviceLock));
+        cache.getCacheConfiguration().setTimeToLiveSeconds(60);
 
     }
 
     public void startRefresh(final ScheduledExecutorService pollingPool) {
-	logger.debug("start refresh cache of {} ", attribute.getName());
-	final CacheRefresher refresher = new CacheRefresher(cache, attribute.getName());
-	result = pollingPool.scheduleAtFixedRate(refresher, 0L, attribute.getPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.debug("start refresh cache of {} ", attribute.getName());
+        final CacheRefresher refresher = new CacheRefresher(cache, attribute.getName().toLowerCase(Locale.ENGLISH));
+        result = pollingPool.scheduleAtFixedRate(refresher, 0L, attribute.getPollingPeriod(), TimeUnit.MILLISECONDS);
     }
 
     public void stopRefresh() {
-	if (result != null) {
-	    logger.debug("stop refresh cache of {}", attribute.getName());
-	    final boolean isCancelled = result.cancel(true);
-	    if (!isCancelled) {
-		logger.error("stop refresh NOT CANCELLED");
-		// DevFailedUtils.throwDevFailed("STOP_REFRESH",
-		// "error stopping refresh of "
-		// + attribute.getName());
-	    }
+        if (result != null) {
+            logger.debug("stop refresh cache of {}", attribute.getName());
+            final boolean isCancelled = result.cancel(true);
+            if (!isCancelled) {
+                logger.error("stop refresh NOT CANCELLED");
+                // DevFailedUtils.throwDevFailed("STOP_REFRESH",
+                // "error stopping refresh of "
+                // + attribute.getName());
+            }
 
-	}
+        }
     }
 
     public SelfPopulatingCache getCache() {
-	return cache;
+        return cache;
     }
 }
