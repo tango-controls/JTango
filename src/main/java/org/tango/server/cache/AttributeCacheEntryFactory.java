@@ -45,15 +45,19 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
     private final DeviceLock deviceLock;
     private long lastUpdateTime;
 
-    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock) {
+    private final String deviceName;
+
+    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock, String deviceName) {
         this.deviceLock = deviceLock;
         this.attribute = attribute;
+        this.deviceName = deviceName;
     }
 
     @Override
     public Object createEntry(final Object key) throws DevFailed {
 
-        logger.debug("Creating entry for key = {} , attribute {} ", key, attribute.getName());
+        logger.debug("Creating entry for key = {} , attribute {}/{} ",
+                new Object[] { key, deviceName, attribute.getName() });
 
         // profilerPeriod.stop().print();
         // profilerPeriod = new Profiler("period");
@@ -65,6 +69,7 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
         // final Profiler profiler = new Profiler("read time");
         // profiler.start(attribute.getName());
         Object result = null;
+
         if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
             deviceLock.lockAttribute();
             try {
