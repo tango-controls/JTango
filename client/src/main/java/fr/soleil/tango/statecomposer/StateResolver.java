@@ -20,7 +20,6 @@ import org.tango.utils.DevFailedUtils;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceData;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.StateUtilities;
 import fr.esrf.TangoApi.Group.Group;
 import fr.esrf.TangoApi.Group.GroupCmdReply;
@@ -42,10 +41,10 @@ public final class StateResolver {
     private final boolean isSynchronous;
 
     private static class ThreadFact implements ThreadFactory {
-	@Override
-	public Thread newThread(final Runnable r) {
-	    return new Thread(r, "StateResolver");
-	}
+        @Override
+        public Thread newThread(final Runnable r) {
+            return new Thread(r, "StateResolver");
+        }
     }
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new ThreadFact());
@@ -54,16 +53,16 @@ public final class StateResolver {
     private final long period;
 
     private class StateRefresher implements Runnable {
-	private DevState state = DevState.UNKNOWN;
+        private DevState state = DevState.UNKNOWN;
 
-	@Override
-	public void run() {
-	    state = stateReader();
-	}
+        @Override
+        public void run() {
+            state = stateReader();
+        }
 
-	public DevState getState() {
-	    return state;
-	}
+        public DevState getState() {
+            return state;
+        }
     }
 
     /**
@@ -73,140 +72,140 @@ public final class StateResolver {
      *            array of String. eg, STATE,priorityValue
      */
     public void configurePriorities(final String[] priorities) {
-	// Set the non defined state in the property at 0 priority
-	// Enumeration of existing state
-	int priority;
-	// Get the custom priority
-	for (final String state : priorities) {
-	    // count the token separated by ","
-	    final StringTokenizer tmpPriorityTokens = new StringTokenizer(state.trim(), ",");
-	    if (tmpPriorityTokens.countTokens() == 2) {
-		// To avoid the the pb of case
-		final String tmpState = tmpPriorityTokens.nextToken().trim().toUpperCase();
-		// If the custom state exist
-		if (StateUtilities.isStateExist(tmpState)) {
-		    try {
-			priority = Integer.valueOf(tmpPriorityTokens.nextToken().trim());
-		    } catch (final NumberFormatException e) {
-			priority = 0;
-		    }
-		    putStatePriority(StateUtilities.getStateForName(tmpState), priority);
-		}
-	    }
-	}
+        // Set the non defined state in the property at 0 priority
+        // Enumeration of existing state
+        int priority;
+        // Get the custom priority
+        for (final String state : priorities) {
+            // count the token separated by ","
+            final StringTokenizer tmpPriorityTokens = new StringTokenizer(state.trim(), ",");
+            if (tmpPriorityTokens.countTokens() == 2) {
+                // To avoid the the pb of case
+                final String tmpState = tmpPriorityTokens.nextToken().trim().toUpperCase();
+                // If the custom state exist
+                if (StateUtilities.isStateExist(tmpState)) {
+                    try {
+                        priority = Integer.valueOf(tmpPriorityTokens.nextToken().trim());
+                    } catch (final NumberFormatException e) {
+                        priority = 0;
+                    }
+                    putStatePriority(StateUtilities.getStateForName(tmpState), priority);
+                }
+            }
+        }
     }
 
     public StateResolver(final long period, final boolean isSynchronous) {
-	priorityStateManager = new PriorityStateManager();
-	this.isSynchronous = isSynchronous;
-	this.period = period;
+        priorityStateManager = new PriorityStateManager();
+        this.isSynchronous = isSynchronous;
+        this.period = period;
     }
 
     public void putStatePriority(final DevState state, final int priority) {
-	priorityStateManager.putStatePriority(state, priority);
+        priorityStateManager.putStatePriority(state, priority);
     }
 
     public void setMonitoredDevices(final int timeout, final String... deviceNameList) throws DevFailed {
-	if (deviceNameList.length > 0 && !deviceNameList[0].equals("")) {
-	    // remove the double entries thanks to a Set
-	    final Set<String> deviceNameSet = new LinkedHashSet<String>();
+        if (deviceNameList.length > 0 && !deviceNameList[0].equals("")) {
+            // remove the double entries thanks to a Set
+            final Set<String> deviceNameSet = new LinkedHashSet<String>();
 
-	    for (final String element : deviceNameList) {
-		deviceNameSet.add(element.trim());
-	    }
-	    for (final String deviceName : deviceNameSet) {
-		// check if device exists and is alive
-		// ProxyFactory.getInstance().createDeviceProxy(deviceName).ping();
-		new DeviceProxy(deviceName).ping();
-	    }
-	    // Create the group
-	    group = ProxyFactory.getInstance().createGroup("statecomposer",
-		    deviceNameSet.toArray(new String[deviceNameSet.size()]));
-	    group.set_timeout_millis(timeout, true);
-	} else {
-	    DevFailedUtils.throwDevFailed("INIT_ERROR", "property DeviceNameList is not configured");
-	}
+            for (final String element : deviceNameList) {
+                deviceNameSet.add(element.trim());
+            }
+//	    for (final String deviceName : deviceNameSet) {
+//		// check if device exists and is alive
+//		// ProxyFactory.getInstance().createDeviceProxy(deviceName).ping();
+//		new DeviceProxy(deviceName).ping();
+//	    }
+            // Create the group
+            group = ProxyFactory.getInstance().createGroup("statecomposer",
+                    deviceNameSet.toArray(new String[deviceNameSet.size()]));
+            group.set_timeout_millis(timeout, true);
+        } else {
+            DevFailedUtils.throwDevFailed("INIT_ERROR", "property DeviceNameList is not configured");
+        }
     }
 
     public void start() {
 
-	if (!isSynchronous) {
-	    future = executor.scheduleAtFixedRate(refresher, 0L, period, TimeUnit.MILLISECONDS);
-	}
+        if (!isSynchronous) {
+            future = executor.scheduleAtFixedRate(refresher, 0L, period, TimeUnit.MILLISECONDS);
+        }
     }
 
     public boolean isStarted() {
-	boolean isStarted = true;
-	if (!isSynchronous && future != null) {
-	    isStarted = !future.isDone();
-	}
-	return isStarted;
+        boolean isStarted = true;
+        if (!isSynchronous && future != null) {
+            isStarted = !future.isDone();
+        }
+        return isStarted;
 
     }
 
     public void stop() {
-	if (!isSynchronous && future != null) {
-	    future.cancel(true);
-	}
+        if (!isSynchronous && future != null) {
+            future.cancel(true);
+        }
     }
 
     public Map<String, String> getErrorReportMap() {
-	return new HashMap<String, String>(errorReportMap);
+        return new HashMap<String, String>(errorReportMap);
     }
 
     public DevState getState() {
-	DevState stateResult;
-	if (isSynchronous) {
-	    stateResult = stateReader();
-	} else {
-	    stateResult = refresher.getState();
-	}
-	return stateResult;
+        DevState stateResult;
+        if (isSynchronous) {
+            stateResult = stateReader();
+        } else {
+            stateResult = refresher.getState();
+        }
+        return stateResult;
     }
 
     public short[] getDeviceStateNumberArray() {
-	return priorityStateManager.getDeviceStateNumberArray();
+        return priorityStateManager.getDeviceStateNumberArray();
     }
 
     public String[] getDeviceStateArray() {
-	return priorityStateManager.getDeviceStateArray();
+        return priorityStateManager.getDeviceStateArray();
     }
 
     public int getPriorityForState(final DevState state) {
-	return priorityStateManager.getPriorityForState(state);
+        return priorityStateManager.getPriorityForState(state);
     }
 
     private DevState stateReader() {
-	GroupCmdReplyList tmpReplyList = null;
-	DevState stateResult = null;
-	try {
-	    tmpReplyList = group.command_inout("State", true);
-	} catch (final DevFailed e) {
-	    errorReportMap.put(group.get_name(), DATE_FORMAT.format(new Date()) + " : Received error for State "
-		    + DevFailedUtils.toString(e));
+        GroupCmdReplyList tmpReplyList = null;
+        DevState stateResult = null;
+        try {
+            tmpReplyList = group.command_inout("State", true);
+        } catch (final DevFailed e) {
+            errorReportMap.put(group.get_name(), DATE_FORMAT.format(new Date()) + " : Received error for State "
+                    + DevFailedUtils.toString(e));
 
-	}
+        }
 
-	if (tmpReplyList != null) {
-	    final Enumeration<?> tmpReplyEnumeration = tmpReplyList.elements();
-	    while (tmpReplyEnumeration.hasMoreElements()) {
-		final GroupCmdReply tmpReply = (GroupCmdReply) tmpReplyEnumeration.nextElement();
-		try {
-		    final DeviceData tmpDeviceData = tmpReply.get_data();
-		    final DevState tmpState = tmpDeviceData.extractDevState();
-		    priorityStateManager.putDeviceState(tmpReply.dev_name(), tmpState);
-		} catch (final DevFailed e) {
-		    errorReportMap.put(tmpReply.dev_name(), DATE_FORMAT.format(new Date())
-			    + " : Received error for State " + DevFailedUtils.toString(e));
-		    priorityStateManager.putDeviceState(tmpReply.dev_name(), DevState.UNKNOWN);
-		}
-		stateResult = priorityStateManager.getHighestPriorityState();
-	    }
-	}
-	return stateResult;
+        if (tmpReplyList != null) {
+            final Enumeration<?> tmpReplyEnumeration = tmpReplyList.elements();
+            while (tmpReplyEnumeration.hasMoreElements()) {
+                final GroupCmdReply tmpReply = (GroupCmdReply) tmpReplyEnumeration.nextElement();
+                try {
+                    final DeviceData tmpDeviceData = tmpReply.get_data();
+                    final DevState tmpState = tmpDeviceData.extractDevState();
+                    priorityStateManager.putDeviceState(tmpReply.dev_name(), tmpState);
+                } catch (final DevFailed e) {
+                    errorReportMap.put(tmpReply.dev_name(), DATE_FORMAT.format(new Date())
+                            + " : Received error for State " + DevFailedUtils.toString(e));
+                    priorityStateManager.putDeviceState(tmpReply.dev_name(), DevState.UNKNOWN);
+                }
+                stateResult = priorityStateManager.getHighestPriorityState();
+            }
+        }
+        return stateResult;
     }
 
     public Group getGroup() {
-	return group;
+        return group;
     }
 }
