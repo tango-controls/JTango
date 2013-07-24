@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject implements
-	org.omg.PortableInterceptor.ServerRequestInterceptor {
+        org.omg.PortableInterceptor.ServerRequestInterceptor {
     private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
 
     /**
@@ -51,6 +51,7 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
     private static final long serialVersionUID = 1L;
     private String clientHostName = "";
     private String giopHostAddress;
+    private String clientIPAddress;
     private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
 
     private ServerRequestInterceptor() {
@@ -63,33 +64,37 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
 
     @Override
     public void receive_request(final ServerRequestInfo ri) throws ForwardRequest {
-	try {
-	    if (ri instanceof ServerRequestInfoImpl) {
-		final ServerRequestInfoImpl infoImpl = (ServerRequestInfoImpl) ri;
-		final Connection connection = infoImpl.request.getConnection().getTransport();
-		if (connection instanceof ServerIIOPConnection) {
-		    final ServerIIOPConnection connex = (ServerIIOPConnection) connection;
-		    final Socket sock = connex.getSocket();
-		    if (sock != null) {
-			// // local informations
-			// final String localIP = sock.getLocalAddress().getHostAddress();
-			// final int localPort = sock.getLocalPort();
+        try {
+            if (ri instanceof ServerRequestInfoImpl) {
+                final ServerRequestInfoImpl infoImpl = (ServerRequestInfoImpl) ri;
+                final Connection connection = infoImpl.request.getConnection().getTransport();
+                if (connection instanceof ServerIIOPConnection) {
+                    final ServerIIOPConnection connex = (ServerIIOPConnection) connection;
+                    final Socket sock = connex.getSocket();
+                    if (sock != null) {
+                        // // local informations
+                        // final String localIP = sock.getLocalAddress().getHostAddress();
+                        // final int localPort = sock.getLocalPort();
 
-			// remote informations
-			final String remoteIP = sock.getInetAddress().getHostAddress();
-			final int remotePort = sock.getPort();
+                        // remote informations
+                        clientIPAddress = sock.getInetAddress().getHostAddress();
+                        final int remotePort = sock.getPort();
 
-			clientHostName = InetAddress.getByName(remoteIP).getCanonicalHostName();
-			giopHostAddress = "giop:tcp:" + remoteIP + ":" + remotePort;
-		    }
-		}
-		// else {
-		// System.out.println("conne " + connection.getClass());
-		// }
-	    }
-	} catch (final Exception e) {
-	    logger.error("", e);
-	}
+                        clientHostName = InetAddress.getByName(clientIPAddress).getCanonicalHostName();
+                        giopHostAddress = "giop:tcp:" + clientIPAddress + ":" + remotePort;
+                    }
+                } else {
+                    // when client is in the same process as the server, connection instance of
+                    // org.jacorb.orb.iiop.IIOPListener$LoopbackAcceptor
+                    final InetAddress addr = InetAddress.getLocalHost();
+                    clientIPAddress = addr.getHostAddress();
+                    clientHostName = addr.getCanonicalHostName();
+                    giopHostAddress = "giop:tcp:" + clientIPAddress;
+                }
+            }
+        } catch (final Exception e) {
+            logger.error("", e);
+        }
 
     }
 
@@ -107,7 +112,7 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
 
     @Override
     public String name() {
-	return this.getClass().getCanonicalName();
+        return this.getClass().getCanonicalName();
     }
 
     @Override
@@ -115,15 +120,19 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
     }
 
     public String getClientHostName() {
-	return clientHostName;
+        return clientHostName;
+    }
+
+    public String getClientIPAddress() {
+        return clientIPAddress;
     }
 
     public String getGiopHostAddress() {
-	return giopHostAddress;
+        return giopHostAddress;
     }
 
     public static ServerRequestInterceptor getInstance() {
-	return INSTANCE;
+        return INSTANCE;
     }
 
 }
