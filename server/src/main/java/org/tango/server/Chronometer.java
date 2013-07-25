@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.tango.server.lock;
+package org.tango.server;
 
 /**
  * Calculate elapsed time
@@ -32,7 +32,7 @@ package org.tango.server.lock;
  */
 public final class Chronometer {
 
-    private static final int TO_SECS = 1000;
+    // private static final int TO_SECS = 1000;
     private long startTime = 0;
     private long duration = 0;
     private boolean isOver = true;
@@ -41,19 +41,19 @@ public final class Chronometer {
      * Start the chronometer
      * 
      * @param duration
-     *            the duration in seconds
+     *            the duration in milliseconds
      */
     public synchronized void start(final long duration) {
-	startTime = System.currentTimeMillis();
-	this.duration = duration;
-	isOver = false;
+        startTime = System.currentTimeMillis();
+        this.duration = duration;
+        isOver = false;
     }
 
     /**
      * stop the chronometer
      */
     public synchronized void stop() {
-	isOver = true;
+        isOver = true;
     }
 
     /**
@@ -62,12 +62,13 @@ public final class Chronometer {
      * @return true if over
      */
     public synchronized boolean isOver() {
-	if (!isOver) {
-	    final long now = System.currentTimeMillis();
-	    if (now - startTime > duration * TO_SECS) {
-		isOver = true;
-	    }
-	}
-	return isOver;
+        if (!isOver) {
+            final long now = System.currentTimeMillis();
+            if (now - startTime > duration /** TO_SECS */
+            ) {
+                isOver = true;
+            }
+        }
+        return isOver;
     }
 }

@@ -38,7 +38,7 @@ import org.tango.server.attribute.AttributePropertiesImpl;
  * 
  * <pre>
  * &#064;Attribute
- * &#064;AttributeProperty(format = "%6.3f")
+ * &#064;AttributeProperties(format = "%6.3f")
  * private double myAttribute;
  * 
  * public double getMyAttribute(){..};
@@ -78,4 +78,16 @@ public @interface AttributeProperties {
     String deltaTime() default AttributePropertiesImpl.NOT_SPECIFIED;
 
     String deltaValue() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String periodicEvent() default AttributePropertiesImpl.PERIOD_1000;
+
+    String changeEventAbsolute() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String changeEventRelative() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String archiveEventAbsolute() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String archiveEventRelative() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String archiveEventPeriod() default AttributePropertiesImpl.NOT_SPECIFIED;
 }

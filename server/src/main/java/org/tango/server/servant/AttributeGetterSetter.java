@@ -249,7 +249,8 @@ public final class AttributeGetterSetter {
                 aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, att.getName()));
                 if (att.isPolled() && fromCache) {
                     // get value from cache
-                    final Element element = cacheManager.getAttributeCache(att).get(names[i]);
+                    final Element element = cacheManager.getAttributeCache(att).get(
+                            names[i].toLowerCase(Locale.ENGLISH));
                     final AttributeValue readValue = (AttributeValue) element.getValue();
                     back[i] = TangoIDLAttributeUtil.toAttributeValue3(att, readValue, att.getWriteValue());
                     LOGGER.debug("read from CACHE {} - expired {}", att.getName(), element.isExpired());
@@ -282,7 +283,7 @@ public final class AttributeGetterSetter {
             aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, att.getName()));
             if (att.isPolled() && fromCache) {
                 // get value from cache
-                final Element element = cacheManager.getAttributeCache(att).get(names[i]);
+                final Element element = cacheManager.getAttributeCache(att).get(names[i].toLowerCase(Locale.ENGLISH));
                 final AttributeValue readValue = (AttributeValue) element.getValue();
                 back[i] = TangoIDLAttributeUtil.toAttributeValue(att, readValue);
                 LOGGER.debug("read from CACHE {} - expired {}", att.getName(), element.isExpired());
