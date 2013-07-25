@@ -39,34 +39,34 @@ public class InitStateTest extends NoDBDeviceManager {
 
     @Test
     public void testInit() throws DevFailed {
-	final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
-	attr.write(20);
-	final TangoCommand tangoCommand = new TangoCommand(deviceName, "Init");
-	tangoCommand.execute();
-	final short shortScalar = (Short) attr.read();
-	assertThat((short) 10, equalTo(shortScalar));
+        final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
+        attr.write(20);
+        final TangoCommand tangoCommand = new TangoCommand(deviceName, "Init");
+        tangoCommand.execute();
+        final short shortScalar = (Short) attr.read();
+        assertThat(shortScalar, equalTo((short) 10));
     }
 
     @Test
     public void testInitState() throws DevFailed {
-	final TangoCommand tangoCommand = new TangoCommand(deviceName, "Status");
-	final Object status = tangoCommand.executeExtract(null);
-	assertThat("hello", equalTo(status));
+        final TangoCommand tangoCommand = new TangoCommand(deviceName, "Status");
+        final Object status = tangoCommand.executeExtract(null);
+        assertThat("hello", equalTo(status));
     }
 
     @Test
     public void testState() throws DevFailed {
-	final TangoCommand tangoCommand = new TangoCommand(deviceName, "testState");
-	tangoCommand.execute();
-	final TangoCommand tangoCommand2 = new TangoCommand(deviceName + "/State");
-	final Object state = tangoCommand2.executeExtract(null);
-	assertThat(DevState.FAULT, equalTo(state));
+        final TangoCommand tangoCommand = new TangoCommand(deviceName, "testState");
+        tangoCommand.execute();
+        final TangoCommand tangoCommand2 = new TangoCommand(deviceName + "/State");
+        final Object state = tangoCommand2.executeExtract(null);
+        assertThat(DevState.FAULT, equalTo(state));
     }
 
     @Test
     public void testBlackBox() throws DevFailed {
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	dev.black_box(10);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        dev.black_box(10);
     }
 
 }
