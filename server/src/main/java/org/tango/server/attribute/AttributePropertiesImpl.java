@@ -42,7 +42,8 @@ import fr.esrf.Tango.PeriodicEventProp;
  */
 public final class AttributePropertiesImpl {
 
-    private static final String PERIOD_1000 = "1000";
+    public static final String PERIOD_1000 = "1000";
+
     private static final String FORMAT_6_2F = "%6.2f";
     // default values
     public static final String NOT_SPECIFIED = "Not specified";
@@ -104,396 +105,427 @@ public final class AttributePropertiesImpl {
     private double deltaValDouble = 0;
 
     public AttributePropertiesImpl() {
-	eventProp = createEmptyEventProperties();
+        eventProp = createEmptyEventProperties();
     }
 
     public AttributePropertiesImpl(final AttributePropertiesImpl props) {
-	label = props.label;
-	description = props.description;
-	unit = props.unit;
-	standardUnit = props.standardUnit;
-	displayUnit = props.displayUnit;
-	format = props.format;
-	minValue = props.minValue;
-	minValueDouble = props.minValueDouble;
-	maxValue = props.maxValue;
-	maxValueDouble = props.maxValueDouble;
-	minAlarm = props.minAlarm;
-	maxAlarm = props.maxAlarm;
-	minWarning = props.minWarning;
-	maxWarning = props.maxWarning;
-	deltaT = props.deltaT;
-	deltaVal = props.deltaVal;
-	alarmExtensions = Arrays.copyOf(props.alarmExtensions, props.alarmExtensions.length);
-	// TODO deep copy
-	eventProp = props.eventProp;
-	extensions = Arrays.copyOf(props.extensions, props.extensions.length);
-	sysExtensions = Arrays.copyOf(props.sysExtensions, props.sysExtensions.length);
+        label = props.label;
+        description = props.description;
+        unit = props.unit;
+        standardUnit = props.standardUnit;
+        displayUnit = props.displayUnit;
+        format = props.format;
+        minValue = props.minValue;
+        minValueDouble = props.minValueDouble;
+        maxValue = props.maxValue;
+        maxValueDouble = props.maxValueDouble;
+        minAlarm = props.minAlarm;
+        maxAlarm = props.maxAlarm;
+        minWarning = props.minWarning;
+        maxWarning = props.maxWarning;
+        deltaT = props.deltaT;
+        deltaVal = props.deltaVal;
+        alarmExtensions = Arrays.copyOf(props.alarmExtensions, props.alarmExtensions.length);
+        // TODO deep copy
+        eventProp = props.eventProp;
+        extensions = Arrays.copyOf(props.extensions, props.extensions.length);
+        sysExtensions = Arrays.copyOf(props.sysExtensions, props.sysExtensions.length);
 
     }
 
     public EventProperties createEmptyEventProperties() {
-	final ChangeEventProp change = new ChangeEventProp();
-	change.abs_change = NOT_SPECIFIED;
-	change.extensions = new String[0];
-	change.rel_change = NOT_SPECIFIED;
-	final PeriodicEventProp per = new PeriodicEventProp();
-	per.extensions = new String[0];
-	per.period = PERIOD_1000;
-	final ArchiveEventProp arch = new ArchiveEventProp();
-	arch.abs_change = NOT_SPECIFIED;
-	arch.extensions = new String[0];
-	arch.period = NOT_SPECIFIED;
-	arch.rel_change = NOT_SPECIFIED;
-	return new EventProperties(change, per, arch);
+        final ChangeEventProp change = new ChangeEventProp();
+        change.abs_change = NOT_SPECIFIED;
+        change.extensions = new String[0];
+        change.rel_change = NOT_SPECIFIED;
+        final PeriodicEventProp per = new PeriodicEventProp();
+        per.extensions = new String[0];
+        per.period = PERIOD_1000;
+        final ArchiveEventProp arch = new ArchiveEventProp();
+        arch.abs_change = NOT_SPECIFIED;
+        arch.extensions = new String[0];
+        arch.period = NOT_SPECIFIED;
+        arch.rel_change = NOT_SPECIFIED;
+        return new EventProperties(change, per, arch);
     }
 
     public String getLabel() {
-	return label;
+        return label;
     }
 
     public void setLabel(final String label) {
-	if (!label.isEmpty()) {
-	    this.label = label;
-	}
+        if (!label.isEmpty()) {
+            this.label = label;
+        }
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public void setDescription(final String description) {
-	if (description.isEmpty() || description.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| description.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.description = AttributePropertiesImpl.NO_DESCRIPTION;
-	} else {
-	    this.description = description;
-	}
+        if (description.isEmpty() || description.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || description.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.description = AttributePropertiesImpl.NO_DESCRIPTION;
+        } else {
+            this.description = description;
+        }
     }
 
     public String getUnit() {
-	return unit;
+        return unit;
     }
 
     public void setUnit(final String unit) {
-	if (unit.isEmpty() || unit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| unit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.unit = AttributePropertiesImpl.NO_UNIT;
-	} else {
-	    this.unit = unit;
-	}
+        if (unit.isEmpty() || unit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || unit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.unit = AttributePropertiesImpl.NO_UNIT;
+        } else {
+            this.unit = unit;
+        }
     }
 
     public String getStandardUnit() {
-	return standardUnit;
+        return standardUnit;
     }
 
     public void setStandardUnit(final String standardUnit) {
-	if (standardUnit.isEmpty() || standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.standardUnit = AttributePropertiesImpl.NO_STD_UNIT;
-	} else {
-	    this.standardUnit = standardUnit;
-	}
+        if (standardUnit.isEmpty() || standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.standardUnit = AttributePropertiesImpl.NO_STD_UNIT;
+        } else {
+            this.standardUnit = standardUnit;
+        }
     }
 
     public String getDisplayUnit() {
-	return displayUnit;
+        return displayUnit;
     }
 
     public void setDisplayUnit(final String displayUnit) {
-	if (displayUnit.isEmpty() || displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.displayUnit = AttributePropertiesImpl.NO_DIPLAY_UNIT;
-	} else {
-	    this.displayUnit = displayUnit;
-	}
+        if (displayUnit.isEmpty() || displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.displayUnit = AttributePropertiesImpl.NO_DIPLAY_UNIT;
+        } else {
+            this.displayUnit = displayUnit;
+        }
     }
 
     public String getFormat() {
-	return format;
+        return format;
     }
 
     public void setFormat(final String format) {
-	if (format.isEmpty() || format.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| format.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.format = AttributePropertiesImpl.FORMAT_6_2F;
-	} else {
-	    this.format = format;
-	}
+        if (format.isEmpty() || format.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || format.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.format = AttributePropertiesImpl.FORMAT_6_2F;
+        } else {
+            this.format = format;
+        }
     }
 
     public String getMinValue() {
-	return minValue;
+        return minValue;
     }
 
     public void setMinValue(final String minValue) {
-	if (minValue.isEmpty() || minValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| minValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.minValue = AttributePropertiesImpl.NOT_SPECIFIED;
-	    minValueDouble = -Double.MAX_VALUE;
-	} else {
-	    this.minValue = minValue;
-	    try {
-		minValueDouble = Double.valueOf(minValue);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (minValue.isEmpty() || minValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || minValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.minValue = AttributePropertiesImpl.NOT_SPECIFIED;
+            minValueDouble = -Double.MAX_VALUE;
+        } else {
+            this.minValue = minValue;
+            try {
+                minValueDouble = Double.valueOf(minValue);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public String getMaxValue() {
-	return maxValue;
+        return maxValue;
     }
 
     public void setMaxValue(final String maxValue) {
-	if (maxValue.isEmpty() || maxValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| maxValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.maxValue = AttributePropertiesImpl.NOT_SPECIFIED;
-	    maxValueDouble = Double.MAX_VALUE;
-	} else {
-	    this.maxValue = maxValue;
-	    try {
-		maxValueDouble = Double.valueOf(maxValue);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (maxValue.isEmpty() || maxValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || maxValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.maxValue = AttributePropertiesImpl.NOT_SPECIFIED;
+            maxValueDouble = Double.MAX_VALUE;
+        } else {
+            this.maxValue = maxValue;
+            try {
+                maxValueDouble = Double.valueOf(maxValue);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public String getMinAlarm() {
-	return minAlarm;
+        return minAlarm;
     }
 
     public void setMinAlarm(final String minAlarm) {
-	if (minAlarm.isEmpty() || minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.minAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
-	    minAlarmDouble = -Double.MAX_VALUE;
-	} else {
-	    this.minAlarm = minAlarm;
-	    try {
-		minAlarmDouble = Double.parseDouble(minAlarm);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (minAlarm.isEmpty() || minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.minAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
+            minAlarmDouble = -Double.MAX_VALUE;
+        } else {
+            this.minAlarm = minAlarm;
+            try {
+                minAlarmDouble = Double.parseDouble(minAlarm);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public String getMaxAlarm() {
-	return maxAlarm;
+        return maxAlarm;
     }
 
     public void setMaxAlarm(final String maxAlarm) {
-	if (maxAlarm.isEmpty() || maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.maxAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
-	    maxAlarmDouble = Double.MAX_VALUE;
-	} else {
-	    this.maxAlarm = maxAlarm;
-	    try {
-		maxAlarmDouble = Double.parseDouble(maxAlarm);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (maxAlarm.isEmpty() || maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.maxAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
+            maxAlarmDouble = Double.MAX_VALUE;
+        } else {
+            this.maxAlarm = maxAlarm;
+            try {
+                maxAlarmDouble = Double.parseDouble(maxAlarm);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public EventProperties getEventProp() {
-	return eventProp;
+        return eventProp;
     }
 
     public void setEventProp(final EventProperties eventProp) {
-	setDefaultPeriod(eventProp.per_event.period);
-	this.eventProp.ch_event.abs_change = getDefaultValue(eventProp.ch_event.abs_change);
-	this.eventProp.ch_event.rel_change = getDefaultValue(eventProp.ch_event.rel_change);
-	this.eventProp.arch_event.abs_change = getDefaultValue(eventProp.arch_event.abs_change);
-	this.eventProp.arch_event.rel_change = getDefaultValue(eventProp.arch_event.rel_change);
-	this.eventProp.arch_event.period = getDefaultValue(eventProp.arch_event.period);
+        setDefaultPeriod(eventProp.per_event.period);
+        this.eventProp.ch_event.abs_change = getDefaultValue(eventProp.ch_event.abs_change);
+        this.eventProp.ch_event.rel_change = getDefaultValue(eventProp.ch_event.rel_change);
+        this.eventProp.arch_event.abs_change = getDefaultValue(eventProp.arch_event.abs_change);
+        this.eventProp.arch_event.rel_change = getDefaultValue(eventProp.arch_event.rel_change);
+        this.eventProp.arch_event.period = getDefaultValue(eventProp.arch_event.period);
     }
 
     public void setEventPeriod(final String value) {
-	setDefaultPeriod(value);
+        setDefaultPeriod(value);
     }
 
     public void setEventAbsChange(final String value) {
-	eventProp.ch_event.abs_change = getDefaultValue(value);
+        eventProp.ch_event.abs_change = getDefaultValue(value);
     }
 
     public void setEventRelChange(final String value) {
-	eventProp.ch_event.rel_change = getDefaultValue(value);
+        eventProp.ch_event.rel_change = getDefaultValue(value);
     }
 
     public void setArchivingEventAbsChange(final String value) {
-	eventProp.arch_event.abs_change = getDefaultValue(value);
+        eventProp.arch_event.abs_change = getDefaultValue(value);
     }
 
     public void setArchivingEventRelChange(final String value) {
-	eventProp.arch_event.rel_change = getDefaultValue(value);
+        eventProp.arch_event.rel_change = getDefaultValue(value);
     }
 
     public void setArchivingEventPeriod(final String value) {
-	eventProp.arch_event.period = getDefaultValue(value);
+        eventProp.arch_event.period = getDefaultValue(value);
     }
 
     private String getDefaultValue(final String field) {
-	String result = field;
-	if (field.equalsIgnoreCase(AttributePropertiesImpl.NONE) || field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
-	    result = NOT_SPECIFIED;
-	}
-	return result;
+        String result = field;
+        if (field.equalsIgnoreCase(AttributePropertiesImpl.NONE) || field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
+            result = NOT_SPECIFIED;
+        }
+        return result;
     }
 
     private void setDefaultPeriod(final String field) {
-	if (field.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-		|| field.equalsIgnoreCase(AttributePropertiesImpl.NONE)
-		|| field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
-	    eventProp.per_event.period = PERIOD_1000;
-	} else {
-	    eventProp.per_event.period = field;
-	}
+        if (field.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                || field.equalsIgnoreCase(AttributePropertiesImpl.NONE)
+                || field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
+            eventProp.per_event.period = PERIOD_1000;
+        } else {
+            eventProp.per_event.period = field;
+        }
     }
 
     public String[] getExtensions() {
-	return Arrays.copyOf(extensions, extensions.length);
+        return Arrays.copyOf(extensions, extensions.length);
     }
 
     public void setExtensions(final String[] extensions) {
-	this.extensions = Arrays.copyOf(extensions, extensions.length);
+        this.extensions = Arrays.copyOf(extensions, extensions.length);
     }
 
     public String[] getSysExtensions() {
-	return Arrays.copyOf(sysExtensions, sysExtensions.length);
+        return Arrays.copyOf(sysExtensions, sysExtensions.length);
     }
 
     public void setSysExtensions(final String[] sysExtensions) {
-	this.sysExtensions = Arrays.copyOf(sysExtensions, sysExtensions.length);
+        this.sysExtensions = Arrays.copyOf(sysExtensions, sysExtensions.length);
     }
 
     public String getWritableAttrName() {
-	return writableAttrName;
+        return writableAttrName;
     }
 
     public String getMinWarning() {
-	return minWarning;
+        return minWarning;
     }
 
     public String getMaxWarning() {
-	return maxWarning;
+        return maxWarning;
     }
 
     public String getDeltaT() {
-	return deltaT;
+        return deltaT;
     }
 
     public String getDeltaVal() {
-	return deltaVal;
+        return deltaVal;
     }
 
     public void setWritableAttrName(final String writableAttrName) {
-	this.writableAttrName = writableAttrName;
+        this.writableAttrName = writableAttrName;
     }
 
     public void setMinWarning(final String minWarning) {
-	if (minWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| minWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.minWarning = AttributePropertiesImpl.NOT_SPECIFIED;
-	    minWarningDouble = -Double.MAX_VALUE;
-	} else {
-	    this.minWarning = minWarning;
-	    try {
-		minWarningDouble = Double.parseDouble(minWarning);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (minWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || minWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.minWarning = AttributePropertiesImpl.NOT_SPECIFIED;
+            minWarningDouble = -Double.MAX_VALUE;
+        } else {
+            this.minWarning = minWarning;
+            try {
+                minWarningDouble = Double.parseDouble(minWarning);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public void setMaxWarning(final String maxWarning) {
-	if (maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.maxWarning = AttributePropertiesImpl.NOT_SPECIFIED;
-	    maxWarningDouble = Double.MAX_VALUE;
-	} else {
-	    this.maxWarning = maxWarning;
-	    try {
-		maxWarningDouble = Double.parseDouble(maxWarning);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.maxWarning = AttributePropertiesImpl.NOT_SPECIFIED;
+            maxWarningDouble = Double.MAX_VALUE;
+        } else {
+            this.maxWarning = maxWarning;
+            try {
+                maxWarningDouble = Double.parseDouble(maxWarning);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public void setDeltaT(final String deltaT) {
-	if (deltaT.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| deltaT.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.deltaT = AttributePropertiesImpl.NOT_SPECIFIED;
-	    deltaTLong = 0;
-	} else {
-	    this.deltaT = deltaT;
-	    try {
-		deltaTLong = Long.parseLong(deltaT);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (deltaT.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || deltaT.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.deltaT = AttributePropertiesImpl.NOT_SPECIFIED;
+            deltaTLong = 0;
+        } else {
+            this.deltaT = deltaT;
+            try {
+                deltaTLong = Long.parseLong(deltaT);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public void setDeltaVal(final String deltaVal) {
-	if (deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-		|| deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-	    this.deltaVal = AttributePropertiesImpl.NOT_SPECIFIED;
-	} else {
-	    this.deltaVal = deltaVal;
-	    try {
-		deltaValDouble = Double.parseDouble(deltaVal);
-	    } catch (final NumberFormatException e) {
-	    }
-	}
+        if (deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NAN)
+                || deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
+            this.deltaVal = AttributePropertiesImpl.NOT_SPECIFIED;
+        } else {
+            this.deltaVal = deltaVal;
+            try {
+                deltaValDouble = Double.parseDouble(deltaVal);
+            } catch (final NumberFormatException e) {
+            }
+        }
     }
 
     public String[] getAlarmExtensions() {
-	return Arrays.copyOf(alarmExtensions, alarmExtensions.length);
+        return Arrays.copyOf(alarmExtensions, alarmExtensions.length);
     }
 
     public void setAlarmExtensions(final String[] alarmExtensions) {
-	this.alarmExtensions = Arrays.copyOf(alarmExtensions, alarmExtensions.length);
+        this.alarmExtensions = Arrays.copyOf(alarmExtensions, alarmExtensions.length);
     }
 
     public double getMinValueDouble() {
-	return minValueDouble;
+        return minValueDouble;
     }
 
     public double getMaxValueDouble() {
-	return maxValueDouble;
+        return maxValueDouble;
     }
 
     public double getMinAlarmDouble() {
-	return minAlarmDouble;
+        return minAlarmDouble;
     }
 
     public double getMaxAlarmDouble() {
-	return maxAlarmDouble;
+        return maxAlarmDouble;
     }
 
     public double getMinWarningDouble() {
-	return minWarningDouble;
+        return minWarningDouble;
     }
 
     public double getMaxWarningDouble() {
-	return maxWarningDouble;
+        return maxWarningDouble;
     }
 
     @Override
     public String toString() {
 
-	final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
-		ToStringStyle.SHORT_PREFIX_STYLE);
-	reflectionToStringBuilder.setExcludeFieldNames(new String[] { "eventProp", "alarmExtensions", "extensions",
-		"sysExtensions", "minValueDouble", "maxValueDouble", "minAlarmDouble", "maxAlarmDouble",
-		"minWarningDouble", "maxWarningDouble", "writableAttrName", "deltaTLong", "deltaValDouble" });
-	return reflectionToStringBuilder.toString();
+        final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
+                ToStringStyle.SHORT_PREFIX_STYLE);
+        reflectionToStringBuilder.setExcludeFieldNames(new String[] { "eventProp", "alarmExtensions", "extensions",
+                "sysExtensions", "minValueDouble", "maxValueDouble", "minAlarmDouble", "maxAlarmDouble",
+                "minWarningDouble", "maxWarningDouble", "writableAttrName", "deltaTLong", "deltaValDouble" });
+        return reflectionToStringBuilder.toString();
     }
 
     public long getDeltaTLong() {
-	return deltaTLong;
+        return deltaTLong;
     }
 
     public double getDeltaValDouble() {
-	return deltaValDouble;
+        return deltaValDouble;
+    }
+
+    private boolean compareEventProps(final EventProperties p1, final EventProperties p2) {
+        boolean isEqual = true;
+        if (!p1.arch_event.abs_change.equals(p2.arch_event.abs_change)) {
+            isEqual = false;
+        } else if (!p1.arch_event.rel_change.equals(p2.arch_event.rel_change)) {
+            isEqual = false;
+        } else if (!p1.arch_event.period.equals(p2.arch_event.period)) {
+            isEqual = false;
+        } else if (!p1.ch_event.abs_change.equals(p2.ch_event.abs_change)) {
+            isEqual = false;
+        } else if (!p1.ch_event.rel_change.equals(p2.ch_event.rel_change)) {
+            isEqual = false;
+        } else if (!p1.per_event.period.equals(p2.per_event.period)) {
+            isEqual = false;
+        }
+        return isEqual;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .toString();
+        final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+        boolean isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
+        if (isEqual) {
+            isEqual = compareEventProps(this.getEventProp(), ((AttributePropertiesImpl) obj).getEventProp());
+
+        }
+        return isEqual;
     }
 
 }

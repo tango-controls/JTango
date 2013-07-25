@@ -110,6 +110,7 @@ public final class ORBManager {
         props.put("jacorb.retry_interval", "100");
 
         props.put("jacorb.codeset", true);
+        // props.put("jacorb.config.dir", "fr/esrf/TangoApi");
 
         // Initial timeout for establishing a connection.
         props.put("jacorb.connection.client.connect_timeout", "5000");

@@ -69,13 +69,13 @@ final class BuilderUtils {
      * @return
      */
     static String getAttributeName(final String fieldName, final Attribute annot) {
-	String attributeName = null;
-	if (annot.name().equals("")) {
-	    attributeName = fieldName;
-	} else {
-	    attributeName = annot.name();
-	}
-	return attributeName;
+        String attributeName = null;
+        if (annot.name().equals("")) {
+            attributeName = fieldName;
+        } else {
+            attributeName = annot.name();
+        }
+        return attributeName;
     }
 
     /**
@@ -86,73 +86,80 @@ final class BuilderUtils {
      *             if static
      */
     static void checkStatic(final Field field) throws DevFailed {
-	if (Modifier.isStatic(field.getModifiers())) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, field + MUST_NOT_BE_STATIC);
-	}
+        if (Modifier.isStatic(field.getModifiers())) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, field + MUST_NOT_BE_STATIC);
+        }
     }
 
     static AttributeConfiguration getAttributeConfiguration(final Class<?> type, final Method getter,
-	    final Method setter, final Attribute annot, final String attributeName) throws DevFailed {
-	final AttributeConfiguration config = new AttributeConfiguration();
-	config.setName(attributeName);
-	config.setDispLevel(DispLevel.from_int(annot.displayLevel()));
-	config.setMaxX(annot.maxDimX());
-	config.setMaxY(annot.maxDimY());
-	config.setType(type);
-	config.setMemorized(annot.isMemorized());
-	config.setMemorizedAtInit(annot.isMemorizedAtInit());
-	config.setPolled(annot.isPolled());
-	config.setPollingPeriod(annot.pollingPeriod());
-	if (setter == null) {
-	    config.setWritable(AttrWriteType.READ);
-	} else if (getter == null) {
-	    config.setWritable(AttrWriteType.WRITE);
-	} else {
-	    config.setWritable(AttrWriteType.READ_WRITE);
-	}
-	return config;
+            final Method setter, final Attribute annot, final String attributeName) throws DevFailed {
+        final AttributeConfiguration config = new AttributeConfiguration();
+        config.setName(attributeName);
+        config.setDispLevel(DispLevel.from_int(annot.displayLevel()));
+        config.setMaxX(annot.maxDimX());
+        config.setMaxY(annot.maxDimY());
+        config.setType(type);
+        config.setMemorized(annot.isMemorized());
+        config.setMemorizedAtInit(annot.isMemorizedAtInit());
+        config.setPolled(annot.isPolled());
+        config.setPollingPeriod(annot.pollingPeriod());
+        if (setter == null) {
+            config.setWritable(AttrWriteType.READ);
+        } else if (getter == null) {
+            config.setWritable(AttrWriteType.WRITE);
+        } else {
+            config.setWritable(AttrWriteType.READ_WRITE);
+        }
+        return config;
     }
 
     static AttributePropertiesImpl getAttributeProperties(final AccessibleObject method, final String attributeName) {
-	// add default attr properties
-	final AttributePropertiesImpl props = new AttributePropertiesImpl();
-	if (method.isAnnotationPresent(AttributeProperties.class)) {
-	    final AttributeProperties annotProp = method.getAnnotation(AttributeProperties.class);
-	    if (annotProp.label().equals("")) {
-		props.setLabel(attributeName);
-	    } else {
-		props.setLabel(annotProp.label());
-	    }
-	    props.setDescription(annotProp.description());
-	    props.setDisplayUnit(annotProp.displayUnit());
-	    props.setUnit(annotProp.unit());
-	    props.setStandardUnit(annotProp.standardUnit());
-	    props.setFormat(annotProp.format());
-	    props.setMaxAlarm(annotProp.maxAlarm());
-	    props.setMinAlarm(annotProp.minAlarm());
-	    props.setMaxValue(annotProp.maxValue());
-	    props.setMinValue(annotProp.minValue());
-	    props.setMinWarning(annotProp.minWarning());
-	    props.setMaxWarning(annotProp.maxWarning());
-	    props.setDeltaT(annotProp.deltaTime());
-	    props.setDeltaVal(annotProp.deltaValue());
+        // add default attr properties
+        final AttributePropertiesImpl props = new AttributePropertiesImpl();
+        if (method.isAnnotationPresent(AttributeProperties.class)) {
+            final AttributeProperties annotProp = method.getAnnotation(AttributeProperties.class);
+            if (annotProp.label().equals("")) {
+                props.setLabel(attributeName);
+            } else {
+                props.setLabel(annotProp.label());
+            }
+            props.setDescription(annotProp.description());
+            props.setDisplayUnit(annotProp.displayUnit());
+            props.setUnit(annotProp.unit());
+            props.setStandardUnit(annotProp.standardUnit());
+            props.setFormat(annotProp.format());
+            props.setMaxAlarm(annotProp.maxAlarm());
+            props.setMinAlarm(annotProp.minAlarm());
+            props.setMaxValue(annotProp.maxValue());
+            props.setMinValue(annotProp.minValue());
+            props.setMinWarning(annotProp.minWarning());
+            props.setMaxWarning(annotProp.maxWarning());
+            props.setDeltaT(annotProp.deltaTime());
+            props.setDeltaVal(annotProp.deltaValue());
+            // event
+            props.setEventAbsChange(annotProp.changeEventAbsolute());
+            props.setEventRelChange(annotProp.changeEventRelative());
+            props.setEventPeriod(annotProp.periodicEvent());
+            props.setArchivingEventRelChange(annotProp.archiveEventRelative());
+            props.setArchivingEventAbsChange(annotProp.archiveEventAbsolute());
+            props.setArchivingEventPeriod(annotProp.archiveEventPeriod());
 
-	} else {
-	    props.setLabel(attributeName);
-	}
-	return props;
+        } else {
+            props.setLabel(attributeName);
+        }
+        return props;
     }
 
     static void setStateMachine(final AccessibleObject annotatedObject, final DeviceBehaviorObject behavior) {
-	final StateMachine stateMach = annotatedObject.getAnnotation(StateMachine.class);
-	if (stateMach != null) {
-	    if (stateMach.endState() != DeviceState.UNKNOWN) {
-		behavior.setEndState(stateMach.endState());
-	    }
-	    if (stateMach.deniedStates().length != 0) {
-		behavior.setDeniedStates(stateMach.deniedStates());
-	    }
-	}
+        final StateMachine stateMach = annotatedObject.getAnnotation(StateMachine.class);
+        if (stateMach != null) {
+            if (stateMach.endState() != DeviceState.UNKNOWN) {
+                behavior.setEndState(stateMach.endState());
+            }
+            if (stateMach.deniedStates().length != 0) {
+                behavior.setDeniedStates(stateMach.deniedStates());
+            }
+        }
     }
 
 }

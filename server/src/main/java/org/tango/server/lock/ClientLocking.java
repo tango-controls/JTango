@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DatabaseFactory;
 import org.tango.orb.ServerRequestInterceptor;
+import org.tango.server.Chronometer;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
@@ -74,63 +75,63 @@ public final class ClientLocking {
     private int lockingCounter;
 
     public ClientLocking(final String deviceName, final String className) {
-	this.deviceName = deviceName;
-	lockingCounter = 0;
-	hasBeenForced = false;
-	// get command that cannot be locked
-	try {
-	    final String access = DatabaseFactory.getDatabase().getAccessDeviceName();
-	    if (!access.isEmpty()) {
-		final DeviceData in = new DeviceData();
-		in.insert(className);
-		allowedCommands = new DeviceProxy(access).command_inout("GetAllowedCommands", in).extractStringArray();
-	    }
-	} catch (final DevFailed e) {
-	    logger.error("failed to retrieve tango access control - {}", DevFailedUtils.toString(e));
-	}
+        this.deviceName = deviceName;
+        lockingCounter = 0;
+        hasBeenForced = false;
+        // get command that cannot be locked
+        try {
+            final String access = DatabaseFactory.getDatabase().getAccessDeviceName();
+            if (!access.isEmpty()) {
+                final DeviceData in = new DeviceData();
+                in.insert(className);
+                allowedCommands = new DeviceProxy(access).command_inout("GetAllowedCommands", in).extractStringArray();
+            }
+        } catch (final DevFailed e) {
+            logger.error("failed to retrieve tango access control - {}", DevFailedUtils.toString(e));
+        }
     }
 
     public void init() {
-	lockingCounter = 0;
+        lockingCounter = 0;
     }
 
     public void relock() throws DevFailed {
-	unLock(false);
-	lock(lockDuration, clientIdentityLock, lockerHost);
+        unLock(false);
+        lock(lockDuration, clientIdentityLock, lockerHost);
     }
 
     public void lock(final int validity, final ClntIdent clientIdentity, final String hostName) throws DevFailed {
-	logger.debug("locking for client {}- {}", hostName, ClientIDUtil.toString(clientIdentity));
-	clientIdentityLock = clientIdentity;
-	lockerHost = hostName;
-	lockDuration = validity;
-	clientLockChrono.start(validity);
-	lockingCounter++;
+        logger.debug("locking for client {}- {}", hostName, ClientIDUtil.toString(clientIdentity));
+        clientIdentityLock = clientIdentity;
+        lockerHost = hostName;
+        lockDuration = validity;
+        clientLockChrono.start(validity * 1000);
+        lockingCounter++;
     }
 
     public void unLock(final boolean isForced) {
-	if (isForced) {
-	    lockingCounter = 0;
-	    hasBeenForced = true;
-	    previousLocker = clientIdentityLock;
-	} else {
-	    hasBeenForced = false;
-	    if (lockingCounter > 0) {
-		lockingCounter--;
-	    }
-	}
+        if (isForced) {
+            lockingCounter = 0;
+            hasBeenForced = true;
+            previousLocker = clientIdentityLock;
+        } else {
+            hasBeenForced = false;
+            if (lockingCounter > 0) {
+                lockingCounter--;
+            }
+        }
 
-	if (lockingCounter == 0) {
-	    clientLockChrono.stop();
-	}
+        if (lockingCounter == 0) {
+            clientLockChrono.stop();
+        }
     }
 
     public boolean isOver() {
-	final boolean isOver = clientLockChrono.isOver();
-	if (lockingCounter > 0 && isOver) {
-	    lockingCounter--;
-	}
-	return isOver;
+        final boolean isOver = clientLockChrono.isOver();
+        if (lockingCounter > 0 && isOver) {
+            lockingCounter--;
+        }
+        return isOver;
 
     }
 
@@ -141,76 +142,76 @@ public final class ClientLocking {
      * @throws DevFailed
      */
     public void checkClientLocking(final ClntIdent clIdent, final String... names) throws DevFailed {
-	logger.debug("check for client {} - {}", ServerRequestInterceptor.getInstance().getGiopHostAddress(),
-		ClientIDUtil.toString(clIdent));
-	boolean doCheck = true;
-	for (final String name : names) {
-	    if (ArrayUtils.contains(allowedCommands, name)) {
-		doCheck = false;
-		break;
-	    }
-	}
-	if (doCheck && !ArrayUtils.contains(names, DeviceImpl.STATE_NAME)
-		&& !ArrayUtils.contains(names, DeviceImpl.STATUS_NAME)) {
-	    // not locked for state and status
-	    if (!clientLockChrono.isOver()
-		    && !lockerHost.equalsIgnoreCase(ServerRequestInterceptor.getInstance().getGiopHostAddress())
-		    && !ClientIDUtil.clientIdentEqual(clIdent, clientIdentityLock)) {
-		// device is locked
-		DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_LOCKED, "device is locked by " + lockerHost
-			+ "- " + ClientIDUtil.toString(clIdent));
-	    } else if (hasBeenForced && ClientIDUtil.clientIdentEqual(clIdent, previousLocker)) {
-		// if was unlock by client
-		hasBeenForced = false;
-		// lockingCounter = 0;
-		DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_UNLOCKED, "device unlock was forced");
-	    }
-	}
+        logger.debug("check for client {} - {}", ServerRequestInterceptor.getInstance().getGiopHostAddress(),
+                ClientIDUtil.toString(clIdent));
+        boolean doCheck = true;
+        for (final String name : names) {
+            if (ArrayUtils.contains(allowedCommands, name)) {
+                doCheck = false;
+                break;
+            }
+        }
+        if (doCheck && !ArrayUtils.contains(names, DeviceImpl.STATE_NAME)
+                && !ArrayUtils.contains(names, DeviceImpl.STATUS_NAME)) {
+            // not locked for state and status
+            if (!clientLockChrono.isOver()
+                    && !lockerHost.equalsIgnoreCase(ServerRequestInterceptor.getInstance().getGiopHostAddress())
+                    && !ClientIDUtil.clientIdentEqual(clIdent, clientIdentityLock)) {
+                // device is locked
+                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_LOCKED, "device is locked by " + lockerHost
+                        + "- " + ClientIDUtil.toString(clIdent));
+            } else if (hasBeenForced && ClientIDUtil.clientIdentEqual(clIdent, previousLocker)) {
+                // if was unlock by client
+                hasBeenForced = false;
+                // lockingCounter = 0;
+                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_UNLOCKED, "device unlock was forced");
+            }
+        }
     }
 
     public DevVarLongStringArray getLockStatus() {
-	// The strings contain:
-	// 1 - The locker process hostname(like giop:tcp:[::ffff:172.28.1.114]:1897)
-	// 2 - The java main class (in case of Java locker)
-	// 0 - A string which summarizes the locking status
-	// The longs contain:
-	// 1 - A locked flag (0 means not locked, 1 means locked)
-	// 2 - The locker process PID (C++ client)
-	// 3 - The locker UUID (Java client) which needs 4 longs
-	final String[] strings = new String[_3];
-	final int[] longs = new int[_6];
+        // The strings contain:
+        // 1 - The locker process hostname(like giop:tcp:[::ffff:172.28.1.114]:1897)
+        // 2 - The java main class (in case of Java locker)
+        // 0 - A string which summarizes the locking status
+        // The longs contain:
+        // 1 - A locked flag (0 means not locked, 1 means locked)
+        // 2 - The locker process PID (C++ client)
+        // 3 - The locker UUID (Java client) which needs 4 longs
+        final String[] strings = new String[_3];
+        final int[] longs = new int[_6];
 
-	if (!clientLockChrono.isOver()) {
-	    strings[1] = lockerHost;
-	    longs[0] = 1;
-	    strings[0] = "Device " + deviceName + " is locked by " + lockerHost;
+        if (!clientLockChrono.isOver()) {
+            strings[1] = lockerHost;
+            longs[0] = 1;
+            strings[0] = "Device " + deviceName + " is locked by " + lockerHost;
 
-	    if (clientIdentityLock.discriminator().equals(LockerLanguage.CPP)) {
-		strings[2] = "Not defined";
-		longs[1] = clientIdentityLock.cpp_clnt();
-		for (int i = 2; i < longs.length; i++) {
-		    longs[i] = 0;
-		}
-	    } else {
-		strings[2] = clientIdentityLock.java_clnt().MainClass;
-		longs[1] = 0;
-		for (int i = 0; i < clientIdentityLock.java_clnt().uuid.length; i++) {
-		    longs[i + 2] = (int) clientIdentityLock.java_clnt().uuid[i];
-		}
-	    }
-	} else {
-	    // strings[0] = "Not defined";
-	    strings[0] = "Device " + deviceName + " is not locked";
-	    strings[1] = "Not defined";
-	    strings[2] = "Not defined";
+            if (clientIdentityLock.discriminator().equals(LockerLanguage.CPP)) {
+                strings[2] = "Not defined";
+                longs[1] = clientIdentityLock.cpp_clnt();
+                for (int i = 2; i < longs.length; i++) {
+                    longs[i] = 0;
+                }
+            } else {
+                strings[2] = clientIdentityLock.java_clnt().MainClass;
+                longs[1] = 0;
+                for (int i = 0; i < clientIdentityLock.java_clnt().uuid.length; i++) {
+                    longs[i + 2] = (int) clientIdentityLock.java_clnt().uuid[i];
+                }
+            }
+        } else {
+            // strings[0] = "Not defined";
+            strings[0] = "Device " + deviceName + " is not locked";
+            strings[1] = "Not defined";
+            strings[2] = "Not defined";
 
-	    Arrays.fill(longs, 0);
-	}
-	return new DevVarLongStringArray(longs, strings);
+            Arrays.fill(longs, 0);
+        }
+        return new DevVarLongStringArray(longs, strings);
     }
 
     public boolean isHasBeenForced() {
-	return hasBeenForced;
+        return hasBeenForced;
     }
 
 }

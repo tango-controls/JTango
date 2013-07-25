@@ -1,26 +1,26 @@
 /**
- * Copyright (C) : 2012
- * 
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
- * 
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
  * This file is part of Tango.
- * 
+ *
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango. If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.cache;
 
@@ -31,7 +31,9 @@ import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceLock;
+import org.tango.server.events.EventManager;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -47,7 +49,8 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
 
     private final String deviceName;
 
-    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock, String deviceName) {
+    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock,
+            final String deviceName) {
         this.deviceLock = deviceLock;
         this.attribute = attribute;
         this.deviceName = deviceName;
@@ -84,9 +87,12 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                     attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
                     attribute.addToHistory();
                     result = attribute.getReadValue();
+
+                    EventManager.getInstance().pushEventCheck(attribute.getName(), deviceName, (AttributeValue) result);
                 }
             } catch (final DevFailed e) {
                 attribute.addErrorToHistory(e);
+                EventManager.getInstance().pushEvent(attribute.getName(), deviceName, e);
                 throw e;
             } finally {
                 deviceLock.unlockAttribute();

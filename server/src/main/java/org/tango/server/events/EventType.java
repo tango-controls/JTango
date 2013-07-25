@@ -1,0 +1,114 @@
+/**
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
+ * This file is part of Tango.
+ *
+ * Tango is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Tango is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.tango.server.events;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.tango.utils.DevFailedUtils;
+
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.TangoConst;
+
+public enum EventType {
+    /**
+     * Change event. Use the attribute properties abs_change and/or rel_change
+     */
+    CHANGE_EVENT(TangoConst.CHANGE_EVENT, TangoConst.eventNames[0]),
+    /**
+     * Quality event. Send an event if the attribute quality changes.
+     */
+    QUALITY_EVENT(TangoConst.QUALITY_EVENT, TangoConst.eventNames[1]),
+    /**
+     * Periodic event. Send an event at the period specified by the attribute property event_period
+     */
+    PERIODIC_EVENT(TangoConst.PERIODIC_EVENT, TangoConst.eventNames[2]),
+    /**
+     * Archived event. Send a periodic event at period configured in property archive_period. Or/and change event with
+     * values from archive_rel_change and/or archive_abs_change
+     */
+    ARCHIVE_EVENT(TangoConst.ARCHIVE_EVENT, TangoConst.eventNames[3]),
+    /**
+     * User event.
+     */
+    USER_EVENT(TangoConst.USER_EVENT, TangoConst.eventNames[4]),
+    /**
+     * Attribute configuration event. Send an event if an attribute's properties change.
+     */
+    ATT_CONF_EVENT(TangoConst.ATT_CONF_EVENT, TangoConst.eventNames[5]),
+    /**
+     * Data ready event.
+     */
+    DATA_READY_EVENT(TangoConst.DATA_READY_EVENT, TangoConst.eventNames[6]);
+
+    private static final Map<String, EventType> EVENT_TYPE_MAP = new HashMap<String, EventType>();
+    static {
+        for (final EventType s : EnumSet.allOf(EventType.class)) {
+            EVENT_TYPE_MAP.put(s.getString(), s);
+        }
+    }
+
+    private int value;
+    private String string;
+
+    private EventType(final int value, final String string) {
+        this.value = value;
+        this.string = string;
+    }
+
+    /**
+     * Get an {@link EventType} from a String
+     * 
+     * @param string the event type as a String
+     * @return the EventType
+     * @throws DevFailed if event type does not exist
+     */
+    public static EventType getEvent(final String string) throws DevFailed {
+        final EventType result = EVENT_TYPE_MAP.get(string);
+        if (result == null) {
+            DevFailedUtils.throwDevFailed(string + " is not an event type");
+        }
+        return result;
+
+    }
+
+    /**
+     * 
+     * @return EventType as a String
+     */
+    public String getString() {
+        return string;
+    }
+
+    /**
+     * 
+     * @return EventType as an int
+     */
+    public int getValue() {
+        return value;
+    }
+
+}

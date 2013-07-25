@@ -46,43 +46,44 @@ public final class StateStatusCache {
     private final CommandImpl command;
 
     public StateStatusCache(final CacheManager manager, final CommandImpl command, final AttributeImpl attribute,
-	    final String deviceName, final DeviceLock deviceLock) {
-	this.command = command;
-	final String cacheName = "stateStatusTangoPollingCache." + deviceName + "/" + command.getName();
-	Cache defaultCache = manager.getCache(cacheName);
-	if (defaultCache == null) {
-	    manager.addCache(cacheName);
-	    defaultCache = manager.getCache(cacheName);
-	    // defaultCache.setStatisticsEnabled(true);
-	}
-	defaultCache.flush();
-	cache = new SelfPopulatingCache(defaultCache, new StateStatusCacheEntryFactory(command, attribute, deviceLock));
-	cache.getCacheConfiguration().setTimeToLiveSeconds(60);
+            final String deviceName, final DeviceLock deviceLock) {
+        this.command = command;
+        final String cacheName = "stateStatusTangoPollingCache." + deviceName + "/" + command.getName();
+        Cache defaultCache = manager.getCache(cacheName);
+        if (defaultCache == null) {
+            manager.addCache(cacheName);
+            defaultCache = manager.getCache(cacheName);
+            // defaultCache.setStatisticsEnabled(true);
+        }
+        defaultCache.flush();
+        cache = new SelfPopulatingCache(defaultCache, new StateStatusCacheEntryFactory(command, attribute, deviceLock,
+                deviceName));
+        cache.getCacheConfiguration().setTimeToLiveSeconds(60);
 
     }
 
     public void startRefresh(final ScheduledExecutorService pollingPool) {
-	logger.debug("start refresh cache of {} at period of {}", command.getName(), command.getPollingPeriod());
-	final CacheRefresher refresher = new CacheRefresher(cache, command.getName());
-	result = pollingPool.scheduleAtFixedRate(refresher, 0L, command.getPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.debug("start refresh cache of {} at period of {}", command.getName(), command.getPollingPeriod());
+        final CacheRefresher refresher = new CacheRefresher(cache, command.getName());
+        result = pollingPool.scheduleAtFixedRate(refresher, 0L, command.getPollingPeriod(), TimeUnit.MILLISECONDS);
 
     }
 
     public void stopRefresh() {
-	if (result != null) {
-	    logger.debug("stop refresh cache of {}", command.getName());
-	    final boolean isCancelled = result.cancel(true);
-	    if (!isCancelled) {
-		logger.error("stop refresh NOT CANCELLED");
-		// DevFailedUtils.throwDevFailed("STOP_REFRESH",
-		// "error stopping refresh of "
-		// + attribute.getName());
-	    }
+        if (result != null) {
+            logger.debug("stop refresh cache of {}", command.getName());
+            final boolean isCancelled = result.cancel(true);
+            if (!isCancelled) {
+                logger.error("stop refresh NOT CANCELLED");
+                // DevFailedUtils.throwDevFailed("STOP_REFRESH",
+                // "error stopping refresh of "
+                // + attribute.getName());
+            }
 
-	}
+        }
     }
 
     public SelfPopulatingCache getCache() {
-	return cache;
+        return cache;
     }
 }

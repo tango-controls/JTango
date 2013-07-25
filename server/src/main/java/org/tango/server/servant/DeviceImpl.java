@@ -539,7 +539,7 @@ public final class DeviceImpl extends Device_4POA {
         deviceProperties = properties;
     }
 
-    private void configurePolling(final CommandImpl command) throws DevFailed {
+    public void configurePolling(final CommandImpl command) throws DevFailed {
         if (command.isPolled()) {
             if (command.getName().equals(DeviceImpl.STATE_NAME) || command.getName().equals(DeviceImpl.STATUS_NAME)) {
                 // attribute is also set as polled
@@ -555,7 +555,7 @@ public final class DeviceImpl extends Device_4POA {
         }
     }
 
-    private void configurePolling(final AttributeImpl attribute) throws DevFailed {
+    public void configurePolling(final AttributeImpl attribute) throws DevFailed {
         if (pollAttributes.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
             // configuration comes from tango db
             attribute.configurePolling(pollAttributes.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
@@ -621,7 +621,7 @@ public final class DeviceImpl extends Device_4POA {
                     configurePolling(command);
                 }
                 isCorrectlyInit = true;
-            } catch (DevFailed e) {
+            } catch (final DevFailed e) {
                 isCorrectlyInit = false;
                 try {
                     stateImpl.stateMachine(DeviceState.FAULT);
