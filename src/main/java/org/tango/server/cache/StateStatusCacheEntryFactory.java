@@ -30,6 +30,7 @@ import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.DeviceLock;
+import org.tango.server.events.EventManager;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -39,42 +40,46 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
     private final AttributeImpl attribute;
     private final DeviceLock deviceLock;
     private long lastUpdateTime;
+    private final String deviceName;
 
     public StateStatusCacheEntryFactory(final CommandImpl command, final AttributeImpl attribute,
-	    final DeviceLock deviceLock) {
-	this.deviceLock = deviceLock;
-	this.command = command;
-	this.attribute = attribute;
+            final DeviceLock deviceLock, final String deviceName) {
+        this.deviceLock = deviceLock;
+        this.command = command;
+        this.attribute = attribute;
+        this.deviceName = deviceName;
     }
 
     @Override
     public Object createEntry(final Object key) throws DevFailed {
-	Object result = null;
-	deviceLock.lockAttribute();
-	try {
-	    synchronized (attribute) {
-		final long time1 = System.nanoTime();
-		attribute.updateValue();
-		final long now = System.nanoTime();
-		final long nowMilli = System.currentTimeMillis();
-		final long deltaTime = now - lastUpdateTime;
-		lastUpdateTime = now;
-		final long executionDuration = lastUpdateTime - time1;
-		attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-		command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-		attribute.addToHistory();
-		result = attribute.getReadValue();
-	    }
-	    command.addToHistory(((AttributeValue) result).getValue());
-	} catch (final DevFailed e) {
-	    command.addErrorToHistory(e);
-	    attribute.addErrorToHistory(e);
-	    throw e;
-	} finally {
-	    deviceLock.unlockAttribute();
-	}
+        Object result = null;
+        deviceLock.lockAttribute();
+        try {
+            synchronized (attribute) {
+                final long time1 = System.nanoTime();
+                attribute.updateValue();
+                final long now = System.nanoTime();
+                final long nowMilli = System.currentTimeMillis();
+                final long deltaTime = now - lastUpdateTime;
+                lastUpdateTime = now;
+                final long executionDuration = lastUpdateTime - time1;
+                attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+                command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+                attribute.addToHistory();
+                result = attribute.getReadValue();
+            }
+            command.addToHistory(((AttributeValue) result).getValue());
+            EventManager.getInstance().pushEventCheck(attribute.getName(), deviceName, (AttributeValue) result);
+        } catch (final DevFailed e) {
+            command.addErrorToHistory(e);
+            attribute.addErrorToHistory(e);
+            EventManager.getInstance().pushEvent(attribute.getName(), deviceName, e);
+            throw e;
+        } finally {
+            deviceLock.unlockAttribute();
+        }
 
-	return result;
+        return result;
     }
 
 }

@@ -29,9 +29,14 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.attribute.AttributeValue;
+import org.tango.server.command.CommandImpl;
+import org.tango.server.events.EventManager;
+import org.tango.server.events.EventType;
 import org.tango.server.servant.AttributeGetterSetter;
 import org.tango.server.servant.DeviceImpl;
 
+import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevFailed;
 
 /**
@@ -53,10 +58,10 @@ public final class DeviceManager {
      * @param device
      */
     public DeviceManager(final DeviceImpl device) {
-	this.device = device;
-	name = device.getName();
-	className = device.getClassName();
-	adminName = device.adm_name();
+        this.device = device;
+        name = device.getName();
+        className = device.getClassName();
+        adminName = device.adm_name();
     }
 
     /**
@@ -64,7 +69,7 @@ public final class DeviceManager {
      * @return name of the device
      */
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -72,7 +77,7 @@ public final class DeviceManager {
      * @return class of the device, as defined in tango db
      */
     public String getClassName() {
-	return className;
+        return className;
     }
 
     /**
@@ -80,7 +85,20 @@ public final class DeviceManager {
      * @return admin device name
      */
     public String getAdminName() {
-	return adminName;
+        return adminName;
+    }
+
+    /**
+     * Get an attribute's properties
+     * 
+     * @param attributeName
+     *            the attribute name
+     * @return its properties
+     * @throws DevFailed
+     */
+    public AttributePropertiesImpl getAttributeProperties(final String attributeName) throws DevFailed {
+        final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
+        return attr.getProperties();
     }
 
     /**
@@ -93,9 +111,9 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void setAttributeProperties(final String attributeName, final AttributePropertiesImpl properties)
-	    throws DevFailed {
-	final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
-	attr.setProperties(properties);
+            throws DevFailed {
+        final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
+        attr.setProperties(properties);
     }
 
     /**
@@ -106,12 +124,12 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void removeAttributeProperties(final String attributeName) throws DevFailed {
-	final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
-	attr.removeProperties();
+        final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
+        attr.removeProperties();
     }
 
     /**
-     * Check is an attribute or an command is polled
+     * Check if an attribute or an command is polled
      * 
      * @param polledObject
      *            The name of the polled object (attribute or command)
@@ -119,11 +137,11 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public boolean isPolled(final String polledObject) throws DevFailed {
-	try {
-	    return AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList()).isPolled();
-	} catch (final DevFailed e) {
-	    return device.getCommand(polledObject).isPolled();
-	}
+        try {
+            return AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList()).isPolled();
+        } catch (final DevFailed e) {
+            return device.getCommand(polledObject).isPolled();
+        }
 
     }
 
@@ -136,11 +154,36 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public int getPollingPeriod(final String polledObject) throws DevFailed {
-	try {
-	    return AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList()).getPollingPeriod();
-	} catch (final DevFailed e) {
-	    return device.getCommand(polledObject).getPollingPeriod();
-	}
+        try {
+            return AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList()).getPollingPeriod();
+        } catch (final DevFailed e) {
+            return device.getCommand(polledObject).getPollingPeriod();
+        }
+    }
+
+    /**
+     * Configure polling of an attribute or a command
+     * 
+     * @param polledObject The name of the polled object (attribute or command)
+     * @param pollingPeriod The polling period
+     * @throws DevFailed
+     */
+    public void setPollingPeriod(final String polledObject, final int pollingPeriod) throws DevFailed {
+        try {
+            final AttributeImpl attr = AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList());
+            attr.configurePolling(pollingPeriod);
+            device.configurePolling(attr);
+        } catch (final DevFailed e) {
+            if (polledObject.equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                    || polledObject.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+                final CommandImpl cmd = device.getCommand(polledObject);
+                cmd.configurePolling(pollingPeriod);
+                device.configurePolling(cmd);
+            } else {
+                throw e;
+            }
+        }
+
     }
 
     /**
@@ -151,14 +194,50 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void triggerPolling(final String polledObject) throws DevFailed {
-	device.triggerPolling(polledObject);
+        device.triggerPolling(polledObject);
+    }
+
+    /**
+     * Push an event if some client had register it
+     * 
+     * @param attributeName The attribute name
+     * @param value The new attribute value
+     * @param eventType The type of event to fire
+     * @throws DevFailed
+     */
+    public void pushEvent(final String attributeName, final AttributeValue value, final EventType eventType)
+            throws DevFailed {
+        EventManager.getInstance().pushEvent(name, attributeName, value, eventType);
+    }
+
+    /**
+     * Push a DATA_READY event if some client had registered it
+     * 
+     * @param attributeName The attribute name
+     * @param value data ready
+     * @throws DevFailed
+     */
+    public void pushEvent(final String attributeName, final AttDataReady value) throws DevFailed {
+        EventManager.getInstance().pushEvent(name, attributeName, value);
+    }
+
+    /**
+     * Push an error event
+     * 
+     * @param attributeName The attribute name
+     * @param error The error
+     * @param eventType The type of event to fire
+     * @throws DevFailed
+     */
+    public void pushEvent(final String attributeName, final DevFailed error) throws DevFailed {
+        EventManager.getInstance().pushEvent(name, attributeName, error);
     }
 
     @Override
     public String toString() {
-	final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
-		ToStringStyle.SHORT_PREFIX_STYLE);
-	reflectionToStringBuilder.setExcludeFieldNames(new String[] { "device" });
-	return reflectionToStringBuilder.toString();
+        final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
+                ToStringStyle.SHORT_PREFIX_STYLE);
+        reflectionToStringBuilder.setExcludeFieldNames(new String[] { "device" });
+        return reflectionToStringBuilder.toString();
     }
 }

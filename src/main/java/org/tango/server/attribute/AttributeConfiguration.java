@@ -58,62 +58,63 @@ public final class AttributeConfiguration implements PolledObjectConfig {
     }
 
     public AttributeConfiguration(final AttributeConfiguration config) {
-	name = config.name;
-	format = config.format;
-	writable = config.writable;
-	type = config.type;
-	dispLevel = config.dispLevel;
-	maxX = config.maxX;
-	maxY = config.maxY;
-	isMemorized = config.isMemorized;
-	isMemorizedAtInit = config.isMemorizedAtInit;
-	pollingPeriod = config.pollingPeriod;
-	isPolled = config.isPolled;
-	attributeProperties = config.attributeProperties;
+        name = config.name;
+        format = config.format;
+        writable = config.writable;
+        type = config.type;
+        dispLevel = config.dispLevel;
+        maxX = config.maxX;
+        maxY = config.maxY;
+        isMemorized = config.isMemorized;
+        isMemorizedAtInit = config.isMemorizedAtInit;
+        pollingPeriod = config.pollingPeriod;
+        isPolled = config.isPolled;
+        attributeProperties = config.attributeProperties;
     }
 
     DispLevel getDispLevel() {
-	return dispLevel;
+        return dispLevel;
     }
 
     public void setDispLevel(final DispLevel dispLevel) {
-	this.dispLevel = dispLevel;
+        this.dispLevel = dispLevel;
     }
 
+    @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     public AttrDataFormat getFormat() {
-	return format;
+        return format;
     }
 
     public AttrWriteType getWritable() {
-	return writable;
+        return writable;
     }
 
     public Class<?> getType() {
-	return type;
+        return type;
     }
 
     public Class<?> getScalarType() {
-	return enumType.getType();
+        return enumType.getType();
     }
 
     public int getMaxX() {
-	return maxX;
+        return maxX;
     }
 
     public int getMaxY() {
-	return maxY;
+        return maxY;
     }
 
     public void setName(final String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public void setWritable(final AttrWriteType writable) {
-	this.writable = writable;
+        this.writable = writable;
     }
 
     /**
@@ -123,73 +124,73 @@ public final class AttributeConfiguration implements PolledObjectConfig {
      * @throws DevFailed
      */
     public void setType(final Class<?> type) throws DevFailed {
-	this.type = type;
-	enumType = AttributeTangoType.getTypeFromClass(type);
-	tangoType = enumType.getTangoIDLType();
-	if (type.isArray()) {
-	    if (type.getComponentType().isArray()) {
-		format = AttrDataFormat.IMAGE;
-	    } else {
-		format = AttrDataFormat.SPECTRUM;
-		maxY = 0;
-	    }
-	} else {
-	    format = AttrDataFormat.SCALAR;
-	    maxX = 1;
-	    maxY = 0;
-	}
+        this.type = type;
+        enumType = AttributeTangoType.getTypeFromClass(type);
+        tangoType = enumType.getTangoIDLType();
+        if (type.isArray()) {
+            if (type.getComponentType().isArray()) {
+                format = AttrDataFormat.IMAGE;
+            } else {
+                format = AttrDataFormat.SPECTRUM;
+                maxY = 0;
+            }
+        } else {
+            format = AttrDataFormat.SCALAR;
+            maxX = 1;
+            maxY = 0;
+        }
     }
 
     public void setMaxX(final int maxX) {
-	this.maxX = maxX;
+        this.maxX = maxX;
     }
 
     public void setMaxY(final int maxY) {
-	this.maxY = maxY;
+        this.maxY = maxY;
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE);
-	sb.append("name", name);
-	sb.append("format", format.value());
-	final StringBuilder s = new StringBuilder().append(type.getCanonicalName()).append(",").append(enumType)
-		.append("=").append(tangoType);
-	sb.append("type", s.toString());
-	sb.append("writable", writable.value());
-	sb.append("dispLevel", dispLevel.value());
-	sb.append("isMemorized", isMemorized);
-	sb.append("isMemorizedAtInit", isMemorizedAtInit);
-	sb.append("isPolled", isPolled);
-	if (isPolled) {
-	    sb.append("pollingPeriod", pollingPeriod);
-	}
-	sb.appendToString(attributeProperties.toString());
-	return sb.toString();
+        final ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE);
+        sb.append("name", name);
+        sb.append("format", format.value());
+        final StringBuilder s = new StringBuilder().append(type.getCanonicalName()).append(",").append(enumType)
+                .append("=").append(tangoType);
+        sb.append("type", s.toString());
+        sb.append("writable", writable.value());
+        sb.append("dispLevel", dispLevel.value());
+        sb.append("isMemorized", isMemorized);
+        sb.append("isMemorizedAtInit", isMemorizedAtInit);
+        sb.append("isPolled", isPolled);
+        if (isPolled) {
+            sb.append("pollingPeriod", pollingPeriod);
+        }
+        sb.appendToString(attributeProperties.toString());
+        return sb.toString();
     }
 
     public boolean isMemorized() {
-	return isMemorized;
+        return isMemorized;
     }
 
     public void setMemorized(final boolean isMemorized) {
-	this.isMemorized = isMemorized;
+        this.isMemorized = isMemorized;
     }
 
     public AttributePropertiesImpl getAttributeProperties() {
-	return attributeProperties;
+        return attributeProperties;
     }
 
     public void setAttributeProperties(final AttributePropertiesImpl attributeProperties) {
-	this.attributeProperties = attributeProperties;
-	if (this.attributeProperties.getLabel().isEmpty()
-		|| this.attributeProperties.getLabel().equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
-	    this.attributeProperties.setLabel(name);
-	}
+        this.attributeProperties = new AttributePropertiesImpl(attributeProperties);
+        if (this.attributeProperties.getLabel().isEmpty()
+                || this.attributeProperties.getLabel().equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
+            this.attributeProperties.setLabel(name);
+        }
     }
 
     public int getTangoType() {
-	return tangoType;
+        return tangoType;
     }
 
     /**
@@ -200,49 +201,51 @@ public final class AttributeConfiguration implements PolledObjectConfig {
      * @throws DevFailed
      */
     public void setTangoType(final int tangoType, final AttrDataFormat format) throws DevFailed {
-	setFormat(format);
-	this.tangoType = tangoType;
-	enumType = AttributeTangoType.getTypeFromTango(tangoType);
-	if (format.equals(AttrDataFormat.SCALAR)) {
-	    type = enumType.getType();
-	} else if (format.equals(AttrDataFormat.SPECTRUM)) {
-	    type = Array.newInstance(enumType.getType(), 0).getClass();
-	} else {
-	    type = Array.newInstance(enumType.getType(), 0, 0).getClass();
-	}
+        setFormat(format);
+        this.tangoType = tangoType;
+        enumType = AttributeTangoType.getTypeFromTango(tangoType);
+        if (format.equals(AttrDataFormat.SCALAR)) {
+            type = enumType.getType();
+        } else if (format.equals(AttrDataFormat.SPECTRUM)) {
+            type = Array.newInstance(enumType.getType(), 0).getClass();
+        } else {
+            type = Array.newInstance(enumType.getType(), 0, 0).getClass();
+        }
     }
 
     public void setFormat(final AttrDataFormat format) {
-	this.format = format;
-	if (format.equals(AttrDataFormat.SCALAR)) {
-	    maxX = 1;
-	    maxY = 0;
-	} else if (format.equals(AttrDataFormat.SPECTRUM)) {
-	    maxY = 0;
-	}
+        this.format = format;
+        if (format.equals(AttrDataFormat.SCALAR)) {
+            maxX = 1;
+            maxY = 0;
+        } else if (format.equals(AttrDataFormat.SPECTRUM)) {
+            maxY = 0;
+        }
     }
 
     public boolean isMemorizedAtInit() {
-	return isMemorizedAtInit;
+        return isMemorizedAtInit;
     }
 
     public void setMemorizedAtInit(final boolean isMemorizedAtInit) {
-	this.isMemorizedAtInit = isMemorizedAtInit;
+        this.isMemorizedAtInit = isMemorizedAtInit;
     }
 
     public int getPollingPeriod() {
-	return pollingPeriod;
+        return pollingPeriod;
     }
 
+    @Override
     public void setPollingPeriod(final int pollingPeriod) {
-	this.pollingPeriod = pollingPeriod;
+        this.pollingPeriod = pollingPeriod;
     }
 
     public boolean isPolled() {
-	return isPolled;
+        return isPolled;
     }
 
+    @Override
     public void setPolled(final boolean isPolled) {
-	this.isPolled = isPolled;
+        this.isPolled = isPolled;
     }
 }

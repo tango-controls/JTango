@@ -46,6 +46,7 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.logging.LoggingManager;
 import org.tango.orb.ORBManager;
 import org.tango.server.annotation.Device;
+import org.tango.server.events.EventManager;
 import org.tango.server.export.TangoExporter;
 import org.tango.server.servant.Constants;
 import org.tango.utils.DevFailedUtils;
@@ -91,21 +92,26 @@ public final class ServerManager {
 
     private TangoExporter tangoExporter;
 
+    static {
+        // a server does not need graphics
+        System.setProperty("java.awt.headless", "true");
+    }
+
     private ServerManager() {
-	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-	    /**
-	     * shutdown hook
-	     */
-	    @Override
-	    public void run() {
-		MDC.put(SERVER_NAME_LOGGING, serverName);
-		logger.error("Shutdown hook unregister " + serverName);
-		try {
-		    ServerManager.getInstance().stop();
-		} catch (final DevFailed e) {
-		}
-	    }
-	}));
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            /**
+             * shutdown hook
+             */
+            @Override
+            public void run() {
+                MDC.put(SERVER_NAME_LOGGING, serverName);
+                logger.error("Shutdown hook unregister " + serverName);
+                try {
+                    ServerManager.getInstance().stop();
+                } catch (final DevFailed e) {
+                }
+            }
+        }));
     }
 
     /**
@@ -114,7 +120,7 @@ public final class ServerManager {
      * @return the server manager
      */
     public static ServerManager getInstance() {
-	return INSTANCE;
+        return INSTANCE;
     }
 
     /**
@@ -126,7 +132,7 @@ public final class ServerManager {
      *            The class that define a device with {@link Device}
      */
     public void addClass(final String tangoClass, final Class<?> deviceClass) {
-	tangoClasses.put(tangoClass, deviceClass);
+        tangoClasses.put(tangoClass, deviceClass);
     }
 
     /**
@@ -148,13 +154,13 @@ public final class ServerManager {
      * @see ServerManager#addClass(String, Class)
      */
     public synchronized void start(final String[] args, final String execName) {
-	if (!isStarted.get()) {
-	    try {
-		init(args, execName);
-	    } catch (final DevFailed e) {
-		DevFailedUtils.printDevFailed(e);
-	    }
-	}
+        if (!isStarted.get()) {
+            try {
+                init(args, execName);
+            } catch (final DevFailed e) {
+                DevFailedUtils.printDevFailed(e);
+            }
+        }
     }
 
     /**
@@ -166,10 +172,10 @@ public final class ServerManager {
      * @throws DevFailed
      */
     public synchronized void startError(final String[] args, final String execName) throws DevFailed {
-	if (isStarted.get()) {
-	    DevFailedUtils.throwDevFailed("this server is already started");
-	}
-	init(args, execName);
+        if (isStarted.get()) {
+            DevFailedUtils.throwDevFailed("this server is already started");
+        }
+        init(args, execName);
     }
 
     /**
@@ -191,50 +197,50 @@ public final class ServerManager {
      * @see ServerManager#addClass(String, Class)
      */
     public synchronized void start(final String[] args, final Class<?> deviceClass) {
-	if (!isStarted.get()) {
-	    addClass(deviceClass.getSimpleName(), deviceClass);
-	    try {
+        if (!isStarted.get()) {
+            addClass(deviceClass.getSimpleName(), deviceClass);
+            try {
 
-		init(args, deviceClass.getSimpleName());
+                init(args, deviceClass.getSimpleName());
 
-	    } catch (final DevFailed e) {
-		DevFailedUtils.printDevFailed(e);
-	    }
-	}
+            } catch (final DevFailed e) {
+                DevFailedUtils.printDevFailed(e);
+            }
+        }
     }
 
     private void init(final String[] args, final String execName) throws DevFailed {
-	xlogger.entry();
-	// assume SLF4J is bound to logback in the current environment
-	// final LoggerContext lc = (LoggerContext)
-	// LoggerFactory.getILoggerFactory();
-	// // print logback's internal status
-	// StatusPrinter.print(lc);
+        xlogger.entry();
+        // assume SLF4J is bound to logback in the current environment
+        // final LoggerContext lc = (LoggerContext)
+        // LoggerFactory.getILoggerFactory();
+        // // print logback's internal status
+        // StatusPrinter.print(lc);
 
-	this.execName = execName;
-	// Manage command line option
-	checkArgs(args);
-	serverName = this.execName + "/" + instanceName;
-	MDC.put(SERVER_NAME_LOGGING, serverName);
-	logger.info("Starting server {}", serverName);
+        this.execName = execName;
+        // Manage command line option
+        checkArgs(args);
+        serverName = this.execName + "/" + instanceName;
+        MDC.put(SERVER_NAME_LOGGING, serverName);
+        logger.info("Starting server {}", serverName);
 
-	final StringBuilder tmp = new StringBuilder(serverName);
+        final StringBuilder tmp = new StringBuilder(serverName);
 
-	// Check that the server name is not too long
-	if (tmp.length() > SERVER_NAME_MAX_LENGTH) {
-	    DevFailedUtils.throwDevFailed(INIT_ERROR, "The device server name is too long! Max length is "
-		    + SERVER_NAME_MAX_LENGTH + " characters.");
-	}
-	isStarted.set(true);
-	initPIDAndHostName();
-	final String toBeImported = Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName;
-	ORBManager.init(useDb, toBeImported);
-	tangoExporter = new TangoExporter(hostName, serverName, pid, tangoClasses);
-	tangoExporter.exportAll();
-	logger.info("TANGO server {} started", serverName);
-	// start the ORB
-	ORBManager.startDetached();
-	xlogger.exit();
+        // Check that the server name is not too long
+        if (tmp.length() > SERVER_NAME_MAX_LENGTH) {
+            DevFailedUtils.throwDevFailed(INIT_ERROR, "The device server name is too long! Max length is "
+                    + SERVER_NAME_MAX_LENGTH + " characters.");
+        }
+        isStarted.set(true);
+        initPIDAndHostName();
+        final String toBeImported = Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName;
+        ORBManager.init(useDb, toBeImported);
+        tangoExporter = new TangoExporter(hostName, serverName, pid, tangoClasses);
+        tangoExporter.exportAll();
+        logger.info("TANGO server {} started", serverName);
+        // start the ORB
+        ORBManager.startDetached();
+        xlogger.exit();
     }
 
     /**
@@ -243,19 +249,20 @@ public final class ServerManager {
      * @throws DevFailed
      */
     public void stop() throws DevFailed {
-	try {
-	    if (isStarted.get()) {
-		tangoClasses.clear();
-		if (tangoExporter != null) {
-		    tangoExporter.clearClass();
-		    tangoExporter.unexportAll();
-		}
-	    }
-	} finally {
-	    ORBManager.shutdown();
-	    logger.error("everything has been shutdown normally");
-	    isStarted.set(false);
-	}
+        try {
+            if (isStarted.get()) {
+                tangoClasses.clear();
+                if (tangoExporter != null) {
+                    tangoExporter.clearClass();
+                    tangoExporter.unexportAll();
+                }
+                EventManager.getInstance().close();
+            }
+        } finally {
+            ORBManager.shutdown();
+            logger.error("everything has been shutdown normally");
+            isStarted.set(false);
+        }
     }
 
     /**
@@ -264,8 +271,8 @@ public final class ServerManager {
      * @return The usage
      */
     private String getUsage() {
-	return "usage : java -DTANGO_HOST=$TANGO_HOST " + execName
-		+ " instance_name [-v[trace level]]  [-nodb [-dlist <device name list>] [-file=fileName]]";
+        return "usage : java -DTANGO_HOST=$TANGO_HOST " + execName
+                + " instance_name [-v[trace level]]  [-nodb [-dlist <device name list>] [-file=fileName]]";
     }
 
     /**
@@ -276,29 +283,29 @@ public final class ServerManager {
      * @throws DevFailed
      */
     private void checkArgs(final String[] argv) throws DevFailed {
-	if (argv.length < 1) {
-	    DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
-	}
-	instanceName = argv[0];
-	useDb = true;
-	DatabaseFactory.setUseDb(true);
-	List<String> noDbDevices = new ArrayList<String>();
-	for (int i = 1; i < argv.length; i++) {
-	    final String arg = argv[i];
-	    if (arg.startsWith("-h")) { // trace instance name
-		System.out.println("instance list for server " + execName + ": "
-			+ Arrays.toString(DatabaseFactory.getDatabase().getInstanceNameList(execName)));
-	    } else if (arg.startsWith("-v")) { // logging level
-		final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
-		LoggingManager.getInstance().setRootLoggingLevel(level);
-	    } else if (arg.startsWith("-dlist")) {
-		noDbDevices = configureNoDB(argv, i);
-		useDb = false;
-	    } else if (arg.startsWith("-file")) {
-		configureNoDBFile(argv, arg, noDbDevices);
-		useDb = false;
-	    }
-	}
+        if (argv.length < 1) {
+            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+        }
+        instanceName = argv[0];
+        useDb = true;
+        DatabaseFactory.setUseDb(true);
+        List<String> noDbDevices = new ArrayList<String>();
+        for (int i = 1; i < argv.length; i++) {
+            final String arg = argv[i];
+            if (arg.startsWith("-h")) { // trace instance name
+                System.out.println("instance list for server " + execName + ": "
+                        + Arrays.toString(DatabaseFactory.getDatabase().getInstanceNameList(execName)));
+            } else if (arg.startsWith("-v")) { // logging level
+                final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
+                LoggingManager.getInstance().setRootLoggingLevel(level);
+            } else if (arg.startsWith("-dlist")) {
+                noDbDevices = configureNoDB(argv, i);
+                useDb = false;
+            } else if (arg.startsWith("-file")) {
+                configureNoDBFile(argv, arg, noDbDevices);
+                useDb = false;
+            }
+        }
     }
 
     /**
@@ -310,22 +317,22 @@ public final class ServerManager {
      * @throws DevFailed
      */
     private List<String> configureNoDB(final String argv[], final int currentIdx) throws DevFailed {
-	final List<String> noDbDevices = new ArrayList<String>();
-	if (!ArrayUtils.contains(argv, NODB)) {
-	    DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
-	} else {
-	    for (int j = currentIdx + 1; j < argv.length; j++) {
-		if (!argv[j].startsWith("-")) {
-		    noDbDevices.add(argv[j]);
-		    logger.warn("Device with no db: " + argv[j]);
-		} else {
-		    break;
-		}
-	    }
-	    DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
-		    .toArray(new String[tangoClasses.size()]));
-	}
-	return noDbDevices;
+        final List<String> noDbDevices = new ArrayList<String>();
+        if (!ArrayUtils.contains(argv, NODB)) {
+            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+        } else {
+            for (int j = currentIdx + 1; j < argv.length; j++) {
+                if (!argv[j].startsWith("-")) {
+                    noDbDevices.add(argv[j]);
+                    logger.warn("Device with no db: " + argv[j]);
+                } else {
+                    break;
+                }
+            }
+            DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
+                    .toArray(new String[tangoClasses.size()]));
+        }
+        return noDbDevices;
 
     }
 
@@ -339,19 +346,19 @@ public final class ServerManager {
      * @throws DevFailed
      */
     private void configureNoDBFile(final String argv[], final String arg, final List<String> noDbDevices)
-	    throws DevFailed {
-	if (!ArrayUtils.contains(argv, NODB)) {
-	    DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
-	} else {
-	    final String name = arg.split("=")[1];
-	    final File file = new File(name);
-	    if (!file.exists() && !file.isFile()) {
-		DevFailedUtils.throwDevFailed(INIT_ERROR, name + " does not exists or is not a file");
-	    }
-	    logger.warn("Tango Database is not used - with file {} ", file.getPath());
-	    DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
-		    .toArray(new String[tangoClasses.size()]));
-	}
+            throws DevFailed {
+        if (!ArrayUtils.contains(argv, NODB)) {
+            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+        } else {
+            final String name = arg.split("=")[1];
+            final File file = new File(name);
+            if (!file.exists() && !file.isFile()) {
+                DevFailedUtils.throwDevFailed(INIT_ERROR, name + " does not exists or is not a file");
+            }
+            logger.warn("Tango Database is not used - with file {} ", file.getPath());
+            DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
+                    .toArray(new String[tangoClasses.size()]));
+        }
 
     }
 
@@ -362,22 +369,22 @@ public final class ServerManager {
      */
     private void initPIDAndHostName() throws DevFailed {
 
-	final RuntimeMXBean rmxb = ManagementFactory.getRuntimeMXBean();
-	final String pidAndHost = rmxb.getName();
-	final String[] splitted = pidAndHost.split("@");
-	if (splitted.length > 1) {
-	    pid = splitted[0];
-	}
-	// hostName = splitted[1];
-	try {
-	    final InetAddress addr = InetAddress.getLocalHost();
-	    hostName = addr.getCanonicalHostName();
-	} catch (final UnknownHostException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
+        final RuntimeMXBean rmxb = ManagementFactory.getRuntimeMXBean();
+        final String pidAndHost = rmxb.getName();
+        final String[] splitted = pidAndHost.split("@");
+        if (splitted.length > 1) {
+            pid = splitted[0];
+        }
+        // hostName = splitted[1];
+        try {
+            final InetAddress addr = InetAddress.getLocalHost();
+            hostName = addr.getCanonicalHostName();
+        } catch (final UnknownHostException e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
 
-	logger.debug("pid: " + pid);
-	logger.debug("hostName: " + hostName);
+        logger.debug("pid: " + pid);
+        logger.debug("hostName: " + hostName);
 
     }
 
@@ -387,7 +394,7 @@ public final class ServerManager {
      * @return the host name
      */
     public String getHostName() {
-	return hostName;
+        return hostName;
     }
 
     /**
@@ -396,7 +403,7 @@ public final class ServerManager {
      * @return the pid
      */
     public String getPid() {
-	return pid;
+        return pid;
     }
 
     /**
@@ -405,7 +412,7 @@ public final class ServerManager {
      * @return execName/instanceName
      */
     public String getExecName() {
-	return execName;
+        return execName;
     }
 
     /**
@@ -414,7 +421,7 @@ public final class ServerManager {
      * @return The instance name
      */
     public String getInstanceName() {
-	return instanceName;
+        return instanceName;
     }
 
     /**
@@ -423,7 +430,7 @@ public final class ServerManager {
      * @return The server name
      */
     public String getServerName() {
-	return serverName;
+        return serverName;
     }
 
     /**
@@ -435,11 +442,11 @@ public final class ServerManager {
      * @throws DevFailed
      */
     public String[] getDevicesOfClass(final String tangoClass) throws DevFailed {
-	return tangoExporter.getDevicesOfClass(tangoClass);
+        return tangoExporter.getDevicesOfClass(tangoClass);
     }
 
     public String getAdminDeviceName() {
-	return Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName;
+        return Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName;
     }
 
     /**
@@ -447,7 +454,7 @@ public final class ServerManager {
      * @return true is the server is running
      */
     public boolean isStarted() {
-	return isStarted.get();
+        return isStarted.get();
     }
 
 }
