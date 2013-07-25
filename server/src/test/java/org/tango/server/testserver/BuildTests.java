@@ -47,88 +47,88 @@ public class BuildTests {
 
     @Test
     public void testNoInitTest() throws DevFailed {
-	startDetachedNoDb(NoInitDevice.class);
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/checkProp");
-	assertThat(ta.read(String.class), equalTo("default"));
-	ta.write("toto");
-	assertThat(ta.read(String.class), equalTo("toto"));
-	dev.command_inout("Init");
-	assertThat(ta.read(String.class), equalTo("default"));
+        startDetachedNoDb(NoInitDevice.class);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/checkProp");
+        assertThat(ta.read(String.class), equalTo("default"));
+        ta.write("toto");
+        assertThat(ta.read(String.class), equalTo("toto"));
+        dev.command_inout("Init");
+        assertThat(ta.read(String.class), equalTo("default"));
 
     }
 
     @Test(expected = DevFailed.class)
     public void testBad1() throws DevFailed {
-	startDetachedNoDb(BadServer.class);
+        startDetachedNoDb(BadServer.class);
     }
 
     @Test(expected = DevFailed.class)
     public void testBad2() throws DevFailed {
-	startDetachedNoDb(BadServer2.class);
+        startDetachedNoDb(BadServer2.class);
     }
 
     @Test(expected = DevFailed.class)
     public void testBad3() throws DevFailed {
-	startDetachedNoDb(BadServer3.class);
+        startDetachedNoDb(BadServer3.class);
     }
 
     @Test(expected = DevFailed.class)
     public void testBad4() throws DevFailed {
-	startDetachedNoDb(BadServer4.class);
+        startDetachedNoDb(BadServer4.class);
     }
 
     @Test(expected = DevFailed.class)
     public void testBad5() throws DevFailed {
-	startDetachedNoDb(BadServer5.class);
+        startDetachedNoDb(BadServer5.class);
     }
 
     @Test(timeout = 3000)
     public void testInit() throws DevFailed {
-	startDetachedNoDb(InitErrorServer.class);
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	assertThat(dev.state(), equalTo(DevState.INIT));
-	assertThat(dev.status(), containsString("Init in progress"));
-	while (dev.state().equals(DevState.INIT)) {
-	    try {
-		Thread.sleep(100);
-	    } catch (final InterruptedException e) {
-	    }
-	}
-	assertThat(dev.state(), equalTo(DevState.FAULT));
-	assertThat(dev.status(), containsString("fake error"));
-	dev.command_inout("Init");
+        startDetachedNoDb(InitErrorServer.class);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        assertThat(dev.state(), equalTo(DevState.INIT));
+        assertThat(dev.status(), containsString("Init in progress"));
+        while (dev.state().equals(DevState.INIT)) {
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+            }
+        }
+        assertThat(dev.state(), equalTo(DevState.FAULT));
+        assertThat(dev.status(), containsString("fake error"));
+        dev.command_inout("Init");
     }
 
     @Test
     public void testDefaultState() throws DevFailed {
-	startDetachedNoDb(TestDefaultStateServer.class);
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	assertThat(dev.state(), equalTo(DevState.UNKNOWN));
-	assertThat(dev.status(), equalTo("The device is in UNKNOWN state."));
+        startDetachedNoDb(TestDefaultStateServer.class);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        assertThat(dev.state(), equalTo(DevState.UNKNOWN));
+        assertThat(dev.status(), equalTo("The device is in UNKNOWN state."));
     }
 
     @Test
-    public void testtate() throws DevFailed {
-	startDetachedNoDb(TestStateServer.class);
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	System.out.println(DeviceState.toString(dev.state()));
-	assertThat(dev.state(), equalTo(DevState.ON));
+    public void testState() throws DevFailed {
+        startDetachedNoDb(TestStateServer.class);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        System.out.println(DeviceState.toString(dev.state()));
+        assertThat(dev.state(), equalTo(DevState.ON));
     }
 
     @After
     public void after() throws DevFailed {
-	ServerManager.getInstance().stop();
+        ServerManager.getInstance().stop();
     }
 
     private void startDetachedNoDb(final Class<?> deviceClass) throws DevFailed {
-	System.setProperty("OAPort", noDbGiopPort);
-	ServerManager.getInstance().addClass(deviceClass.getCanonicalName(), deviceClass);
-	ServerManager.getInstance().startError(new String[] { noDbInstanceName, "-nodb", "-dlist", noDbDeviceName },
-		deviceClass.getCanonicalName());
-	// adminName = "tango://localhost:" + noDbGiopPort + "/" +
-	// Constants.ADMIN_DEVICE_DOMAIN + "/"
-	// + ServerManager.getInstance().getServerName() + "#dbase=no";
+        System.setProperty("OAPort", noDbGiopPort);
+        ServerManager.getInstance().addClass(deviceClass.getCanonicalName(), deviceClass);
+        ServerManager.getInstance().startError(new String[] { noDbInstanceName, "-nodb", "-dlist", noDbDeviceName },
+                deviceClass.getCanonicalName());
+        // adminName = "tango://localhost:" + noDbGiopPort + "/" +
+        // Constants.ADMIN_DEVICE_DOMAIN + "/"
+        // + ServerManager.getInstance().getServerName() + "#dbase=no";
     }
 
 }
