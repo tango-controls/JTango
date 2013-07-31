@@ -57,7 +57,7 @@ import java.util.Hashtable;
 class KeepAliveThread extends Thread implements TangoConst {
 
     private static final long EVENT_RESUBSCRIBE_PERIOD = 600000;
-    private static final long EVENT_HEARTBEAT_PERIOD = 10000;
+    private static final long EVENT_HEARTBEAT_PERIOD   =  10000;
     private static boolean stop = false;
     private static KeepAliveThread  instance = null;
     //===============================================================
