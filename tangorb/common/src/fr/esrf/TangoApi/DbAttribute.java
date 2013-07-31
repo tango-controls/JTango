@@ -46,7 +46,7 @@ import java.util.Vector;
  */
 
 
-public class DbAttribute extends Vector implements java.io.Serializable {
+public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable {
     public String name;
 
     //===========================================================
@@ -70,7 +70,7 @@ public class DbAttribute extends Vector implements java.io.Serializable {
      */
     //===========================================================
     public DbDatum datum(int idx) {
-        return (DbDatum) elementAt(idx);
+        return elementAt(idx);
     }
 
     //===========================================================
@@ -83,7 +83,7 @@ public class DbAttribute extends Vector implements java.io.Serializable {
     public DbDatum datum(String name) {
         DbDatum datum;
         for (int i = 0; i < size(); i++) {
-            datum = (DbDatum) elementAt(i);
+            datum = elementAt(i);
             if (name.equalsIgnoreCase(datum.name))
                 return datum;
         }
@@ -99,16 +99,6 @@ public class DbAttribute extends Vector implements java.io.Serializable {
     //===========================================================
     public void add(String name) {
         addElement(new DbDatum(name, ""));
-    }
-    //===========================================================
-    /**
-     * Add a new DbDatum in Vector
-     *
-     * @param datum property name and value
-     */
-    //===========================================================
-    public void add(DbDatum datum) {
-        addElement(datum);
     }
     //===========================================================
     /**

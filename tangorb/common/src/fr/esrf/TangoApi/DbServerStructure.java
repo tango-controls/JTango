@@ -50,7 +50,9 @@ import java.util.ArrayList;
 
 
 public class DbServerStructure {
-    private String   serverName;
+    private String serverName;
+    private String tgHost = null;
+    private String tgPort = null;
     private ArrayList<TangoClass>  classes = new ArrayList<TangoClass>();
 	//===============================================================
     /**
@@ -62,11 +64,61 @@ public class DbServerStructure {
      */
 	//===============================================================
 	public DbServerStructure(String serverName) throws DevFailed {
-		DbServer    server = new DbServer(serverName);
         this.serverName = serverName;
+        buildStructure();
+    }
+	//===============================================================
+    /**
+     * Constructor for DbServerStructure.
+     * It will read the server structure from database.
+     *
+     * @param serverName the specified server (ServerName/InstanceName)
+     * @param tangoHost the specified TANGO_HOST
+     * @throws DevFailed  in case of read database fails.
+     */
+	//===============================================================
+	public DbServerStructure(String serverName, String tangoHost) throws DevFailed {
+        this.serverName = serverName;
+        int pos = tangoHost.indexOf(':');
+        if (pos<0 || pos==tangoHost.length())
+            Except.throw_exception("BAD_SYNTAX",
+                    "TANGO_HOST name is not valid", "DbServerStructure.DbServerStructure()");
+        tgHost = tangoHost.substring(0, pos);
+        tgPort = tangoHost.substring(pos+1);
+        buildStructure();
+    }
+	//===============================================================
+    /**
+     * Constructor for DbServerStructure.
+     * It will read the server structure from database.
+     *
+     * @param serverName the specified server (ServerName/InstanceName)
+     *	@param	host	host where database is running.
+     *	@param	port	port for database connection.
+     * @throws DevFailed  in case of read database fails.
+     */
+	//===============================================================
+	public DbServerStructure(String serverName, String host, String port) throws DevFailed {
+
+        this.serverName = serverName;
+        tgHost = host;
+        tgPort = port;
+        buildStructure();
+    }
+    //===============================================================
+    //===============================================================
+    private void buildStructure() throws DevFailed {
+        DbServer    server;
+        if (tgHost ==null || tgPort ==null)
+            server = new DbServer(serverName);
+        else {
+            server = new DbServer(serverName, tgHost, tgPort);
+        }
 
         //  Check if server defined in database.
-        new DeviceProxy("dserver/"+serverName.toLowerCase());
+        String  adminName = (tgHost ==null)? "" : "tango://"+ tgHost +":"+ tgPort +"/";
+        adminName += "dserver/"+serverName.toLowerCase();
+        new DeviceProxy(adminName);
 
         //  Build Server classes
         String[]    classNames = server.get_class_list();
@@ -189,7 +241,9 @@ public class DbServerStructure {
      */
 	//===============================================================
     public void remove() throws DevFailed {
-        remove(ApiUtil.get_db_obj().get_tango_host());
+        Database    database =
+                (tgHost ==null)? ApiUtil.get_db_obj() : ApiUtil.get_db_obj(tgHost, tgPort);
+        remove(database.get_tango_host());
     }
 	//===============================================================
     /**
@@ -252,7 +306,8 @@ public class DbServerStructure {
         //===========================================================
         private TangoClass(String name) throws DevFailed {
             this.name = name;
-            Database    database = ApiUtil.get_db_obj();
+            Database    database =
+                    (tgHost ==null)? ApiUtil.get_db_obj() : ApiUtil.get_db_obj(tgHost, tgPort);
 
             //  Read properties
             String[]    propertyNames = database.get_class_property_list(name, "*");
@@ -281,7 +336,9 @@ public class DbServerStructure {
             }
 
             //  Build devices
-            String[]    deviceNames = new DbServer(serverName).get_device_name(name);
+            String[]    deviceNames = (tgHost ==null) ?
+                    new DbServer(serverName).get_device_name(name)
+                :   new DbServer(serverName, tgHost, tgPort).get_device_name(name);
             for (String deviceName : deviceNames)
                 add(new TangoDevice(deviceName));
         }
@@ -375,19 +432,22 @@ public class DbServerStructure {
      * A class defining a Tango device
      */
     //===============================================================
-    public class TangoDevice extends DeviceProxy {
+    public class TangoDevice {
         String name;
+        DeviceProxy deviceProxy;
         ArrayList<TangoProperty>   properties = new ArrayList<TangoProperty>();
         ArrayList<TangoAttribute>  attributes = new ArrayList<TangoAttribute>();
         //===========================================================
         TangoDevice(String name) throws DevFailed{
-            super(name);
             this.name = name;
+            String  fullName =
+                    (tgHost ==null) ? name :  "tango://"+ tgHost +":"+ tgPort +"/"+name;
+            deviceProxy = new DeviceProxy(fullName);
 
             //  Read properties
-            String[]    propertyNames = this.get_property_list("*");
+            String[]    propertyNames = deviceProxy.get_property_list("*");
             if (propertyNames.length>0) {
-                DbDatum[]   propertyValues = get_property(propertyNames);
+                DbDatum[]   propertyValues = deviceProxy.get_property(propertyNames);
                 for (int i=0 ; i<propertyNames.length ; i++) {
                     if (!propertyValues[i].is_empty()) {
                         properties.add(new TangoProperty(propertyNames[i], propertyValues[i].extractStringArray()));
@@ -395,13 +455,13 @@ public class DbServerStructure {
                 }
             }
             //  get attribute list from Db
-            Database    database = ApiUtil.get_db_obj();
+            Database    database =
+                    (tgHost ==null)? ApiUtil.get_db_obj() : ApiUtil.get_db_obj(tgHost, tgPort);
             String[] attributeNames  = database.get_device_attribute_list(name);
             for (String attributeName : attributeNames) {
                 //  Read attribute properties
                 DbAttribute dbAttribute = database.get_device_attribute_property(name, attributeName);
-                for (Object object : dbAttribute) {
-                    DbDatum datum = (DbDatum) object;
+                for (DbDatum datum : dbAttribute) {
                     if (!datum.is_empty()) {
                         TangoAttribute attribute = new TangoAttribute(attributeName);
                         attribute.add(new TangoProperty(datum.name, datum.extractStringArray()));
@@ -442,7 +502,7 @@ public class DbServerStructure {
                 //  Build the DbDAttribute list for the class
                 for (TangoAttribute attribute : attributes) {
                     if (attribute.size()>0) {
-                        DbAttribute    dbAttribute = new DbAttribute(name);
+                        DbAttribute    dbAttribute = new DbAttribute(attribute.name);
                         for (TangoProperty property : attribute) {
                             dbAttribute.add(new DbDatum(property.name, property.values));
                         }
@@ -453,7 +513,7 @@ public class DbServerStructure {
                 //  Copy in array before put in database
                 DbAttribute[]   dbAttributes = new DbAttribute[dbAttributeList.size()];
                 for (int i=0 ; i<dbAttributeList.size() ; i++) {
-                    dbAttributes[i] =dbAttributeList.get(i);
+                    dbAttributes[i]  =dbAttributeList.get(i);
                 }
                 database.put_device_attribute_property(name, dbAttributes);
             }
