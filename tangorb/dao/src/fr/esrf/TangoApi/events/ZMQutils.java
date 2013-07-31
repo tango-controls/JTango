@@ -594,7 +594,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception " + e + " has been catch",
+                    "An exception \'" + e + "\' has been catch",
                     "ZMQutils.deMarshallZmqCallInfo()");
             return null;    //  Cannot occur
         }
