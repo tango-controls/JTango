@@ -50,7 +50,7 @@ public class TangoEventListenerList implements Serializable {
      */
     //============================================================
     class TangoListener {
-        Object         type;
+        Class<?>       type;
         EventListener  listener;
         private <T extends EventListener> TangoListener(Class<T> type, T listener) {
             this.type = type;
