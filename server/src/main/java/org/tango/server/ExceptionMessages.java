@@ -61,6 +61,8 @@ public final class ExceptionMessages {
     public static final String INCOMPATIBLE_DATA_TYPE = "API_IncompatibleAttrDataType";
     public static final String COMMAND_NOT_ALLOWED = "API_CommandNotAllowed";
     public static final String DB_ACCESS = "API_DatabaseAccess";
+    public static final String EVENT_CRITERIA_NOT_SET = "API_EventCriteriaNotSet";
+    public static final String EVENT_NOT_AVAILABLE = "API_EventNotAvailable";
     public static final String EVENT_NO_FREE_PORT = "API_NoFreePortFound";
     public static final String TANGO_HOST_ERROR = "API_GetTangoHostFailed";
 }
