@@ -133,7 +133,8 @@ public class EventConsumerUtil {
 			if (zmqEnable==null || !zmqEnable.equals("true")) {
             	try {
                 	ZMQutils.getInstance();
-                    System.out.println("====================== ZMQ event system is " + "available ============================");
+                    System.out.println("====================== ZMQ (" + ZMQutils.getZmqVersion() +
+                            ") event system is available ============================");
             	}
             	catch(java.lang.NoClassDefFoundError error) {
                     System.err.println("======================================================================");
