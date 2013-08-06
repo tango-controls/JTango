@@ -329,7 +329,7 @@ public class  ZMQutils {
      */
 	//===============================================================
     static String getFullHeartBeatName(String tangoHost, String deviceName) throws DevFailed {
-        return ("tango://" + tangoHost + "/" + deviceName + ".heartbeat");
+        return ("tango://" + tangoHost + "/" + deviceName + ".heartbeat").toLowerCase();
     }
 	//===============================================================
     /**

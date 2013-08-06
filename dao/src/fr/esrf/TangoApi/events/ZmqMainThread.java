@@ -63,7 +63,7 @@ public class ZmqMainThread extends Thread {
     private ZMQ.Socket  controlSocket;
     private ZMQ.Socket  heartbeatSocket;
     private ZMQ.Socket  eventSocket;
-    private ZMQ.Poller  items;
+    private ZmqPollers pollers;
     private boolean     stop = false;
     /**
      * Map<endPoint, eventList>
@@ -80,6 +80,13 @@ public class ZmqMainThread extends Thread {
     private static final int NbFields   = ValueIdx+1;
 
     private static final long SendHwmSocket = 10000;
+    //===============================================================
+    private class ZmqPollers extends ZMQ.Poller {
+        private ZmqPollers(ZMQ.Context context, int size) {
+            super(context, size);
+        }
+    }
+    //===============================================================
     //===============================================================
     /**
      * Default constructor
@@ -113,10 +120,11 @@ public class ZmqMainThread extends Thread {
         }
 
         // Initialize poll set
-        items = context.poller(3);
-        items.register(heartbeatSocket, ZMQ.Poller.POLLIN);
-        items.register(eventSocket,     ZMQ.Poller.POLLIN);
-        items.register(controlSocket,   ZMQ.Poller.POLLIN);
+        //pollers = context.poller(3);
+        pollers = new ZmqPollers(context, 3);
+        pollers.register(heartbeatSocket, ZMQ.Poller.POLLIN);
+        pollers.register(eventSocket, ZMQ.Poller.POLLIN);
+        pollers.register(controlSocket, ZMQ.Poller.POLLIN);
     }
     //===============================================================
     /**
@@ -129,11 +137,11 @@ public class ZmqMainThread extends Thread {
         while (!stop) {
             try {
                 //  Poll the sockets inputs
-                items.poll();
+                pollers.poll();
 
                 //  read the speaking one
-                for (int i=0 ; i<items.getSize() ; i++) {
-                    if (items.pollin(i)) {
+                for (int i=0 ; i< pollers.getSize() ; i++) {
+                    if (pollers.pollin(i)) {
                         manageInputBuffer(i);
                     }
                 }
@@ -191,6 +199,7 @@ public class ZmqMainThread extends Thread {
      */
     //===============================================================
     private void manageInputBuffer(int source){
+        //System.out.println("manageInputBuffer -> "+source);
         switch (source) {
             case ControlSock:
                 try {
@@ -405,9 +414,15 @@ public class ZmqMainThread extends Thread {
         //  Is it the first call ?
         if (previousCounter==Long.MAX_VALUE) {
             callBackStruct.setZmqCounter(eventCounter);
+            //  There is NO synchronous call for DataReady event !!!!
+            if (callBackStruct.event_name.equals(
+                    TangoConst.eventNames[TangoConst.DATA_READY_EVENT])) {
+                callBackStruct.setSynchronousDone(true);
+            }
             //  To be sure to have first event after synchronous call,
             //      wait the event pushed in dedicated thread.
-            while (!callBackStruct.isSynchronousDone()) {
+            int timeout = 5000;
+            for (int i=0 ; !callBackStruct.isSynchronousDone() && i<timeout ; i++) {
                 try { Thread.sleep(1); } catch (InterruptedException e) { /* */ }
             }
             return true;
@@ -480,8 +495,6 @@ public class ZmqMainThread extends Thread {
      */
     //===============================================================
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
-            if (dbg!=null && dbg.equals("true"))
-                System.out.println("CheckApi=true");
         //  First part is heartbeat name
         String  name = new String(inputs[NameIdx]);
 
@@ -522,7 +535,6 @@ public class ZmqMainThread extends Thread {
         }
         /* */
     }
-    private static String   dbg = System.getenv("CheckApi");
     //===============================================================
     //===============================================================
     private String getConnectedEndPoint(String eventName) {
