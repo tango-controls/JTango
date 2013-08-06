@@ -128,7 +128,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 while (keys.hasMoreElements() && !found) {
                     String name = (String) keys.nextElement();
                     EventChannelStruct event_channel_struct = channel_map.get(name);
-                    if (event_channel_struct.adm_device_proxy.name().equals(domain_name)) {
+                    if (event_channel_struct.adm_device_proxy.name().equalsIgnoreCase(domain_name)) {
                         event_channel_struct.last_heartbeat = System.currentTimeMillis();
                         found = true;
                     }
