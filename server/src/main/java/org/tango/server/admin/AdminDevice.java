@@ -695,22 +695,25 @@ public final class AdminDevice {
 
                         if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
 
-                            // if (attributeImpl.isPolled()) {
-                            // TODO Check if event criteria are set
-                            // Found. Store objects
+                             if (attributeImpl.isPolled()) {
+                                // Check if event criteria are set. Otherwise a DevFailed is thrown
+                                 EventManager.checkEventCriteria(attributeImpl, eventType);
+                                // Found. Store objects
+                                device = deviceImpl;
+                                attribute = attributeImpl;
 
-                            device = deviceImpl;
-                            attribute = attributeImpl;
-                            // XXX could not start user event if not polled?
-//                            } else
-//                                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED, "Attribute "
-//                                        + attributeName + " is not polled");
+                                // ToDo could not start user event if not polled?
+                                // XXX YES it must be polled with a period of 0 ms !!!
+                            } else
+                                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
+                                    "The polling (necessary to send events) for the attribute " +
+                                            attributeName + " is not started");
                         }
                     }
 
                     if (attribute == null) { // Not found
-                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + attributeName
-                                + " not found");
+                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND,
+                                "Attribute " + attributeName + " not found");
                     }
                 }
             }
@@ -721,13 +724,13 @@ public final class AdminDevice {
         if (device == null) { // Not found
             DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, "Device " + deviceName + " not found");
         }
+        xlogger.exit();
+
         // Subscribe and returns connection parameters for client
         // Str[0] = Heartbeat pub endpoint -
         // Str[1] = Event pub endpoint
         // - Lg[0] = Tango lib release
         // - Lg[1] = Device IDL release
-        xlogger.exit();
-
         return EventManager.getInstance().getConnectionParameters(deviceName, attribute, eventType);
 
     }
