@@ -355,9 +355,11 @@ public class ZmqEventConsumer extends EventConsumer implements
 
                     //	If reconnection done, try to re subscribe
                     //		and read attribute in synchronous mode
-                    if (!callbackStruct.event_name.equals(eventNames[DATA_READY_EVENT]))
-                        if (reconnectToEvent(channelStruct, callbackStruct))
+                    if (!callbackStruct.event_name.equals(eventNames[DATA_READY_EVENT])) {
+                        if (reconnectToEvent(channelStruct, callbackStruct)) {
                             readAttributeAndPush(channelStruct, callbackStruct);
+                        }
+                    }
                 }
             }
         }
