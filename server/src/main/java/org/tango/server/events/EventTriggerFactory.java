@@ -24,14 +24,11 @@
  */
 package org.tango.server.events;
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributePropertiesImpl;
-import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.EventProperties;
 
 /**
  * Factory to build an event trigger in function of the event type
@@ -47,7 +44,7 @@ public class EventTriggerFactory {
      * 
      * @param eventType The event type
      * @param attribute The attribute that will send events
-     * @return
+     * @return the created EventTrigger object
      * @throws DevFailed
      */
     public static IEventTrigger createEventTrigger(final EventType eventType, final AttributeImpl attribute)
@@ -68,19 +65,9 @@ public class EventTriggerFactory {
                 eventTrigger = new PropertiesEventTrigger(attribute);
                 break;
             case CHANGE_EVENT:
-                if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                        && props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
-                    throw DevFailedUtils.newDevFailed("cannot not start change event for " + attribute.getName()
-                            + ", it is not configured");
-                }
                 eventTrigger = new ChangeEventTrigger(attribute, props.ch_event.abs_change, props.ch_event.rel_change);
                 break;
             case ARCHIVE_EVENT:
-                if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                        && props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
-                    throw DevFailedUtils.newDevFailed("cannot not start archive event for " + attribute.getName()
-                            + ", it is not configured");
-                }
                 final long periodA = Long.parseLong(props.arch_event.period);
                 eventTrigger = new ArchiveEventTrigger(periodA, props.arch_event.abs_change,
                         props.arch_event.rel_change, attribute);

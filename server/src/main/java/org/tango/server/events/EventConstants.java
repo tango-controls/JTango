@@ -41,8 +41,8 @@ interface EventConstants {
     static final int USER_PORT_END = 64000;
 
     // Miscellaneous releases
-    static final int TANGO_RELEASE = 312;
-    static final int ZMQ_RELEASE = (int) (100.0 * ApiUtil.getZmqVersion());
+    static final int TANGO_RELEASE = 812;
+    static final int ZMQ_RELEASE = (int) (100.0 * EventUtilities.getZmqVersion());
 
     // Time to manage events
     static final long EVENT_RESUBSCRIBE_PERIOD = 600000;
