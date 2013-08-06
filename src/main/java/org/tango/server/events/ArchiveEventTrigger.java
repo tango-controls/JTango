@@ -24,13 +24,17 @@
  */
 package org.tango.server.events;
 
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
 
 import fr.esrf.Tango.DevFailed;
+import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.utils.DevFailedUtils;
 
 /**
  * manage trigger for {@link EventType#ARCHIVE_EVENT}
@@ -77,4 +81,20 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     }
 
+    /**
+     * Check if event criteria are set for specified attribute
+     * @param attribute     the specified attribute
+     * @throws DevFailed if no event criteria is set for specified attribute.
+     */
+    public static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)     &&
+                props.arch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
+                props.arch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) ) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                    "Archive event properties (archive_abs_change or " +
+                            "archive_rel_change or archive_period) for attribute " +
+                            attribute.getName() + " are not set");
+        }
+    }
 }

@@ -27,11 +27,14 @@ package org.tango.server.events;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
@@ -143,7 +146,7 @@ public class ChangeEventTrigger implements IEventTrigger {
         // absolute change
         if (checkAbsolute) {
             final double delta = val - previousVal;
-            hasChanged = delta <= absolute || delta >= absolute;
+            hasChanged = Math.abs(delta) >= absolute;
         }
         // relative change
         if (!hasChanged && checkRelative) {
@@ -157,7 +160,7 @@ public class ChangeEventTrigger implements IEventTrigger {
             } else {
                 delta = (val - previousVal) * 100.0 / previousVal;
             }
-            hasChanged = delta <= relative || delta >= relative;
+            hasChanged = Math.abs(delta) >= relative;
         }
         return hasChanged;
     }
@@ -181,7 +184,7 @@ public class ChangeEventTrigger implements IEventTrigger {
                 // absolute change
                 if (checkAbsolute) {
                     final double delta = valD - previousValD;
-                    hasChanged = delta <= absolute || delta >= absolute;
+                    hasChanged = Math.abs(delta) >= absolute;
                 }
                 // relative change
                 if (!hasChanged && checkRelative) {
@@ -195,7 +198,7 @@ public class ChangeEventTrigger implements IEventTrigger {
                     } else {
                         delta = valD - previousValD * 100.0 / previousValD;
                     }
-                    hasChanged = delta <= relative || delta >= relative;
+                    hasChanged = Math.abs(delta) >= relative;
                 }
                 if (hasChanged) {
                     break;
@@ -250,4 +253,18 @@ public class ChangeEventTrigger implements IEventTrigger {
         return hasChanged;
     }
 
+    /**
+     * Check if event criteria are set for specified events
+     * @param attribute     the specified attribute
+     * @throws DevFailed if no event criteria is set for specified attribute.
+     */
+    static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
+                props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                    "Event properties (abs_change or rel_change) for attribute " +
+                            attribute.getName() + " are not set");
+        }
+    }
 }

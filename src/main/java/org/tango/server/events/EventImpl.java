@@ -24,32 +24,18 @@
  */
 package org.tango.server.events;
 
-import org.jacorb.orb.CDROutputStream;
+import fr.esrf.Tango.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
-import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
-import fr.esrf.Tango.AttDataReady;
-import fr.esrf.Tango.AttDataReadyHelper;
-import fr.esrf.Tango.AttributeConfig_3;
-import fr.esrf.Tango.AttributeConfig_3Helper;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.AttributeValue_4Helper;
-import fr.esrf.Tango.DevErrorListHelper;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.ZmqCallInfo;
-import fr.esrf.Tango.ZmqCallInfoHelper;
-import fr.esrf.TangoApi.ApiUtil;
-
 /**
- * based on AttributeImpl object
- * with event information
+ * based on AttributeImpl object with event information
  * 
  * @author verdier
  */
@@ -127,10 +113,10 @@ final class EventImpl {
         try {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-            eventSocket.send(marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(marshall(attribute, attributeValue), 0);
+            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(attribute, attributeValue), 0);
             logger.debug("sent event: {}", fullName);
-            // System.out.println(" ----> Event sent for " + fullName);
+            //System.out.println(" ----> Event sent for " + fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
@@ -143,10 +129,10 @@ final class EventImpl {
         try {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-            eventSocket.send(marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(marshall(dataReady), 0);
+            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(dataReady), 0);
             logger.debug("sent event: {}", fullName);
-            // System.out.println(" ----> Event sent for " + fullName);
+            //System.out.println(" ----> Event sent for " + fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
@@ -159,8 +145,8 @@ final class EventImpl {
         try {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-            eventSocket.send(marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(marshallConfig(attribute), 0);
+            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshallConfig(attribute), 0);
             logger.debug("sent event: {}", fullName);
             // System.out.println(" ----> Event sent for " + fullName);
         } catch (final org.zeromq.ZMQException e) {
@@ -185,8 +171,8 @@ final class EventImpl {
             try {
                 eventSocket.sendMore(fullName);
                 eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-                eventSocket.send(marshall(counter++, true), ZMQ.SNDMORE);
-                eventSocket.send(marshall(devFailed), 0);
+                eventSocket.send(EventUtilities.marshall(counter++, true), ZMQ.SNDMORE);
+                eventSocket.send(EventUtilities.marshall(devFailed), 0);
                 logger.debug("sent ERROR event: {}", fullName);
                 // System.out.println(" ----> Event sent for " + fullName);
             } catch (final org.zeromq.ZMQException e) {
@@ -194,131 +180,6 @@ final class EventImpl {
             }
         }
         xlogger.exit();
-    }
-
-    /**
-     * Add 4 bytes at beginning for C++ alignment
-     * 
-     * @param data buffer to be aligned
-     * @return buffer after c++ alignment.
-     */
-    private byte[] cppAlignment(final byte[] data) {
-        xlogger.entry();
-        final byte[] buffer = new byte[data.length + 4];
-        buffer[0] = (byte) 0xc0;
-        buffer[1] = (byte) 0xde;
-        buffer[2] = (byte) 0xc0;
-        buffer[3] = (byte) 0xde;
-        System.arraycopy(data, 0, buffer, 4, data.length);
-        xlogger.exit();
-        return buffer;
-
-    }
-
-    /**
-     * Marshall the attribute with attribute Value
-     * 
-     * @param attribute attribute to marshall
-     * @param attributeValue attribute value to marshall
-     * @return result of the marshall action
-     * @throws DevFailed if marshall action failed
-     */
-    private byte[] marshall(final AttributeImpl attribute, final AttributeValue attributeValue) throws DevFailed {
-        xlogger.entry();
-        final AttributeValue_4 attributeValue4 = TangoIDLAttributeUtil.toAttributeValue4(attribute, attributeValue,
-                null);
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            AttributeValue_4Helper.write(os, attributeValue4);
-            xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
-        } finally {
-            os.close();
-        }
-    }
-
-    /**
-     * Marshall AttDataReady
-     * 
-     * @param dataReady
-     * @return result of the marshall action
-     * @throws DevFailed
-     */
-    private byte[] marshall(final AttDataReady dataReady) throws DevFailed {
-        xlogger.entry();
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            AttDataReadyHelper.write(os, dataReady);
-            xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
-        } finally {
-            os.close();
-        }
-
-    }
-
-    /**
-     * Marshall the attribute with attribute config
-     * 
-     * @param attributeValue attribute value to marshall
-     * @return result of the marshall action
-     * @throws DevFailed if marshall action failed
-     */
-    private byte[] marshallConfig(final AttributeImpl attribute) throws DevFailed {
-        xlogger.entry();
-        final AttributeConfig_3 config = TangoIDLAttributeUtil.toAttributeConfig3(attribute);
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            AttributeConfig_3Helper.write(os, config);
-            xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
-        } finally {
-            os.close();
-        }
-
-    }
-
-    /**
-     * Marshall the attribute with a DevFailed object
-     * 
-     * @param devFailed DevFailed object to marshall
-     * @return result of the marshall action
-     * @throws DevFailed if marshall action failed
-     */
-
-    private byte[] marshall(final DevFailed devFailed) throws DevFailed {
-        xlogger.entry();
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            DevErrorListHelper.write(os, devFailed.errors);
-            xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
-        } finally {
-            os.close();
-        }
-    }
-
-    /**
-     * Marshall the ZmqCallInfo object
-     * 
-     * @param counter event counter
-     * @param isException true if the attribute has failed
-     * @return result of the marshall action
-     * @throws DevFailed if marshall action failed
-     */
-
-    private byte[] marshall(final int counter, final boolean isException) throws DevFailed {
-        xlogger.entry();
-        final ZmqCallInfo zmqCallInfo = new ZmqCallInfo((int) ApiUtil.getZmqVersion(), counter,
-                EventConstants.EXECUTE_METHOD, EventConstants.OBJECT_IDENTIFIER, isException);
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            ZmqCallInfoHelper.write(os, zmqCallInfo);
-            xlogger.exit();
-            return os.getBufferCopy();
-        } finally {
-            os.close();
-        }
     }
 
 }
