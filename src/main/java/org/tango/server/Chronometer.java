@@ -64,10 +64,7 @@ public final class Chronometer {
     public synchronized boolean isOver() {
         if (!isOver) {
             final long now = System.currentTimeMillis();
-            if (now - startTime > duration /** TO_SECS */
-            ) {
-                isOver = true;
-            }
+            isOver = ((now-startTime) >= duration);
         }
         return isOver;
     }
