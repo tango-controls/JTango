@@ -116,7 +116,7 @@ final class EventImpl {
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(attribute, attributeValue), 0);
             logger.debug("sent event: {}", fullName);
-            //System.out.println(" ----> Event sent for " + fullName);
+//            /System.out.println(" ----> Event sent for " + fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }

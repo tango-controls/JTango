@@ -68,9 +68,16 @@ public class EventTriggerFactory {
                 eventTrigger = new ChangeEventTrigger(attribute, props.ch_event.abs_change, props.ch_event.rel_change);
                 break;
             case ARCHIVE_EVENT:
-                final long periodA = Long.parseLong(props.arch_event.period);
-                eventTrigger = new ArchiveEventTrigger(periodA, props.arch_event.abs_change,
-                        props.arch_event.rel_change, attribute);
+                long periodA;
+                try {
+                    //  Check if specified and a number
+                    periodA = Long.parseLong(props.arch_event.period);
+                }
+                catch (NumberFormatException e) {
+                    periodA = -1;
+                }
+                eventTrigger = new ArchiveEventTrigger(periodA,
+                        props.arch_event.abs_change, props.arch_event.rel_change, attribute);
                 break;
             case DATA_READY_EVENT:
             case USER_EVENT:

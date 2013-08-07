@@ -59,6 +59,7 @@ public class ChangeEventTrigger implements IEventTrigger {
     private boolean checkAbsolute;
     private double relative;
     private boolean checkRelative;
+    private boolean isArchive = false;
 
     /**
      * Ctr
@@ -70,6 +71,13 @@ public class ChangeEventTrigger implements IEventTrigger {
     public ChangeEventTrigger(final AttributeImpl attribute, final String absolute, final String relative) {
         this.attribute = attribute;
         value = attribute.getReadValue();
+        initializeCriteria(absolute, relative);
+    }
+    void setAsArchive(boolean b) {
+        isArchive = b;
+    }
+
+    private void initializeCriteria(final String absolute, final String relative) {
         try {
             this.absolute = Double.parseDouble(absolute);
             checkAbsolute = true;
@@ -87,19 +95,32 @@ public class ChangeEventTrigger implements IEventTrigger {
     private DevFailed error;
     private DevFailed previousError;
 
+    private boolean previousInitialized = false;
     @Override
     public boolean isSendEvent() throws DevFailed {
         xlogger.entry();
-        previousValue = value;
         value = attribute.getReadValue();
 
-        boolean hasChanged = false;
+        //  Check if first call
+        if (!previousInitialized) {
+            previousValue = value;
+            previousInitialized = true;
+            return false;
+        }
 
+        //  Check if properties have changed
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if(isArchive)
+            initializeCriteria(props.arch_event.abs_change, props.arch_event.rel_change);
+        else
+            initializeCriteria(props.ch_event.abs_change, props.ch_event.rel_change);
+
+        boolean hasChanged = false;
         if (previousError != null && error == null) {
             // there was an error before
             hasChanged = true;
         } else if (previousError == null && error != null) {
-            // an error has just occured
+            // an error has just occur
             hasChanged = true;
         } else if (previousError != null && error != null) {
             if (!DevFailedUtils.toString(previousError).equals(DevFailedUtils.toString(error))) {
@@ -125,6 +146,9 @@ public class ChangeEventTrigger implements IEventTrigger {
                 hasChanged = hasArrayStringChanged();
             }
         }
+        if (hasChanged) {
+            previousValue = value;
+        }
 
         // TODO DevEncoded?
         logger.debug("CHANGE event must send: {}", hasChanged);
@@ -140,7 +164,6 @@ public class ChangeEventTrigger implements IEventTrigger {
 
     private boolean hasScalarNumberChanged() {
         boolean hasChanged = false;
-
         final double val = Double.parseDouble(value.getValue().toString());
         final double previousVal = Double.parseDouble(previousValue.getValue().toString());
         // absolute change
@@ -259,6 +282,10 @@ public class ChangeEventTrigger implements IEventTrigger {
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
     static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
+        //  Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString())
+            return;
+        //  Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
         if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
                 props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
