@@ -24,6 +24,7 @@
  */
 package org.tango.server.events;
 
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -45,32 +46,54 @@ public class PeriodicEventTrigger implements IEventTrigger {
     private final Logger logger = LoggerFactory.getLogger(PeriodicEventTrigger.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(PeriodicEventTrigger.class);
 
-    private final long period;
-    private final boolean isSamePeriod;
+    private long period;
+    private boolean isSamePeriod;
+
+    private AttributeImpl   attribute;
+    private boolean isArchive = false;
 
     /**
      * Ctr
      * 
      * @param period The period at which to send events
-     * @param attribute
+     * @param attribute the specified attribute
      */
     public PeriodicEventTrigger(final long period, final AttributeImpl attribute) {
+        this.attribute = attribute;
         this.period = period;
-        isSamePeriod = attribute.getPollingPeriod() == period ? true : false;
+        isSamePeriod = attribute.getPollingPeriod() == period;
         // first time, send event right now
         periodicChrono.stop();
+    }
+    void setAsArchive(boolean b) {
+        isArchive = b;
     }
 
     @Override
     public boolean isSendEvent() {
         xlogger.entry();
+        //  Check if properties have changed
+        final EventProperties props = attribute.getProperties().getEventProp();
+        try {
+            if (isArchive)
+                period = Long.parseLong(props.arch_event.period);
+            else
+                period = Long.parseLong(props.per_event.period);
+            isSamePeriod = attribute.getPollingPeriod() == period;
+        }
+        catch (NumberFormatException e) {
+            period = -1;
+        }
+
         boolean hasChanged = false;
-        if (isSamePeriod) {
-            // the polling period is the same as the periodic event period. So always send.
-            hasChanged = true;
-        } else if (periodicChrono.isOver() && period > 0) {
-            hasChanged = true;
-            periodicChrono.start(period);
+        if (period>0) {
+            if (isSamePeriod) {
+                // the polling period is the same as the periodic event period. So always send.
+                hasChanged = true;
+            } else if (periodicChrono.isOver() && period > 0) {
+                hasChanged = true;
+                periodicChrono.start(period);
+            }
         }
         logger.debug("PERIODIC event must send: {}", hasChanged);
         xlogger.exit();

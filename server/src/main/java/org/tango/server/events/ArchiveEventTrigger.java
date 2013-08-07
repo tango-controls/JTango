@@ -47,7 +47,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
     private final XLogger xlogger = XLoggerFactory.getXLogger(ArchiveEventTrigger.class);
 
     private final ChangeEventTrigger change;
-    private final PeriodicEventTrigger periodic;
+    private PeriodicEventTrigger periodic = null;
 
     /**
      * Ctr
@@ -57,16 +57,21 @@ public class ArchiveEventTrigger implements IEventTrigger {
      * @param relative The archive relative change delta
      * @param attribute The attribute that send events
      */
-    public ArchiveEventTrigger(final long period, final String absolute, final String relative,
-            final AttributeImpl attribute) {
+    public ArchiveEventTrigger(final long period,
+                               final String absolute, final String relative,
+                               final AttributeImpl attribute) {
         periodic = new PeriodicEventTrigger(period, attribute);
         change = new ChangeEventTrigger(attribute, absolute, relative);
+        periodic.setAsArchive(true);
+        change.setAsArchive(true);
     }
 
     @Override
     public boolean isSendEvent() throws DevFailed {
         xlogger.entry();
-        boolean isSend = periodic.isSendEvent();
+        boolean isSend = false;
+        if (periodic!=null)
+            isSend = periodic.isSendEvent();
         if (!isSend) {
             isSend = change.isSendEvent();
         }
@@ -78,7 +83,6 @@ public class ArchiveEventTrigger implements IEventTrigger {
     @Override
     public void setError(final DevFailed error) {
         change.setError(error);
-
     }
 
     /**
@@ -87,6 +91,10 @@ public class ArchiveEventTrigger implements IEventTrigger {
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
     public static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
+        //  Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString())
+            return;
+        //  Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
         if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)     &&
                 props.arch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
