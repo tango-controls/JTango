@@ -27,7 +27,9 @@ package org.tango.server.events;
 import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.EventProperties;
+import fr.esrf.TangoApi.ApiUtil;
+import fr.esrf.TangoApi.DbDatum;
+import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,6 @@ public final class EventManager {
     private static boolean isInitialized = false;
     private static String heartbeatEndpoint = null;
     private static String eventEndpoint = null;
-    // private static int hwm;
     private final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
 
@@ -103,11 +104,11 @@ public final class EventManager {
             DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
                     "ZMQ classes not found. Event system is not available.");
         }
+
         String adminDeviceName = ServerManager.getInstance().getAdminDeviceName();
         // TODO : without database?
         heartbeatSocket = context.socket(ZMQ.PUB);
         eventSocket = context.socket(ZMQ.PUB);
-        // hwm = EventConstants.HWM_DEFAULT;
 
         // Get the free ports and build endpoints
         setEndpoints(SocketType.HEARTBEAT);
@@ -129,13 +130,53 @@ public final class EventManager {
 
 
     /**
-     * Check next port to connect the heartbeatSocket or eventSocket
-     * 
-     * @param socketType HEARTBEAT or EVENT
+     * Check the High Water Mark value for server.
+     * @return the HWM value to be used.
+     */
+    private int getServerHWM() {
+
+        int hwm = EventConstants.HWM_DEFAULT;
+        //  Check the High Water Mark value from environment
+        String  env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
+        try {
+            if (env!=null) {
+                hwm = Integer.parseInt(env);
+            }
+        }
+        catch (NumberFormatException e) {
+            System.err.println(e);
+        }
+        //  ToDo Check HWM from Util class and Property
+        return hwm;
+    }
+    /**
+     * Check the High Water Mark value for client.
+     * @return the HWM value to be used.
+     */
+    private int getClientHWM() {
+
+        int hwm = EventConstants.HWM_DEFAULT;
+        //  Check the High Water Mark value from Control System property
+        //  ToDo replace by value from Stored Procedure
+        try {
+            DbDatum datum = ApiUtil.get_db_obj().get_property("CtrlSystem", "EventBufferHwm");
+            if (!datum.is_empty()) {
+                hwm = Integer.parseInt(datum.extractString());
+            }
+        }
+        catch (DevFailed e) {
+            Except.print_exception(e);
+        }
+        catch (NumberFormatException e) {
+            System.err.println("ControlSystem/EventBufferHwm property: " + e);
+        }
+        return hwm;
+    }
+    /**
+     * Returns next port to connect the heartbeatSocket or eventSocket
      * @throws DevFailed if no free port found
      */
-    private void setEndpoints(final SocketType socketType) throws DevFailed {
-        xlogger.entry();
+    private int getNextAvailablePort() throws DevFailed{
 
         // find an available port
         ServerSocket ss1 = null;
@@ -157,6 +198,16 @@ public final class EventManager {
                 }
             }
         }
+        return port;
+    }
+    /**
+     * Check next port to connect the heartbeatSocket or eventSocket
+     *
+     * @param socketType HEARTBEAT or EVENT
+     * @throws DevFailed if no free port found
+     */
+    private void setEndpoints(final SocketType socketType) throws DevFailed {
+        xlogger.entry();
 
         String ipAddress;
         try {
@@ -165,13 +216,9 @@ public final class EventManager {
             throw DevFailedUtils.newDevFailed(e1);
         }
 
-        final String endpoint = "tcp://" + ipAddress + ":" + port;
+        final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
         final ZMQ.Socket socket = context.socket(ZMQ.PUB);
-        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
 
-        socket.bind(endpoint);
-        socket.setHWM(EventConstants.HWM_DEFAULT);
-        socket.connect(endpoint);
         switch (socketType) {
             case HEARTBEAT:
                 heartbeatSocket = socket;
@@ -180,12 +227,23 @@ public final class EventManager {
             case EVENTS:
                 eventSocket = socket;
                 eventEndpoint = endpoint;
+                socket.setSndHWM(getServerHWM());
+                logger.debug("HWM has been set to " + socket.getSndHWM());
                 break;
         }
+        socket.setLinger(0);
+        socket.setReconnectIVL(-1);
+
+        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
+        socket.bind(endpoint);
         xlogger.exit();
     }
 
-
+    /**
+     * Search the specified EventImpl object
+     * @param fullName specified EventImpl name.
+     * @return the specified EventImpl object if found, otherwise returns null.
+     */
     private EventImpl getEventImpl(final String fullName) {
 
         if (!isInitialized) {
@@ -242,8 +300,7 @@ public final class EventManager {
             }
         }
 
-        // TODO blocks indefinitely
-        //context.term();
+        context.term();
         isInitialized = false;
         logger.debug("all event resources closed");
         xlogger.exit();
@@ -282,7 +339,7 @@ public final class EventManager {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION,
-                EventConstants.HWM_DEFAULT, 0, 0, EventConstants.ZMQ_RELEASE, };
+                getClientHWM(), 0, 0, EventConstants.ZMQ_RELEASE, };
         longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
         return longStringArray;
     }
@@ -375,8 +432,6 @@ public final class EventManager {
      * @throws DevFailed if event type is change or archive and no event criteria is set.
      */
     public static void checkEventCriteria(AttributeImpl attribute, String eventTypeStr) throws DevFailed{
-        final EventProperties props = attribute.getProperties().getEventProp();
-
         switch (EventType.getEvent(eventTypeStr)) {
             case CHANGE_EVENT:
                 ChangeEventTrigger.checkEventCriteria(attribute);
