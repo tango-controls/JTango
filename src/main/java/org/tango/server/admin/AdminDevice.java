@@ -703,8 +703,10 @@ public final class AdminDevice {
                                 attribute = attributeImpl;
 
                                 // ToDo could not start user event if not polled?
-                                // XXX YES it must be polled with a period of 0 ms !!!
-                            } else
+                                // XXX No. It must be authorized by code with attribute methods
+                                //	set_data_ready_event(), set_change_event() or set_archive_event()
+
+                             } else
                                 DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
                                     "The polling (necessary to send events) for the attribute " +
                                             attributeName + " is not started");
