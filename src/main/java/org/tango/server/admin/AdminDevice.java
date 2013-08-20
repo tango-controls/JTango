@@ -731,6 +731,10 @@ public final class AdminDevice {
         // Str[1] = Event pub endpoint
         // - Lg[0] = Tango lib release
         // - Lg[1] = Device IDL release
+        // - Lg[2] = High Water Mark buffer size
+        // - Lg[3] = Multicast info
+        // - Lg[4] = Multicast info
+        // - Lg[5] = ZMQ release
         return EventManager.getInstance().getConnectionParameters(deviceName, attribute, eventType);
 
     }
