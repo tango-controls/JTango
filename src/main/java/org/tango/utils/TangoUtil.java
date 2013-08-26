@@ -2,7 +2,7 @@
  * (c) Copyright 2004, iSencia Belgium NV
  * All Rights Reserved.
  * 
- * This software is the proprietary information of iSencia Belgium NV.  
+ * This software is the proprietary information of iSencia Belgium NV.
  * Use is subject to license terms.
  */
 package org.tango.utils;
@@ -127,7 +127,7 @@ public final class TangoUtil {
         String result;
         final String[] fields = attributeName.split(DEVICE_SEP);
         if (fields.length == 1) {
-            result = ApiUtil.get_db_obj().get_alias_from_attribute(fields[0]);
+            result = ApiUtil.get_db_obj().get_attribute_from_alias(fields[0]);
         } else if (fields.length == 2) {
             result = ApiUtil.get_db_obj().get_device_from_alias(fields[0]);
         } else if (fields.length == 4) {
@@ -153,7 +153,7 @@ public final class TangoUtil {
         } else {
             final Database db = ApiUtil.get_db_obj();
             if (fields.length == 1) {
-                result = db.get_alias_from_attribute(fields[0]);
+                result = db.get_attribute_from_alias(fields[0]);
             } else if (fields.length == 2) {
                 result = db.get_device_from_alias(fields[0]) + DEVICE_SEP + fields[1];
             } else {
