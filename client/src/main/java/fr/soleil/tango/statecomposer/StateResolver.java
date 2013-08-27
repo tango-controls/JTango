@@ -14,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.tango.utils.DevFailedUtils;
 
@@ -41,13 +42,16 @@ public final class StateResolver {
     private final boolean isSynchronous;
 
     private static class ThreadFact implements ThreadFactory {
+
+        private static final AtomicInteger THREAD_NR = new AtomicInteger(0);
+
         @Override
         public Thread newThread(final Runnable r) {
-            return new Thread(r, "StateResolver");
+            return new Thread(r, "StateResolver" + THREAD_NR.incrementAndGet());
         }
     }
 
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new ThreadFact());
+    private ScheduledExecutorService executor;
     private ScheduledFuture<?> future;
     private final StateRefresher refresher = new StateRefresher();
     private final long period;
@@ -99,6 +103,7 @@ public final class StateResolver {
         priorityStateManager = new PriorityStateManager();
         this.isSynchronous = isSynchronous;
         this.period = period;
+
     }
 
     public void putStatePriority(final DevState state, final int priority) {
@@ -128,8 +133,8 @@ public final class StateResolver {
     }
 
     public void start() {
-
         if (!isSynchronous) {
+            executor = Executors.newScheduledThreadPool(1, new ThreadFact());
             future = executor.scheduleAtFixedRate(refresher, 0L, period, TimeUnit.MILLISECONDS);
         }
     }
@@ -146,6 +151,7 @@ public final class StateResolver {
     public void stop() {
         if (!isSynchronous && future != null) {
             future.cancel(true);
+            executor.shutdownNow();
         }
     }
 
