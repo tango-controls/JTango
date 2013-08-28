@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
@@ -277,7 +277,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             final double minAlarm = props.getMinAlarmDouble();
             final double maxWarning = props.getMaxWarningDouble();
             final double minWarning = props.getMinWarningDouble();
-            final long deltaT = config.getAttributeProperties().getDeltaTLong();
+            final long deltaT = props.getDeltaTLong();
             if (config.getFormat().equals(AttrDataFormat.SCALAR)) {
                 checkScalarQuality(returnedValue, maxAlarm, minAlarm, maxWarning, minWarning, deltaT);
             } else {
@@ -376,6 +376,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void checkScalarDeltaAlarm(final AttributeValue returnedValue, final long deltaTime, final double valRead) {
         if (writtenTimestamp != 0 && deltaTime != 0) {
             // check difference between set value and actual value
+
             final double deltaVal = Math.abs(config.getAttributeProperties().getDeltaValDouble());
             final long currentDeltaTime = returnedValue.getTime() - writtenTimestamp;
             final double valWrite = Double.parseDouble(writeValue.getValue().toString());
