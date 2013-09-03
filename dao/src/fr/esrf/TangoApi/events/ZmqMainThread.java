@@ -627,8 +627,14 @@ public class ZmqMainThread extends Thread {
             //  Check if it ia a reconnection -> disconnect before connection
             //  Not available in ZMQ 3.1
             if (ApiUtil.getZmqVersion()>=3.20) {
-                if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint))
-                    socket.disconnect(controlStructure.endPoint);
+                if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint)) {
+					try {
+	                    socket.disconnect(controlStructure.endPoint);
+					}
+					catch (org.zeromq.ZMQException e) {
+						System.err.println(e);
+					}
+				}
             }
 
             //  Do the connection
