@@ -43,4 +43,8 @@ public final class Constants {
     public static final String POLLING_PERIOD = "pollingPeriod";
 
     public static final int QUEUE_CAPACITY = 100;
+
+    public static final String POLLED_OBJECT = "Polled object ";
+    public static final String POLLED_ATTR = "polled_attr";
+    public static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
 }

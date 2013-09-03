@@ -50,20 +50,19 @@ final class InitBuilder {
     private final XLogger xlogger = XLoggerFactory.getXLogger(InitBuilder.class);
 
     public void build(final Method method, final DeviceImpl device, final Object businessObject) throws DevFailed {
-	xlogger.entry();
-	logger.debug("Has an init method: {}", method.getName());
+        xlogger.entry();
+        logger.debug("Has an init method: {}", method.getName());
 
-	if (method.getParameterTypes().length != 0 && method.getReturnType() != void.class) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
-	}
-	if (Modifier.isStatic(method.getModifiers())) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
-	}
-	final Init annot = method.getAnnotation(Init.class);
-	final InitImpl init = new InitImpl(device.getName(), method, annot.lazyLoading(), businessObject);
-	device.setInit(init);
-	BuilderUtils.setStateMachine(method, init);
-	xlogger.exit();
+        if (method.getParameterTypes().length != 0 && method.getReturnType() != void.class) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
+        }
+        if (Modifier.isStatic(method.getModifiers())) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
+        }
+        final Init annot = method.getAnnotation(Init.class);
+        final InitImpl init = device.buildInit(method, annot.lazyLoading());
+        BuilderUtils.setStateMachine(method, init);
+        xlogger.exit();
     }
 
 }

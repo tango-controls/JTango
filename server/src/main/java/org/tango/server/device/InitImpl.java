@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Init;
+import org.tango.server.servant.PollingManager;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -78,6 +79,7 @@ public final class InitImpl extends DeviceBehaviorObject {
     private final ExecutorService executor;
     private Future<Void> future;
     private final AtomicBoolean isInitDoneCorrectly = new AtomicBoolean(false);
+    private final PollingManager pollingManager;
 
     /**
      * Ctr
@@ -86,11 +88,13 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @param isLazy
      * @param businessObject
      */
-    public InitImpl(final String deviceName, final Method initMethod, final boolean isLazy, final Object businessObject) {
+    public InitImpl(final String deviceName, final Method initMethod, final boolean isLazy,
+            final Object businessObject, final PollingManager pollingManager) {
         super();
         this.initMethod = initMethod;
         this.isLazy = isLazy;
         this.businessObject = businessObject;
+        this.pollingManager = pollingManager;
         executor = Executors.newSingleThreadExecutor(new ThreadFact(deviceName));
     }
 
@@ -150,15 +154,18 @@ public final class InitImpl extends DeviceBehaviorObject {
     private void doInit(final StateImpl stateImpl, final StatusImpl statusImpl) {
         isInitDoneCorrectly.set(false);
         try {
-            stateImpl.stateMachine(DeviceState.INIT);
-            statusImpl.statusMachine("Init in progress", DeviceState.INIT);
-            initMethod.invoke(businessObject);
-            if (getEndState() != null) {
-                // state changed by @StateMachine
-                stateImpl.stateMachine(getEndState());
-            } else if (stateImpl.isDefaultState()) {
-                stateImpl.stateMachine(DeviceState.UNKNOWN);
+            if (initMethod != null) {
+                stateImpl.stateMachine(DeviceState.INIT);
+                statusImpl.statusMachine("Init in progress", DeviceState.INIT);
+                initMethod.invoke(businessObject);
+                if (getEndState() != null) {
+                    // state changed by @StateMachine
+                    stateImpl.stateMachine(getEndState());
+                } else if (stateImpl.isDefaultState()) {
+                    stateImpl.stateMachine(DeviceState.UNKNOWN);
+                }
             }
+            pollingManager.initPolling();
             isInitDoneCorrectly.set(true);
         } catch (final IllegalArgumentException e) {
             manageError(stateImpl, statusImpl, e);
