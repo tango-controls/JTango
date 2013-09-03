@@ -625,7 +625,7 @@ public class  ZMQutils {
     }
 	//===============================================================
     /**
-     * De Marshall data from a receve byte buffer
+     * De Marshall data from a receive byte buffer
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
@@ -650,7 +650,7 @@ public class  ZMQutils {
     }
 	//===============================================================
     /**
-     * De Marshall data from a receve byte buffer
+     * De Marshall data from a receive byte buffer
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @param idl   idl revision to convert to attribute value
