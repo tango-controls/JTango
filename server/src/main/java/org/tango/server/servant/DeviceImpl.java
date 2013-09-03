@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
@@ -48,10 +48,7 @@ import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.DeviceState;
-import org.tango.client.database.DatabaseFactory;
-import org.tango.command.CommandTangoType;
 import org.tango.server.ExceptionMessages;
-import org.tango.server.IPollable;
 import org.tango.server.InvocationContext;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.ServerManager;
@@ -118,10 +115,10 @@ import fr.esrf.Tango.MultiDevFailed;
  */
 public final class DeviceImpl extends Device_4POA {
 
-    private static final String INIT_CMD = "Init";
-    private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
-    private static final String POLLED_OBJECT = "Polled object ";
-    private static final String POLLED_ATTR = "polled_attr";
+    public static final String INIT_CMD = "Init";
+//    private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
+//    private static final String POLLED_OBJECT = "Polled object ";
+//    private static final String POLLED_ATTR = "polled_attr";
     private final Logger logger = LoggerFactory.getLogger(DeviceImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceImpl.class);
 
@@ -241,7 +238,7 @@ public final class DeviceImpl extends Device_4POA {
     /**
      * Manage lazy init
      */
-    private volatile boolean isCorrectlyInit;
+    private final AtomicBoolean isCorrectlyInit = new AtomicBoolean(false);
     private boolean stateCheckAttrAlarm = false;
     /**
      * client info of lastest command. Used for locking device from client
@@ -267,6 +264,8 @@ public final class DeviceImpl extends Device_4POA {
     private final String deviceType;
 
     private DeviceScheduler deviceScheduler;
+
+    private final PollingManager pollingManager;
 
     /**
      * Ctr
@@ -326,8 +325,8 @@ public final class DeviceImpl extends Device_4POA {
                     this, name, className, false);
             addDeviceProperty(property6);
 
-            final DevicePropertyImpl property7 = new DevicePropertyImpl(POLLED_ATTR, "poll attributes", this.getClass()
-                    .getMethod("setPolledAttributes", String[].class), this, name, className, false);
+            final DevicePropertyImpl property7 = new DevicePropertyImpl(Constants.POLLED_ATTR, "poll attributes", this
+                    .getClass().getMethod("setPolledAttributes", String[].class), this, name, className, false);
             addDeviceProperty(property7);
 
         } catch (final SecurityException e) {
@@ -335,6 +334,8 @@ public final class DeviceImpl extends Device_4POA {
         } catch (final NoSuchMethodException e) {
             DevFailedUtils.throwDevFailed(e);
         }
+        pollingManager = new PollingManager(deviceName, cacheManager, attributeList, commandList, minPolling,
+                pollAttributes, minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
 
         MDC.put(MDC_KEY, name);
         logger.info("Device {} of of {} created with tx type: {}", new Object[] { deviceName,
@@ -436,6 +437,7 @@ public final class DeviceImpl extends Device_4POA {
         // if init is already in progress, do nothing
         if (!isInitializing) {
             isInitializing = true;
+            isCorrectlyInit.set(false);
             deleteDevice();
             doInit();
             isInitializing = false;
@@ -483,17 +485,7 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public CommandImpl getCommand(final String name) throws DevFailed {
-        CommandImpl result = null;
-        for (final CommandImpl command : commandList) {
-            if (command.getName().equalsIgnoreCase(name)) {
-                result = command;
-                break;
-            }
-        }
-        if (result == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.COMMAND_NOT_FOUND, "Command " + name + " not found");
-        }
-        return result;
+        return CommandGetter.getCommand(name, commandList);
     }
 
     /**
@@ -540,44 +532,19 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     public void configurePolling(final CommandImpl command) throws DevFailed {
-        if (command.isPolled()) {
-            if (command.getName().equals(DeviceImpl.STATE_NAME) || command.getName().equals(DeviceImpl.STATUS_NAME)) {
-                // attribute is also set as polled
-                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(command.getName(), attributeList);
-                // attribute.updatePollingConfigFromDB();
-                cacheManager.startStateStatusPolling(command, attribute);
-            } else {
-                cacheManager.startCommandPolling(command);
-            }
-        }
-        if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
-            command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
-        }
+        pollingManager.configurePolling(command);
     }
 
     public void configurePolling(final AttributeImpl attribute) throws DevFailed {
-        if (pollAttributes.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            // configuration comes from tango db
-            attribute.configurePolling(pollAttributes.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
-        }
-        if (attribute.isPolled()) {
-            // start polling
-            if (attribute.getName().equals(DeviceImpl.STATE_NAME) || attribute.getName().equals(DeviceImpl.STATUS_NAME)) {
-                // command is also set as polled
-                final CommandImpl cmd = getCommand(attribute.getName());
-                cmd.updatePollingConfigFromDB();
-                cacheManager.startStateStatusPolling(cmd, attribute);
-            } else {
-                cacheManager.startAttributePolling(attribute);
-            }
-        }
-        if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
-        }
+        pollingManager.configurePolling(attribute);
     }
 
     private synchronized void doInit() {
-        isCorrectlyInit = false;
+        isCorrectlyInit.set(false);
+
+        if (init == null) {
+            init = new InitImpl(name, null, false, businessObject, pollingManager);
+        }
         try {
             if (deviceScheduler != null) {
                 deviceScheduler.triggerJob();
@@ -593,12 +560,11 @@ public final class DeviceImpl extends Device_4POA {
                 prop.update();
             }
 
-            if (init != null) {
-                init.execute(stateImpl, statusImpl);
-            }
+            init.execute(stateImpl, statusImpl);
 
+            isCorrectlyInit.set(true);
         } catch (final DevFailed e) {
-            isCorrectlyInit = false;
+            isCorrectlyInit.set(false);
             // ignore error so that server always starts
             try {
                 stateImpl.stateMachine(DeviceState.FAULT);
@@ -607,35 +573,9 @@ public final class DeviceImpl extends Device_4POA {
                 // ignore
                 logger.debug("not important", e1);
             }
-        } finally {
-            try {
-                for (final AttributeImpl attribute : attributeList) {
-                    attribute.applyMemorizedValue();
-                    attribute.configureAttributePropFromDb();
-                    // attribute.updatePollingConfigFromDB();
-                    configurePolling(attribute);
-                }
-
-                for (final CommandImpl command : commandList) {
-                    command.updatePollingConfigFromDB();
-                    configurePolling(command);
-                }
-                isCorrectlyInit = true;
-            } catch (final DevFailed e) {
-                isCorrectlyInit = false;
-                try {
-                    stateImpl.stateMachine(DeviceState.FAULT);
-                    statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
-                } catch (final DevFailed e1) {
-                    // ignore
-                    logger.debug("not important", e1);
-                }
-            }
-
         }
 
         logger.error("init OK " + isCorrectlyInit);
-
     }
 
     /**
@@ -665,23 +605,6 @@ public final class DeviceImpl extends Device_4POA {
         doInit();
         logger.debug("device init done");
         xlogger.exit();
-    }
-
-    private void savePollingConfig() throws DevFailed {
-        // save polling config
-        final String[] pollingConfig = new String[pollAttributes.size() * 2];
-        int i = 0;
-        for (final Entry<String, Integer> entry : pollAttributes.entrySet()) {
-            pollingConfig[i++] = entry.getKey();
-            pollingConfig[i++] = Integer.toString(entry.getValue());
-        }
-        if (pollingConfig.length == 0) {
-            DatabaseFactory.getDatabase().deleteDeviceProperty(name, POLLED_ATTR);
-        } else {
-            final Map<String, String[]> props = new HashMap<String, String[]>();
-            props.put(POLLED_ATTR, pollingConfig);
-            DatabaseFactory.getDatabase().setDeviceProperties(name, props);
-        }
     }
 
     /**
@@ -1541,6 +1464,7 @@ public final class DeviceImpl extends Device_4POA {
         try {
             history = command.getHistory().toDevCmdHistory4(maxSize);
         } catch (final Exception e) {
+            e.printStackTrace();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1560,55 +1484,7 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public void triggerPolling(final String objectName) throws DevFailed {
-        boolean isACommand = false;
-        CommandImpl cmd = null;
-        try {
-            cmd = getCommand(objectName);
-            isACommand = true;
-        } catch (final DevFailed e) {
-        }
-        if (!isACommand) {
-            // polled object is not a command. May be an attribute
-            AttributeImpl att = null;
-            try {
-                att = AttributeGetterSetter.getAttribute(objectName, attributeList);
-            } catch (final DevFailed e) {
-                logger.error(POLLED_OBJECT + objectName + " not found");
-                DevFailedUtils.throwDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, POLLED_OBJECT + objectName
-                        + " not found");
-            }
-            checkPolling(objectName, att);
-            try {
-                cacheManager.getAttributeCache(att).refresh(att.getName());
-            } catch (final CacheException e) {
-                if (e.getCause() instanceof DevFailed) {
-                    throw (DevFailed) e.getCause();
-                } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
-                }
-            }
-        } else {
-            checkPolling(objectName, cmd);
-            try {
-                cacheManager.getCommandCache(cmd).refresh(cmd.getName());
-            } catch (final CacheException e) {
-                if (e.getCause() instanceof DevFailed) {
-                    throw (DevFailed) e.getCause();
-                } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
-                }
-            }
-        }
-    }
-
-    private void checkPolling(final String objectName, final IPollable pollable) throws DevFailed {
-        if (pollable.isPolled() && pollable.getPollingPeriod() > 0) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.NOT_SUPPORTED, POLLED_OBJECT + objectName
-                    + " cannot be trigger externally");
-        } else if (!pollable.isPolled()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, POLLED_OBJECT + objectName
-                    + " not polled");
-        }
+        pollingManager.triggerPolling(objectName);
     }
 
     /**
@@ -1972,19 +1848,7 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public void addAttributePolling(final String attributeName, final int pollingPeriod) throws DevFailed {
-        checkPollingLimits(attributeName, pollingPeriod, minAttributePolling);
-        final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
-        attribute.configurePolling(pollingPeriod);
-        if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-            // command is also set as polled
-            final CommandImpl cmd = getCommand(attribute.getName());
-            cmd.configurePolling(pollingPeriod);
-            cacheManager.startStateStatusPolling(cmd, attribute);
-        } else {
-            cacheManager.startAttributePolling(attribute);
-        }
-        pollAttributes.put(attributeName.toLowerCase(Locale.ENGLISH), pollingPeriod);
-        savePollingConfig();
+        pollingManager.addAttributePolling(attributeName, pollingPeriod);
     }
 
     /**
@@ -1998,50 +1862,22 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public void addCommandPolling(final String commandName, final int pollingPeriod) throws DevFailed {
-        checkPollingLimits(commandName, pollingPeriod, minCommandPolling);
-        final CommandImpl command = getCommand(commandName);
-        if (!command.getName().equals(INIT_CMD) && command.getInType().equals(CommandTangoType.VOID)) {
-            command.configurePolling(pollingPeriod);
-            if (command.getName().equals(STATE_NAME) || command.getName().equals(STATUS_NAME)) {
-                // command is also set as polled
-                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(command.getName(), attributeList);
-                attribute.configurePolling(pollingPeriod);
-                pollAttributes.put(attribute.getName().toLowerCase(Locale.ENGLISH), pollingPeriod);
-                cacheManager.startStateStatusPolling(command, attribute);
-                pollAttributes.put(attribute.getName().toLowerCase(Locale.ENGLISH), pollingPeriod);
-                savePollingConfig();
-            } else {
-                cacheManager.startCommandPolling(command);
-            }
-        }
+        pollingManager.addCommandPolling(commandName, pollingPeriod);
 
-    }
-
-    private void checkPollingLimits(final String commandName, final int pollingPeriod,
-            final Map<String, Integer> minPollingValues) throws DevFailed {
-        if (pollingPeriod != 0) {
-            if (pollingPeriod < minPolling) {
-                DevFailedUtils.throwDevFailed(MIN_POLLING_PERIOD_IS + minPolling);
-            }
-            if (minPollingValues.containsKey(commandName.toLowerCase(Locale.ENGLISH))
-                    && pollingPeriod < minPollingValues.get(commandName.toLowerCase(Locale.ENGLISH))) {
-                DevFailedUtils.throwDevFailed(MIN_POLLING_PERIOD_IS + minPolling);
-            }
-        }
     }
 
     /**
      * Stop all polling
      */
     public void stopPolling() {
-        cacheManager.stop();
+        pollingManager.stopPolling();
     }
 
     /**
      * Start already configured polling
      */
     public void startPolling() {
-        cacheManager.start();
+        pollingManager.startPolling();
     }
 
     /**
@@ -2052,18 +1888,7 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public void removeAttributePolling(final String attributeName) throws DevFailed {
-        // jive sends value with lower case, so manage it
-        final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
-        attribute.resetPolling();
-        cacheManager.removeAttributePolling(attribute);
-        pollAttributes.remove(attributeName.toLowerCase(Locale.ENGLISH));
-        if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-            // command is also set as polled
-            final CommandImpl cmd = getCommand(attribute.getName());
-            cmd.resetPolling();
-            cacheManager.removeCommandPolling(cmd);
-        }
-        savePollingConfig();
+        pollingManager.removeAttributePolling(attributeName);
     }
 
     /**
@@ -2074,17 +1899,7 @@ public final class DeviceImpl extends Device_4POA {
      * @throws DevFailed
      */
     public void removeCommandPolling(final String commandName) throws DevFailed {
-        final CommandImpl command = getCommand(commandName);
-        command.resetPolling();
-        cacheManager.removeCommandPolling(command);
-        if (command.getName().equals(STATE_NAME) || command.getName().equals(STATUS_NAME)) {
-            // attribute is also set as polled
-            final AttributeImpl attribute = AttributeGetterSetter.getAttribute(command.getName(), attributeList);
-            attribute.resetPolling();
-            cacheManager.removeAttributePolling(attribute);
-            pollAttributes.remove(command.getName().toLowerCase(Locale.ENGLISH));
-            savePollingConfig();
-        }
+        pollingManager.removeCommandPolling(commandName);
     }
 
     public void lock(final int validity, final ClntIdent clientIdent, final String hostName) throws DevFailed {
@@ -2188,12 +2003,14 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
-     * Set init method {@link Init}
+     * build init method {@link Init}
      * 
-     * @param init
+     * @return init
      */
-    public synchronized void setInit(final InitImpl init) {
-        this.init = init;
+    public synchronized InitImpl buildInit(final Method initMethod, final boolean isLazy) {
+        init = new InitImpl(name, initMethod, isLazy, businessObject, pollingManager);
+        return init;
+        // this.init = init;
     }
 
     /**
@@ -2206,8 +2023,7 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-
-        if (isCorrectlyInit) {
+        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
             // read all attributes to check alarms
             if (stateCheckAttrAlarm) {
                 checkAlarms();
@@ -2220,8 +2036,10 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     private void checkAlarms() throws DevFailed {
-        logger.debug("State: Number of attribute(s) to read: {}", attributeList.size() - 2);
-        for (final AttributeImpl attr : attributeList) {
+        final List<AttributeImpl> attrs = getAttributeList();
+        logger.debug("State: Number of attribute(s) to read: {}", attrs.size() - 2);
+
+        for (final AttributeImpl attr : attrs) {
             try {
                 if (!attr.getName().equals(STATE_NAME) && !attr.getName().equals(STATUS_NAME)) {
                     synchronized (attr) {
@@ -2232,6 +2050,7 @@ public final class DeviceImpl extends Device_4POA {
                     }
 
                 }
+
             } catch (final DevFailed e) {
             }
             if (attr.isOutOfLimits()) {
@@ -2259,7 +2078,7 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        if (isCorrectlyInit) {
+        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
             status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
         } else {
             status = statusImpl.getStatus();

@@ -189,12 +189,12 @@ public final class JTangoTest {
 
     @Schedule(activationProperty = "isRunRefresh", cronExpression = "0/1 * * * * ?")
     public void refresh() {
-	isScheduleRunning = true;
+        isScheduleRunning = true;
     }
 
     @Attribute
     public boolean isScheduleRunning() {
-	return isScheduleRunning;
+        return isScheduleRunning;
     }
 
     /**
@@ -203,116 +203,116 @@ public final class JTangoTest {
     @Init
     @StateMachine(endState = DeviceState.ON)
     public void init() throws DevFailed {
-	isScheduleRunning = false;
-	setDefaultValues();
+        isScheduleRunning = false;
+        setDefaultValues();
 
-	shortScalar = 10;
+        shortScalar = 10;
 
-	createDynamicAttributes();
+        createDynamicAttributes();
 
-	createDynamicCommands();
-	logger.debug("props {}", props);
-	status = "hello";
+        createDynamicCommands();
+        logger.debug("props {}", props);
+        status = "hello";
     }
 
     @Command
     public String getName() {
-	return deviceManager.getName();
+        return deviceManager.getName();
     }
 
     private void setDefaultValues() {
-	shortSpectrum = new short[SPECTRUM_SIZE];
-	Arrays.fill(shortSpectrum, (short) 1);
-	intSpectrum = new int[SPECTRUM_SIZE];
-	Arrays.fill(intSpectrum, 0);
-	byteSpectrum = new byte[SPECTRUM_SIZE];
-	Arrays.fill(byteSpectrum, (byte) 0);
-	doubleSpectrum = new double[SPECTRUM_SIZE];
-	Arrays.fill(doubleSpectrum, 0);
-	floatSpectrum = new float[SPECTRUM_SIZE];
-	Arrays.fill(floatSpectrum, 0);
-	booleanSpectrum = new boolean[SPECTRUM_SIZE];
-	Arrays.fill(booleanSpectrum, true);
-	stringSpectrum = new String[SPECTRUM_SIZE];
-	Arrays.fill(stringSpectrum, "");
+        shortSpectrum = new short[SPECTRUM_SIZE];
+        Arrays.fill(shortSpectrum, (short) 1);
+        intSpectrum = new int[SPECTRUM_SIZE];
+        Arrays.fill(intSpectrum, 0);
+        byteSpectrum = new byte[SPECTRUM_SIZE];
+        Arrays.fill(byteSpectrum, (byte) 0);
+        doubleSpectrum = new double[SPECTRUM_SIZE];
+        Arrays.fill(doubleSpectrum, 0);
+        floatSpectrum = new float[SPECTRUM_SIZE];
+        Arrays.fill(floatSpectrum, 0);
+        booleanSpectrum = new boolean[SPECTRUM_SIZE];
+        Arrays.fill(booleanSpectrum, true);
+        stringSpectrum = new String[SPECTRUM_SIZE];
+        Arrays.fill(stringSpectrum, "");
 
-	shortImage = new short[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final short[] element : shortImage) {
-	    Arrays.fill(element, (short) 0);
-	}
+        shortImage = new short[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final short[] element : shortImage) {
+            Arrays.fill(element, (short) 0);
+        }
 
-	intImage = new int[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final int[] element : intImage) {
-	    Arrays.fill(element, 0);
-	}
-	byteImage = new byte[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final byte[] element : byteImage) {
-	    Arrays.fill(element, (byte) 0);
-	}
-	doubleImage = new double[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final double[] element : doubleImage) {
-	    Arrays.fill(element, 0);
-	}
-	floatImage = new float[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final float[] element : floatImage) {
-	    Arrays.fill(element, 0);
-	}
-	booleanImage = new boolean[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final boolean[] element : booleanImage) {
-	    Arrays.fill(element, true);
-	}
-	stringImage = new String[X_IMAGE_SIZE][Y_IMAGE_SIZE];
-	for (final String[] element : stringImage) {
-	    Arrays.fill(element, "");
-	}
+        intImage = new int[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final int[] element : intImage) {
+            Arrays.fill(element, 0);
+        }
+        byteImage = new byte[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final byte[] element : byteImage) {
+            Arrays.fill(element, (byte) 0);
+        }
+        doubleImage = new double[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final double[] element : doubleImage) {
+            Arrays.fill(element, 0);
+        }
+        floatImage = new float[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final float[] element : floatImage) {
+            Arrays.fill(element, 0);
+        }
+        booleanImage = new boolean[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final boolean[] element : booleanImage) {
+            Arrays.fill(element, true);
+        }
+        stringImage = new String[X_IMAGE_SIZE][Y_IMAGE_SIZE];
+        for (final String[] element : stringImage) {
+            Arrays.fill(element, "");
+        }
     }
 
     private void createDynamicCommands() throws DevFailed {
-	dynamicManager.addCommand(new DynamicCommandTest(String.class));
-	dynamicManager.addCommand(new DynamicCommandTest(String[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(double.class));
-	dynamicManager.addCommand(new DynamicCommandTest(double[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(int.class));
-	dynamicManager.addCommand(new DynamicCommandTest(int[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(float.class));
-	dynamicManager.addCommand(new DynamicCommandTest(float[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(short.class));
-	dynamicManager.addCommand(new DynamicCommandTest(short[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(long.class));
-	dynamicManager.addCommand(new DynamicCommandTest(long[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(byte.class));
-	dynamicManager.addCommand(new DynamicCommandTest(byte[].class));
-	dynamicManager.addCommand(new DynamicCommandTest(boolean.class));
-	dynamicManager.addCommand(new DynamicCommandTest(DevVarDoubleStringArray.class));
-	dynamicManager.addCommand(new DynamicCommandTest(DevVarLongStringArray.class));
-	// dynManager.addCommand(new DynamicAttributeTest(boolean[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(String.class));
+        dynamicManager.addCommand(new DynamicCommandTest(String[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(double.class));
+        dynamicManager.addCommand(new DynamicCommandTest(double[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(int.class));
+        dynamicManager.addCommand(new DynamicCommandTest(int[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(float.class));
+        dynamicManager.addCommand(new DynamicCommandTest(float[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(short.class));
+        dynamicManager.addCommand(new DynamicCommandTest(short[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(long.class));
+        dynamicManager.addCommand(new DynamicCommandTest(long[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(byte.class));
+        dynamicManager.addCommand(new DynamicCommandTest(byte[].class));
+        dynamicManager.addCommand(new DynamicCommandTest(boolean.class));
+        dynamicManager.addCommand(new DynamicCommandTest(DevVarDoubleStringArray.class));
+        dynamicManager.addCommand(new DynamicCommandTest(DevVarLongStringArray.class));
+        // dynManager.addCommand(new DynamicAttributeTest(boolean[].class));
     }
 
     private void createDynamicAttributes() throws DevFailed {
-	dynamicManager.addAttribute(new DynamicAttributeTest(String.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(String[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(String[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(double.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(double[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(double[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(int.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(int[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(int[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(float.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(float[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(float[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(short.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(short[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(short[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(long.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(long[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(long[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(byte.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(byte[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(byte[][].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(boolean.class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(boolean[].class));
-	dynamicManager.addAttribute(new DynamicAttributeTest(boolean[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(String.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(String[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(String[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(double.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(double[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(double[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(int.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(int[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(int[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(float.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(float[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(float[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(short.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(short[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(short[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(long.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(long[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(long[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(byte.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(byte[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(byte[][].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(boolean.class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(boolean[].class));
+        dynamicManager.addAttribute(new DynamicAttributeTest(boolean[][].class));
     }
 
     /**
@@ -322,7 +322,7 @@ public final class JTangoTest {
      */
     @Delete
     public void delete() throws DevFailed {
-	dynamicManager.clearAll();
+        dynamicManager.clearAll();
     }
 
     // SHORT
@@ -332,7 +332,7 @@ public final class JTangoTest {
      */
     @Attribute
     public short getShortScalar() {
-	return shortScalar;
+        return shortScalar;
     }
 
     /**
@@ -342,7 +342,7 @@ public final class JTangoTest {
      */
 
     public void setShortScalar(final short shortScalar) {
-	this.shortScalar = shortScalar;
+        this.shortScalar = shortScalar;
     }
 
     /**
@@ -359,8 +359,8 @@ public final class JTangoTest {
      *            spectrum
      */
     public void setShortSpectrum(final short[] shortSpectrum) {
-	this.shortSpectrum = new short[shortSpectrum.length];
-	System.arraycopy(shortSpectrum, 0, this.shortSpectrum, 0, shortSpectrum.length);
+        this.shortSpectrum = new short[shortSpectrum.length];
+        System.arraycopy(shortSpectrum, 0, this.shortSpectrum, 0, shortSpectrum.length);
     }
 
     /**
@@ -368,7 +368,7 @@ public final class JTangoTest {
      * @return Image of short
      */
     public short[][] getShortImage() {
-	return Arrays.copyOf(shortImage, shortImage.length);
+        return Arrays.copyOf(shortImage, shortImage.length);
     }
 
     /**
@@ -377,63 +377,63 @@ public final class JTangoTest {
      *            image
      */
     public void setShortImage(final short[][] shortImage) {
-	this.shortImage = ArrayUtils.copyOf(shortImage);
+        this.shortImage = ArrayUtils.copyOf(shortImage);
     }
 
     // INTEGER
 
     public int getIntScalar() {
-	return intScalar;
+        return intScalar;
     }
 
     public void setIntScalar(final int intScalar) {
-	this.intScalar = intScalar;
+        this.intScalar = intScalar;
     }
 
     public int[] getIntSpectrum() {
-	return Arrays.copyOf(intSpectrum, intSpectrum.length);
+        return Arrays.copyOf(intSpectrum, intSpectrum.length);
     }
 
     public void setIntSpectrum(final int[] intSpectrum) {
-	this.intSpectrum = new int[intSpectrum.length];
-	System.arraycopy(intSpectrum, 0, this.intSpectrum, 0, intSpectrum.length);
+        this.intSpectrum = new int[intSpectrum.length];
+        System.arraycopy(intSpectrum, 0, this.intSpectrum, 0, intSpectrum.length);
     }
 
     public int[][] getIntImage() {
-	return ArrayUtils.copyOf(intImage);
+        return ArrayUtils.copyOf(intImage);
     }
 
     public void setIntImage(final int[][] intImage) {
-	this.intImage = ArrayUtils.copyOf(intImage);
+        this.intImage = ArrayUtils.copyOf(intImage);
     }
 
     // LONG
 
     public long getLongScalar() {
-	return longScalar;
+        return longScalar;
     }
 
     public void setLongScalar(final long longScalar) {
-	this.longScalar = longScalar;
+        this.longScalar = longScalar;
     }
 
     public long[] getLongSpectrum() {
-	return Arrays.copyOf(longSpectrum, longSpectrum.length);
+        return Arrays.copyOf(longSpectrum, longSpectrum.length);
     }
 
     public void setLongSpectrum(final long[] longSpectrum) {
-	this.longSpectrum = new long[longSpectrum.length];
-	System.arraycopy(longSpectrum, 0, this.longSpectrum, 0, longSpectrum.length);
+        this.longSpectrum = new long[longSpectrum.length];
+        System.arraycopy(longSpectrum, 0, this.longSpectrum, 0, longSpectrum.length);
     }
 
     @Attribute
     public long[] getPollSpectrum() throws DevFailed {
-	error2 = !error2;
+        error2 = !error2;
 	if (error2) {
 	    DevFailedUtils.throwDevFailed("error pollSpectrum");
 	}
 
-	return new long[] { 1, 2 };
+        return new long[] { 1, 2 };
     }
 
     public void setPollSpectrum(final long[] value) {
@@ -441,145 +441,145 @@ public final class JTangoTest {
     }
 
     public long[][] getLongImage() {
-	return ArrayUtils.copyOf(longImage);
+        return ArrayUtils.copyOf(longImage);
     }
 
     public void setLongImage(final long[][] longImage) {
-	this.longImage = ArrayUtils.copyOf(longImage);
+        this.longImage = ArrayUtils.copyOf(longImage);
     }
 
     // FLOAT
 
     public float getFloatScalar() {
-	return floatScalar;
+        return floatScalar;
     }
 
     public void setFloatScalar(final float floatScalar) {
-	this.floatScalar = floatScalar;
+        this.floatScalar = floatScalar;
     }
 
     public float[] getFloatSpectrum() {
-	return Arrays.copyOf(floatSpectrum, floatSpectrum.length);
+        return Arrays.copyOf(floatSpectrum, floatSpectrum.length);
     }
 
     public void setFloatSpectrum(final float[] floatSpectrum) {
-	this.floatSpectrum = new float[floatSpectrum.length];
-	System.arraycopy(floatSpectrum, 0, this.floatSpectrum, 0, floatSpectrum.length);
+        this.floatSpectrum = new float[floatSpectrum.length];
+        System.arraycopy(floatSpectrum, 0, this.floatSpectrum, 0, floatSpectrum.length);
     }
 
     public float[][] getFloatImage() {
-	return ArrayUtils.copyOf(floatImage);
+        return ArrayUtils.copyOf(floatImage);
     }
 
     public void setFloatImage(final float[][] floatImage) {
-	this.floatImage = ArrayUtils.copyOf(floatImage);
+        this.floatImage = ArrayUtils.copyOf(floatImage);
     }
 
     // DOUBLE
 
     public double getDoubleScalar() {
-	return doubleScalar;
+        return doubleScalar;
     }
 
     public void setDoubleScalar(final double doubleScalar) {
-	this.doubleScalar = doubleScalar;
+        this.doubleScalar = doubleScalar;
     }
 
     public double[] getDoubleSpectrum() {
-	return Arrays.copyOf(doubleSpectrum, doubleSpectrum.length);
+        return Arrays.copyOf(doubleSpectrum, doubleSpectrum.length);
     }
 
     public void setDoubleSpectrum(final double[] doubleSpectrum) {
-	this.doubleSpectrum = new double[doubleSpectrum.length];
-	System.arraycopy(doubleSpectrum, 0, this.doubleSpectrum, 0, doubleSpectrum.length);
+        this.doubleSpectrum = new double[doubleSpectrum.length];
+        System.arraycopy(doubleSpectrum, 0, this.doubleSpectrum, 0, doubleSpectrum.length);
     }
 
     public double[][] getDoubleImage() {
-	return ArrayUtils.copyOf(doubleImage);
+        return ArrayUtils.copyOf(doubleImage);
     }
 
     public void setDoubleImage(final double[][] doubleImage) {
-	this.doubleImage = ArrayUtils.copyOf(doubleImage);
+        this.doubleImage = ArrayUtils.copyOf(doubleImage);
     }
 
     // BOOLEAN
 
     public AttributeValue isBooleanScalar() throws DevFailed {
-	return new AttributeValue(booleanScalar, AttrQuality.ATTR_CHANGING);
+        return new AttributeValue(booleanScalar, AttrQuality.ATTR_CHANGING);
     }
 
     public void setBooleanScalar(final boolean booleanScalar) {
-	this.booleanScalar = booleanScalar;
+        this.booleanScalar = booleanScalar;
     }
 
     public boolean[] getBooleanSpectrum() {
-	return Arrays.copyOf(booleanSpectrum, booleanSpectrum.length);
+        return Arrays.copyOf(booleanSpectrum, booleanSpectrum.length);
     }
 
     public void setBooleanSpectrum(final boolean[] booleanSpectrum) {
-	this.booleanSpectrum = new boolean[booleanSpectrum.length];
-	System.arraycopy(booleanSpectrum, 0, this.booleanSpectrum, 0, booleanSpectrum.length);
+        this.booleanSpectrum = new boolean[booleanSpectrum.length];
+        System.arraycopy(booleanSpectrum, 0, this.booleanSpectrum, 0, booleanSpectrum.length);
     }
 
     public boolean[][] getBooleanImage() {
-	return ArrayUtils.copyOf(booleanImage);
+        return ArrayUtils.copyOf(booleanImage);
     }
 
     public void setBooleanImage(final boolean[][] booleanImage) {
-	this.booleanImage = ArrayUtils.copyOf(booleanImage);
+        this.booleanImage = ArrayUtils.copyOf(booleanImage);
     }
 
     // STRING
 
     public String getStringScalar() {
-	return stringScalar;
+        return stringScalar;
     }
 
     public void setStringScalar(final String stringScalar) {
-	this.stringScalar = stringScalar;
+        this.stringScalar = stringScalar;
     }
 
     public String[] getStringSpectrum() {
-	return Arrays.copyOf(stringSpectrum, stringSpectrum.length);
+        return Arrays.copyOf(stringSpectrum, stringSpectrum.length);
     }
 
     public void setStringSpectrum(final String[] stringSpectrum) {
-	this.stringSpectrum = new String[stringSpectrum.length];
-	System.arraycopy(stringSpectrum, 0, this.stringSpectrum, 0, stringSpectrum.length);
+        this.stringSpectrum = new String[stringSpectrum.length];
+        System.arraycopy(stringSpectrum, 0, this.stringSpectrum, 0, stringSpectrum.length);
     }
 
     public String[][] getStringImage() {
-	return ArrayUtils.copyOf(stringImage);
+        return ArrayUtils.copyOf(stringImage);
     }
 
     public void setStringImage(final String[][] stringImage) {
-	this.stringImage = ArrayUtils.copyOf(stringImage);
+        this.stringImage = ArrayUtils.copyOf(stringImage);
     }
 
     @Attribute
     public byte getByteScalar() {
-	return byteScalar;
+        return byteScalar;
     }
 
     public byte[] getByteSpectrum() {
-	return Arrays.copyOf(byteSpectrum, byteSpectrum.length);
+        return Arrays.copyOf(byteSpectrum, byteSpectrum.length);
     }
 
     public byte[][] getByteImage() {
-	return ArrayUtils.copyOf(byteImage);
+        return ArrayUtils.copyOf(byteImage);
     }
 
     public void setByteScalar(final byte byteScalar) {
-	this.byteScalar = byteScalar;
+        this.byteScalar = byteScalar;
     }
 
     public void setByteSpectrum(final byte[] byteSpectrum) {
-	this.byteSpectrum = new byte[byteSpectrum.length];
-	System.arraycopy(byteSpectrum, 0, this.byteSpectrum, 0, byteSpectrum.length);
+        this.byteSpectrum = new byte[byteSpectrum.length];
+        System.arraycopy(byteSpectrum, 0, this.byteSpectrum, 0, byteSpectrum.length);
     }
 
     public void setByteImage(final byte[][] byteImage) {
-	this.byteImage = ArrayUtils.copyOf(byteImage);
+        this.byteImage = ArrayUtils.copyOf(byteImage);
     }
 
     /*
@@ -594,48 +594,48 @@ public final class JTangoTest {
 
     @Command(outTypeDesc = "returns the input value (short)")
     public short shortCommand(final short value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (short[])")
     public short[] shortSpectrumCommand(final short[] value) {
-	return value;
+        return value;
     }
 
     // INTEGER
 
     @Command(outTypeDesc = "returns the input value (int)")
     public int intCommand(final int value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (int[])")
     public int[] intSpectrumCommand(final int[] value) {
-	return value;
+        return value;
     }
 
     // Byte
 
     @Command(outTypeDesc = "returns the input value (byte)")
     public byte byteCommand(final byte value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (byte[])")
     public byte[] byteSpectrumCommand(final byte[] value) {
-	return value;
+        return value;
     }
 
     // LONG
 
     @Command(outTypeDesc = "returns the input value (long)")
     public long longCommand(final long value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (long[])")
     public long[] longSpectrumCommand(final long[] value) {
-	return value;
+        return value;
     }
 
     // DEVENCODED
@@ -649,71 +649,71 @@ public final class JTangoTest {
 
     @Command(outTypeDesc = "returns the input value (float)")
     public float floatCommand(final float value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (float[])")
     public float[] floatSpectrumCommand(final float[] value) {
-	return value;
+        return value;
     }
 
     // DOUBLE
 
     @Command(outTypeDesc = "returns the input value (double)")
     public double doubleCommand(final double value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (double[])")
     public double[] doubleSpectrumCommand(final double[] value) {
-	return value;
+        return value;
     }
 
     // BOOLEAN
 
     @Command(outTypeDesc = "returns the input value (boolean)")
     public boolean booleanCommand(final boolean value) {
-	return value;
+        return value;
     }
 
     // STRING
 
     @Command(outTypeDesc = "returns the input value (String)")
     public String stringCommand(final String value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (String[])")
     public String[] stringSpectrumCommmand(final String[] value) {
-	return value;
+        return value;
     }
 
     // DEVVAR
 
     @Command(outTypeDesc = "returns the input value (DevVarLongStringArray)")
     public DevVarLongStringArray longStringCommand(final DevVarLongStringArray value) {
-	return value;
+        return value;
     }
 
     @Command(outTypeDesc = "returns the input value (DevVarDoubleStringArray)")
     public DevVarDoubleStringArray doubleStringCommand(final DevVarDoubleStringArray value) {
-	return value;
+        return value;
     }
 
     @Command
     public double testPolling() throws DevFailed {
-	final double value = 12;
-	error = !error;
-	if (error) {
-	    DevFailedUtils.throwDevFailed("error");
-	}
+        final double value = 12;
+        error = !error;
+        if (error) {
+            DevFailedUtils.throwDevFailed("error");
+        }
 
-	return value;
+        return value;
     }
 
     @Command
     public int[] testPollingArray() {
-	return new int[] { 1, 2 };
+        return new int[] { 1, 2 };
     }
 
     @Command
@@ -733,28 +733,28 @@ public final class JTangoTest {
      * @throws DevFailed
      */
     public static void start() throws DevFailed {
-	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-	ServerManager.getInstance().startError(new String[] { INSTANCE_NAME }, SERVER_NAME);
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME }, SERVER_NAME);
     }
 
-    public static void startNoDbFile(int portNr) throws DevFailed {
-	System.setProperty("OAPort", Integer.toString(portNr));
-	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-	ServerManager.getInstance().startError(
-		new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
-			"-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath() }, SERVER_NAME);
+    public static void startNoDbFile(final int portNr) throws DevFailed {
+        System.setProperty("OAPort", Integer.toString(portNr));
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(
+                new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
+                        "-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath() }, SERVER_NAME);
     }
 
-    public static void startNoDb(int portNr) throws DevFailed {
-	System.setProperty("OAPort", Integer.toString(portNr));
-	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-	ServerManager.getInstance().startError(new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME },
-		SERVER_NAME);
+    public static void startNoDb(final int portNr) throws DevFailed {
+        System.setProperty("OAPort", Integer.toString(portNr));
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME },
+                SERVER_NAME);
     }
 
     public static void main(final String[] args) {
-	ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-	ServerManager.getInstance().start(args, SERVER_NAME);
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().start(args, SERVER_NAME);
     }
 
     /*
@@ -768,7 +768,7 @@ public final class JTangoTest {
      *            String []
      */
     public void setMyProp(final String myProp) {
-	this.myProp = myProp;
+        this.myProp = myProp;
     }
 
     /**
@@ -777,7 +777,7 @@ public final class JTangoTest {
      *            String []
      */
     public void setMyClassProp(final String[] myClassProp) {
-	this.myClassProp = Arrays.copyOf(myClassProp, myClassProp.length);
+        this.myClassProp = Arrays.copyOf(myClassProp, myClassProp.length);
     }
 
     /**
@@ -785,7 +785,7 @@ public final class JTangoTest {
      */
     @Command
     public String getMyProperty() {
-	return myProp;
+        return myProp;
     }
 
     /**
@@ -794,19 +794,19 @@ public final class JTangoTest {
      */
     @Command
     public String[] getMyClassProperty() {
-	return Arrays.copyOf(myClassProp, myClassProp.length);
+        return Arrays.copyOf(myClassProp, myClassProp.length);
     }
 
     public DeviceState getStateScalar() {
-	return stateScalar;
+        return stateScalar;
     }
 
     public DevEncoded getDevEncodedScalar() {
-	return devEncodedScalar;
+        return devEncodedScalar;
     }
 
     public void setDevEncodedScalar(final DevEncoded devEncodedScalar) {
-	this.devEncodedScalar = devEncodedScalar;
+        this.devEncodedScalar = devEncodedScalar;
     }
 
     // public DevEncoded[] getDevEncodedSpectrum() {
@@ -820,64 +820,64 @@ public final class JTangoTest {
 
     @AroundInvoke
     public void alwaysHook(final org.tango.server.InvocationContext ctx) {
-	logger.debug(ctx.toString());
+        logger.debug(ctx.toString());
     }
 
     public DevState getState() {
-	return state;
+        return state;
     }
 
     public void setState(final DevState state) {
-	this.state = state;
+        this.state = state;
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 
     public void setStatus(final String status) {
-	this.status = status;
+        this.status = status;
     }
 
     public void setDynamicManager(final DynamicManager dynamicManager) {
-	this.dynamicManager = dynamicManager;
+        this.dynamicManager = dynamicManager;
     }
 
     public void setProps(final Map<String, String[]> props) {
-	this.props = props;
+        this.props = props;
     }
 
     @Command
     public boolean isBooleanProp() {
-	return booleanProp;
+        return booleanProp;
     }
 
     public void setBooleanProp(final boolean booleanProp) {
-	this.booleanProp = booleanProp;
+        this.booleanProp = booleanProp;
     }
 
     public DeviceState[] getStateSpectrum() {
-	return Arrays.copyOf(stateSpectrum, stateSpectrum.length);
+        return Arrays.copyOf(stateSpectrum, stateSpectrum.length);
     }
 
     public void setStateScalar(final DeviceState stateScalar) {
-	this.stateScalar = stateScalar;
+        this.stateScalar = stateScalar;
     }
 
     public void setStateSpectrum(final DeviceState[] stateSpectrum) {
-	this.stateSpectrum = Arrays.copyOf(stateSpectrum, stateSpectrum.length);
+        this.stateSpectrum = Arrays.copyOf(stateSpectrum, stateSpectrum.length);
     }
 
     public double getDeltaAttribute() {
-	return deltaAttribute;
+        return deltaAttribute;
     }
 
     public void setDeltaAttribute(final double deltaAttribute) {
-	// this.deltaAttribute = deltaAttribute;
+        // this.deltaAttribute = deltaAttribute;
     }
 
     public void setDeviceManager(final DeviceManager deviceManager) {
-	this.deviceManager = deviceManager;
+        this.deviceManager = deviceManager;
     }
 
 }
