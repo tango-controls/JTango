@@ -123,6 +123,9 @@ public class EventCallBackStruct implements java.io.Serializable {
     //=======================================================================
     public void setSynchronousDone(boolean synchronousDone) {
         this.synchronousDone = synchronousDone;
+        if (!synchronousDone)   //  When start synchronous, it is a reconnection.
+            zmqCounter = Long.MAX_VALUE;    //  reset the event counter
+
     }
     //=======================================================================
     //=======================================================================
