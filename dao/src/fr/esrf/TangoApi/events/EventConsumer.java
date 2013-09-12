@@ -525,6 +525,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         boolean old_transp = callbackStruct.device.get_transparency_reconnection();
         callbackStruct.device.set_transparency_reconnection(true);
         try {
+            callbackStruct.setSynchronousDone(false);
             if (callbackStruct.event_name.equals(eventNames[ATT_CONF_EVENT]))
                 info = callbackStruct.device.get_attribute_info_ex(callbackStruct.attr_name);
             else
