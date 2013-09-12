@@ -67,7 +67,8 @@ class DevLockManager {
     static private String host_add = null;
     static private JavaClntIdent j_ident;
     static private ClntIdent ident;
-	
+    private static String strPID = null;
+
 	//	java.lang.management.ManagementFactory and
 	//	java.lang.management.RuntimeMXBean
 	//	     Not available on Android JVM
@@ -113,7 +114,6 @@ class DevLockManager {
         l_uuid[1] = uuid.getLeastSignificantBits();
 
         // Try to get Process ID
-        String pid = null;
         if (hasManagementClasses) {
             //	Do it only if class available
             final java.lang.management.RuntimeMXBean mx =
@@ -121,37 +121,30 @@ class DevLockManager {
             final String str = mx.getName();
             final int pos = str.indexOf('@');
             if (pos > 0) {
-                pid = str.substring(0, pos);
+                strPID = str.substring(0, pos);
             }
         }
 
-        // Generate an exception to check stack to find main class
-        try {
-            int x = 0;
-            x = 1 / x;
-            System.out.println(x); // Only to prevent warning compiler
-            // throw new RuntimeException();
-        } catch (final Exception e) {
-            final StackTraceElement[] trace = e.getStackTrace();
+        // Get stack to find main class
+        final StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 
-            // Search main method
-            final String tag = ".main";
-            final String s = trace[trace.length - 1].toString();
-            final int idx = s.indexOf(tag);
-            if (idx > 0) {
-                // Main class found
-                mainClass = s.substring(0, idx);
-                if (pid != null) {
-                    mainClass += " - PID=" + pid;
-                }
-            } else if (pid != null) {
-                // Not found, set with PID
-                mainClass = "PID=" + pid;
-            } else {
-                // Main class and pid not found,
-                // put the highest info in stack
-                mainClass = s.substring(s.lastIndexOf('('));
+        // Search main method
+        final String tag = ".main";
+        final String s = trace[trace.length - 1].toString();
+        final int idx = s.indexOf(tag);
+        if (idx > 0) {
+            // Main class found
+            mainClass = s.substring(0, idx);
+            if (strPID != null) {
+                mainClass += " - PID=" + strPID;
             }
+        } else if (strPID != null) {
+            // Not found, set with PID
+            mainClass = "PID=" + strPID;
+        } else {
+            // Main class and pid not found,
+            // put the highest info in stack
+            mainClass = s.substring(s.lastIndexOf('('));
         }
         j_ident = new JavaClntIdent(mainClass, l_uuid);
         ident = new ClntIdent();
@@ -166,10 +159,25 @@ class DevLockManager {
 
     // ===============================================================
     //
-    // Cient identification management
+    // Client identification management
     //
     // ===============================================================
-
+    // ===============================================================
+    /**
+     *
+     * @return the JVM process ID if found, -1 otherwise.
+     */
+    // ===============================================================
+    public int getJvmPid() {
+        int pid = -1;
+        if (strPID !=null) {
+            try {
+                pid = Integer.parseInt(strPID);
+            }
+            catch (NumberFormatException e) {/* */  }
+        }
+        return pid;
+    }
     // ===============================================================
     /**
      * @return the java client identifier object
