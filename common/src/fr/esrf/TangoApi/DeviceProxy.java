@@ -1792,9 +1792,8 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	/*
 	 * Getter and setter
 	 */
-
 	public DeviceProxy getAdm_dev() {
-		 return this.adm_dev;
+		return this.adm_dev;
 	}
 
 
