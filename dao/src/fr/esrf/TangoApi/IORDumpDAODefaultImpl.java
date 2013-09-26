@@ -35,11 +35,14 @@
 package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.Except;
 import org.jacorb.orb.ParsedIOR;
 import org.jacorb.orb.iiop.IIOPAddress;
 import org.jacorb.orb.iiop.IIOPProfile;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,19 +58,22 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 	private String	hostname    = "";
 	private int		port        = -1;
 	private int		prg_number  = -1;		//	used by TACO
-	private String	devname     = null;
+	private String  deviceName = null;
+    ArrayList<NetworkConnection>    connections = new ArrayList<NetworkConnection>();
+
+
 	public IORDumpDAODefaultImpl()
 	{
 	}
 	
-//===============================================================
-//===============================================================
+    //===============================================================
+    //===============================================================
 	public void init(IORdump iORdump, String devname, String iorString) throws  DevFailed
 	{
 		if (devname==null)
-			this.devname   = "unknown";
+			this.deviceName = "unknown";
 		else
-			this.devname   = devname;
+			this.deviceName = devname;
 
 		//	If ior null get it from database.
 		if (iorString==null)
@@ -84,11 +90,11 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 			else
 				iorAnalysis(iORdump, iorString);
 	}
-//===============================================================
-//===============================================================
+    //===============================================================
+    //===============================================================
 	public void init(IORdump iORdump, String devname) throws  DevFailed
 	{
-		this.devname   = devname;
+		this.deviceName = devname;
 
 		//	Create device to know its IOR.
 		DeviceProxy		dev = new DeviceProxy(devname);
@@ -99,11 +105,11 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 			else
 				iorAnalysis(iORdump, iorString);
 	}
-//===============================================================
-//===============================================================
+    //===============================================================
+    //===============================================================
 	public void init(IORdump iORdump, DeviceProxy dev) throws  DevFailed
 	{
-		this.devname   = dev.name();
+		this.deviceName = dev.name();
 
 		//	get IOR.
 		iorString = dev.get_ior();
@@ -113,29 +119,36 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 			else
 				iorAnalysis(iORdump, iorString);
 	}
-//===============================================================
-/**
- *	Return a string with ID type, IIOP version, host name, and port number.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return a string with ID type, IIOP version, host name, and port number.
+     */
+    //===============================================================
 	public String toString(IORdump iORdump)
 	{
 		if (iorString == null)
-			return "No IOR found in database for " + devname + "\n" +
+			return "No IOR found in database for " + deviceName + "\n" +
 					"(Maybe, the device has never been exported...)";
 		else
 		{
-			String str = "Device:          " + devname + "\n" +
-						 "type_id:         " + get_type_id()		+ "\n";
-				if (!iORdump.is_taco)
-					str +=	"iiop_version:    " + get_iiop_version()	+ "\n";
+            StringBuilder   sb = new StringBuilder();
+			sb.append("Device:          ").append(deviceName).append("\n");
+			sb.append("type_id:         ").append(get_type_id()).append("\n");
+            if (!iORdump.is_taco)
+                sb.append("iiop_version:    ").append(get_iiop_version()).append("\n");
 
-				str +=		"host:            " + get_host()			+ "\n";
-				if (!iORdump.is_taco)
-					str +=	"port:            " + get_port();
-				else
-					str +=	"prg number:      " + get_prg_number();
-			return str;
+            sb.append("host:            ").append(get_host()).append("\n");
+            ArrayList<String> alternates = getAlternateAddresses();
+            if (alternates.size()>0) {
+                for (String add : alternates )
+                    sb.append("alternate addr.: ").append(add).append("\n");
+            }
+
+            if (!iORdump.is_taco)
+                sb.append("port:            ").append(get_port());
+            else
+                sb.append("prg number:      ").append(get_prg_number());
+			return sb.toString();
 		}
 	}
     //===============================================================
@@ -169,10 +182,7 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 			return;
 	
 		//	Start Analysis  --  Code based on :
-		//   org.jacorb.orb.util.PrintIOR.printIOR(pior, ApiUtil.get_orb());
-		//-------------------------------------------------------------------
-		//	Constructor signature modified in JacORB-2.3.0
-		// ParsedIOR pior = new ParsedIOR( iorString, ApiUtil.get_orb(), null);
+		//   org.jacorb.orb.util.PrintIOR.printIOR(orb, ior);
 		ParsedIOR pior = new ParsedIOR(
 				(org.jacorb.orb.ORB)ApiUtil.get_orb(), iorString);
         org.omg.IOP.IOR ior = pior.getIOR();
@@ -183,83 +193,113 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
             iiopVersion = "" + (int) p.version().major + "." +
                     (int) p.version().minor;
 
-            //	Modified in JacORB-2.3.0
-            //	String	name =  p.getAddress().getHostname();
-            String name = ((IIOPAddress) p.getAddress()).getOriginalHost();
             try {
-                InetAddress iadd = InetAddress.getByName(name);
-                String      add = iadd.getHostAddress();
-                hostname = iadd.getHostName();
-                host = hostname + " (" + add + ")";
-				/*
-				List	list = p.getAlternateAddresses();
-				System.out.println("List size="+list.size());
-				for (Object o : list)
-					System.out.println("--> "+o);
-				*/
+                //  check for multiple connections
+                connections.add(new NetworkConnection((IIOPAddress) p.getAddress()));
+                List	alternates = p.getAlternateAddresses();
+                for (Object alternate : alternates)
+                    connections.add(new NetworkConnection((IIOPAddress)alternate));
             }
             catch (Exception e) {
-                host = name + " (" + e + ")";
+                host = " (" + e + ")";
             }
-            //	Modified in JacORB-2.3.0
-            //	port = p.getAddress().getPort();
-            port = ((IIOPAddress) p.getAddress()).getPort();
-            if (port < 0) port += 65536;
+
+
+            if (connections.isEmpty())
+                Except.throw_exception("NO_NETWORK_FOUND",
+                        "Failed to found network connection", "IORdump.iorAnalysis()");
+            NetworkConnection   connection = connections.get(0);
+            hostname = connection.name;
+            host = hostname + " (" + connection.address + ")";
+            port = connection.port;
         }
 	}
-//===============================================================
-/**
- *	Return the ID type
- */
-//===============================================================
+    //===============================================================
+    //===============================================================
+    private class NetworkConnection {
+        private String name;
+        private String address;
+        private int port;
+
+        private NetworkConnection(IIOPAddress iiopAddress) throws UnknownHostException {
+            String originalHost = iiopAddress.getOriginalHost();
+            InetAddress inetAddress = InetAddress.getByName(originalHost);
+            address = inetAddress.getHostAddress();
+            name = inetAddress.getHostName();
+            port = iiopAddress.getPort();
+            if (port < 0) port += 65536;
+        }
+    }
+    //===============================================================
+    /**
+     *	Return the ID type
+     */
+    //===============================================================
 	public String get_type_id()
 	{
 		return type_id;
 	}
-//===============================================================
-/**
- *	Return the host where the process is running.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return the host where the process is running.
+     */
+    //===============================================================
 	public String get_host()
 	{
 		return host;
 	}
-//===============================================================
-/**
- *	Return the host name where the process is running.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return the host name where the process is running.
+     */
+    //===============================================================
 	public String get_hostname()
 	{
 		return hostname;
 	}
-//===============================================================
-/**
- *	Return the connection port.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return the connection port.
+     */
+    //===============================================================
 	public int get_port()
 	{
 		return port;
 	}
-//===============================================================
-/**
- *	Return the connection TACO prg_number.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return the connection TACO prg_number.
+     */
+    //===============================================================
 	public int get_prg_number()
 	{
 		return prg_number;
 	}
-//===============================================================
-/**
- *	Return the IIOP version number.
- */
-//===============================================================
+    //===============================================================
+    /**
+     *	Return the IIOP version number.
+     */
+    //===============================================================
 	public String get_iiop_version()
 	{
 		return iiopVersion;
+	}
+    //===============================================================
+    /**
+     *	Return alternate address  list .
+     */
+    //===============================================================
+	public ArrayList<String> getAlternateAddresses()
+	{
+        ArrayList<String>   list = new ArrayList<String>();
+        for (int i=1 ; i<connections.size() ; i++) {
+            NetworkConnection connection = connections.get(i);
+            String  address = connection.address;
+            if (!connection.name.equals(connection.address))
+                address += " (" + connection.name +")";
+            list.add(address);
+        }
+		return list;
 	}
 }
 
