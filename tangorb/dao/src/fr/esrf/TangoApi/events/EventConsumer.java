@@ -316,11 +316,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 }
             }
             else {
-                //System.err.println("====================================================");
-                //System.err.println("callback_struct.consumer=null  for " + callbackKey);
-                //  Never connected. Do not know if ZMQ or Notifd.
-                //  ToDo invalid ZMQ
-                /********************/
                 if (EventConsumerUtil.isZmqLoadable()) {
                     try {
                         //  Try for zmq
@@ -353,7 +348,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                     }
                 }
                 else
-                /***************************/
                 {
                     try {
                         //  Try for notifd
