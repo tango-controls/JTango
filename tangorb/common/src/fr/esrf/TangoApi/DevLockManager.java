@@ -96,10 +96,10 @@ class DevLockManager {
      */
     // ===============================================================
     static DevLockManager getInstance() {
-	if (instance == null) {
-	    instance = new DevLockManager();
-	}
-	return instance;
+        if (instance == null) {
+            instance = new DevLockManager();
+        }
+        return instance;
     }
 
     // ===============================================================
