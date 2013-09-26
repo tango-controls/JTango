@@ -609,16 +609,10 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                         // e.printStackTrace();
                         connection.device = null;
                         connection.ior = null;
-                        try {
                         Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
                             "Connection to database failed  !\n" + e, "connect_to_dbase("
                                 + connection.url.host + "," + connection.url.strport + ")");
-                        }
-                        catch (DevFailed e2) {
-                            e2.printStackTrace();
-                            throw e2;
-                        }
-		    		}
+ 		    		}
 				} else {
 		    		// e.printStackTrace();
 		    		connection.device = null;
