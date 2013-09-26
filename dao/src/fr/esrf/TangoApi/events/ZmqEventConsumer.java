@@ -136,13 +136,13 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private void connect(DeviceProxy deviceProxy, String attributeName, String eventName, DeviceData deviceData) throws DevFailed {
-        String deviceName = deviceProxy.name();
+         String deviceName = deviceProxy.name();
         String adm_name = null;
-        int tangoVersion = 0;
+        int tangoVersion = deviceData.extractLongStringArray().lvalue[0];
         try {
             adm_name = deviceProxy.adm_name();  //.toLowerCase();
             //  Since Tango 8.1, heartbeat is sent in lower case.
-            tangoVersion = new DeviceProxy(adm_name).getTangoVersion();
+            //tangoVersion = new DeviceProxy(adm_name).getTangoVersion();
             if (tangoVersion>=810)
                 adm_name = adm_name.toLowerCase();
 
@@ -374,7 +374,6 @@ public class ZmqEventConsumer extends EventConsumer implements
 
     //===============================================================
     //===============================================================
-
     public void push_structured_event(StructuredEvent structuredEvent) throws Disconnected {
         //  Nothing to do for ZMQ system
     }
