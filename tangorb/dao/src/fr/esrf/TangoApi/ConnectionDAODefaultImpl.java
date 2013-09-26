@@ -329,6 +329,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
 	    	final ORB orb = ApiUtil.get_orb();
 	    	connection.setObj(orb.string_to_object(corba_str));
+            Object o = connection.getObj();
 
 		} catch (final RuntimeException e) {
 	    	Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_VALID", e.toString().substring(
@@ -408,14 +409,19 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     // ===================================================================
     public String get_host_name(final Connection connection) throws DevFailed {
-		Database db;
-		if (connection.url.host == null) {
-	    	db = ApiUtil.get_db_obj();
-		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
-		}
-		final DbDevImportInfo info = db.import_device(connection.devname);
-		return info.hostname;
+        if (connection.url.use_db) {
+            Database db;
+            if (connection.url.host == null) {
+                db = ApiUtil.get_db_obj();
+            } else {
+                db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+            }
+            final DbDevImportInfo info = db.import_device(connection.devname);
+            return info.hostname;
+        }
+        else {
+            return connection.url.host;
+        }
     }
 
     // ===================================================================
@@ -603,17 +609,23 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                         // e.printStackTrace();
                         connection.device = null;
                         connection.ior = null;
+                        try {
                         Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
                             "Connection to database failed  !\n" + e, "connect_to_dbase("
                                 + connection.url.host + "," + connection.url.strport + ")");
+                        }
+                        catch (DevFailed e2) {
+                            e2.printStackTrace();
+                            throw e2;
+                        }
 		    		}
 				} else {
 		    		// e.printStackTrace();
 		    		connection.device = null;
 		    		connection.ior = null;
-		    		Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
-			    		"Connection to database failed  !\n" + ex, "connect_to_dbase("
-				    		+ connection.url.host + "," + connection.url.strport + ")");
+    		    	Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
+	    		    	"Connection to database failed  !\n" + ex, "connect_to_dbase("
+		    		    	+ connection.url.host + "," + connection.url.strport + ")");
 				}
 	    	}
 		}
@@ -862,32 +874,32 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 				if (connection.device_4 != null) {
 		    		received = connection.device_4.command_inout_4(command, argin.extractAny(),
 			    		connection.dev_src, DevLockManager.getInstance().getClntIdent());
-					} else if (connection.device_2 != null) {
-		    			received = connection.device_2.command_inout_2(command, argin.extractAny(),
-			    			connection.dev_src);
-					} else {
-		    			received = connection.device.command_inout(command, argin.extractAny());
-					}
-					done = true;
-	    		} catch (final DevFailed e) {
-				final String reason = "TangoApi_CANNOT_EXECUTE_COMMAND";
-				final String desc = "Cannot execute command " + command + " on "
-					+ connection.devname;
-				final String origin = "Connection.command_inout()";
+                } else if (connection.device_2 != null) {
+                    received = connection.device_2.command_inout_2(command, argin.extractAny(),
+                        connection.dev_src);
+                } else {
+                    received = connection.device.command_inout(command, argin.extractAny());
+                }
+                done = true;
+            } catch (final DevFailed e) {
+            final String reason = "TangoApi_CANNOT_EXECUTE_COMMAND";
+            final String desc = "Cannot execute command " + command + " on "
+                + connection.devname;
+            final String origin = "Connection.command_inout()";
 
-				// Check if (from database) DeviceNotDefined exception
-				// then add witch database in the existing DevFailed.
-				if (e.errors[0].reason.equals("DB_DeviceNotDefined")) {
-		    		String d = e.errors[0].desc;
-		    		final int idx = d.lastIndexOf("!");
-		    		if (idx > 0) {
-						d = d.substring(0, idx);
-		    		}
-		    		d += "  " + connection.url.host + ":" + connection.url.port + " !";
-		    		e.errors[0].desc = d;
-				}
-				Except.throw_connection_failed(e, reason, desc, origin);
-	    	} catch (final Exception e) {
+            // Check if (from database) DeviceNotDefined exception
+            // then add witch database in the existing DevFailed.
+            if (e.errors[0].reason.equals("DB_DeviceNotDefined")) {
+                String d = e.errors[0].desc;
+                final int idx = d.lastIndexOf("!");
+                if (idx > 0) {
+                    d = d.substring(0, idx);
+                }
+                d += "  " + connection.url.host + ":" + connection.url.port + " !";
+                e.errors[0].desc = d;
+            }
+            Except.throw_connection_failed(e, reason, desc, origin);
+        } catch (final Exception e) {
 				manageExceptionReconnection(connection, retries, i, e,
 						 this.getClass() + ".command_inout");
 	    	}
