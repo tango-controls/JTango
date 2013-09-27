@@ -64,7 +64,7 @@ public class AttributeGroupTaskReader implements Runnable {
                 // read attributes
                 try {
                     resultGroup = attributeGroup.read();
-                    if (readAttributeInfo) {
+                    if (readAttributeInfo || readWriteValue) {
                         attributeInfoExList = attributeGroup.getConfig();
                     }
                     attributeGroupListener.updateDeviceAttribute(resultGroup);
@@ -81,7 +81,9 @@ public class AttributeGroupTaskReader implements Runnable {
                 int i = 0;
                 String attrName = null;
                 AttributeInfoEx attributeInfo = null;
-
+                Object tmpReadValue = null;
+                Object tmpWriteValue = null;
+                AttrDataFormat format = AttrDataFormat.SCALAR;
                 for (final DeviceAttribute deviceAttribute : resultGroup) {
                     attrName = attributeNames[i++];
                     attributeInfo = null;
@@ -89,18 +91,19 @@ public class AttributeGroupTaskReader implements Runnable {
                         attributeInfo = attributeInfoExList[i];
                     }
                     try {
-                        final double tmpReadValue = InsertExtractUtils.extractRead(deviceAttribute,
-                                AttrDataFormat.SCALAR, double.class);
+                        format = deviceAttribute.getDataFormat();
+                        tmpReadValue = InsertExtractUtils.extractRead(deviceAttribute, format);
                         attributeGroupListener.updateReadValue(attrName, tmpReadValue);
+
                         if (attributeInfo != null) {
                             attributeGroupListener.updateAttributeInfoEx(attrName, attributeInfo);
                         }
                         if(readQuality) {
                             attributeGroupListener.updateQuality(attrName, deviceAttribute.getQuality());
                         }
-                        if (readWriteValue && (attributeInfo.writable != AttrWriteType.READ)) {
-                            final double tmpWriteValue = InsertExtractUtils.extractWrite(deviceAttribute,
-                                    AttrDataFormat.SCALAR, attributeInfo.writable, double.class);
+                        if (readWriteValue && (attributeInfo != null) && (attributeInfo.writable != AttrWriteType.READ)) {
+                            tmpWriteValue = InsertExtractUtils.extractWrite(deviceAttribute, attributeInfo.writable,
+                                    format);
                             attributeGroupListener.updateWriteValue(attrName, tmpWriteValue);
                         }
 
