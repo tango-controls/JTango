@@ -8,9 +8,9 @@ public interface IAttributeGroupTaskListener {
 
     public void updateDeviceAttribute(DeviceAttribute[] resultGroup);
 
-    public void updateReadValue(String completeAttributeName, double value);
+    public void updateReadValue(String completeAttributeName, Object value);
 
-    public void updateWriteValue(String completeAttributeName, double value);
+    public void updateWriteValue(String completeAttributeName, Object value);
 
     public void updateErrorMessage(String completeAttributeName, String errorMessage);
 
