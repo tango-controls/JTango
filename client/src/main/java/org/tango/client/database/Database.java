@@ -12,7 +12,7 @@ import org.tango.utils.DevFailedUtils;
 import fr.esrf.Tango.DevFailed;
 
 /**
- * Client of the tango database device. TODO: DbGetDataForServerCache
+ * Client of the tango database device.
  * 
  * @author ABEILLE
  * 
@@ -32,25 +32,25 @@ public final class Database implements ITangoDB {
      * @throws DevFailed
      */
     Database(final String host, final String port) throws DevFailed {
-	database = new fr.esrf.TangoApi.Database(host, port);
-	final NoCacheDatabase noCache = new NoCacheDatabase(host, port);
-	try {
-	    final DatabaseCache tmp = new DatabaseCache(database, noCache);
-	    if (tmp.isCacheAvailable()) {
-		cache = tmp;
-	    } else {
-		logger.warn("database cache version {} not supported, please install it to have better performance",
-			tmp.getVersion());
-		cache = noCache;
-	    }
-	} catch (final DevFailed e) {
-	    logger.error("error loading db cache, {} ", DevFailedUtils.toString(e));
-	    cache = noCache;
-	} catch (final Exception e) {
-	    // TODO: should be removed, indicate a bug in cache loading
-	    logger.error("error loading db cache", e);
-	    cache = noCache;
-	}
+        database = new fr.esrf.TangoApi.Database(host, port);
+        final NoCacheDatabase noCache = new NoCacheDatabase(host, port);
+        try {
+            final DatabaseCache tmp = new DatabaseCache(database, noCache);
+            if (tmp.isCacheAvailable()) {
+                cache = tmp;
+            } else {
+                logger.warn("database cache version {} not supported, please install it to have better performance",
+                        tmp.getVersion());
+                cache = noCache;
+            }
+        } catch (final DevFailed e) {
+            logger.error("error loading db cache, {} ", DevFailedUtils.toString(e));
+            cache = noCache;
+        } catch (final Exception e) {
+            // TODO: should be removed, indicate a bug in cache loading
+            logger.error("error loading db cache", e);
+            cache = noCache;
+        }
     }
 
     /**
@@ -62,7 +62,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public void exportDevice(final DeviceExportInfo info) throws DevFailed {
-	cache.exportDevice(info);
+        cache.exportDevice(info);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public String[] getInstanceNameList(final String dsExecName) throws DevFailed {
-	return cache.getInstanceNameList(dsExecName);
+        return cache.getInstanceNameList(dsExecName);
     }
 
     /**
@@ -88,7 +88,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public DeviceImportInfo importDevice(final String toBeImported) throws DevFailed {
-	return cache.importDevice(toBeImported);
+        return cache.importDevice(toBeImported);
     }
 
     /**
@@ -100,7 +100,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public void unexportServer(final String serverName) throws DevFailed {
-	cache.unexportServer(serverName);
+        cache.unexportServer(serverName);
     }
 
     /**
@@ -115,7 +115,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public String[] getDeviceList(final String serverName, final String className) throws DevFailed {
-	return cache.getDeviceList(serverName, className);
+        return cache.getDeviceList(serverName, className);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public Map<String, String[]> getDeviceProperties(final String name, final String... propertyNames) throws DevFailed {
-	return cache.getDeviceProperties(name, propertyNames);
+        return cache.getDeviceProperties(name, propertyNames);
     }
 
     /**
@@ -144,7 +144,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public void setDeviceProperties(final String deviceName, final Map<String, String[]> properties) throws DevFailed {
-	cache.setDeviceProperties(deviceName, properties);
+        cache.setDeviceProperties(deviceName, properties);
     }
 
     /**
@@ -159,7 +159,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public Map<String, String[]> getClassProperties(final String name, final String... propertyNames) throws DevFailed {
-	return cache.getClassProperties(name, propertyNames);
+        return cache.getClassProperties(name, propertyNames);
     }
 
     /**
@@ -173,7 +173,7 @@ public final class Database implements ITangoDB {
      */
     @Override
     public void setClassProperties(final String name, final Map<String, String[]> properties) throws DevFailed {
-	cache.setClassProperties(name, properties);
+        cache.setClassProperties(name, properties);
     }
 
     /**
@@ -188,8 +188,8 @@ public final class Database implements ITangoDB {
      */
     @Override
     public Map<String, String[]> getAttributeProperties(final String deviceName, final String attributeName)
-	    throws DevFailed {
-	return cache.getAttributeProperties(deviceName, attributeName);
+            throws DevFailed {
+        return cache.getAttributeProperties(deviceName, attributeName);
 
     }
 
@@ -206,33 +206,38 @@ public final class Database implements ITangoDB {
      */
     @Override
     public void setAttributeProperties(final String deviceName, final String attributeName,
-	    final Map<String, String[]> properties) throws DevFailed {
-	cache.setAttributeProperties(deviceName, attributeName, properties);
+            final Map<String, String[]> properties) throws DevFailed {
+        cache.setAttributeProperties(deviceName, attributeName, properties);
     }
 
     @Override
     public void deleteDeviceProperty(final String deviceName, final String propertyName) throws DevFailed {
-	cache.deleteDeviceProperty(deviceName, propertyName);
+        cache.deleteDeviceProperty(deviceName, propertyName);
     }
 
     @Override
     public void loadCache(final String serverName, final String hostName) throws DevFailed {
-	cache.loadCache(serverName, hostName);
+        cache.loadCache(serverName, hostName);
     }
 
     @Override
     public String getAccessDeviceName() throws DevFailed {
-	return cache.getAccessDeviceName();
+        return cache.getAccessDeviceName();
     }
 
     @Override
     public void clearCache() {
-	cache.clearCache();
+        cache.clearCache();
     }
 
     @Override
     public void deleteAttributeProperties(final String deviceName, final String... attributeNames) throws DevFailed {
-	cache.deleteAttributeProperties(deviceName, attributeNames);
+        cache.deleteAttributeProperties(deviceName, attributeNames);
+    }
+
+    @Override
+    public String[] getPossibleTangoHosts() throws DevFailed {
+        return cache.getPossibleTangoHosts();
     }
 
 }
