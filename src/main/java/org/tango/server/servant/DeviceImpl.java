@@ -2184,10 +2184,6 @@ public final class DeviceImpl extends Device_4POA {
         return clientIdentity;
     }
 
-    public TangoCacheManager getCacheManager() {
-        return cacheManager;
-    }
-
     public void setDeviceScheduler(final List<Method> methodList) {
         deviceScheduler = new DeviceScheduler(businessObject, methodList, name, className);
     }

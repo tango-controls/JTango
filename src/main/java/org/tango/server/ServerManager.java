@@ -46,6 +46,7 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.logging.LoggingManager;
 import org.tango.orb.ORBManager;
 import org.tango.server.annotation.Device;
+import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.events.EventManager;
 import org.tango.server.export.TangoExporter;
 import org.tango.server.servant.Constants;
@@ -235,6 +236,7 @@ public final class ServerManager {
         ORBManager.init(useDb, toBeImported);
         tangoExporter = new TangoExporter(hostName, serverName, pid, tangoClasses);
         tangoExporter.exportAll();
+
         logger.info("TANGO server {} started", serverName);
         // start the ORB
         ORBManager.startDetached();
@@ -254,6 +256,7 @@ public final class ServerManager {
                     tangoExporter.clearClass();
                     tangoExporter.unexportAll();
                 }
+                TangoCacheManager.shutdown();
                 EventManager.getInstance().close();
             }
         } finally {

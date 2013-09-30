@@ -570,6 +570,26 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         return config.isPolled();
     }
 
+    public boolean isCheckArchivingEvent() {
+        return config.isCheckArchivingEvent();
+    }
+
+    public boolean isCheckChangeEvent() {
+        return config.isCheckChangeEvent();
+    }
+
+    public boolean isPushArchiveEvent() {
+        return config.isPushArchiveEvent();
+    }
+
+    public boolean isPushChangeEvent() {
+        return config.isPushChangeEvent();
+    }
+
+    public boolean isPushDataReady() {
+        return config.isPushDataReady();
+    }
+
     public int getTangoType() {
         return config.getTangoType();
     }
