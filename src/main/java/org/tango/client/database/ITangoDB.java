@@ -138,7 +138,7 @@ public interface ITangoDB {
      * @throws DevFailed
      */
     void setAttributeProperties(final String deviceName, final String attributeName,
-	    final Map<String, String[]> properties) throws DevFailed;
+            final Map<String, String[]> properties) throws DevFailed;
 
     /**
      * Remove a device property from tango DB
@@ -161,6 +161,13 @@ public interface ITangoDB {
      * @throws DevFailed
      */
     void deleteAttributeProperties(String deviceName, String... attributeNames) throws DevFailed;
+
+    /**
+     * Ask the database for all possible tango hosts
+     * 
+     * @return
+     */
+    String[] getPossibleTangoHosts() throws DevFailed;
 
     String getAccessDeviceName() throws DevFailed;
 
