@@ -337,6 +337,32 @@ public class EventTest {
     }
 
     @Test(timeout = 1000)
+    public void changeDevEncoded() throws DevFailed {
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final int id = dev.subscribe_event("devEncodedAttr", TangoConst.CHANGE_EVENT, 100, new String[] {},
+                TangoConst.NOT_STATELESS);
+        int eventsNb = 0;
+        byte[] value = new byte[0];
+        byte[] previousValue = new byte[0];
+        try {
+            while (eventsNb < 3) {
+                final EventData[] events = dev.get_events();
+                for (final EventData eventData : events) {
+                    System.out.println("devEncodedAttr event " + eventData.name);
+                    if (eventData.name.contains("devencodedattr")) {
+                        eventsNb++;
+                        previousValue = value;
+                        value = eventData.attr_value.extractDevEncoded().encoded_data;
+                    }
+                }
+            }
+            assertThat(value, not(previousValue));
+        } finally {
+            dev.unsubscribe_event(id);
+        }
+    }
+
+    @Test(timeout = 1000)
     public void changeStateArray() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("stateArray", TangoConst.CHANGE_EVENT, 100, new String[] {},
