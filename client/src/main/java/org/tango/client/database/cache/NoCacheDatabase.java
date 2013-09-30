@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.tango.TangoHostManager;
 import org.tango.client.database.DeviceExportInfo;
 import org.tango.client.database.DeviceImportInfo;
 
@@ -410,10 +411,10 @@ public final class NoCacheDatabase implements ICachableDatabase {
     @Override
     public String getAccessDeviceName() throws DevFailed {
         String access = "";
-        DbDatum prop = database.get_property("CtrlSystem", "Services");
+        final DbDatum prop = database.get_property("CtrlSystem", "Services");
         if (prop != null) {
             final String[] r = prop.extractStringArray();
-            if (r != null)
+            if (r != null) {
                 for (final String string : r) {
                     // get device name
                     if (string.startsWith("AccessControl")) {
@@ -421,7 +422,27 @@ public final class NoCacheDatabase implements ICachableDatabase {
                     }
 
                 }
+            }
         }
         return access;
+    }
+
+    @Override
+    public String[] getPossibleTangoHosts() throws DevFailed {
+        String[] tangoHosts = null;
+        try {
+            final DeviceData deviceData = database.command_inout("DbGetCSDbServerList");
+            tangoHosts = deviceData.extractStringArray();
+        } catch (final DevFailed e) {
+            // this is an old database server
+            final String desc = e.errors[0].desc.toLowerCase();
+            if (desc.startsWith("command ") && desc.endsWith("not found")) {
+                tangoHosts = new String[] { TangoHostManager.getFirstFullTangoHost() };
+            } else {
+                throw e;
+            }
+        }
+        return tangoHosts;
+
     }
 }
