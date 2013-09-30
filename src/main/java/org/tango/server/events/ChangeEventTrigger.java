@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
@@ -38,6 +38,7 @@ import org.tango.server.attribute.AttributeValue;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
+import fr.esrf.Tango.DevEncoded;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.EventProperties;
@@ -120,6 +121,8 @@ public class ChangeEventTrigger implements IEventTrigger {
                     hasChanged = hasScalarNumberChanged();
                 } else if (attribute.isState()) {
                     hasChanged = hasStateChanged();
+                } else if (attribute.isDevEncoded()) {
+                    hasChanged = hasDevEncodedChanged();
                 } else {
                     // string or boolean
                     hasChanged = hasScalarStringChanged();
@@ -139,7 +142,6 @@ public class ChangeEventTrigger implements IEventTrigger {
             }
         }
 
-        // TODO DevEncoded?
         logger.debug("CHANGE event for {} must send: {}", attribute.getName(), hasChanged);
         xlogger.exit();
         return hasChanged;
@@ -177,6 +179,12 @@ public class ChangeEventTrigger implements IEventTrigger {
             hasChanged = Math.abs(delta) >= relative;
         }
         return hasChanged;
+    }
+
+    private boolean hasDevEncodedChanged() {
+        final DevEncoded val = (DevEncoded) value.getValue();
+        final DevEncoded previousVal = (DevEncoded) previousValue.getValue();
+        return !Arrays.equals(val.encoded_data, previousVal.encoded_data);
     }
 
     private boolean hasScalarStringChanged() {
@@ -237,7 +245,7 @@ public class ChangeEventTrigger implements IEventTrigger {
                 val = ArrayUtils.toStringArray(value.getValue());
                 previousVal = ArrayUtils.toStringArray(previousValue.getValue());
             }
-            if (!Arrays.toString(val).equals(Arrays.toString(previousVal))) {
+            if (!Arrays.equals(val, previousVal)) {
                 hasChanged = true;
             }
         }
