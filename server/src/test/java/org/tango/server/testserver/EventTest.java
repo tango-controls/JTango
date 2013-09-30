@@ -45,7 +45,7 @@ import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
 
-@Ignore("TODO: client API does not works for user events")
+@Ignore("TODO: tests not fully stable (work 99% of time)")
 public class EventTest {
 
     private static String deviceName = "tmp/test/event";
@@ -74,7 +74,9 @@ public class EventTest {
 
     @AfterClass
     public static void stopDevice() throws DevFailed {
+        System.out.println("stop device");
         ServerManager.getInstance().stop();
+        System.out.println("stop device out");
     }
 
     @Test(timeout = 1000)
@@ -104,21 +106,27 @@ public class EventTest {
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("changeRelative", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
-        int eventsNb = 0;
-        double value = 0;
-        double previousValue = 0;
-        while (eventsNb < 3) {
-            final EventData[] events = dev.get_events();
-            for (final EventData eventData : events) {
-                if (eventData.name.contains("changerelative")) {
-                    eventsNb++;
-                    previousValue = value;
-                    value = eventData.attr_value.extractDouble();
+        try {
+            int eventsNb = 0;
+            double value = 0;
+            double previousValue = 0;
+            while (eventsNb < 3) {
+                final EventData[] events = dev.get_events();
+                for (final EventData eventData : events) {
+                    System.out.println(eventData.event);
+                    System.out.println(eventData.name);
+                    if (eventData.name.contains("changerelative")) {
+                        eventsNb++;
+                        previousValue = value;
+                        value = eventData.attr_value.extractDouble();
+                        System.out.println("received changerelative " + value);
+                    }
                 }
             }
+            assertThat(value, equalTo(previousValue + 1));
+        } finally {
+            dev.unsubscribe_event(id);
         }
-        assertThat(value, equalTo(previousValue + previousValue / 100));
-        dev.unsubscribe_event(id);
     }
 
     @Test(timeout = 1000)
@@ -311,7 +319,9 @@ public class EventTest {
             while (eventsNb < 3) {
 
                 final EventData[] events = dev.get_events();
+                // System.out.println("events " + events.length);
                 for (final EventData eventData : events) {
+                    System.out.println("event " + eventData.name);
                     if (eventData.name.contains("state")) {
                         eventsNb++;
                         previousValue = value;
@@ -319,6 +329,7 @@ public class EventTest {
                     }
                 }
             }
+            System.out.println("assert");
             assertThat(value, not(previousValue));
         } finally {
             dev.unsubscribe_event(id);
@@ -410,14 +421,16 @@ public class EventTest {
                 TangoConst.NOT_STATELESS);
         boolean error = false;
         try {
-
+            dev.read_attribute("error");
             final DeviceData dd = new DeviceData();
             dd.insert(0);
             dev.command_inout("setError", dd);
 
             while (!error) {
+                dev.read_attribute("error");
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
+                    System.out.println("error r " + eventData.name);
                     if (eventData.name.endsWith("error")) {
                         if (eventData.err) {
                             final DevFailed e = new DevFailed(eventData.errors);
@@ -429,6 +442,9 @@ public class EventTest {
                 }
 
             }
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
         } finally {
             dev.unsubscribe_event(id);
             // put back no error
@@ -451,17 +467,18 @@ public class EventTest {
                 TangoConst.NOT_STATELESS);
         boolean error1 = false;
         try {
-
+            dev.read_attribute("error");
             final DeviceData dd = new DeviceData();
             dd.insert(0);
             dev.command_inout("setError", dd);
+            dev.read_attribute("error");
             try {
                 Thread.sleep(300);
             } catch (final InterruptedException e1) {
             }
             dd.insert(1);
             dev.command_inout("setError", dd);
-
+            dev.read_attribute("error");
             while (!error1) {
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
@@ -580,6 +597,9 @@ public class EventTest {
                 eventCounter++;
             }
             assertThat(value, equalTo(previousValue + 1));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
         } finally {
             dev.unsubscribe_event(id);
         }
