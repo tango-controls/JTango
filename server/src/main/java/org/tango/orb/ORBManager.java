@@ -26,6 +26,7 @@ package org.tango.orb;
 
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
@@ -84,6 +85,7 @@ public final class ORBManager {
     public static final String SERVER_IMPL_NAME = "nodb.device";
     private static ORB orb;
     private static POA poa;
+    private static ExecutorService orbStart;
 
     private ORBManager() {
     }
@@ -334,12 +336,13 @@ public final class ORBManager {
      * Start the ORB. non blocking.
      */
     public static void startDetached() {
-        Executors.newSingleThreadExecutor(new ThreadFactory() {
+        orbStart = Executors.newSingleThreadExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(final Runnable r) {
                 return new Thread(r, "ORB run");
             }
-        }).submit(new StartTask());
+        });
+        orbStart.submit(new StartTask());
         LOGGER.debug("ORB started");
     }
 
@@ -436,6 +439,9 @@ public final class ORBManager {
      * Shutdown the ORB
      */
     public static void shutdown() {
+        if (orbStart != null) {
+            orbStart.shutdown();
+        }
         if (orb != null) {
             orb.shutdown(true);
             LOGGER.debug("ORB shutdown");

@@ -55,6 +55,7 @@ import org.tango.server.build.DeviceClassBuilder;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
+import org.tango.server.events.EventType;
 import org.tango.server.export.IExporter;
 import org.tango.server.properties.ClassPropertyImpl;
 import org.tango.server.properties.DevicePropertyImpl;
@@ -683,8 +684,7 @@ public final class AdminDevice {
         final String deviceName = argin[0].toLowerCase(Locale.ENGLISH);
         final String attributeName = argin[1].toLowerCase(Locale.ENGLISH);
         // argin[2] - "subscribe" not used.
-        final String eventType = argin[3].toLowerCase(Locale.ENGLISH);
-
+        final EventType eventType = EventType.getEvent(argin[3].toLowerCase(Locale.ENGLISH));
         // Search the specified device and attribute objects
         DeviceImpl device = null;
         AttributeImpl attribute = null;
@@ -695,27 +695,56 @@ public final class AdminDevice {
 
                         if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
 
-                             if (attributeImpl.isPolled()) {
+                            if (attributeImpl.isPolled()) {
                                 // Check if event criteria are set. Otherwise a DevFailed is thrown
-                                 EventManager.checkEventCriteria(attributeImpl, eventType);
+                                EventManager.checkEventCriteria(attributeImpl, eventType);
                                 // Found. Store objects
                                 device = deviceImpl;
                                 attribute = attributeImpl;
 
-                                // ToDo could not start user event if not polled?
-                                // XXX No. It must be authorized by code with attribute methods
-                                //	set_data_ready_event(), set_change_event() or set_archive_event()
+                            } else {
+                                // check if event is pushed from device
+                                boolean throwError = false;
+                                switch (eventType) {
+                                    case ARCHIVE_EVENT:
+                                        if (!attributeImpl.isPushArchiveEvent()) {
+                                            throwError = true;
+                                        }
+                                        break;
+                                    case CHANGE_EVENT:
+                                        if (!attributeImpl.isPushChangeEvent()) {
+                                            throwError = true;
+                                        }
+                                        break;
+                                    case DATA_READY_EVENT:
+                                        if (!attributeImpl.isPushDataReady()) {
+                                            throwError = true;
+                                        }
+                                        break;
+                                    case USER_EVENT:
+                                        break;
+                                    case PERIODIC_EVENT:
+                                    case QUALITY_EVENT:
+                                    default:
+                                        throwError = true;
+                                        break;
 
-                             } else
-                                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
-                                    "The polling (necessary to send events) for the attribute " +
-                                            attributeName + " is not started");
+                                }
+                                if (throwError) {
+                                    DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
+                                            "The polling (necessary to send events) for the attribute " + attributeName
+                                                    + " is not started");
+                                } else {
+                                    device = deviceImpl;
+                                    attribute = attributeImpl;
+                                }
+                            }
                         }
                     }
 
                     if (attribute == null) { // Not found
-                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND,
-                                "Attribute " + attributeName + " not found");
+                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + attributeName
+                                + " not found");
                     }
                 }
             }

@@ -88,11 +88,11 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                     attribute.addToHistory();
                     result = attribute.getReadValue();
 
-                    EventManager.getInstance().pushEventCheck(attribute.getName(), deviceName, (AttributeValue) result);
+                    EventManager.getInstance().pushEvent(deviceName, attribute.getName(), (AttributeValue) result);
                 }
             } catch (final DevFailed e) {
                 attribute.addErrorToHistory(e);
-                EventManager.getInstance().pushEvent(attribute.getName(), deviceName, e);
+                EventManager.getInstance().pushEvent(deviceName, attribute.getName(), e);
                 throw e;
             } finally {
                 deviceLock.unlockAttribute();

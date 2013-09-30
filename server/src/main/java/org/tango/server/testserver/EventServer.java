@@ -72,12 +72,11 @@ public class EventServer {
     }
 
     @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventRelative = "1", periodicEvent = "100")
+    @AttributeProperties(changeEventRelative = "1")
     private double changeRelative = 1;
 
     public double getChangeRelative() throws DevFailed {
-        final double percent = changeRelative / 100;
-        changeRelative = changeRelative + percent;
+        changeRelative = changeRelative + 1;
         return changeRelative;
     }
 
@@ -174,7 +173,7 @@ public class EventServer {
 
     private int counter = 1;
 
-    @Attribute
+    @Attribute(pushDataReady = true)
     public String getDataReady() throws DevFailed {
         final String dataReady = "Hello";
         final AttDataReady dataR = new AttDataReady("dataReady", TangoConst.Tango_DEV_STRING, counter);
@@ -192,14 +191,20 @@ public class EventServer {
 
     private volatile int errorCode = 2;
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
+    @Attribute(pushChangeEvent = true, checkChangeEvent = true)
+    @AttributeProperties(changeEventAbsolute = "100")
     public int getError() throws DevFailed {
         switch (errorCode) {
             case 0:
-                throw DevFailedUtils.newDevFailed("error0");
+                deviceManager.pushEvent("error", DevFailedUtils.newDevFailed("error0"));
+                break;
+            // throw DevFailedUtils.newDevFailed("error0");
             case 1:
-                throw DevFailedUtils.newDevFailed("error1");
+                deviceManager.pushEvent("error", DevFailedUtils.newDevFailed("error1"));
+                break;
+            // throw DevFailedUtils.newDevFailed("error1");
             default:
+                deviceManager.pushEvent("error", new AttributeValue(0), EventType.CHANGE_EVENT);
                 break;
         }
         return 0;

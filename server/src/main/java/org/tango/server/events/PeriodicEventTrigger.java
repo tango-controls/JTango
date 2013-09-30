@@ -24,7 +24,6 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -33,6 +32,7 @@ import org.tango.server.Chronometer;
 import org.tango.server.attribute.AttributeImpl;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#PERIODIC_EVENT}
@@ -49,8 +49,7 @@ public class PeriodicEventTrigger implements IEventTrigger {
     private long period;
     private boolean isSamePeriod;
 
-    private AttributeImpl   attribute;
-    private boolean isArchive = false;
+    private final AttributeImpl attribute;
 
     /**
      * Ctr
@@ -65,28 +64,17 @@ public class PeriodicEventTrigger implements IEventTrigger {
         // first time, send event right now
         periodicChrono.stop();
     }
-    void setAsArchive(boolean b) {
-        isArchive = b;
+
+    public void setPeriod(final long period) {
+        this.period = period;
+        isSamePeriod = attribute.getPollingPeriod() == period;
     }
 
     @Override
     public boolean isSendEvent() {
         xlogger.entry();
-        //  Check if properties have changed
-        final EventProperties props = attribute.getProperties().getEventProp();
-        try {
-            if (isArchive)
-                period = Long.parseLong(props.arch_event.period);
-            else
-                period = Long.parseLong(props.per_event.period);
-            isSamePeriod = attribute.getPollingPeriod() == period;
-        }
-        catch (NumberFormatException e) {
-            period = -1;
-        }
-
         boolean hasChanged = false;
-        if (period>0) {
+        if (period > 0) {
             if (isSamePeriod) {
                 // the polling period is the same as the periodic event period. So always send.
                 hasChanged = true;
@@ -102,8 +90,21 @@ public class PeriodicEventTrigger implements IEventTrigger {
 
     @Override
     public void setError(final DevFailed error) {
-        // TODO Auto-generated method stub
+    }
 
+    @Override
+    public void updateProperties() {
+        final EventProperties props = attribute.getProperties().getEventProp();
+        try {
+            period = Long.parseLong(props.per_event.period);
+        } catch (final NumberFormatException e) {
+        }
+
+    }
+
+    @Override
+    public boolean doCheck() {
+        return true;
     }
 
 }

@@ -98,8 +98,8 @@ public final class EventManager {
         try {
             context = ZMQ.context(1);
             System.out.println("====================== ZMQ (" + EventUtilities.getZmqVersion()
-                    + ") event system started =======================");
-        } catch (final Error e) {
+                    + ") SERVER event system started =======================");
+        } catch (final Throwable e) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
                     "ZMQ classes not found. Event system is not available.");
         }
@@ -253,25 +253,22 @@ public final class EventManager {
         }
 
         // Check if subscribed
-        final EventImpl eventImpl = eventImplMap.get(fullName);
-        if (eventImpl == null) {
-            return null;
-        }
+        EventImpl eventImpl = eventImplMap.get(fullName);
 
         // Check if subscription is out of time
-        if (!eventImpl.isStillSubscribed()) {
-            logger.debug("{} not Subscribed any more", fullName);
+        if (eventImpl != null && !eventImpl.isStillSubscribed()) {
+            logger.debug("{} not subscribed any more", fullName);
             // System.out.println(fullName + "Not Subscribed any more");
             eventImplMap.remove(fullName);
 
             // if no subscribers, close sockets
             if (eventImplMap.isEmpty()) {
+                logger.debug("no subscribers on server, closing resources");
                 close();
             }
-            return null;
+            eventImpl = null;
         }
 
-        // Else
         return eventImpl;
     }
 
@@ -302,8 +299,9 @@ public final class EventManager {
                 System.err.println("cannot close event socket " + e);
             }
         }
+
         if (context != null) {
-            context.term();
+            // context.term();
         }
         isInitialized = false;
         logger.debug("all event resources closed");
@@ -321,7 +319,7 @@ public final class EventManager {
      * @return the connection parameters for specified event.
      */
     public DevVarLongStringArray getConnectionParameters(final String deviceName, final AttributeImpl attribute,
-            final String eventTypeStr) throws DevFailed {
+            final EventType eventType) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -329,11 +327,11 @@ public final class EventManager {
         }
 
         // check if event is already subscribed
-        final String fullName = EventUtilities.buildEventName(deviceName, attribute.getName(), eventTypeStr);
+        final String fullName = EventUtilities.buildEventName(deviceName, attribute.getName(), eventType.getString());
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(attribute, EventType.getEvent(eventTypeStr));
+            eventImpl = new EventImpl(attribute, eventType);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -354,7 +352,7 @@ public final class EventManager {
      * @param devFailed the attribute failed error to be sent as event
      * @throws DevFailed
      */
-    public void pushEvent(final String attributeName, final String deviceName, final DevFailed devFailed)
+    public void pushEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
             throws DevFailed {
         xlogger.entry();
         for (final String eventTypeName : TangoConst.eventNames) {
@@ -374,14 +372,14 @@ public final class EventManager {
      * @param attributeValue the attribute value to be sent as event
      * @throws DevFailed
      */
-    public void pushEventCheck(final String attributeName, final String deviceName, final AttributeValue attributeValue)
+    public void pushEvent(final String deviceName, final String attributeName, final AttributeValue attributeValue)
             throws DevFailed {
         xlogger.entry();
         for (final String eventTypeName : TangoConst.eventNames) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventTypeName);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushEventCheck(eventSocket, fullName, attributeValue);
+                eventImpl.pushEvent(eventSocket, fullName, attributeValue);
             }
         }
         xlogger.exit();
@@ -422,7 +420,6 @@ public final class EventManager {
                 EventType.DATA_READY_EVENT.getString());
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            System.out.println("Fire DataReady event");
             eventImpl.pushEvent(eventSocket, fullName, dataReady);
         }
         xlogger.exit();
@@ -435,13 +432,15 @@ public final class EventManager {
      * @param eventTypeStr the specified event type
      * @throws DevFailed if event type is change or archive and no event criteria is set.
      */
-    public static void checkEventCriteria(final AttributeImpl attribute, final String eventTypeStr) throws DevFailed {
-        switch (EventType.getEvent(eventTypeStr)) {
+    public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
+        switch (eventType) {
             case CHANGE_EVENT:
                 ChangeEventTrigger.checkEventCriteria(attribute);
                 break;
             case ARCHIVE_EVENT:
                 ArchiveEventTrigger.checkEventCriteria(attribute);
+                break;
+            default:
                 break;
         }
     }

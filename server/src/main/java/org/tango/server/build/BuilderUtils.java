@@ -103,6 +103,11 @@ final class BuilderUtils {
         config.setMemorizedAtInit(annot.isMemorizedAtInit());
         config.setPolled(annot.isPolled());
         config.setPollingPeriod(annot.pollingPeriod());
+        config.setPushDataReady(annot.pushDataReady());
+        config.setPushChangeEvent(annot.pushChangeEvent());
+        config.setCheckChangeEvent(annot.checkChangeEvent());
+        config.setPushArchiveEvent(annot.pushArchiveEvent());
+        config.setCheckArchivingEvent(annot.checkArchivingEvent());
         if (setter == null) {
             config.setWritable(AttrWriteType.READ);
         } else if (getter == null) {

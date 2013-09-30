@@ -27,7 +27,6 @@ package org.tango.server.events;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -41,6 +40,7 @@ import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#CHANGE_EVENT}
@@ -50,8 +50,8 @@ import fr.esrf.Tango.DevState;
  */
 public class ChangeEventTrigger implements IEventTrigger {
 
-    private final Logger logger = LoggerFactory.getLogger(PeriodicEventTrigger.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(PeriodicEventTrigger.class);
+    private final Logger logger = LoggerFactory.getLogger(ChangeEventTrigger.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(ChangeEventTrigger.class);
     private final AttributeImpl attribute;
     private AttributeValue previousValue;
     private AttributeValue value;
@@ -59,7 +59,9 @@ public class ChangeEventTrigger implements IEventTrigger {
     private boolean checkAbsolute;
     private double relative;
     private boolean checkRelative;
-    private boolean isArchive = false;
+    private DevFailed error;
+    private DevFailed previousError;
+    private boolean previousInitialized = false;
 
     /**
      * Ctr
@@ -71,13 +73,10 @@ public class ChangeEventTrigger implements IEventTrigger {
     public ChangeEventTrigger(final AttributeImpl attribute, final String absolute, final String relative) {
         this.attribute = attribute;
         value = attribute.getReadValue();
-        initializeCriteria(absolute, relative);
-    }
-    void setAsArchive(boolean b) {
-        isArchive = b;
+        setCriteria(absolute, relative);
     }
 
-    private void initializeCriteria(final String absolute, final String relative) {
+    public void setCriteria(final String absolute, final String relative) {
         try {
             this.absolute = Double.parseDouble(absolute);
             checkAbsolute = true;
@@ -92,66 +91,56 @@ public class ChangeEventTrigger implements IEventTrigger {
         }
     }
 
-    private DevFailed error;
-    private DevFailed previousError;
-
-    private boolean previousInitialized = false;
     @Override
     public boolean isSendEvent() throws DevFailed {
         xlogger.entry();
+        boolean hasChanged = false;
+
         value = attribute.getReadValue();
 
-        //  Check if first call
+        // Check if first call
         if (!previousInitialized) {
             previousValue = value;
             previousInitialized = true;
-            return false;
-        }
-
-        //  Check if properties have changed
-        final EventProperties props = attribute.getProperties().getEventProp();
-        if(isArchive)
-            initializeCriteria(props.arch_event.abs_change, props.arch_event.rel_change);
-        else
-            initializeCriteria(props.ch_event.abs_change, props.ch_event.rel_change);
-
-        boolean hasChanged = false;
-        if (previousError != null && error == null) {
-            // there was an error before
-            hasChanged = true;
-        } else if (previousError == null && error != null) {
-            // an error has just occur
-            hasChanged = true;
-        } else if (previousError != null && error != null) {
-            if (!DevFailedUtils.toString(previousError).equals(DevFailedUtils.toString(error))) {
-                // the error msg has change
-                hasChanged = true;
-            }
-        } else if (attribute.isScalar()) {
-            if (attribute.isNumber()) {
-                hasChanged = hasScalarNumberChanged();
-            } else if (attribute.isState()) {
-                hasChanged = hasStateChanged();
-            } else {
-                // string or boolean
-                hasChanged = hasScalarStringChanged();
-            }
+            hasChanged = false;
         } else {
-            if (attribute.isNumber()) {
-                hasChanged = hasArrayNumberChanged();
-            } else if (attribute.isState()) {
-                hasChanged = hasStateArrayChanged();
+            if (previousError != null && error == null) {
+                // there was an error before
+                hasChanged = true;
+            } else if (previousError == null && error != null) {
+                // an error has just occured
+                hasChanged = true;
+            } else if (previousError != null && error != null) {
+                if (!DevFailedUtils.toString(previousError).equals(DevFailedUtils.toString(error))) {
+                    // the error msg has changed
+                    hasChanged = true;
+                }
+            } else if (attribute.isScalar()) {
+                if (attribute.isNumber()) {
+                    hasChanged = hasScalarNumberChanged();
+                } else if (attribute.isState()) {
+                    hasChanged = hasStateChanged();
+                } else {
+                    // string or boolean
+                    hasChanged = hasScalarStringChanged();
+                }
             } else {
-                // string or boolean
-                hasChanged = hasArrayStringChanged();
+                if (attribute.isNumber()) {
+                    hasChanged = hasArrayNumberChanged();
+                } else if (attribute.isState()) {
+                    hasChanged = hasStateArrayChanged();
+                } else {
+                    // string or boolean
+                    hasChanged = hasArrayStringChanged();
+                }
             }
-        }
-        if (hasChanged) {
-            previousValue = value;
+            if (hasChanged) {
+                previousValue = value;
+            }
         }
 
         // TODO DevEncoded?
-        logger.debug("CHANGE event must send: {}", hasChanged);
+        logger.debug("CHANGE event for {} must send: {}", attribute.getName(), hasChanged);
         xlogger.exit();
         return hasChanged;
     }
@@ -181,8 +170,10 @@ public class ChangeEventTrigger implements IEventTrigger {
                     delta = 100;
                 }
             } else {
-                delta = (val - previousVal) * 100.0 / previousVal;
+                delta = (val - previousVal) / previousVal * 100.0;
             }
+            System.out.println("delta " + delta);
+            System.out.println("relative " + relative);
             hasChanged = Math.abs(delta) >= relative;
         }
         return hasChanged;
@@ -278,20 +269,34 @@ public class ChangeEventTrigger implements IEventTrigger {
 
     /**
      * Check if event criteria are set for specified events
-     * @param attribute     the specified attribute
+     * 
+     * @param attribute the specified attribute
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
-    static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
-        //  Check if value is not numerical (always true for State and String)
-        if (attribute.isState() || attribute.isString())
+    static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
+        // Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString()) {
             return;
-        //  Else check criteria
-        final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
-                props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                    "Event properties (abs_change or rel_change) for attribute " +
-                            attribute.getName() + " are not set");
         }
+        // Else check criteria
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)
+                && props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
+            DevFailedUtils
+                    .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                            "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                                    + " are not set");
+        }
+    }
+
+    @Override
+    public void updateProperties() {
+        final EventProperties props = attribute.getProperties().getEventProp();
+        setCriteria(props.ch_event.abs_change, props.ch_event.rel_change);
+    }
+
+    @Override
+    public boolean doCheck() {
+        return attribute.isPushChangeEvent() ? attribute.isCheckChangeEvent() : true;
     }
 }

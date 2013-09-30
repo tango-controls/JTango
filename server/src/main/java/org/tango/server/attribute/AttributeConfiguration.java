@@ -52,6 +52,11 @@ public final class AttributeConfiguration implements PolledObjectConfig {
     private int pollingPeriod = 0;
     private boolean isPolled = false;
     private AttributePropertiesImpl attributeProperties = new AttributePropertiesImpl();
+    boolean pushDataReady;
+    boolean pushChangeEvent;
+    boolean checkChangeEvent;
+    boolean pushArchiveEvent;
+    boolean checkArchivingEvent;
 
     public AttributeConfiguration() {
 
@@ -69,6 +74,11 @@ public final class AttributeConfiguration implements PolledObjectConfig {
         isMemorizedAtInit = config.isMemorizedAtInit;
         pollingPeriod = config.pollingPeriod;
         isPolled = config.isPolled;
+        pushDataReady = config.pushDataReady;
+        pushChangeEvent = config.pushChangeEvent;
+        checkChangeEvent = config.checkChangeEvent;
+        pushArchiveEvent = config.pushArchiveEvent;
+        checkArchivingEvent = config.checkArchivingEvent;
         attributeProperties = config.attributeProperties;
     }
 
@@ -247,5 +257,45 @@ public final class AttributeConfiguration implements PolledObjectConfig {
     @Override
     public void setPolled(final boolean isPolled) {
         this.isPolled = isPolled;
+    }
+
+    public boolean isPushDataReady() {
+        return pushDataReady;
+    }
+
+    public void setPushDataReady(final boolean pushDataReady) {
+        this.pushDataReady = pushDataReady;
+    }
+
+    public boolean isPushChangeEvent() {
+        return pushChangeEvent;
+    }
+
+    public void setPushChangeEvent(final boolean pushChangeEvent) {
+        this.pushChangeEvent = pushChangeEvent;
+    }
+
+    public boolean isCheckChangeEvent() {
+        return checkChangeEvent;
+    }
+
+    public void setCheckChangeEvent(final boolean checkChangeEvent) {
+        this.checkChangeEvent = checkChangeEvent;
+    }
+
+    public boolean isPushArchiveEvent() {
+        return pushArchiveEvent;
+    }
+
+    public void setPushArchiveEvent(final boolean pushArchiveEvent) {
+        this.pushArchiveEvent = pushArchiveEvent;
+    }
+
+    public boolean isCheckArchivingEvent() {
+        return checkArchivingEvent;
+    }
+
+    public void setCheckArchivingEvent(final boolean checkArchivingEvent) {
+        this.checkArchivingEvent = checkArchivingEvent;
     }
 }

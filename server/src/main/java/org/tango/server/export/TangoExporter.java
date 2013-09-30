@@ -61,11 +61,11 @@ public final class TangoExporter implements IExporter {
     private final List<DeviceClassBuilder> deviceClassList = new ArrayList<DeviceClassBuilder>();
 
     public TangoExporter(final String hostName, final String serverName, final String pid,
-	    final Map<String, Class<?>> tangoClasses) {
-	this.hostName = hostName;
-	this.serverName = serverName;
-	this.pid = pid;
-	this.tangoClasses = new HashMap<String, Class<?>>(tangoClasses);
+            final Map<String, Class<?>> tangoClasses) {
+        this.hostName = hostName;
+        this.serverName = serverName;
+        this.pid = pid;
+        this.tangoClasses = new HashMap<String, Class<?>>(tangoClasses);
     }
 
     /**
@@ -75,23 +75,23 @@ public final class TangoExporter implements IExporter {
      */
     @Override
     public void exportAll() throws DevFailed {
-	// load tango db cache
-	DatabaseFactory.getDatabase().loadCache(serverName, hostName);
-	// special case for admin device
-	final DeviceClassBuilder clazz = new DeviceClassBuilder(AdminDevice.class, ADMIN_SERVER_CLASS_NAME);
-	deviceClassList.add(clazz);
-	final DeviceImpl dev = buildDevice(Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName, clazz);
-	((AdminDevice) dev.getBusinessObject()).setTangoExporter(this);
-	((AdminDevice) dev.getBusinessObject()).setClassList(deviceClassList);
+        // load tango db cache
+        DatabaseFactory.getDatabase().loadCache(serverName, hostName);
+        // special case for admin device
+        final DeviceClassBuilder clazz = new DeviceClassBuilder(AdminDevice.class, ADMIN_SERVER_CLASS_NAME);
+        deviceClassList.add(clazz);
+        final DeviceImpl dev = buildDevice(Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName, clazz);
+        ((AdminDevice) dev.getBusinessObject()).setTangoExporter(this);
+        ((AdminDevice) dev.getBusinessObject()).setClassList(deviceClassList);
 
-	// load server class
-	exportDevices();
+        // load server class
+        exportDevices();
 
-	// init polling pool config
-	TangoCacheManager.initPoolConf();
+        // init polling pool config
+        TangoCacheManager.initPoolConf();
 
-	// clear tango db cache (used only for server start-up phase)
-	DatabaseFactory.getDatabase().clearCache();
+        // clear tango db cache (used only for server start-up phase)
+        DatabaseFactory.getDatabase().clearCache();
     }
 
     /**
@@ -101,24 +101,24 @@ public final class TangoExporter implements IExporter {
      */
     @Override
     public void exportDevices() throws DevFailed {
-	// load server class
-	for (final Entry<String, Class<?>> entry : tangoClasses.entrySet()) {
-	    final String tangoClass = entry.getKey();
-	    final Class<?> deviceClass = entry.getValue();
-	    logger.debug("loading class {}", deviceClass.getCanonicalName());
-	    final DeviceClassBuilder deviceClassBuilder = new DeviceClassBuilder(deviceClass, tangoClass);
-	    deviceClassList.add(deviceClassBuilder);
-	    // export all its devices
-	    final String[] deviceList = DatabaseFactory.getDatabase().getDeviceList(serverName, tangoClass);
-	    logger.debug("devices found  {}", Arrays.toString(deviceList));
-	    if (deviceList.length == 0) {
-		DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
-			+ tangoClass);
-	    }
-	    for (final String deviceName : deviceList) {
-		buildDevice(deviceName, deviceClassBuilder);
-	    }
-	}
+        // load server class
+        for (final Entry<String, Class<?>> entry : tangoClasses.entrySet()) {
+            final String tangoClass = entry.getKey();
+            final Class<?> deviceClass = entry.getValue();
+            logger.debug("loading class {}", deviceClass.getCanonicalName());
+            final DeviceClassBuilder deviceClassBuilder = new DeviceClassBuilder(deviceClass, tangoClass);
+            deviceClassList.add(deviceClassBuilder);
+            // export all its devices
+            final String[] deviceList = DatabaseFactory.getDatabase().getDeviceList(serverName, tangoClass);
+            logger.debug("devices found  {}", Arrays.toString(deviceList));
+            if (deviceList.length == 0) {
+                DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
+                        + tangoClass);
+            }
+            for (final String deviceName : deviceList) {
+                buildDevice(deviceName, deviceClassBuilder);
+            }
+        }
     }
 
     /**
@@ -128,92 +128,92 @@ public final class TangoExporter implements IExporter {
      */
     @Override
     public void unexportDevices() throws DevFailed {
-	xlogger.entry();
-	final List<DeviceClassBuilder> clazzToRemove = new ArrayList<DeviceClassBuilder>();
-	for (final DeviceClassBuilder clazz : deviceClassList) {
-	    if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
-		for (final DeviceImpl device : clazz.getDeviceImplList()) {
-		    logger.debug("unexport device {}", device.getName());
-		    ORBUtils.unexportDevice(device);
-		}
-		clazz.clearDevices();
-		clazzToRemove.add(clazz);
-	    }
-	}
-	for (final DeviceClassBuilder deviceClassBuilder : clazzToRemove) {
-	    deviceClassList.remove(deviceClassBuilder);
-	}
-	// unregisterServer();
-	// deviceClassList.clear();
-	xlogger.exit();
+        xlogger.entry();
+        final List<DeviceClassBuilder> clazzToRemove = new ArrayList<DeviceClassBuilder>();
+        for (final DeviceClassBuilder clazz : deviceClassList) {
+            if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
+                for (final DeviceImpl device : clazz.getDeviceImplList()) {
+                    logger.debug("unexport device {}", device.getName());
+                    ORBUtils.unexportDevice(device);
+                }
+                clazz.clearDevices();
+                clazzToRemove.add(clazz);
+            }
+        }
+        for (final DeviceClassBuilder deviceClassBuilder : clazzToRemove) {
+            deviceClassList.remove(deviceClassBuilder);
+        }
+        // unregisterServer();
+        // deviceClassList.clear();
+        xlogger.exit();
     }
 
     @Override
     public void unexportAll() throws DevFailed {
-	xlogger.entry();
-	for (final DeviceClassBuilder clazz : deviceClassList) {
-	    for (final DeviceImpl device : clazz.getDeviceImplList()) {
-		logger.debug("unexport device {}", device.getName());
-		device.unLock(true);
-		try {
-		    ORBUtils.unexportDevice(device);
-		} catch (final DevFailed e) {
-		}
-	    }
-	    clazz.clearDevices();
-	}
-	unregisterServer();
-	deviceClassList.clear();
-	// remove all cache of device and class properties to reload them
-	PropertiesUtils.clearCache();
+        xlogger.entry();
+        for (final DeviceClassBuilder clazz : deviceClassList) {
+            for (final DeviceImpl device : clazz.getDeviceImplList()) {
+                logger.debug("unexport device {}", device.getName());
+                device.unLock(true);
+                try {
+                    ORBUtils.unexportDevice(device);
+                } catch (final DevFailed e) {
+                }
+            }
+            clazz.clearDevices();
+        }
+        unregisterServer();
+        deviceClassList.clear();
+        // remove all cache of device and class properties to reload them
+        PropertiesUtils.clearCache();
 
-	xlogger.exit();
+        xlogger.exit();
     }
 
     private void unregisterServer() {
-	xlogger.entry();
-	if (serverName != null) {
-	    try {
-		logger.info("unexporting server {}", serverName);
-		DatabaseFactory.getDatabase().unexportServer(serverName);
-	    } catch (final DevFailed e) {
-		logger.debug(DevFailedUtils.toString(e));
-	    }
-	}
-	xlogger.exit();
+        xlogger.entry();
+        if (serverName != null) {
+            try {
+                logger.info("unexporting server {}", serverName);
+                DatabaseFactory.getDatabase().unexportServer(serverName);
+            } catch (final DevFailed e) {
+                logger.debug(DevFailedUtils.toString(e));
+            }
+        }
+        xlogger.exit();
     }
 
     @Override
     public DeviceImpl buildDevice(final String name, final DeviceClassBuilder classBuilder) throws DevFailed {
-	final DeviceImpl devToClean = classBuilder.getDeviceImpl(name);
-	if (devToClean != null) {
-	    logger.info("unexporting device {}", devToClean.getName());
-	    ORBUtils.unexportDevice(devToClean);
-	}
-	final DeviceImpl dev = classBuilder.buildDevice(name);
-	logger.info("exporting device {}", dev.getName());
-	ORBUtils.exportDevice(dev, hostName, pid);
-	return dev;
+        final DeviceImpl devToClean = classBuilder.getDeviceImpl(name);
+        if (devToClean != null) {
+            logger.info("unexporting device {}", devToClean.getName());
+            ORBUtils.unexportDevice(devToClean);
+        }
+        final DeviceImpl dev = classBuilder.buildDevice(name);
+        logger.info("exporting device {}", dev.getName());
+        ORBUtils.exportDevice(dev, hostName, pid);
+        return dev;
     }
 
     @Override
     public DeviceImpl getDevice(final String className, final String deviceName) throws DevFailed {
-	if (!className.equalsIgnoreCase(ADMIN_SERVER_CLASS_NAME) && !tangoClasses.containsKey(className)) {
-	    DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, className
-		    + " does not exists on this server");
-	}
-	DeviceImpl device = null;
-	for (final DeviceClassBuilder classBuilder : deviceClassList) {
-	    if (className.equalsIgnoreCase(classBuilder.getClassName())) {
-		device = classBuilder.getDeviceImpl(deviceName);
-		break;
-	    }
-	}
-	if (device == null) {
-	    DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName
-		    + " does not exists on this server");
-	}
-	return device;
+        if (!className.equalsIgnoreCase(ADMIN_SERVER_CLASS_NAME) && !tangoClasses.containsKey(className)) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, className
+                    + " does not exists on this server");
+        }
+        DeviceImpl device = null;
+        for (final DeviceClassBuilder classBuilder : deviceClassList) {
+            if (className.equalsIgnoreCase(classBuilder.getClassName())) {
+                device = classBuilder.getDeviceImpl(deviceName);
+                break;
+            }
+        }
+        if (device == null) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName
+                    + " does not exists on this server");
+        }
+        return device;
     }
 
     /**
@@ -225,27 +225,27 @@ public final class TangoExporter implements IExporter {
      * @throws DevFailed
      */
     public String[] getDevicesOfClass(final String tangoClass) throws DevFailed {
-	if (!tangoClasses.containsKey(tangoClass)) {
-	    DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, tangoClass
-		    + " does not exists on this server");
-	}
-	String[] deviceNames = new String[] {};
-	for (final DeviceClassBuilder classBuilder : deviceClassList) {
-	    if (tangoClass.equalsIgnoreCase(classBuilder.getClassName())) {
-		final List<String> list = classBuilder.getDeviceNameList();
-		deviceNames = list.toArray(new String[list.size()]);
-		break;
-	    }
-	}
-	return deviceNames;
+        if (!tangoClasses.containsKey(tangoClass)) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, tangoClass
+                    + " does not exists on this server");
+        }
+        String[] deviceNames = new String[] {};
+        for (final DeviceClassBuilder classBuilder : deviceClassList) {
+            if (tangoClass.equalsIgnoreCase(classBuilder.getClassName())) {
+                final List<String> list = classBuilder.getDeviceNameList();
+                deviceNames = list.toArray(new String[list.size()]);
+                break;
+            }
+        }
+        return deviceNames;
     }
 
     public List<DeviceClassBuilder> getDeviceClassList() {
-	return new ArrayList<DeviceClassBuilder>(deviceClassList);
+        return new ArrayList<DeviceClassBuilder>(deviceClassList);
     }
 
     public void clearClass() {
-	tangoClasses.clear();
+        tangoClasses.clear();
     }
 
 }

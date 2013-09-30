@@ -47,4 +47,15 @@ public interface IEventTrigger {
      */
     void setError(final DevFailed error);
 
+    /**
+     * Update event properties
+     */
+    void updateProperties();
+
+    /**
+     * 
+     * @return true if do the event fire check
+     */
+    boolean doCheck();
+
 }
