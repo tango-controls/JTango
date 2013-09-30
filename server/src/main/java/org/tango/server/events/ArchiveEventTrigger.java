@@ -24,17 +24,17 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
-
-import fr.esrf.Tango.DevFailed;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.utils.DevFailedUtils;
+
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#ARCHIVE_EVENT}
@@ -48,6 +48,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     private final ChangeEventTrigger change;
     private PeriodicEventTrigger periodic = null;
+    private final AttributeImpl attribute;
 
     /**
      * Ctr
@@ -57,24 +58,21 @@ public class ArchiveEventTrigger implements IEventTrigger {
      * @param relative The archive relative change delta
      * @param attribute The attribute that send events
      */
-    public ArchiveEventTrigger(final long period,
-                               final String absolute, final String relative,
-                               final AttributeImpl attribute) {
+    public ArchiveEventTrigger(final long period, final String absolute, final String relative,
+            final AttributeImpl attribute) {
+        this.attribute = attribute;
         periodic = new PeriodicEventTrigger(period, attribute);
         change = new ChangeEventTrigger(attribute, absolute, relative);
-        periodic.setAsArchive(true);
-        change.setAsArchive(true);
     }
 
     @Override
     public boolean isSendEvent() throws DevFailed {
         xlogger.entry();
-        boolean isSend = false;
-        if (periodic!=null)
-            isSend = periodic.isSendEvent();
+        boolean isSend = periodic.isSendEvent();
         if (!isSend) {
             isSend = change.isSendEvent();
         }
+
         logger.debug("ARCHIVE event must send: {}", isSend);
         xlogger.exit();
         return isSend;
@@ -87,22 +85,42 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     /**
      * Check if event criteria are set for specified attribute
-     * @param attribute     the specified attribute
+     * 
+     * @param attribute the specified attribute
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
-    public static void checkEventCriteria(AttributeImpl attribute) throws DevFailed {
-        //  Check if value is not numerical (always true for State and String)
-        if (attribute.isState() || attribute.isString())
+    public static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
+        // Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString()) {
             return;
-        //  Else check criteria
-        final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)     &&
-                props.arch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) &&
-                props.arch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED) ) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                    "Archive event properties (archive_abs_change or " +
-                            "archive_rel_change or archive_period) for attribute " +
-                            attribute.getName() + " are not set");
         }
+        // Else check criteria
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)
+                && props.arch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)
+                && props.arch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                    "Archive event properties (archive_abs_change or "
+                            + "archive_rel_change or archive_period) for attribute " + attribute.getName()
+                            + " are not set");
+        }
+    }
+
+    @Override
+    public void updateProperties() {
+        final EventProperties props = attribute.getProperties().getEventProp();
+        long period = -1;
+        try {
+            period = Long.parseLong(props.arch_event.period);
+        } catch (final NumberFormatException e) {
+        }
+        periodic.setPeriod(period);
+        change.setCriteria(props.arch_event.abs_change, props.arch_event.rel_change);
+
+    }
+
+    @Override
+    public boolean doCheck() {
+        return attribute.isPushArchiveEvent() ? attribute.isCheckArchivingEvent() : true;
     }
 }

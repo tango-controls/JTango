@@ -44,4 +44,13 @@ public class DefaultEventTrigger implements IEventTrigger {
 
     }
 
+    @Override
+    public void updateProperties() {
+    }
+
+    @Override
+    public boolean doCheck() {
+        return true;
+    }
+
 }

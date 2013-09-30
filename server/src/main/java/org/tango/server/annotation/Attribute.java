@@ -134,4 +134,39 @@ public @interface Attribute {
      */
     int maxDimY() default Integer.MAX_VALUE;
 
+    /**
+     * Data Ready event pushed from device
+     * 
+     * @return
+     */
+    boolean pushDataReady() default false;
+
+    /**
+     * Change event pushed from device
+     * 
+     * @return
+     */
+    boolean pushChangeEvent() default false;
+
+    /**
+     * The framework will check event conditions before firing it
+     * 
+     * @return
+     */
+    boolean checkChangeEvent() default true;
+
+    /**
+     * Archive event pushed from device
+     * 
+     * @return
+     */
+    boolean pushArchiveEvent() default false;
+
+    /**
+     * The framework will check event conditions before firing it
+     * 
+     * @return
+     */
+    boolean checkArchivingEvent() default true;
+
 }

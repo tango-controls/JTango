@@ -24,8 +24,6 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.TangoApi.ApiUtil;
-
 /**
  * defines constants to manage ZMQ events
  * 

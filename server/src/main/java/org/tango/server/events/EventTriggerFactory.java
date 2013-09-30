@@ -24,11 +24,12 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
+
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.EventProperties;
 
 /**
  * Factory to build an event trigger in function of the event type
@@ -70,14 +71,13 @@ public class EventTriggerFactory {
             case ARCHIVE_EVENT:
                 long periodA;
                 try {
-                    //  Check if specified and a number
+                    // Check if specified and a number
                     periodA = Long.parseLong(props.arch_event.period);
-                }
-                catch (NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     periodA = -1;
                 }
-                eventTrigger = new ArchiveEventTrigger(periodA,
-                        props.arch_event.abs_change, props.arch_event.rel_change, attribute);
+                eventTrigger = new ArchiveEventTrigger(periodA, props.arch_event.abs_change,
+                        props.arch_event.rel_change, attribute);
                 break;
             case DATA_READY_EVENT:
             case USER_EVENT:

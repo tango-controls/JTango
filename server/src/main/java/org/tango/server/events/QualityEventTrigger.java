@@ -74,8 +74,15 @@ public class QualityEventTrigger implements IEventTrigger {
 
     @Override
     public void setError(final DevFailed error) {
-        // TODO Auto-generated method stub
+    }
 
+    @Override
+    public void updateProperties() {
+    }
+
+    @Override
+    public boolean doCheck() {
+        return true;
     }
 
 }
