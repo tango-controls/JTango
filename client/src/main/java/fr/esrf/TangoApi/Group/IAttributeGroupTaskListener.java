@@ -10,11 +10,15 @@ public interface IAttributeGroupTaskListener {
 
     public void updateReadValue(String completeAttributeName, Object value);
 
-    public void updateWriteValue(String completeAttributeName, Object value);
-
     public void updateErrorMessage(String completeAttributeName, String errorMessage);
 
+    public void updateWriteValue(String completeAttributeName, Object value);
+
+    public void updateWriteValueErrorMessage(String completeAttributeName, String errorMessage);
+
     public void updateAttributeInfoEx(String completeAttributeName, AttributeInfoEx attributeInfo);
+
+    public void updateAttributeInfoErrorMessage(String completeAttributeName, String errorMessage);
 
     public void updateQuality(String completeAttributeName, AttrQuality quality);
 
