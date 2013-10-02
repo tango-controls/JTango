@@ -985,6 +985,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry(Arrays.toString(names));
         checkInitialization();
         blackBox.insertInblackBox("read_attributes_4 " + Arrays.toString(names), source, clIdent);
+        clientIdentity = clIdent;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1104,6 +1105,7 @@ public final class DeviceImpl extends Device_4POA {
         }
         logger.debug("writing {}", Arrays.toString(names));
         blackBox.insertInblackBox("write_attributes_4 " + Arrays.toString(names), clIdent);
+        clientIdentity = clIdent;
         if (!name.equalsIgnoreCase(adm_name())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
@@ -1147,7 +1149,7 @@ public final class DeviceImpl extends Device_4POA {
             names[i] = values[i].name;
         }
         blackBox.insertInblackBox("write_read_attributes_4 " + Arrays.toString(names), clIdent);
-
+        clientIdentity = clIdent;
         AttributeValue_4[] val = null;
         if (!name.equalsIgnoreCase(adm_name())) {
             clientLocking.checkClientLocking(clIdent, names);
@@ -1709,6 +1711,7 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
+        clientIdentity = clIdent;
         if (!name.equalsIgnoreCase(adm_name())) {
             clientLocking.checkClientLocking(clIdent);
         }
