@@ -315,7 +315,7 @@ public final class EventManager {
      * 
      * @param deviceName The specified event device name
      * @param attribute The specified event attribute name
-     * @param eventTypeStr The specified event type
+     * @param eventType The specified event type
      * @return the connection parameters for specified event.
      */
     public DevVarLongStringArray getConnectionParameters(final String deviceName, final AttributeImpl attribute,
@@ -429,7 +429,7 @@ public final class EventManager {
      * Check if event criteria are set for change and archive events
      * 
      * @param attribute the specified attribute
-     * @param eventTypeStr the specified event type
+     * @param eventType the specified event type
      * @throws DevFailed if event type is change or archive and no event criteria is set.
      */
     public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
