@@ -26,6 +26,7 @@ package org.tango.server.device;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
@@ -35,8 +36,10 @@ import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
 import org.tango.server.servant.AttributeGetterSetter;
 import org.tango.server.servant.DeviceImpl;
+import org.tango.utils.ClientIDUtil;
 
 import fr.esrf.Tango.AttDataReady;
+import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 
 /**
@@ -231,6 +234,25 @@ public final class DeviceManager {
      */
     public void pushEvent(final String attributeName, final DevFailed error) throws DevFailed {
         EventManager.getInstance().pushEvent(name, attributeName, error);
+    }
+
+    /**
+     * Get the client identity of the current request. WARNING: works only if the client is of version IDL4 and for
+     * these requests: read_attribute(s), write_attribute(s), write_read_attribute(s), command_inout.
+     * 
+     * @return the client identity
+     */
+    public ClntIdent getClientIdentity() {
+        return ClientIDUtil.copyClntIdent(device.getClientIdentity());
+    }
+
+    /**
+     * Get the client host name of the current request
+     * 
+     * @return
+     */
+    public String getClientHostName() {
+        return ServerRequestInterceptor.getInstance().getClientHostName();
     }
 
     @Override
