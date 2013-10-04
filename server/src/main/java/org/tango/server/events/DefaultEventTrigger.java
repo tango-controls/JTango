@@ -36,7 +36,7 @@ public class DefaultEventTrigger implements IEventTrigger {
 
     @Override
     public boolean isSendEvent() throws DevFailed {
-        return false;
+        return true;
     }
 
     @Override
