@@ -128,6 +128,14 @@ final class EventImpl {
         xlogger.exit();
     }
 
+    /**
+     * Send a data ready event
+     * 
+     * @param eventSocket
+     * @param fullName
+     * @param dataReady
+     * @throws DevFailed
+     */
     void pushEvent(final ZMQ.Socket eventSocket, final String fullName, final AttDataReady dataReady) throws DevFailed {
         xlogger.entry();
         try {
