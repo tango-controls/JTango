@@ -117,36 +117,16 @@
 
 
 	<dependencies>
-		<!-- to remove -->
-
-		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>TangORB</artifactId>
-			<version>8.2.5-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>log4j</artifactId>
-					<groupId>log4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<!-- <exclusion> <artifactId>jzmq</artifactId> <groupId>org.zeromq</groupId> 
-					</exclusion> -->
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>JTangoCommons</artifactId>
-			<version>1.0.5-SNAPSHOT</version>
-		</dependency>
-
-		<!-- to remove -->
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>1.0.5-SNAPSHOT</version>
+			<version>1.0.6</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jzmq</artifactId>
+					<groupId>org.zeromq</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jeromq</groupId>
