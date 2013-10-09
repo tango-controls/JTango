@@ -1,4 +1,4 @@
-package fr.esrf.TangoApi.Group;
+package fr.soleil.tango.attributecomposer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
