@@ -1,4 +1,4 @@
-package fr.esrf.TangoApi.Group;
+package fr.soleil.tango.attributecomposer;
 
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.TangoApi.AttributeInfoEx;
