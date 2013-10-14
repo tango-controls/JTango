@@ -702,6 +702,7 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         blackBox.insertInblackBox("Operation ping");
+        clientIdentity = null;
         xlogger.exit();
     }
 
@@ -713,6 +714,8 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         blackBox.insertInblackBox("Attribute adm_name");
+        clientIdentity = null;
+
         final String adminDeviceName = Constants.ADMIN_DEVICE_DOMAIN + "/"
                 + ServerManager.getInstance().getServerName();
         xlogger.exit(adminDeviceName);
@@ -748,6 +751,7 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         blackBox.insertInblackBox("Attribute description requested ");
+        clientIdentity = null;
         String desc = "A TANGO device";
         if (name.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
             desc = "A device server device !!";
@@ -763,7 +767,8 @@ public final class DeviceImpl extends Device_4POA {
     @Override
     public String name() {
         MDC.put(MDC_KEY, name);
-        blackBox.insertInblackBox("Attribute name");
+        blackBox.insertInblackBox("Device name");
+        clientIdentity = null;
         xlogger.entry();
         return name;
     }
@@ -784,6 +789,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("read_attribute_history_2");
+        clientIdentity = null;
         // TODO read_attribute_history_2
         return new DevAttrHistory[0];
     }
@@ -805,6 +811,7 @@ public final class DeviceImpl extends Device_4POA {
         // TODO read_attribute_history_3
         checkInitialization();
         blackBox.insertInblackBox("read_attribute_history_3");
+        clientIdentity = null;
         return new DevAttrHistory_3[0];
     }
 
@@ -824,6 +831,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("read_attribute_history_4");
+        clientIdentity = null;
         DevAttrHistory_4 result = null;
         try {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
@@ -854,6 +862,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("read_attributes");
+        clientIdentity = null;
         if (attributeNames.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -892,6 +901,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("read_attributes_2", source);
+        clientIdentity = null;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -936,6 +946,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("read_attributes_3", source);
+        clientIdentity = null;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1026,6 +1037,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("write_attributes");
+        clientIdentity = null;
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
@@ -1061,6 +1073,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("write_attributes_3");
+        clientIdentity = null;
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
@@ -1204,6 +1217,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_list_query");
+        clientIdentity = null;
         // Retrieve number of command and allocate memory to send back info
         final List<CommandImpl> cmdList = getCommandList();
         Collections.sort(cmdList);
@@ -1235,6 +1249,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_list_query_2");
+        clientIdentity = null;
         final DevCmdInfo_2[] back = new DevCmdInfo_2[commandList.size()];
         int i = 0;
         final List<CommandImpl> cmdList = getCommandList();
@@ -1269,6 +1284,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_query " + commandName);
+        clientIdentity = null;
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo tmp = new DevCmdInfo();
         tmp.cmd_name = foundCmd.getName();
@@ -1294,6 +1310,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_query_2 " + commandName);
+        clientIdentity = null;
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo_2 tmp = new DevCmdInfo_2();
         tmp.cmd_name = foundCmd.getName();
@@ -1322,6 +1339,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_inout " + command);
+        clientIdentity = null;
         Any argout = null;
         deviceLock.lockCommand();
         try {
@@ -1359,6 +1377,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_inout_2 " + command, source);
+        clientIdentity = null;
         Any argout = null;
 
         deviceLock.lockCommand();
@@ -1439,6 +1458,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_inout_history_2 " + commandName);
+        clientIdentity = null;
         // TODO command_inout_history_2
         // returncommandHistory.get(command).toArray(n)
         return new DevCmdHistory[] {};
@@ -1460,6 +1480,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("command_inout_history_4 " + commandName);
+        clientIdentity = null;
         final CommandImpl command = getCommand(commandName);
 
         DevCmdHistory_4 history = null;
@@ -1566,6 +1587,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry(Arrays.toString(attributeNames));
         checkInitialization();
         blackBox.insertInblackBox("get_attribute_config_3 " + Arrays.toString(attributeNames));
+        clientIdentity = null;
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1616,6 +1638,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry(Arrays.toString(attributeNames));
         checkInitialization();
         blackBox.insertInblackBox("get_attribute_config_2 " + Arrays.toString(attributeNames));
+        clientIdentity = null;
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1668,6 +1691,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("get_attribute_config " + Arrays.toString(attributeNames));
+        clientIdentity = null;
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1716,6 +1740,7 @@ public final class DeviceImpl extends Device_4POA {
             clientLocking.checkClientLocking(clIdent);
         }
         blackBox.insertInblackBox("set_attribute_config_4", clIdent);
+        clientIdentity = null;
         set_attribute_config_3(newConf);
         xlogger.exit();
 
@@ -1734,6 +1759,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("set_attribute_config_3");
+        clientIdentity = null;
         for (final AttributeConfig_3 attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
 
@@ -1768,6 +1794,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("set_attribute_config");
+        clientIdentity = null;
         for (final AttributeConfig attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
             final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);

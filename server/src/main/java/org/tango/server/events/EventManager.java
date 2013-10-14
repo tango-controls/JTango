@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
@@ -49,6 +49,7 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
+import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.TangoApi.ApiUtil;
@@ -409,17 +410,17 @@ public final class EventManager {
      * 
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
-     * @param counter a user counter
+     * @param dataReady data ready object
      * @throws DevFailed
      */
-    public void pushDataReadyEvent(final String deviceName, final String attributeName, final int counter)
+    public void pushEvent(final String deviceName, final String attributeName, final AttDataReady dataReady)
             throws DevFailed {
         xlogger.entry();
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName,
                 EventType.DATA_READY_EVENT.getString());
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushDataReadyEvent(eventSocket, fullName, counter);
+            eventImpl.pushEvent(eventSocket, fullName, dataReady);
         }
         xlogger.exit();
     }
