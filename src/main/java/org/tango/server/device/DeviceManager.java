@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.device;
 
@@ -38,6 +38,7 @@ import org.tango.server.servant.AttributeGetterSetter;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
 
+import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 
@@ -216,11 +217,11 @@ public final class DeviceManager {
      * Push a DATA_READY event if some client had registered it
      * 
      * @param attributeName The attribute name
-     * @param counter a user counter
+     * @param dataReady data ready object
      * @throws DevFailed
      */
-    public void pushDataReadyEvent(final String attributeName, final int counter) throws DevFailed {
-        EventManager.getInstance().pushDataReadyEvent(name, attributeName, counter);
+    public void pushEvent(final String attributeName, final AttDataReady dataReady) throws DevFailed {
+        EventManager.getInstance().pushEvent(name, attributeName, dataReady);
     }
 
     /**
@@ -228,7 +229,6 @@ public final class DeviceManager {
      * 
      * @param attributeName The attribute name
      * @param error The error
-     * @param eventType The type of event to fire
      * @throws DevFailed
      */
     public void pushEvent(final String attributeName, final DevFailed error) throws DevFailed {
