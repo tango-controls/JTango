@@ -126,7 +126,11 @@ public final class StateResolver {
             // Create the group
             group = ProxyFactory.getInstance().createGroup("statecomposer",
                     deviceNameSet.toArray(new String[deviceNameSet.size()]));
-            group.set_timeout_millis(timeout, true);
+            try {
+                group.set_timeout_millis(timeout, true);
+            } catch (final DevFailed e) {
+                // not important, could failed if some devices are down
+            }
         } else {
             DevFailedUtils.throwDevFailed("INIT_ERROR", "property DeviceNameList is not configured");
         }
