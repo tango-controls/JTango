@@ -24,6 +24,8 @@
  */
 package org.tango.server.testserver;
 
+import fr.esrf.Tango.AttDataReady;
+import fr.esrf.TangoDs.TangoConst;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.Attribute;
@@ -185,10 +187,9 @@ public class EventServer {
     private int counter = 1;
 
     @Attribute(pushDataReady = true)
-    public String getDataReady() throws DevFailed {
-        final String dataReady = "Hello";
-        counter++;
-        deviceManager.pushDataReadyEvent("dataReady", counter);
+    public AttDataReady getDataReady() throws DevFailed {
+        final AttDataReady dataReady = new AttDataReady("Value", TangoConst.Tango_DEV_DOUBLE, counter++);
+        deviceManager.pushEvent("Hello", dataReady);
         return dataReady;
     }
 
