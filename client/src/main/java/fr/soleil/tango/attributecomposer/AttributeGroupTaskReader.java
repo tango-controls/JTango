@@ -19,7 +19,7 @@ import fr.soleil.tango.clientapi.TangoGroupAttribute;
 public class AttributeGroupTaskReader implements Runnable {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    private static final Logger LOGGER = LoggerFactory.getLogger(AttributeGroupTaskReader.class);
+    private final Logger logger = LoggerFactory.getLogger(AttributeGroupTaskReader.class);
 
     private boolean readWriteValue = false;
     private boolean readQuality = false;
@@ -27,8 +27,9 @@ public class AttributeGroupTaskReader implements Runnable {
     private final IAttributeGroupTaskListener attributeGroupListener;
     private TangoGroupAttribute attributeGroup = null;
 
-    public AttributeGroupTaskReader(final IAttributeGroupTaskListener listener, TangoGroupAttribute attributeGroup,
-            boolean readWriteValue, boolean readQuality, boolean readAttributeInfo) {
+    public AttributeGroupTaskReader(final IAttributeGroupTaskListener listener,
+            final TangoGroupAttribute attributeGroup, final boolean readWriteValue, final boolean readQuality,
+            final boolean readAttributeInfo) {
         attributeGroupListener = listener;
         this.readWriteValue = readWriteValue;
         this.readQuality = readQuality;
@@ -36,8 +37,8 @@ public class AttributeGroupTaskReader implements Runnable {
         setAttributeGroup(attributeGroup);
     }
 
-    public AttributeGroupTaskReader(final IAttributeGroupTaskListener listener, boolean readWriteValue,
-            boolean readQuality, boolean readAttributeInfo) {
+    public AttributeGroupTaskReader(final IAttributeGroupTaskListener listener, final boolean readWriteValue,
+            final boolean readQuality, final boolean readAttributeInfo) {
         this(listener, null, readWriteValue, readQuality, readAttributeInfo);
     }
 
@@ -45,7 +46,7 @@ public class AttributeGroupTaskReader implements Runnable {
         this(listener, false, false, false);
     }
 
-    public void setAttributeGroup(TangoGroupAttribute attributeGroup) {
+    public void setAttributeGroup(final TangoGroupAttribute attributeGroup) {
         this.attributeGroup = attributeGroup;
     }
 
@@ -55,33 +56,33 @@ public class AttributeGroupTaskReader implements Runnable {
     }
 
     public void valueReader() {
-        if ((attributeGroup != null) && (attributeGroupListener != null)) {
+        if (attributeGroup != null && attributeGroupListener != null) {
             try {
                 DeviceAttribute[] resultGroup = null;
                 AttributeInfoEx[] attributeInfoExList = null;
-                String[] attributeNames = attributeGroup.getGroup().getAttributeNames();
+                final String[] attributeNames = attributeGroup.getGroup().getAttributeNames();
 
                 // read attributes
                 try {
                     resultGroup = attributeGroup.read();
                     attributeGroupListener.updateDeviceAttribute(resultGroup);
                 } catch (final DevFailed devFailed) {
-                    LOGGER.error("error extract group", devFailed);
-                    LOGGER.error(DevFailedUtils.toString(devFailed));
+                    logger.error("error extract group", devFailed);
+                    logger.error(DevFailedUtils.toString(devFailed));
                     if (attributeGroupListener != null) {
-                        attributeGroupListener.catchException(devFailed);
+                        attributeGroupListener.catchDevFailed(devFailed);
                     }
                     return;
                 }
 
-                if ((readAttributeInfo || readWriteValue) && (attributeGroup != null)) {
+                if ((readAttributeInfo || readWriteValue) && attributeGroup != null) {
                     try {
                         attributeInfoExList = attributeGroup.getConfig();
-                    }catch (final DevFailed devFailed) {
-                        LOGGER.error("error read attribute info", devFailed);
-                        LOGGER.error(DevFailedUtils.toString(devFailed));
+                    } catch (final DevFailed devFailed) {
+                        logger.error("error read attribute info", devFailed);
+                        logger.error(DevFailedUtils.toString(devFailed));
                         if (attributeGroupListener != null) {
-                            attributeGroupListener.catchException(devFailed);
+                            attributeGroupListener.catchDevFailed(devFailed);
                         }
                     }
                 }
@@ -89,54 +90,58 @@ public class AttributeGroupTaskReader implements Runnable {
                 // extract results
                 boolean tmpHasFailed = false;
                 int i = 0;
-                String attrName = null;
-                AttributeInfoEx attributeInfo = null;
-                Object tmpReadValue = null;
-                Object tmpWriteValue = null;
-                AttrDataFormat format = AttrDataFormat.SCALAR;
                 for (final DeviceAttribute deviceAttribute : resultGroup) {
-                    attrName = attributeNames[i++];
-                    attributeInfo = null;
-                    if ((attributeInfoExList != null) && (i > 0) && (i < attributeInfoExList.length)) {
+                    final String attrName = attributeNames[i++];
+                    AttributeInfoEx attributeInfo = null;
+                    if (attributeInfoExList != null && i > 0 && i < attributeInfoExList.length) {
                         attributeInfo = attributeInfoExList[i];
                     }
+
                     try {
-                        format = deviceAttribute.getDataFormat();
-                        tmpReadValue = InsertExtractUtils.extractRead(deviceAttribute, format);
-                        attributeGroupListener.updateReadValue(attrName, tmpReadValue);
+                        if (deviceAttribute != null) {
+                            final AttrDataFormat format = deviceAttribute.getDataFormat();
+                            final Object tmpReadValue = InsertExtractUtils.extractRead(deviceAttribute, format);
 
-                        if (readAttributeInfo) {
-                            if (attributeInfo != null) {
-                                attributeGroupListener.updateAttributeInfoEx(attrName, attributeInfo);
-                            }
-                            else {
-                                attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date())
-                                        + " : Can't read attribute info of" + attrName);
-                            }
-                        }
+                            attributeGroupListener.updateReadValue(attrName, tmpReadValue);
 
-                        if(readQuality) {
-                            attributeGroupListener.updateQuality(attrName, deviceAttribute.getQuality());
-                        }
-
-                        if (readWriteValue) {
-                            try {
-                                if ((attributeInfo != null) && (attributeInfo.writable != AttrWriteType.READ)) {
-                                    tmpWriteValue = InsertExtractUtils.extractWrite(deviceAttribute, attributeInfo.writable,
-                                            format);
-                                    attributeGroupListener.updateWriteValue(attrName, tmpWriteValue);
+                            if (readAttributeInfo) {
+                                if (attributeInfo != null) {
+                                    attributeGroupListener.updateAttributeInfoEx(attrName, attributeInfo);
+                                } else {
+                                    attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date())
+                                            + " : Can't read attribute info of" + attrName);
                                 }
-                            } catch (DevFailed e) {
-                                LOGGER.error("error extract write value", e);
-                                LOGGER.error(DevFailedUtils.toString(e));
-                                attributeGroupListener.updateWriteValueErrorMessage(attrName,
-                                        DATE_FORMAT.format(new Date()) + " : " + DevFailedUtils.toString(e));
                             }
+
+                            if (readQuality) {
+                                attributeGroupListener.updateQuality(attrName, deviceAttribute.getQuality());
+                            }
+
+                            if (readWriteValue) {
+                                try {
+                                    if (attributeInfo != null && attributeInfo.writable != AttrWriteType.READ) {
+                                        final Object tmpWriteValue = InsertExtractUtils.extractWrite(deviceAttribute,
+                                                attributeInfo.writable, format);
+                                        attributeGroupListener.updateWriteValue(attrName, tmpWriteValue);
+                                    }
+                                } catch (final DevFailed e) {
+                                    logger.error("error extract write value", e);
+                                    logger.error(DevFailedUtils.toString(e));
+                                    attributeGroupListener.updateWriteValueErrorMessage(attrName,
+                                            DATE_FORMAT.format(new Date()) + " : " + DevFailedUtils.toString(e));
+                                }
+                            }
+                        } else {
+                            logger.error("error extract group, device attribute for {} is null", attrName);
+                            attributeGroupListener.updateQuality(attrName, AttrQuality.ATTR_INVALID);
+                            attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date()) + " : "
+                                    + "cannot read " + attrName);
+                            tmpHasFailed = true;
                         }
 
                     } catch (final DevFailed devFailed) {
-                        LOGGER.error("error extract group", devFailed);
-                        LOGGER.error(DevFailedUtils.toString(devFailed));
+                        logger.error("error extract group", devFailed);
+                        logger.error(DevFailedUtils.toString(devFailed));
                         tmpHasFailed = true;
                         attributeGroupListener.updateQuality(attrName, AttrQuality.ATTR_INVALID);
                         attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date()) + " : "
@@ -145,7 +150,7 @@ public class AttributeGroupTaskReader implements Runnable {
                 }
                 if (tmpHasFailed) {
                     attributeGroupListener.catchException(new Exception(DATE_FORMAT.format(new Date())
-                            + " : One of the attribute hasFailed"));
+                            + " : at least, one attribute reading has failed"));
                 } else {
                     attributeGroupListener.readingLoopFinished();
                 }
