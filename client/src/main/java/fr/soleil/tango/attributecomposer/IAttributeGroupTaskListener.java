@@ -1,6 +1,7 @@
 package fr.soleil.tango.attributecomposer;
 
 import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
 
@@ -23,6 +24,8 @@ public interface IAttributeGroupTaskListener {
     public void updateQuality(String completeAttributeName, AttrQuality quality);
 
     public void catchException(Exception exception);
+
+    public void catchDevFailed(DevFailed exception);
 
     public void readingLoopFinished();
 
