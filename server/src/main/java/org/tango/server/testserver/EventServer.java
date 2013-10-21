@@ -39,11 +39,9 @@ import org.tango.server.device.DeviceManager;
 import org.tango.server.events.EventType;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevEncoded;
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoDs.TangoConst;
 
 /**
  * A device to test Tango events.
@@ -185,13 +183,16 @@ public class EventServer {
         return stateArray;
     }
 
+    @Attribute(pushDataReady = true)
+    public double getDataReady() {
+        return 10.0;
+    }
+
     private int counter = 1;
 
-    @Attribute(pushDataReady = true)
-    public double getDataReady() throws DevFailed {
-        final AttDataReady dataReady = new AttDataReady("Value", TangoConst.Tango_DEV_DOUBLE, counter++);
-        deviceManager.pushEvent("dataReady", dataReady);
-        return 10.0;
+    @Command
+    public void pushDataReady() throws DevFailed {
+        deviceManager.pushDataReadyEvent("doubleArrayAtt", counter++);
     }
 
     @Attribute

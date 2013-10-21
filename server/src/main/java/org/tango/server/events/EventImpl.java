@@ -129,12 +129,13 @@ final class EventImpl {
      * 
      * @param eventSocket the socket to send event
      * @param fullName event full name
-     * @param dataReady AttrDataReady object
+     * @param counter a counter value
      * @throws DevFailed
      */
-    void pushEvent(final ZMQ.Socket eventSocket, final String fullName, final AttDataReady dataReady) throws DevFailed {
+    void pushDataReadyEvent(final ZMQ.Socket eventSocket, final String fullName, int counter) throws DevFailed {
         xlogger.entry();
         try {
+            final AttDataReady dataReady = new AttDataReady(attribute.getName(), attribute.getTangoType(), counter);
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
