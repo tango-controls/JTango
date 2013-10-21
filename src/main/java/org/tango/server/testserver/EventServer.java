@@ -24,8 +24,6 @@
  */
 package org.tango.server.testserver;
 
-import fr.esrf.Tango.AttDataReady;
-import fr.esrf.TangoDs.TangoConst;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.Attribute;
@@ -41,9 +39,11 @@ import org.tango.server.device.DeviceManager;
 import org.tango.server.events.EventType;
 import org.tango.utils.DevFailedUtils;
 
+import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevEncoded;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.TangoConst;
 
 /**
  * A device to test Tango events.
@@ -110,6 +110,7 @@ public class EventServer {
     DeviceState[] stateArray = new DeviceState[] { DeviceState.OFF };
 
     @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "5")
     private int qualityAtt;
 
     private AttrQuality quality = AttrQuality.ATTR_VALID;
@@ -187,44 +188,46 @@ public class EventServer {
     private int counter = 1;
 
     @Attribute(pushDataReady = true)
-    public AttDataReady getDataReady() throws DevFailed {
+    public double getDataReady() throws DevFailed {
         final AttDataReady dataReady = new AttDataReady("Value", TangoConst.Tango_DEV_DOUBLE, counter++);
-        deviceManager.pushEvent("Hello", dataReady);
-        return dataReady;
+        deviceManager.pushEvent("dataReady", dataReady);
+        return 10.0;
     }
 
     @Attribute
     public String getUserEvent() throws DevFailed {
-        final String userEvent = "Hello";
-        deviceManager.pushEvent("userEvent", new AttributeValue(userEvent), EventType.USER_EVENT);
-        return userEvent;
+        return "Hello";
     }
 
-    private volatile int errorCode = 2;
+    @Command
+    public void pushUserEvent() throws DevFailed {
+        deviceManager.pushEvent("userEvent", EventType.USER_EVENT);
+    }
+
+    private int error = 0;
 
     @Attribute(pushChangeEvent = true, checkChangeEvent = true)
     @AttributeProperties(changeEventAbsolute = "100")
     public int getError() throws DevFailed {
-        switch (errorCode) {
+        switch (error) {
             case 0:
-                deviceManager.pushEvent("error", DevFailedUtils.newDevFailed("error0"));
-                break;
-            // throw DevFailedUtils.newDevFailed("error0");
+                throw DevFailedUtils.newDevFailed("error0");
             case 1:
-                deviceManager.pushEvent("error", DevFailedUtils.newDevFailed("error1"));
-                break;
-            // throw DevFailedUtils.newDevFailed("error1");
+                throw DevFailedUtils.newDevFailed("error1");
             default:
-                deviceManager.pushEvent("error", new AttributeValue(0), EventType.CHANGE_EVENT);
                 break;
         }
         return 0;
     }
 
     @Command
-    public void setError(final int error) throws DevFailed {
-        this.errorCode = error;
+    public void pushError() throws DevFailed {
+        deviceManager.pushEvent("error", EventType.CHANGE_EVENT);
+    }
 
+    @Command
+    public void setError(final int error) throws DevFailed {
+        this.error = error;
     }
 
     public void setDeviceManager(final DeviceManager deviceManager) {

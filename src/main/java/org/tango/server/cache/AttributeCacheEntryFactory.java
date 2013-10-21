@@ -31,7 +31,6 @@ import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceLock;
 import org.tango.server.events.EventManager;
 
@@ -87,8 +86,7 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                     attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
                     attribute.addToHistory();
                     result = attribute.getReadValue();
-
-                    EventManager.getInstance().pushEvent(deviceName, attribute.getName(), (AttributeValue) result);
+                    EventManager.getInstance().pushEvent(deviceName, attribute.getName());
                 }
             } catch (final DevFailed e) {
                 attribute.addErrorToHistory(e);
