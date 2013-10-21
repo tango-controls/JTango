@@ -39,9 +39,10 @@ public enum EventType {
      */
     CHANGE_EVENT(TangoConst.CHANGE_EVENT, TangoConst.eventNames[0]),
     /**
-     * Quality event. Send an event if the attribute quality changes.
+     * DEPRECATED: Quality event. Send an event if the attribute quality changes.
+     * 
+     * QUALITY_EVENT(TangoConst.QUALITY_EVENT, TangoConst.eventNames[1]),
      */
-    QUALITY_EVENT(TangoConst.QUALITY_EVENT, TangoConst.eventNames[1]),
     /**
      * Periodic event. Send an event at the period specified by the attribute property event_period
      */

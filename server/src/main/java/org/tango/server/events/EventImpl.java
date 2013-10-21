@@ -1,26 +1,26 @@
 /**
- * Copyright (C) : 2012
- * 
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
- * 
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
  * This file is part of Tango.
- * 
+ *
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango. If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributeValue;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
@@ -95,29 +94,27 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    void pushEvent(final ZMQ.Socket eventSocket, final String fullName, final AttributeValue attributeValue)
-            throws DevFailed {
+    void pushEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
         if (eventTrigger.doCheck() && eventTrigger.isSendEvent()) {
             if (eventType.equals(EventType.ATT_CONF_EVENT)) {
-                pushEventConfig(eventSocket, fullName);
+                pushConfigEvent(eventSocket, fullName);
             } else {
-                sendEvent(eventSocket, fullName, attributeValue);
+                sendEvent(eventSocket, fullName);
             }
         }
         xlogger.exit();
     }
 
-    private void sendEvent(final ZMQ.Socket eventSocket, final String fullName, final AttributeValue attributeValue)
-            throws DevFailed {
+    private void sendEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
         try {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(EventUtilities.marshall(attribute, attributeValue), 0);
+            eventSocket.send(EventUtilities.marshall(attribute), 0);
             logger.debug("sent event: {}", fullName);
 //            /System.out.println(" ----> Event sent for " + fullName);
         } catch (final org.zeromq.ZMQException e) {
@@ -151,7 +148,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushEventConfig(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    void pushConfigEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
         try {
             eventSocket.sendMore(fullName);
