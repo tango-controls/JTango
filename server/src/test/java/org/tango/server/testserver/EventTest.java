@@ -391,7 +391,7 @@ public class EventTest {
     @Test(timeout = 1000)
     public void changeQuality() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
-        final int id = dev.subscribe_event("qualityAtt", TangoConst.QUALITY_EVENT, 100, new String[] {},
+        final int id = dev.subscribe_event("qualityAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
         int eventsNb = 0;
         AttrQuality value = AttrQuality.ATTR_VALID;
@@ -449,19 +449,37 @@ public class EventTest {
         try {
             dev.read_attribute("error");
             final DeviceData dd = new DeviceData();
-            dd.insert(0);
-            dev.command_inout("setError", dd);
+            int errorCode = 0;
 
             while (!error) {
-                dev.read_attribute("error");
+                dd.insert(errorCode);
+                dev.command_inout("setError", dd);
+                errorCode++;
+                dev.command_inout("pushError");
+                try {
+                    Thread.sleep(100);
+                } catch (final InterruptedException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
-                    System.out.println("error r " + eventData.name);
-                    if (eventData.name.endsWith("error")) {
+                    System.out.println("error received: " + eventData.name);
+                    if (eventData.name.contains("error")) {
+                        // XXX I don't known why: an error can be received in 2 different ways
                         if (eventData.err) {
                             final DevFailed e = new DevFailed(eventData.errors);
+                            System.out.println("contains an error: " + DevFailedUtils.toString(e));
                             if (DevFailedUtils.toString(e).contains("error0")) {
                                 error = true;
+                            }
+                        } else {
+                            try {
+                                eventData.attr_value.extractLong();
+                            } catch (final DevFailed e) {
+                                if (DevFailedUtils.toString(e).contains("error0")) {
+                                    error = true;
+                                }
                             }
                         }
                     }
@@ -493,18 +511,17 @@ public class EventTest {
                 TangoConst.NOT_STATELESS);
         boolean error1 = false;
         try {
-            dev.read_attribute("error");
             final DeviceData dd = new DeviceData();
             dd.insert(0);
             dev.command_inout("setError", dd);
-            dev.read_attribute("error");
+            dev.command_inout("pushError");
             try {
                 Thread.sleep(300);
             } catch (final InterruptedException e1) {
             }
             dd.insert(1);
             dev.command_inout("setError", dd);
-            dev.read_attribute("error");
+            dev.command_inout("pushError");
             while (!error1) {
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
@@ -580,7 +597,7 @@ public class EventTest {
 
         // read will send user event
         try {
-            dev.read_attribute("userEvent");
+            dev.command_inout("pushUserEvent");
 
             final EventData[] events = dev.get_events();
             for (final EventData eventData : events) {

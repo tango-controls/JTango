@@ -63,6 +63,7 @@ public class ChangeEventTrigger implements IEventTrigger {
     private DevFailed error;
     private DevFailed previousError;
     private boolean previousInitialized = false;
+    private final QualityEventTrigger qualityTrigger;
 
     /**
      * Ctr
@@ -74,6 +75,7 @@ public class ChangeEventTrigger implements IEventTrigger {
     public ChangeEventTrigger(final AttributeImpl attribute, final String absolute, final String relative) {
         this.attribute = attribute;
         value = attribute.getReadValue();
+        qualityTrigger = new QualityEventTrigger(attribute);
         setCriteria(absolute, relative);
     }
 
@@ -95,50 +97,57 @@ public class ChangeEventTrigger implements IEventTrigger {
     @Override
     public boolean isSendEvent() throws DevFailed {
         xlogger.entry();
-        boolean hasChanged = false;
-
-        value = attribute.getReadValue();
-
-        // Check if first call
-        if (!previousInitialized) {
-            previousValue = value;
-            previousInitialized = true;
-            hasChanged = false;
-        } else {
-            if (previousError != null && error == null) {
-                // there was an error before
-                hasChanged = true;
-            } else if (previousError == null && error != null) {
-                // an error has just occured
-                hasChanged = true;
-            } else if (previousError != null && error != null) {
-                if (!DevFailedUtils.toString(previousError).equals(DevFailedUtils.toString(error))) {
-                    // the error msg has changed
-                    hasChanged = true;
-                }
-            } else if (attribute.isScalar()) {
-                if (attribute.isNumber()) {
-                    hasChanged = hasScalarNumberChanged();
-                } else if (attribute.isState()) {
-                    hasChanged = hasStateChanged();
-                } else if (attribute.isDevEncoded()) {
-                    hasChanged = hasDevEncodedChanged();
-                } else {
-                    // string or boolean
-                    hasChanged = hasScalarStringChanged();
-                }
-            } else {
-                if (attribute.isNumber()) {
-                    hasChanged = hasArrayNumberChanged();
-                } else if (attribute.isState()) {
-                    hasChanged = hasStateArrayChanged();
-                } else {
-                    // string or boolean
-                    hasChanged = hasArrayStringChanged();
-                }
-            }
-            if (hasChanged) {
+        boolean hasChanged = qualityTrigger.isSendEvent();
+        if (!hasChanged) {
+            value = attribute.getReadValue();
+            // Check if first call
+            if (!previousInitialized) {
+                previousError = error;
                 previousValue = value;
+                previousInitialized = true;
+                hasChanged = false;
+            } else {
+                if (previousError != null && error == null) {
+                    // there was an error before
+                    hasChanged = true;
+                } else if (previousError == null && error != null) {
+                    // an error has just occured
+                    hasChanged = true;
+                } else if (previousError != null && error != null) {
+                    if (!DevFailedUtils.toString(previousError).equals(DevFailedUtils.toString(error))) {
+                        // the error msg has changed
+                        hasChanged = true;
+                    }
+                } else if (value.getValue() == null && previousValue.getValue() == null) {
+                    hasChanged = false;
+                } else if (value.getValue() == null && previousValue.getValue() != null) {
+                    hasChanged = true;
+                } else if (value.getValue() != null && previousValue.getValue() == null) {
+                    hasChanged = true;
+                } else if (attribute.isScalar()) {
+                    if (attribute.isNumber()) {
+                        hasChanged = hasScalarNumberChanged();
+                    } else if (attribute.isState()) {
+                        hasChanged = hasStateChanged();
+                    } else if (attribute.isDevEncoded()) {
+                        hasChanged = hasDevEncodedChanged();
+                    } else {
+                        // string or boolean
+                        hasChanged = hasScalarStringChanged();
+                    }
+                } else {
+                    if (attribute.isNumber()) {
+                        hasChanged = hasArrayNumberChanged();
+                    } else if (attribute.isState()) {
+                        hasChanged = hasStateArrayChanged();
+                    } else {
+                        // string or boolean
+                        hasChanged = hasArrayStringChanged();
+                    }
+                }
+                if (hasChanged) {
+                    previousValue = value;
+                }
             }
         }
 

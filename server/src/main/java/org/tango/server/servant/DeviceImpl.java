@@ -73,6 +73,7 @@ import org.tango.server.device.DeviceLock;
 import org.tango.server.device.InitImpl;
 import org.tango.server.device.StateImpl;
 import org.tango.server.device.StatusImpl;
+import org.tango.server.events.EventManager;
 import org.tango.server.history.DeviceBlackBox;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -543,6 +544,7 @@ public final class DeviceImpl extends Device_4POA {
         isCorrectlyInit.set(false);
 
         if (init == null) {
+
             init = new InitImpl(name, null, false, businessObject, pollingManager);
         }
         try {
@@ -559,7 +561,6 @@ public final class DeviceImpl extends Device_4POA {
             for (final ClassPropertyImpl prop : classPropertyList) {
                 prop.update();
             }
-
             init.execute(stateImpl, statusImpl);
 
             isCorrectlyInit.set(true);
@@ -1809,7 +1810,7 @@ public final class DeviceImpl extends Device_4POA {
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
             logger.debug("set_attribute_config: {}", props);
             attribute.setProperties(props);
-
+            EventManager.getInstance().pushConfigEvent(name, attributeName);
         }
         xlogger.exit();
     }

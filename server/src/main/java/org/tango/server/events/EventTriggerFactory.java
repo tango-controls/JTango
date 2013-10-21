@@ -59,9 +59,6 @@ public class EventTriggerFactory {
                 final long period = Long.parseLong(props.per_event.period);
                 eventTrigger = new PeriodicEventTrigger(period, attribute);
                 break;
-            case QUALITY_EVENT:
-                eventTrigger = new QualityEventTrigger(attribute);
-                break;
             case ATT_CONF_EVENT:
                 eventTrigger = new PropertiesEventTrigger(attribute);
                 break;

@@ -55,26 +55,34 @@
 //
 //-======================================================================
 
-
 package org.tango.server.events;
-
-import fr.esrf.Tango.*;
-import fr.esrf.TangoApi.ApiUtil;
-import org.jacorb.orb.CDROutputStream;
-import org.slf4j.ext.XLogger;
-import org.slf4j.ext.XLoggerFactory;
-import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributeValue;
-import org.tango.server.idl.TangoIDLAttributeUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import org.jacorb.orb.CDROutputStream;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.idl.TangoIDLAttributeUtil;
+
+import fr.esrf.Tango.AttDataReady;
+import fr.esrf.Tango.AttDataReadyHelper;
+import fr.esrf.Tango.AttributeConfig_3;
+import fr.esrf.Tango.AttributeConfig_3Helper;
+import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_4Helper;
+import fr.esrf.Tango.DevErrorListHelper;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.ZmqCallInfo;
+import fr.esrf.Tango.ZmqCallInfoHelper;
+import fr.esrf.TangoApi.ApiUtil;
+
 /**
- *	This class is a set of static utilities used for event management.
- *
- * @author  verdier
+ * This class is a set of static utilities used for event management.
+ * 
+ * @author verdier
  */
 
 class EventUtilities {
@@ -83,11 +91,11 @@ class EventUtilities {
     private static String tangoHost = null;
     private static final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
 
-
-    static String buildEventName(final String deviceName, final String attributeName,
-                                 final String eventType) throws DevFailed  {
-        if (tangoHost==null)
+    static String buildEventName(final String deviceName, final String attributeName, final String eventType)
+            throws DevFailed {
+        if (tangoHost == null) {
             tangoHost = ApiUtil.get_db_obj().getPossibleTangoHosts()[0];
+        }
 
         String fullName = "tango://" + tangoHost + "/" + deviceName.toLowerCase(Locale.ENGLISH);
         if (attributeName != null) {
@@ -99,7 +107,7 @@ class EventUtilities {
 
     /**
      * Add 4 bytes at beginning for C++ alignment
-     *
+     * 
      * @param data buffer to be aligned
      * @return buffer after c++ alignment.
      */
@@ -117,16 +125,16 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with attribute Value
-     *
+     * 
      * @param attribute attribute to marshall
      * @param attributeValue attribute value to marshall
      * @return result of the marshall action
      * @throws fr.esrf.Tango.DevFailed if marshall action failed
      */
-    static byte[] marshall(final AttributeImpl attribute, final AttributeValue attributeValue) throws DevFailed {
+    static byte[] marshall(final AttributeImpl attribute) throws DevFailed {
         xlogger.entry();
-        final AttributeValue_4 attributeValue4 =
-                TangoIDLAttributeUtil.toAttributeValue4(attribute, attributeValue, null);
+        final AttributeValue_4 attributeValue4 = TangoIDLAttributeUtil.toAttributeValue4(attribute,
+                attribute.getReadValue(), attribute.getWriteValue());
         final CDROutputStream os = new CDROutputStream();
         try {
             AttributeValue_4Helper.write(os, attributeValue4);
@@ -139,7 +147,7 @@ class EventUtilities {
 
     /**
      * Marshall AttDataReady
-     *
+     * 
      * @param dataReady the DataReady object to marshall
      * @return result of the marshall action
      * @throws DevFailed
@@ -158,7 +166,7 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with attribute config
-     *
+     * 
      * @return result of the marshall action
      * @throws DevFailed if marshall action failed
      */
@@ -177,7 +185,7 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with a DevFailed object
-     *
+     * 
      * @param devFailed DevFailed object to marshall
      * @return result of the marshall action
      * @throws DevFailed if marshall action failed
@@ -196,7 +204,7 @@ class EventUtilities {
 
     /**
      * Marshall the ZmqCallInfo object
-     *
+     * 
      * @param counter event counter
      * @param isException true if the attribute has failed
      * @return result of the marshall action
@@ -204,70 +212,61 @@ class EventUtilities {
      */
     static byte[] marshall(final int counter, final boolean isException) throws DevFailed {
         xlogger.entry();
-        final ZmqCallInfo zmqCallInfo = new ZmqCallInfo(
-                EventConstants.ZMQ_RELEASE,
-                counter,
-                EventConstants.EXECUTE_METHOD,
-                EventConstants.OBJECT_IDENTIFIER,
-                isException);
+        final ZmqCallInfo zmqCallInfo = new ZmqCallInfo(EventConstants.ZMQ_RELEASE, counter,
+                EventConstants.EXECUTE_METHOD, EventConstants.OBJECT_IDENTIFIER, isException);
         final CDROutputStream os = new CDROutputStream();
         try {
             ZmqCallInfoHelper.write(os, zmqCallInfo);
             xlogger.exit();
-            //EventManager.dump(os.getBufferCopy());
+            // EventManager.dump(os.getBufferCopy());
             return os.getBufferCopy();
         } finally {
             os.close();
         }
     }
 
-
-
-
-
-
-
-
-    static void dump(byte[] rec) {
+    static void dump(final byte[] rec) {
         for (int i = 0; i < rec.length; i++) {
 
-            String s = String.format("%02x", (0xFF & rec[i]));
+            final String s = String.format("%02x", 0xFF & rec[i]);
             // logger.debug("0x{} ",s);
             System.out.print("0x" + s + " ");
-            if (((i + 1) % 16) == 0)
+            if ((i + 1) % 16 == 0) {
                 System.out.println();
+            }
         }
         System.out.println();
     }
 
     /**
      * Return the zmq version as a double like
-     *         3.22 for "3.2.2" or 0.0 if zmq not available
-     *
+     * 3.22 for "3.2.2" or 0.0 if zmq not available
+     * 
      * @return the TangORB version as a String
      */
     static double getZmqVersion() {
-        if (zmqVersion<0.0) {   //  Not already checked.
+        if (zmqVersion < 0.0) { // Not already checked.
             zmqVersion = 0.0;
             try {
-                String  strVersion = org.zeromq.ZMQ.getVersionString();
-                StringTokenizer stk = new StringTokenizer(strVersion, ".");
-                ArrayList<String> list = new ArrayList<String>();
-                while (stk.hasMoreTokens())
+                String strVersion = org.zeromq.ZMQ.getVersionString();
+                final StringTokenizer stk = new StringTokenizer(strVersion, ".");
+                final ArrayList<String> list = new ArrayList<String>();
+                while (stk.hasMoreTokens()) {
                     list.add(stk.nextToken());
+                }
 
                 strVersion = list.get(0) + "." + list.get(1);
-                if (list.size()>2)
+                if (list.size() > 2) {
                     strVersion += list.get(2);
+                }
                 try {
                     zmqVersion = Double.parseDouble(strVersion);
-                }
-                catch (NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     System.err.println(e);
                 }
+            } catch (final Exception e) { /*System.err.println(e);*/
+            } catch (final Error e) { /*System.err.println(e);*/
             }
-            catch (Exception e) { /*System.err.println(e);*/  }
-            catch (Error e)     { /*System.err.println(e);*/  }
         }
         return zmqVersion;
     }

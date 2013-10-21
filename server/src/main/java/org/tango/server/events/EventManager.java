@@ -1,26 +1,26 @@
 /**
- * Copyright (C) : 2012
- * 
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
- * 
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
  * This file is part of Tango.
- * 
+ *
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango. If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
@@ -44,7 +44,6 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.ServerManager;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributeValue;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
@@ -75,7 +74,6 @@ public final class EventManager {
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
 
     private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
-
     private static ScheduledExecutorService heartBeatExecutor;
 
     private enum SocketType {
@@ -369,17 +367,15 @@ public final class EventManager {
      * Check if the event must be sent and fire it if must be done
      * 
      * @param attributeName specified event attribute
-     * @param attributeValue the attribute value to be sent as event
      * @throws DevFailed
      */
-    public void pushEvent(final String deviceName, final String attributeName, final AttributeValue attributeValue)
-            throws DevFailed {
+    public void pushEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
         for (final String eventTypeName : TangoConst.eventNames) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventTypeName);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushEvent(eventSocket, fullName, attributeValue);
+                eventImpl.pushEvent(eventSocket, fullName);
             }
         }
         xlogger.exit();
@@ -394,13 +390,13 @@ public final class EventManager {
      * @param eventTypeName specified event type.
      * @throws DevFailed
      */
-    public void pushEvent(final String deviceName, final String attributeName, final AttributeValue attributeValue,
-            final EventType eventTypeName) throws DevFailed {
+    public void pushEvent(final String deviceName, final String attributeName, final EventType eventTypeName)
+            throws DevFailed {
         xlogger.entry();
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventTypeName.getString());
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushEvent(eventSocket, fullName, attributeValue);
+            eventImpl.pushEvent(eventSocket, fullName);
         }
         xlogger.exit();
     }
@@ -421,6 +417,17 @@ public final class EventManager {
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
             eventImpl.pushEvent(eventSocket, fullName, dataReady);
+        }
+        xlogger.exit();
+    }
+
+    public void pushConfigEvent(final String deviceName, final String attributeName) throws DevFailed {
+        xlogger.entry();
+        final String fullName = EventUtilities.buildEventName(deviceName, attributeName,
+                EventType.DATA_READY_EVENT.getString());
+        final EventImpl eventImpl = getEventImpl(fullName);
+        if (eventImpl != null) {
+            eventImpl.pushConfigEvent(eventSocket, fullName);
         }
         xlogger.exit();
     }

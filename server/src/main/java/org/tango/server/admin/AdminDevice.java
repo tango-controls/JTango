@@ -724,7 +724,6 @@ public final class AdminDevice {
                                     case USER_EVENT:
                                         break;
                                     case PERIODIC_EVENT:
-                                    case QUALITY_EVENT:
                                     default:
                                         throwError = true;
                                         break;

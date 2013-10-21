@@ -1,26 +1,26 @@
 /**
- * Copyright (C) : 2012
- * 
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
- * 
+ * Copyright (C) :     2012
+ *
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
+ *
  * This file is part of Tango.
- * 
+ *
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango. If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.device;
 
@@ -30,13 +30,13 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
-import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
 import org.tango.server.servant.AttributeGetterSetter;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.ClntIdent;
@@ -201,16 +201,32 @@ public final class DeviceManager {
     }
 
     /**
-     * Push an event if some client had register it
+     * Push an event if some client had register it. The method will perform a read on the requested attribute before
+     * sending the event
      * 
      * @param attributeName The attribute name
-     * @param value The new attribute value
      * @param eventType The type of event to fire
      * @throws DevFailed
      */
-    public void pushEvent(final String attributeName, final AttributeValue value, final EventType eventType)
-            throws DevFailed {
-        EventManager.getInstance().pushEvent(name, attributeName, value, eventType);
+    public void pushEvent(final String attributeName, final EventType eventType) throws DevFailed {
+        switch (eventType) {
+            case CHANGE_EVENT:
+            case ARCHIVE_EVENT:
+            case USER_EVENT:
+                // get attribute value
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName,
+                        device.getAttributeList());
+                try {
+                    attribute.updateValue();
+                    // push the event
+                    EventManager.getInstance().pushEvent(name, attributeName, eventType);
+                } catch (final DevFailed e) {
+                    EventManager.getInstance().pushEvent(name, attributeName, e);
+                }
+                break;
+            default:
+                throw DevFailedUtils.newDevFailed("Only USER, ARCHIVE or CHANGE event can be send");
+        }
     }
 
     /**
@@ -222,17 +238,6 @@ public final class DeviceManager {
      */
     public void pushEvent(final String attributeName, final AttDataReady dataReady) throws DevFailed {
         EventManager.getInstance().pushEvent(name, attributeName, dataReady);
-    }
-
-    /**
-     * Push an error event
-     * 
-     * @param attributeName The attribute name
-     * @param error The error
-     * @throws DevFailed
-     */
-    public void pushEvent(final String attributeName, final DevFailed error) throws DevFailed {
-        EventManager.getInstance().pushEvent(name, attributeName, error);
     }
 
     /**

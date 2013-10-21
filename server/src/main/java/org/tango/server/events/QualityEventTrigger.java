@@ -42,12 +42,13 @@ import fr.esrf.Tango.DevFailed;
  */
 public class QualityEventTrigger implements IEventTrigger {
 
-    private final Logger logger = LoggerFactory.getLogger(PeriodicEventTrigger.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(PeriodicEventTrigger.class);
+    private final Logger logger = LoggerFactory.getLogger(QualityEventTrigger.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(QualityEventTrigger.class);
 
     private AttributeValue previousValue;
     private AttributeValue value;
     private final AttributeImpl attribute;
+    private boolean previousInitialized;
 
     /**
      * Ctr
@@ -56,17 +57,24 @@ public class QualityEventTrigger implements IEventTrigger {
      */
     public QualityEventTrigger(final AttributeImpl attribute) {
         this.attribute = attribute;
-        previousValue = attribute.getReadValue();
+        previousInitialized = false;
     }
 
     @Override
     public boolean isSendEvent() {
         xlogger.entry();
         previousValue = value;
+        boolean hasChanged = false;
         value = attribute.getReadValue();
-        final AttrQuality previousQuality = previousValue.getQuality();
-        final AttrQuality quality = value.getQuality();
-        final boolean hasChanged = !quality.equals(previousQuality);
+        if (!previousInitialized) {
+            previousValue = value;
+            previousInitialized = true;
+            hasChanged = false;
+        } else {
+            final AttrQuality previousQuality = previousValue.getQuality();
+            final AttrQuality quality = value.getQuality();
+            hasChanged = !quality.equals(previousQuality);
+        }
         logger.debug("QUALITY event must send: {}", hasChanged);
         xlogger.exit();
         return hasChanged;
