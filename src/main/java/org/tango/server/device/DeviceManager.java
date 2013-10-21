@@ -38,7 +38,6 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 
@@ -233,11 +232,10 @@ public final class DeviceManager {
      * Push a DATA_READY event if some client had registered it
      * 
      * @param attributeName The attribute name
-     * @param dataReady data ready object
      * @throws DevFailed
      */
-    public void pushEvent(final String attributeName, final AttDataReady dataReady) throws DevFailed {
-        EventManager.getInstance().pushEvent(name, attributeName, dataReady);
+    public void pushDataReadyEvent(final String attributeName, final int counter) throws DevFailed {
+        EventManager.getInstance().pushDataReadyEvent(name, attributeName, counter);
     }
 
     /**

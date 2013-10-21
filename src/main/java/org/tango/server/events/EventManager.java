@@ -48,7 +48,6 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
-import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.TangoApi.ApiUtil;
@@ -406,17 +405,17 @@ public final class EventManager {
      * 
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
-     * @param dataReady data ready object
+     * @param counter a counter value
      * @throws DevFailed
      */
-    public void pushEvent(final String deviceName, final String attributeName, final AttDataReady dataReady)
+    public void pushDataReadyEvent(final String deviceName, final String attributeName, final int counter)
             throws DevFailed {
         xlogger.entry();
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName,
                 EventType.DATA_READY_EVENT.getString());
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushEvent(eventSocket, fullName, dataReady);
+            eventImpl.pushDataReadyEvent(eventSocket, fullName, counter);
         }
         xlogger.exit();
     }

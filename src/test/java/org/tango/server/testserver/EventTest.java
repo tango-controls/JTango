@@ -620,21 +620,25 @@ public class EventTest {
     @Test(timeout = 10000)
     public void dataReady() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
-        final int id = dev.subscribe_event("dataReady", TangoConst.DATA_READY_EVENT, 100, new String[] {},
+        final int id = dev.subscribe_event("doubleArrayAtt", TangoConst.DATA_READY_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
         int eventCounter = 0;
         int value = 0;
         int previousValue = 0;
         try {
             while (eventCounter < 3) {
-                // read will send user event
-                dev.read_attribute("dataReady");
+                dev.command_inout("pushDataReady");
 
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
-                    if (eventData.name.contains("dataready")) {
+                    System.out.println("data ready " + eventData.name);
+                    if (eventData.name.contains("doublearrayatt")) {
                         previousValue = value;
-                        value = eventData.data_ready.ctr;
+                        if (eventData.data_ready != null) {
+                            value = eventData.data_ready.ctr;
+                            System.out.println("data ready " + value);
+                        }
+
                     }
                 }
                 eventCounter++;
