@@ -56,7 +56,7 @@ public class AttributeGroupTaskReader implements Runnable {
     }
 
     public void valueReader() {
-        if (attributeGroup != null && attributeGroupListener != null) {
+        if ((attributeGroup != null) && (attributeGroupListener != null)) {
             try {
                 DeviceAttribute[] resultGroup = null;
                 AttributeInfoEx[] attributeInfoExList = null;
@@ -75,7 +75,7 @@ public class AttributeGroupTaskReader implements Runnable {
                     return;
                 }
 
-                if ((readAttributeInfo || readWriteValue) && attributeGroup != null) {
+                if ((readAttributeInfo || readWriteValue) && (attributeGroup != null)) {
                     try {
                         attributeInfoExList = attributeGroup.getConfig();
                     } catch (final DevFailed devFailed) {
@@ -90,13 +90,13 @@ public class AttributeGroupTaskReader implements Runnable {
                 // extract results
                 boolean tmpHasFailed = false;
                 int i = 0;
+                String attrName = null;
                 for (final DeviceAttribute deviceAttribute : resultGroup) {
-                    final String attrName = attributeNames[i++];
+                    attrName = attributeNames[i];
                     AttributeInfoEx attributeInfo = null;
-                    if (attributeInfoExList != null && i > 0 && i < attributeInfoExList.length) {
+                    if ((attributeInfoExList != null) && (i >= 0) && (i < attributeInfoExList.length)) {
                         attributeInfo = attributeInfoExList[i];
                     }
-
                     try {
                         if (deviceAttribute != null) {
                             final AttrDataFormat format = deviceAttribute.getDataFormat();
@@ -108,7 +108,8 @@ public class AttributeGroupTaskReader implements Runnable {
                                 if (attributeInfo != null) {
                                     attributeGroupListener.updateAttributeInfoEx(attrName, attributeInfo);
                                 } else {
-                                    attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date())
+                                    attributeGroupListener.updateAttributeInfoErrorMessage(attrName,
+                                            DATE_FORMAT.format(new Date())
                                             + " : Can't read attribute info of" + attrName);
                                 }
                             }
@@ -119,7 +120,7 @@ public class AttributeGroupTaskReader implements Runnable {
 
                             if (readWriteValue) {
                                 try {
-                                    if (attributeInfo != null && attributeInfo.writable != AttrWriteType.READ) {
+                                    if ((attributeInfo != null) && (attributeInfo.writable != AttrWriteType.READ)) {
                                         final Object tmpWriteValue = InsertExtractUtils.extractWrite(deviceAttribute,
                                                 attributeInfo.writable, format);
                                         attributeGroupListener.updateWriteValue(attrName, tmpWriteValue);
@@ -147,6 +148,7 @@ public class AttributeGroupTaskReader implements Runnable {
                         attributeGroupListener.updateErrorMessage(attrName, DATE_FORMAT.format(new Date()) + " : "
                                 + DevFailedUtils.toString(devFailed));
                     }
+                    i++;
                 }
                 if (tmpHasFailed) {
                     attributeGroupListener.catchException(new Exception(DATE_FORMAT.format(new Date())
