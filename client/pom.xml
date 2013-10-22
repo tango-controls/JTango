@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>JTangoClientLang</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9-SNAPSHOT</version>
 	<name>JTango Client Lang</name>
 	<description>Tango client utilities</description>
 	<developers>
