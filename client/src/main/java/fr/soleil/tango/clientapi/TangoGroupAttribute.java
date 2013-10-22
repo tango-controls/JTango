@@ -15,12 +15,12 @@ public final class TangoGroupAttribute {
 
     private final AttributeGroup group;
     private final String[] attributeNamesGroup;
-    private final DeviceAttribute[] deviceAttributes;
+    private DeviceAttribute[] deviceAttributes;
 
     public TangoGroupAttribute(final String... attributeNames) throws DevFailed {
-	attributeNamesGroup = attributeNames;
-	group = ProxyFactory.getInstance().createAttributeGroup(true, attributeNames);
-	deviceAttributes = group.read();
+        attributeNamesGroup = attributeNames;
+        group = ProxyFactory.getInstance().createAttributeGroup(true, attributeNames);
+        deviceAttributes = group.read();
     }
 
     /**
@@ -30,9 +30,22 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public TangoGroupAttribute(final boolean throwExceptions, final String... attributeNames) throws DevFailed {
-	attributeNamesGroup = attributeNames;
-	group = ProxyFactory.getInstance().createAttributeGroup(throwExceptions, attributeNames);
-	deviceAttributes = group.read();
+        this(throwExceptions, true, attributeNames);
+    }
+
+    /**
+     * @param groupName
+     * @param throwExceptions
+     * @param attributeNames
+     * @throws DevFailed
+     */
+    public TangoGroupAttribute(final boolean throwExceptions, final boolean readValue, final String... attributeNames)
+            throws DevFailed {
+        attributeNamesGroup = attributeNames;
+        group = ProxyFactory.getInstance().createAttributeGroup(throwExceptions, attributeNames);
+        if (readValue) {
+            deviceAttributes = group.read();
+        }
     }
 
     /**
@@ -43,17 +56,17 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public void write(final Object value) throws DevFailed {
-	for (final DeviceAttribute deviceAttribute : deviceAttributes) {
-	    InsertExtractUtils.insert(deviceAttribute, value);
-	}
-	group.write(deviceAttributes);
+        for (final DeviceAttribute deviceAttribute : deviceAttributes) {
+            InsertExtractUtils.insert(deviceAttribute, value);
+        }
+        group.write(deviceAttributes);
     }
 
     public void writeAysn(final Object value) throws DevFailed {
-	for (final DeviceAttribute deviceAttribute : deviceAttributes) {
-	    InsertExtractUtils.insert(deviceAttribute, value);
-	}
-	group.writeAsync(deviceAttributes);
+        for (final DeviceAttribute deviceAttribute : deviceAttributes) {
+            InsertExtractUtils.insert(deviceAttribute, value);
+        }
+        group.writeAsync(deviceAttributes);
     }
 
     /**
@@ -64,27 +77,27 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public void write(final Object... value) throws DevFailed {
-	writeAysn(value);
-	getWriteAsyncReplies();
+        writeAysn(value);
+        getWriteAsyncReplies();
     }
 
     public void writeAysn(final Object... value) throws DevFailed {
-	if (value.length != deviceAttributes.length) {
-	    DevFailedUtils.throwDevFailed("WRITE_ERROR", deviceAttributes.length + " values must be provided");
-	}
-	int i = 0;
-	for (final DeviceAttribute deviceAttribute : deviceAttributes) {
-	    InsertExtractUtils.insert(deviceAttribute, value[i++]);
-	}
-	group.writeAsync(deviceAttributes);
+        if (value.length != deviceAttributes.length) {
+            DevFailedUtils.throwDevFailed("WRITE_ERROR", deviceAttributes.length + " values must be provided");
+        }
+        int i = 0;
+        for (final DeviceAttribute deviceAttribute : deviceAttributes) {
+            InsertExtractUtils.insert(deviceAttribute, value[i++]);
+        }
+        group.writeAsync(deviceAttributes);
     }
 
     public void getWriteAsyncReplies() throws DevFailed {
-	group.getWriteReplies();
+        group.getWriteReplies();
     }
 
     public DeviceAttribute[] read() throws DevFailed {
-	return group.read();
+        return group.read();
     }
 
     /**
@@ -94,17 +107,17 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public Object[] readExtract() throws DevFailed {
-	final DeviceAttribute[] da = read();
-	final Object[] results = extract(da);
-	return results;
+        final DeviceAttribute[] da = read();
+        final Object[] results = extract(da);
+        return results;
     }
 
     public Object[] extract(final DeviceAttribute[] da) throws DevFailed {
-	final Object[] results = new Object[da.length];
-	for (int i = 0; i < results.length; i++) {
-	    results[i] = InsertExtractUtils.extract(da[i]);
-	}
-	return results;
+        final Object[] results = new Object[da.length];
+        for (int i = 0; i < results.length; i++) {
+            results[i] = InsertExtractUtils.extract(da[i]);
+        }
+        return results;
     }
 
     /**
@@ -113,7 +126,7 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public void readAync() throws DevFailed {
-	group.readAsync();
+        group.readAsync();
     }
 
     /**
@@ -123,7 +136,7 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public DeviceAttribute[] getReadAsyncReplies() throws DevFailed {
-	return group.getReadReplies();
+        return group.getReadReplies();
     }
 
     /**
@@ -131,17 +144,17 @@ public final class TangoGroupAttribute {
      * @throws DevFailed
      */
     public AttributeInfoEx[] getConfig() throws DevFailed {
-	return group.getConfig();
+        return group.getConfig();
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder str = new ToStringBuilder(this);
-	str.append("names", Arrays.toString(attributeNamesGroup));
-	return str.toString();
+        final ToStringBuilder str = new ToStringBuilder(this);
+        str.append("names", Arrays.toString(attributeNamesGroup));
+        return str.toString();
     }
 
     public AttributeGroup getGroup() {
-	return group;
+        return group;
     }
 }
