@@ -326,12 +326,10 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void createDevice(final Connection connection, final String corba_str) throws DevFailed {
 		try {
 	    	// Build corba object
-
 	    	final ORB orb = ApiUtil.get_orb();
 	    	connection.setObj(orb.string_to_object(corba_str));
-            Object o = connection.getObj();
-
-		} catch (final RuntimeException e) {
+		}
+        catch (final RuntimeException e) {
 	    	Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_VALID", e.toString().substring(
 		    	e.toString().indexOf(":") + 2), "Connection.createDevice()");
 		}
@@ -342,7 +340,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		}
 		try {
 	    	connection.setDev_timeout(Integer.parseInt(strTimeout));
-		} catch (final Exception e) {
+		}
+        catch (final Exception e) {
 	    	ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(connection);
 	    	e.printStackTrace();
 		}
@@ -918,6 +917,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     }
 
     // ===========================================================
+    private long t0 = System.currentTimeMillis();
+    private int pingCnt = 0;
     /**
      * Execute a ping command to a device server.
      * 
