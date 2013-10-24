@@ -35,9 +35,6 @@
 package fr.esrf.TangoApi.events;
 
 
-import javax.swing.*;
-import java.awt.*;
-
 /**
  * Class Description: Utility methods for event classes
  * 
@@ -63,7 +60,7 @@ public class EventUtil {
         synchronized (monitor) {
             if (!graphicAvailableChecked) {
                 try {
-                    java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    graphicIsAvailable = !java.awt.GraphicsEnvironment.isHeadless();
                 }
                 catch(Error e) {
                     graphicIsAvailable = false;
