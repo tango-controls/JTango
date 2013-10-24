@@ -34,6 +34,7 @@
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.TangoDs.Except;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 
@@ -42,7 +43,9 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -62,7 +65,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.3.1  -  Wed Jul 03 11:22:33 CEST 2013";
+            "8.3.6b  -  Thu Oct 24 15:25:38 CEST 2013";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -567,6 +570,48 @@ public class ApiUtil {
         }
 
     }
+    //===============================================================
+    /**
+     * Write a trace file (used to debug).
+     * It is used to debug, it does not throw DevFailed
+     * @param filename   file name to be generated
+     */
+    //===============================================================
+    public static void writeStackTraceFile(String filename, String deviceName){
+        //  Get the stack to write it in a file
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stackTrace) {
+            System.out.println(element);
+        }
+        //  Get host name and pid
+        String host = "";
+        try {
+            host = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+        } catch (final java.net.UnknownHostException e) { /* */  }
+        int pid = DevLockManager.getInstance().getJvmPid();
+        filename += "."+host+"."+pid;
+        StringBuilder sb = new StringBuilder(deviceName+":\n");
+        for (StackTraceElement stackTraceElement : stackTrace)
+            sb.append(stackTraceElement).append('\n');
+        writeFile(filename, sb.toString());
+    }
+    //===============================================================
+    /**
+     * Write a trace file (used to debug).
+     * It is used to debug, it does not throw DevFailed
+     * @param filename  file name to be generated
+     * @param code      code to be generated in file.
+     */
+    //===============================================================
+    public static void writeFile(String filename, String code){
+        try {
+            FileOutputStream fidout = new FileOutputStream(filename);
+            fidout.write(code.getBytes());
+            fidout.close();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
     //===================================================================
     /**
      * Return the TangORB version as an integer like
@@ -622,7 +667,7 @@ public class ApiUtil {
     }
     //===================================================================
     /**
-     * Convert a signed int to a unsigne value in a long
+     * Convert a signed int to a unsigned value in a long
      * @param intValue    signed integer value to convert
      * @return the unsigned value in a long
      */
