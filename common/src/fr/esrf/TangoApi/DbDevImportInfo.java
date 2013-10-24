@@ -192,7 +192,7 @@ public class DbDevImportInfo implements java.io.Serializable {
             } catch (DevFailed e) {
                 //	return full exception string
                 //-----------------------------------
-                StringBuffer sb = new StringBuffer(e.toString() + ":\n");
+                StringBuilder sb = new StringBuilder(e.toString() + ":\n");
                 for (int i = 0; i < e.errors.length; i++) {
                     sb.append(e.errors[i].reason).append(" from ");
                     sb.append(e.errors[i].origin).append("\n");
