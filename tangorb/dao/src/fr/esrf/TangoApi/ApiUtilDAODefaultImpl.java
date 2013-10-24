@@ -262,9 +262,10 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 
             // Set jacorb verbosity at minimum value
             props.put("jacorb.config.log.verbosity", "0");
-
             props.put("jacorb.disableClientOrbPolicies", "off");
 
+            //  Add directory to get jacorb.properties
+            props.put("jacorb.config.dir", "fr/esrf/TangoApi/etc");
 			System.setProperties(props);
 
             // Initialize ORB
@@ -464,50 +465,52 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     // GA: add synchronized
     public synchronized void remove_async_request(final int id) {
 
-	// Try to destroye Request object (added by PV 7/9/06)
-	final AsyncCallObject aco =  async_request_table.get(id);
-	if (aco != null) {
-	    removePendingRepliesOfRequest(aco.request);
-	    ((org.jacorb.orb.ORB) ApiUtil.getOrb()).removeRequest(aco.request);
-	    async_request_table.remove(id);
-	}
+        // Try to destroye Request object (added by PV 7/9/06)
+        final AsyncCallObject aco =  async_request_table.get(id);
+        if (aco != null) {
+            removePendingRepliesOfRequest(aco.request);
+            ((org.jacorb.orb.ORB) ApiUtil.getOrb()).removeRequest(aco.request);
+            async_request_table.remove(id);
+        }
     }
 
 
+    @SuppressWarnings("UnusedParameters")
     private static void removePendingReplies(final Delegate delegate) {
-	// try to solve a memory leak. pending_replies is still growing when
-	// server is in timeout
-/*****
-	Removed for JacORB-3
-	if (!delegate.get_pending_replies().isEmpty()) {
-	    delegate.get_pending_replies().clear();
-	}
-*/
+        // try to solve a memory leak. pending_replies is still growing when
+        // server is in timeout
+        /*****
+        Removed for JacORB-3
+        if (!delegate.get_pending_replies().isEmpty()) {
+            delegate.get_pending_replies().clear();
+        }
+        *****/
     }
     public static void removePendingRepliesOfRequest(final Request request) {
-	final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
-		.target())._get_delegate();
-	removePendingReplies(delegate);
+        final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
+            .target())._get_delegate();
+        removePendingReplies(delegate);
     }
 
     public static void removePendingRepliesOfDevice(final Connection connection) {
-	final org.jacorb.orb.Delegate delegate;
-	if (connection.device_4 != null) {
-	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
-		    ._get_delegate();
-	} else if (connection.device_3 != null) {
-	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
-		    ._get_delegate();
-	} else if (connection.device_2 != null) {
-	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
-		    ._get_delegate();
-	} else if (connection.device != null) {
-	    delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
-		    ._get_delegate();
-	} else {
-	    return;
-	}
-	removePendingReplies(delegate);
+        final org.jacorb.orb.Delegate delegate;
+        if (connection.device_4 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
+                ._get_delegate();
+        } else if (connection.device_3 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
+                ._get_delegate();
+        } else if (connection.device_2 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
+                ._get_delegate();
+        } else if (connection.device != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
+                ._get_delegate();
+        }
+        else {
+            return;
+        }
+        removePendingReplies(delegate);
     }
 
     // ==========================================================================
@@ -516,10 +519,10 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ==========================================================================
     public void set_async_reply_model(final int id, final int reply_model) {
-	final AsyncCallObject aco = async_request_table.get(id);
-	if (aco != null) {
-	    aco.reply_model = reply_model;
-	}
+        final AsyncCallObject aco = async_request_table.get(id);
+        if (aco != null) {
+            aco.reply_model = reply_model;
+        }
     }
 
     // ==========================================================================
@@ -528,10 +531,10 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ==========================================================================
     public void set_async_reply_cb(final int id, final CallBack cb) {
-	final AsyncCallObject aco = async_request_table.get(id);
-	if (aco != null) {
-	    aco.cb = cb;
-	}
+        final AsyncCallObject aco = async_request_table.get(id);
+        if (aco != null) {
+            aco.cb = cb;
+        }
     }
 
     // ==========================================================================
@@ -544,17 +547,17 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ==========================================================================
     public int pending_asynch_call(final DeviceProxy dev, final int reply_model) {
-	int cnt = 0;
-	final Enumeration _enum = async_request_table.keys();
-	while (_enum.hasMoreElements()) {
-        int n = (Integer)_enum.nextElement();
-	    final AsyncCallObject aco = async_request_table.get(n);
-	    if (aco.dev == dev
-		    && (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model)) {
-		cnt++;
-	    }
-	}
-	return cnt;
+        int cnt = 0;
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+            final AsyncCallObject aco = async_request_table.get(n);
+            if (aco.dev == dev
+                && (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model)) {
+            cnt++;
+            }
+        }
+        return cnt;
     }
 
     // ==========================================================================
@@ -566,16 +569,16 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ==========================================================================
     public int pending_asynch_call(final int reply_model) {
-	int cnt = 0;
-	final Enumeration _enum = async_request_table.keys();
-	while (_enum.hasMoreElements()) {
-        int n = (Integer)_enum.nextElement();
-	    final AsyncCallObject aco = async_request_table.get(n);
-	    if (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model) {
-		    cnt++;
-	    }
-	}
-	return cnt;
+        int cnt = 0;
+        final Enumeration _enum = async_request_table.keys();
+        while (_enum.hasMoreElements()) {
+            int n = (Integer)_enum.nextElement();
+            final AsyncCallObject aco = async_request_table.get(n);
+            if (reply_model == ApiDefs.ALL_ASYNCH || aco.reply_model == reply_model) {
+                cnt++;
+            }
+        }
+        return cnt;
     }
 
     // ==========================================================================
@@ -587,7 +590,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      */
     // ==========================================================================
     public void set_asynch_cb_sub_model(final int model) {
-	async_cb_sub_model = model;
+    	async_cb_sub_model = model;
     }
 
     // ==========================================================================
@@ -711,26 +714,26 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
      *
      * @param objname
      *            object name (used in first index of output array)..
-     * @param attr
+     * @param attributes
      *            DbAttribute array to be converted
      * @return the String array created from input argument.
      */
     // ==========================================================================
-    public String[] toStringArray(final String objname, final DbAttribute[] attr, final int mode) {
-        final int nb_attr = attr.length;
+    public String[] toStringArray(final String objname, final DbAttribute[] attributes, final int mode) {
+        final int nb_attr = attributes.length;
 
         // Copy object name and nb attrib to String array
         final ArrayList<String> list = new ArrayList<String>();
         list.add(objname);
-        list.add("" + nb_attr);
-        for (int i = 0; i < nb_attr; i++) {
+        list.add(Integer.toString(nb_attr));
+        for (DbAttribute attribute : attributes) {
             // Copy Attrib name and nb prop to String array
-            list.add(attr[i].name);
-            list.add("" + attr[i].size());
-            for (int j = 0; j < attr[i].size(); j++) {
+            list.add(attribute.name);
+            list.add("" + attribute.size());
+            for (int j=0 ; j<attribute.size() ; j++) {
                 // Copy data to String array
-                list.add(attr[i].get_property_name(j));
-                final String[] values = attr[i].get_value(j);
+                list.add(attribute.get_property_name(j));
+                final String[] values = attribute.get_value(j);
                 if (mode != 1) {
                     list.add("" + values.length);
                 }
