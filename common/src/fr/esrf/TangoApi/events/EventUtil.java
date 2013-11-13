@@ -59,16 +59,22 @@ public class EventUtil {
     public static boolean graphicAvailable() {
         synchronized (monitor) {
             if (!graphicAvailableChecked) {
-                try {
-                    graphicIsAvailable = !java.awt.GraphicsEnvironment.isHeadless();
-                }
-                catch(Error e) {
+                String s = System.getProperty("SERVER");
+                if (s!=null && s.equals("true")) {
                     graphicIsAvailable = false;
-                    //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
                 }
-                catch(Exception e) {
-                    graphicIsAvailable = false;
-                    //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
+                else {
+                    try {
+                        graphicIsAvailable = !java.awt.GraphicsEnvironment.isHeadless();
+                    }
+                    catch(Error e) {
+                        graphicIsAvailable = false;
+                        //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
+                    }
+                    catch(Exception e) {
+                        graphicIsAvailable = false;
+                        //System.err.println(e + "\n" + "---------------> Graphics Environment not available");
+                    }
                 }
                 graphicAvailableChecked = true;
            }
