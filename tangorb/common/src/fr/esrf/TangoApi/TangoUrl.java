@@ -59,6 +59,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
     boolean use_db = true;
     static private boolean envRead = false;
 
+    public static final String  NO_DATABASE = "#dbase=no";
     //===================================================================
 
     /**
@@ -140,21 +141,19 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
         if (protocol==TANGO && (host == null || host.isEmpty())) {
             //  Check if database already connected
             Database db = null;
-            try {
-                //  If default database already create, get it
-                if (ApiUtil.default_db_obj_exists()) {
-                    db = ApiUtil.get_default_db_obj();
-                }
-                else {
-                    //  if tango_host is unknown --> get it from environment
-                    setFromEnv();
-                    if (host!=null && !host.isEmpty())
-                        db = ApiUtil.get_db_obj(host, strport);
-                    else
-                        db = ApiUtil.get_db_obj();
-                }
+            //  If default database already create, get it
+            if (ApiUtil.default_db_obj_exists()) {
+                db = ApiUtil.get_default_db_obj();
             }
-            catch (DevFailed e) { /* */ }
+            else {
+                //  if tango_host is unknown --> get it from environment
+                setFromEnv();
+                if (host!=null && !host.isEmpty())
+                    db = ApiUtil.get_db_obj(host, strport);
+                else
+                    db = ApiUtil.get_db_obj();
+            }
+
             if (db != null)
                 envRead = true;
 
@@ -254,7 +253,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
         sb.append("://").append(host).append(":").append(strport);
         sb.append("/").append(devname);
         if (!use_db)
-            sb.append("#dbase=no");
+            sb.append(NO_DATABASE);
         return sb.toString();
     }
     //===================================================================
