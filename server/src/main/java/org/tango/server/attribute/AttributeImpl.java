@@ -178,23 +178,35 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      */
     public void updateValue() throws DevFailed {
         xlogger.entry(getName());
+
+        // invoke on device
+        try {
+            final AttributeValue returnedValue = (AttributeValue) behavior.getValue().clone();
+            this.updateValue(returnedValue);
+        } catch (final CloneNotSupportedException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+
+        xlogger.exit(getName());
+    }
+
+    /**
+     * set the read value
+     * 
+     * @throws DevFailed
+     */
+    public void updateValue(final AttributeValue inValue) throws DevFailed {
+        xlogger.entry(getName());
         readValue = new AttributeValue();
         try {
-            // invoke on device
-            AttributeValue returnedValue;
-            try {
-                returnedValue = (AttributeValue) behavior.getValue().clone();
-            } catch (final CloneNotSupportedException e) {
-                throw DevFailedUtils.newDevFailed(e);
-            }
 
             // get as array if necessary (for image)
-            if (returnedValue.getValue() != null) {
-                checkUpdateErrors(returnedValue);
-                readValue.setValue(ArrayUtils.from2DArrayToArray(returnedValue.getValue()));
+            if (inValue.getValue() != null) {
+                checkUpdateErrors(inValue);
+                readValue.setValue(ArrayUtils.from2DArrayToArray(inValue.getValue()));
                 // force dim for image
-                readValue.setXDim(returnedValue.getXDim());
-                readValue.setYDim(returnedValue.getYDim());
+                readValue.setXDim(inValue.getXDim());
+                readValue.setYDim(inValue.getYDim());
                 // force conversion to check types
                 TangoIDLAttributeUtil.toAttributeValue4(this, readValue, null);
                 if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
@@ -219,7 +231,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             } else {
                 DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
             }
-            updateQuality(returnedValue);
+            updateQuality(inValue);
             updateDefaultWritePart();
         } catch (final DevFailed e) {
             readValue.setQuality(AttrQuality.ATTR_INVALID);

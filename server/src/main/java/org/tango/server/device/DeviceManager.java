@@ -30,6 +30,7 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
@@ -217,6 +218,35 @@ public final class DeviceManager {
                         device.getAttributeList());
                 try {
                     attribute.updateValue();
+                    // push the event
+                    EventManager.getInstance().pushEvent(name, attributeName, eventType);
+                } catch (final DevFailed e) {
+                    EventManager.getInstance().pushEvent(name, attributeName, e);
+                }
+                break;
+            default:
+                throw DevFailedUtils.newDevFailed("Only USER, ARCHIVE or CHANGE event can be send");
+        }
+    }
+
+    /**
+     * Push an event if some client had register it.
+     * 
+     * @param attributeName The attribute name
+     * @param eventType The type of event to fire
+     * @throws DevFailed
+     */
+    public void pushEvent(final String attributeName, final AttributeValue value, final EventType eventType)
+            throws DevFailed {
+        switch (eventType) {
+            case CHANGE_EVENT:
+            case ARCHIVE_EVENT:
+            case USER_EVENT:
+                // set attribute value
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName,
+                        device.getAttributeList());
+                try {
+                    attribute.updateValue(value);
                     // push the event
                     EventManager.getInstance().pushEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
