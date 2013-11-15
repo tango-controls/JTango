@@ -917,8 +917,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     }
 
     // ===========================================================
-    private long t0 = System.currentTimeMillis();
-    private int pingCnt = 0;
     /**
      * Execute a ping command to a device server.
      * 
@@ -930,12 +928,12 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		long result = 0;
 		final int maxRetries = connection.transparent_reconnection ? 1 : 0;
 		int nbRetries = 0;
-		boolean retry = false;
+		boolean retry;
 		do {
 	    	try {
 				result = doPing(connection);
+                retry = false;
 	    	} catch (final DevFailed e) {
-
 				if (nbRetries < maxRetries) {
 		    		retry = true;
 				} else {
