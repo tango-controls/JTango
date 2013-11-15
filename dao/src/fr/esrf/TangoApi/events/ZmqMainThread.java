@@ -140,7 +140,7 @@ public class ZmqMainThread extends Thread {
                 pollers.poll();
 
                 //  read the speaking one
-                for (int i=0 ; i< pollers.getSize() ; i++) {
+                for (int i=0 ; i<pollers.getSize() ; i++) {
                     if (pollers.pollin(i)) {
                         manageInputBuffer(i);
                     }
@@ -202,6 +202,7 @@ public class ZmqMainThread extends Thread {
         //System.out.println("manageInputBuffer -> "+source);
         switch (source) {
             case ControlSock:
+                //System.out.println(System.currentTimeMillis() + " - receive Control");
                 try {
                     //  Read input from socket
                     byte[] inputBuffer = controlSocket.recv(0);
@@ -218,6 +219,7 @@ public class ZmqMainThread extends Thread {
                 break;
 
             case HearBeatSock:
+                //System.out.println(System.currentTimeMillis() + " - receive heartbeat");
                 try {
                     //  Read input from socket (in 3 parts)
                     byte[][]    inputs = readSocket(heartbeatSocket, 3);
@@ -229,6 +231,7 @@ public class ZmqMainThread extends Thread {
                 break;
 
             case EventSock:
+                //System.out.println(System.currentTimeMillis() + " - receive event  -----------------");
                 try {
                     byte[][]    inputs = readSocket(eventSocket, 4);
                     manageEvent(inputs);
@@ -312,7 +315,6 @@ public class ZmqMainThread extends Thread {
      */
     //===============================================================
     private void manageEvent(byte[][] inputs) throws DevFailed {
-
 
         try {
             //  Check if inputs are coherent
@@ -497,6 +499,7 @@ public class ZmqMainThread extends Thread {
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
         //  First part is heartbeat name
         String  name = new String(inputs[NameIdx]);
+        //System.out.println(name);
 
         //  Check if name is coherent
         int start = name.indexOf("dserver/");
@@ -620,7 +623,7 @@ public class ZmqMainThread extends Thread {
             else
                 traceZmqSubscription(controlStructure.eventName, true);
         }
-      //  Check if not already connected or forced (re connection)
+        //  Check if not already connected or forced (re connection)
         if (controlStructure.forceReconnection || !alreadyConnected(controlStructure.endPoint)) {
             ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
 
