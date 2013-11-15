@@ -1664,5 +1664,27 @@ public class Database extends Connection {
 	public void setAccess_proxy(AccessProxy access_proxy) {
 		this.access_proxy = access_proxy;
 	}
+    // ===================================================================
+    // ===================================================================
+    public static void main(String[] args) {
+        try {
+            if (args.length>0) {
+                if (args[0].equals("-hosts")) {
+                    String[]    hosts = ApiUtil.get_db_obj().get_device_member("tango/admin/*");
+                    for (String host : hosts) {
+                        System.out.println(host);
+                    }
+                }
+            }
+            else {
+                System.err.println("Parameters ?");
+                System.err.println("\t-hosts: display controlled (by a Starter) host list");
+            }
+        }
+        catch (DevFailed e) {
+            System.err.println(e.errors[0].desc);
+        }
+    }
+
 }
 
