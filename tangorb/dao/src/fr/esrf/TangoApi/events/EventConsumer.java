@@ -351,7 +351,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 {
                     try {
                         //  Try for notifd
-                        System.out.println("eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();");
                         eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
                         subscribeIfNotDone(eventCallBackStruct, callbackKey);
                         return;
@@ -520,10 +519,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         callbackStruct.device.set_transparency_reconnection(true);
         try {
             callbackStruct.setSynchronousDone(false);
-            if (callbackStruct.event_name.equals(eventNames[ATT_CONF_EVENT]))
+            if (callbackStruct.event_name.equals(eventNames[ATT_CONF_EVENT])) {
                 info = callbackStruct.device.get_attribute_info_ex(callbackStruct.attr_name);
-            else
+            }
+            else {
                 da = callbackStruct.device.read_attribute(callbackStruct.attr_name);
+            }
+            callbackStruct.setSynchronousDone(true);
 
             // The reconnection worked fine. The heartbeat should come back now,
             // when the notifd has not closed the connection.
@@ -578,7 +580,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
         //===============================================================
         public void run() {
-            //	Then read attribute
+             //	Then read attribute
             DeviceAttribute deviceAttribute = null;
             AttributeInfoEx info = null;
             DevError[] err = null;
