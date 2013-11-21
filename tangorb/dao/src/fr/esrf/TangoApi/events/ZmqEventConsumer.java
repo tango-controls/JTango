@@ -329,7 +329,6 @@ public class ZmqEventConsumer extends EventConsumer implements
             // 3- The server has been restarted on another host.
 
         if (KeepAliveThread.heartbeatHasBeenSkipped(channelStruct)) {
-
             DevError    dev_error = null;
             try{
                 String  admDeviceName = channelStruct.adm_device_proxy.fullName();  //.toLowerCase();
@@ -355,8 +354,8 @@ public class ZmqEventConsumer extends EventConsumer implements
 
                     //	If reconnection done, try to re subscribe
                     //		and read attribute in synchronous mode
-                    if (!callbackStruct.event_name.equals(eventNames[DATA_READY_EVENT])) {
-                        if (reconnectToEvent(channelStruct, callbackStruct)) {
+                    if (reconnectToEvent(channelStruct, callbackStruct)) {
+                        if (!callbackStruct.event_name.equals(eventNames[DATA_READY_EVENT])) {
                             readAttributeAndPush(channelStruct, callbackStruct);
                         }
                     }
