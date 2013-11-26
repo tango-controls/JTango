@@ -171,4 +171,6 @@ public interface ITangoDB {
 
     String getAccessDeviceName() throws DevFailed;
 
+    String getFreeProperty(String name, String propertyName) throws DevFailed;
+
 }

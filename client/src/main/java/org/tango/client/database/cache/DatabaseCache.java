@@ -233,4 +233,10 @@ public final class DatabaseCache implements ICachableDatabase {
         return dbDevice.getPossibleTangoHosts();
     }
 
+    @Override
+    public String getFreeProperty(final String name, final String propertyName) throws DevFailed {
+        // TODO get from cache
+        return dbDevice.getFreeProperty(name, propertyName);
+    }
+
 }
