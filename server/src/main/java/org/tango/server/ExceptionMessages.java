@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server;
 
@@ -61,7 +61,7 @@ public final class ExceptionMessages {
     public static final String INCOMPATIBLE_DATA_TYPE = "API_IncompatibleAttrDataType";
     public static final String COMMAND_NOT_ALLOWED = "API_CommandNotAllowed";
     public static final String DB_ACCESS = "API_DatabaseAccess";
-    public static final String EVENT_CRITERIA_NOT_SET = "API_EventCriteriaNotSet";
+    public static final String EVENT_CRITERIA_NOT_SET = "API_EventPropertiesNotSet";
     public static final String EVENT_NOT_AVAILABLE = "API_EventNotAvailable";
     public static final String EVENT_NO_FREE_PORT = "API_NoFreePortFound";
     public static final String TANGO_HOST_ERROR = "API_GetTangoHostFailed";
