@@ -27,6 +27,8 @@ package org.tango.server.device;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.InvocationContext;
@@ -57,8 +59,8 @@ public final class AroundInvokeImpl {
      * @param aroundInvokeMethod
      */
     public AroundInvokeImpl(final Object businessObject, final Method aroundInvokeMethod) {
-	this.businessObject = businessObject;
-	this.aroundInvokeMethod = aroundInvokeMethod;
+        this.businessObject = businessObject;
+        this.aroundInvokeMethod = aroundInvokeMethod;
     }
 
     /**
@@ -69,23 +71,31 @@ public final class AroundInvokeImpl {
      * @throws DevFailed
      */
     public void aroundInvoke(final InvocationContext ctx) throws DevFailed {
-	xlogger.entry();
-	if (aroundInvokeMethod != null) {
-	    try {
-		aroundInvokeMethod.invoke(businessObject, ctx);
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		if (e.getCause() instanceof DevFailed) {
-		    throw (DevFailed) e.getCause();
-		} else {
-		    DevFailedUtils.throwDevFailed(e.getCause());
-		}
-	    }
-	}
-	xlogger.exit();
+        xlogger.entry();
+        if (aroundInvokeMethod != null) {
+            try {
+                aroundInvokeMethod.invoke(businessObject, ctx);
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    throw (DevFailed) e.getCause();
+                } else {
+                    DevFailedUtils.throwDevFailed(e.getCause());
+                }
+            }
+        }
+        xlogger.exit();
+    }
+
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("method", aroundInvokeMethod);
+        builder.append("device class", businessObject.getClass());
+        return builder.toString();
     }
 
 }
