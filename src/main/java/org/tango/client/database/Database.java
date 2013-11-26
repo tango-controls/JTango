@@ -240,4 +240,9 @@ public final class Database implements ITangoDB {
         return cache.getPossibleTangoHosts();
     }
 
+    @Override
+    public String getFreeProperty(final String name, final String propertyName) throws DevFailed {
+        return cache.getFreeProperty(name, propertyName);
+    }
+
 }

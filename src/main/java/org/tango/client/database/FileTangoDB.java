@@ -278,7 +278,9 @@ public final class FileTangoDB implements ITangoDB {
     @Override
     public void deleteDeviceProperty(final String deviceName, final String propertyName) throws DevFailed {
         final Map<String, String[]> props = deviceProperties.get(deviceName);
-        props.remove(propertyName);
+        if (props != null) {
+            props.remove(propertyName);
+        }
     }
 
     @Override
@@ -320,5 +322,10 @@ public final class FileTangoDB implements ITangoDB {
     @Override
     public String[] getPossibleTangoHosts() {
         return new String[] { "" };
+    }
+
+    @Override
+    public String getFreeProperty(final String name, final String propertyName) {
+        return "";
     }
 }

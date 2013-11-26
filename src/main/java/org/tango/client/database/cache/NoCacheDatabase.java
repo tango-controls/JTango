@@ -445,4 +445,16 @@ public final class NoCacheDatabase implements ICachableDatabase {
         return tangoHosts;
 
     }
+
+    @Override
+    public String getFreeProperty(final String name, final String propertyName) throws DevFailed {
+        final DeviceData argin = new DeviceData();
+        argin.insert(new String[] { name, propertyName });
+        final DeviceData deviceData = database.command_inout("DbGetProperty", argin);
+        String result = "";
+        if (deviceData.extractStringArray().length > 4) {
+            result = deviceData.extractStringArray()[4];
+        }
+        return result;
+    }
 }
