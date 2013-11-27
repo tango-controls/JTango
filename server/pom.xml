@@ -117,10 +117,11 @@
 
 
 	<dependencies>
+	<!--TODO use release version  -->
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.9-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jzmq</artifactId>
