@@ -36,6 +36,7 @@ import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 
 public final class CommandCache {
@@ -46,7 +47,7 @@ public final class CommandCache {
     private final CommandImpl command;
 
     public CommandCache(final CacheManager manager, final CommandImpl command, final String deviceName,
-            final DeviceLock deviceLock) {
+            final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.command = command;
         final String cacheName = "cmdTangoPollingCache." + deviceName + "/" + command.getName();
         Cache defaultCache = manager.getCache(cacheName);
@@ -56,7 +57,7 @@ public final class CommandCache {
             // defaultCache.setStatisticsEnabled(true);
         }
         defaultCache.flush();
-        cache = new SelfPopulatingCache(defaultCache, new CommandCacheEntryFactory(command, deviceLock));
+        cache = new SelfPopulatingCache(defaultCache, new CommandCacheEntryFactory(command, deviceLock, aroundInvoke));
         cache.getCacheConfiguration().setTimeToLiveSeconds(60);
 
     }

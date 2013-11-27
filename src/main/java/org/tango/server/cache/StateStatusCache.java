@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 
 public final class StateStatusCache {
@@ -46,7 +47,7 @@ public final class StateStatusCache {
     private final CommandImpl command;
 
     public StateStatusCache(final CacheManager manager, final CommandImpl command, final AttributeImpl attribute,
-            final String deviceName, final DeviceLock deviceLock) {
+            final String deviceName, final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.command = command;
         final String cacheName = "stateStatusTangoPollingCache." + deviceName + "/" + command.getName();
         Cache defaultCache = manager.getCache(cacheName);
@@ -57,7 +58,7 @@ public final class StateStatusCache {
         }
         defaultCache.flush();
         cache = new SelfPopulatingCache(defaultCache, new StateStatusCacheEntryFactory(command, attribute, deviceLock,
-                deviceName));
+                deviceName, aroundInvoke));
         cache.getCacheConfiguration().setTimeToLiveSeconds(60);
 
     }
@@ -79,7 +80,6 @@ public final class StateStatusCache {
                 // "error stopping refresh of "
                 // + attribute.getName());
             }
-
         }
     }
 

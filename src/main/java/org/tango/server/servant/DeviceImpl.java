@@ -24,7 +24,6 @@
  */
 package org.tango.server.servant;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -35,9 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -50,6 +46,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.tango.DeviceState;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.InvocationContext;
+import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.AroundInvoke;
@@ -228,11 +225,6 @@ public final class DeviceImpl extends Device_4POA {
      */
     private final String className;
     /**
-     * Manage tango polling
-     */
-    private final TangoCacheManager cacheManager;
-
-    /**
      * Manage lazy init
      */
     private volatile boolean isInitializing;
@@ -266,7 +258,7 @@ public final class DeviceImpl extends Device_4POA {
 
     private DeviceScheduler deviceScheduler;
 
-    private final PollingManager pollingManager;
+    private PollingManager pollingManager;
 
     /**
      * Ctr
@@ -287,7 +279,7 @@ public final class DeviceImpl extends Device_4POA {
         this.className = className;
         this.deviceType = deviceType;
         deviceLock = new DeviceLock(txType, businessObject.getClass());
-        cacheManager = new TangoCacheManager(name, deviceLock);
+
         this.businessObject = businessObject;
         attributeProperties = new AttributePropertiesManager(deviceName);
         stateCheckAttrAlarm = false;
@@ -335,8 +327,6 @@ public final class DeviceImpl extends Device_4POA {
         } catch (final NoSuchMethodException e) {
             DevFailedUtils.throwDevFailed(e);
         }
-        pollingManager = new PollingManager(deviceName, cacheManager, attributeList, commandList, minPolling,
-                pollAttributes, minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
 
         MDC.put(MDC_KEY, name);
         logger.info("Device {} of of {} created with tx type: {}", new Object[] { deviceName,
@@ -499,10 +489,11 @@ public final class DeviceImpl extends Device_4POA {
         if (attribute.getName().equalsIgnoreCase(STATUS_NAME) || attribute.getName().equalsIgnoreCase(STATE_NAME)) {
             return;
         }
-        attributeList.remove(attribute);
+        pollingManager.removeAttributePolling(attribute.getName());
         statusImpl.removeAttributeAlarm(attribute.getName());
         stateImpl.removeAttributeAlarm(attribute.getName());
-        cacheManager.removeAttributePolling(attribute);
+        attributeList.remove(attribute);
+
     }
 
     /**
@@ -543,10 +534,6 @@ public final class DeviceImpl extends Device_4POA {
     private synchronized void doInit() {
         isCorrectlyInit.set(false);
 
-        if (init == null) {
-
-            init = new InitImpl(name, null, false, businessObject, pollingManager);
-        }
         try {
             if (deviceScheduler != null) {
                 deviceScheduler.triggerJob();
@@ -600,8 +587,8 @@ public final class DeviceImpl extends Device_4POA {
         if (statusImpl == null) {
             statusImpl = new StatusImpl(businessObject, null, null);
         }
-        if (aroundInvokeImpl == null) {
-            aroundInvokeImpl = new AroundInvokeImpl(businessObject, null);
+        if (init == null) {
+            buildInit(null, false);
         }
         doInit();
         logger.debug("device init done");
@@ -620,7 +607,7 @@ public final class DeviceImpl extends Device_4POA {
         PropertiesUtils.clearDeviceCache(name);
         PropertiesUtils.clearClassCache(className);
         stopPolling();
-        cacheManager.removeAll();
+        pollingManager.removeAll();
         if (deviceScheduler != null) {
             deviceScheduler.stop();
         }
@@ -862,8 +849,8 @@ public final class DeviceImpl extends Device_4POA {
         AttributeValue[] result = null;
         deviceLock.lockAttribute();
         try {
-            result = AttributeGetterSetter.getAttributesValues(attributeNames, cacheManager, attributeList,
-                    aroundInvokeImpl, true);
+            result = AttributeGetterSetter.getAttributesValues(attributeNames, pollingManager, attributeList,
+                    aroundInvokeImpl, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -899,15 +886,11 @@ public final class DeviceImpl extends Device_4POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
 
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
         deviceLock.lockAttribute();
         AttributeValue[] result = null;
         try {
-            result = AttributeGetterSetter.getAttributesValues(names, cacheManager, attributeList, aroundInvokeImpl,
-                    fromCache);
+            result = AttributeGetterSetter.getAttributesValues(names, pollingManager, attributeList, aroundInvokeImpl,
+                    source);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -944,15 +927,11 @@ public final class DeviceImpl extends Device_4POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
 
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
         deviceLock.lockAttribute();
         AttributeValue_3[] result = null;
         try {
-            result = AttributeGetterSetter.getAttributesValues3(names, cacheManager, attributeList, aroundInvokeImpl,
-                    fromCache);
+            result = AttributeGetterSetter.getAttributesValues3(names, pollingManager, attributeList, aroundInvokeImpl,
+                    source);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -999,7 +978,7 @@ public final class DeviceImpl extends Device_4POA {
         deviceLock.lockAttribute();
         AttributeValue_4[] result = null;
         try {
-            result = AttributeGetterSetter.getAttributesValues4(name, names, cacheManager, attributeList,
+            result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
@@ -1194,7 +1173,7 @@ public final class DeviceImpl extends Device_4POA {
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
         }
-        return AttributeGetterSetter.getAttributesValues4(name, names, cacheManager, attributeList, aroundInvokeImpl,
+        return AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList, aroundInvokeImpl,
                 DevSource.DEV);
     }
 
@@ -1527,33 +1506,18 @@ public final class DeviceImpl extends Device_4POA {
             }
         }
         // Call the always executed method
-        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, commandName));
+        final CallType callType = CallType.getFromDevSource(source);
+        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
         // Execute the command
         if (cmd.isPolled() && fromCache) {
             logger.debug("execute command {} from CACHE", cmd.getName());
-
-            try {
-                final Element element = cacheManager.getCommandCache(cmd).get(cmd.getName());
-                final Serializable cmdValue = element.getValue();
-                if (cmdValue instanceof org.tango.server.attribute.AttributeValue) {
-                    // state or status are returned as attributevalue
-                    ret = ((org.tango.server.attribute.AttributeValue) cmdValue).getValue();
-                } else {
-                    ret = element.getValue();
-                }
-            } catch (final CacheException e) {
-                if (e.getCause() instanceof DevFailed) {
-                    throw (DevFailed) e.getCause();
-                } else {
-                    throw DevFailedUtils.newDevFailed(e.getCause());
-                }
-            }
+            ret = pollingManager.getCommandCacheElement(cmd);
         } else {
             logger.debug("execute command {} from DEVICE", cmd.getName());
             final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
             ret = cmd.execute(input);
         }
-        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, commandName));
+        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
         stateImpl.stateMachine(cmd.getEndState());
 
         xlogger.exit();
@@ -1835,8 +1799,8 @@ public final class DeviceImpl extends Device_4POA {
      */
     public void removeCommand(final CommandImpl command) throws DevFailed {
         if (!command.getName().equals(INIT_CMD)) {
+            pollingManager.removeCommandPolling(command.getName());
             commandList.remove(command);
-            cacheManager.removeCommandPolling(command);
         }
     }
 
@@ -2011,6 +1975,12 @@ public final class DeviceImpl extends Device_4POA {
      */
     public void setAroundInvokeImpl(final AroundInvokeImpl aroundInvokeImpl) {
         this.aroundInvokeImpl = aroundInvokeImpl;
+        final TangoCacheManager cacheManager = new TangoCacheManager(name, deviceLock, aroundInvokeImpl);
+        pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling, pollAttributes,
+                minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
+        if (init != null) {
+            init.setPollingManager(pollingManager);
+        }
     }
 
     /**
@@ -2019,9 +1989,16 @@ public final class DeviceImpl extends Device_4POA {
      * @return init
      */
     public synchronized InitImpl buildInit(final Method initMethod, final boolean isLazy) {
+        if (aroundInvokeImpl == null) {
+            aroundInvokeImpl = new AroundInvokeImpl(businessObject, null);
+        }
+        if (pollingManager == null) {
+            final TangoCacheManager cacheManager = new TangoCacheManager(name, deviceLock, aroundInvokeImpl);
+            pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling,
+                    pollAttributes, minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
+        }
         init = new InitImpl(name, initMethod, isLazy, businessObject, pollingManager);
         return init;
-        // this.init = init;
     }
 
     /**
