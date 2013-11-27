@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.client.database.DatabaseFactory;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.ServerManager;
@@ -50,9 +51,6 @@ import org.zeromq.ZMQ;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.TangoApi.ApiUtil;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 
 /**
@@ -75,6 +73,18 @@ public final class EventManager {
     private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
     private static ScheduledExecutorService heartBeatExecutor;
 
+    private static int serverHWM;
+
+    public static void setServerHWM(final int serverHWM) {
+        EventManager.serverHWM = serverHWM;
+    }
+
+    public static void setClientHWN(final int clientHWN) {
+        EventManager.clientHWN = clientHWN;
+    }
+
+    private static int clientHWN;
+
     private enum SocketType {
         HEARTBEAT, EVENTS
     }
@@ -84,6 +94,29 @@ public final class EventManager {
     }
 
     private EventManager() {
+        serverHWM = EventConstants.HWM_DEFAULT;
+        // Check the High Water Mark value from environment
+        final String env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
+        try {
+            if (env != null) {
+                serverHWM = Integer.parseInt(env);
+            }
+        } catch (final NumberFormatException e) {
+            logger.error("system env TANGO_DS_EVENT_BUFFER_HWM is not a number: {} ", env);
+        }
+
+        clientHWN = EventConstants.HWM_DEFAULT;
+        // Check the High Water Mark value from Control System property
+        String value = "";
+        try {
+            value = DatabaseFactory.getDatabase().getFreeProperty("CtrlSystem", "EventBufferHwm");
+            clientHWN = Integer.parseInt(value);
+        } catch (final DevFailed e) {
+            DevFailedUtils.logDevFailed(e, logger);
+        } catch (final NumberFormatException e) {
+            logger.error("ControlSystem/EventBufferHwm property is not a number: {} ", value);
+        }
+
         isInitialized = false;
     }
 
@@ -129,44 +162,44 @@ public final class EventManager {
      * 
      * @return the HWM value to be used.
      */
-    private int getServerHWM() {
-
-        int hwm = EventConstants.HWM_DEFAULT;
-        // Check the High Water Mark value from environment
-        final String env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
-        try {
-            if (env != null) {
-                hwm = Integer.parseInt(env);
-            }
-        } catch (final NumberFormatException e) {
-            System.err.println(e);
-        }
-        // ToDo Check HWM from Util class and Property
-        return hwm;
-    }
+//    private int getServerHWM() {
+//
+//        int hwm = EventConstants.HWM_DEFAULT;
+//        // Check the High Water Mark value from environment
+//        final String env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
+//        try {
+//            if (env != null) {
+//                hwm = Integer.parseInt(env);
+//            }
+//        } catch (final NumberFormatException e) {
+//            System.err.println(e);
+//        }
+//        // ToDo Check HWM from Util class and Property
+//        return hwm;
+//    }
 
     /**
      * Check the High Water Mark value for client.
      * 
      * @return the HWM value to be used.
      */
-    private int getClientHWM() {
-
-        int hwm = EventConstants.HWM_DEFAULT;
-        // Check the High Water Mark value from Control System property
-        // ToDo replace by value from Stored Procedure
-        try {
-            final DbDatum datum = ApiUtil.get_db_obj().get_property("CtrlSystem", "EventBufferHwm");
-            if (!datum.is_empty()) {
-                hwm = Integer.parseInt(datum.extractString());
-            }
-        } catch (final DevFailed e) {
-            Except.print_exception(e);
-        } catch (final NumberFormatException e) {
-            System.err.println("ControlSystem/EventBufferHwm property: " + e);
-        }
-        return hwm;
-    }
+//    private int getClientHWM() {
+//
+//        int hwm = EventConstants.HWM_DEFAULT;
+//        // Check the High Water Mark value from Control System property
+//        // ToDo replace by value from Stored Procedure
+//        try {
+//            final DbDatum datum = ApiUtil.get_db_obj().get_property("CtrlSystem", "EventBufferHwm");
+//            if (!datum.is_empty()) {
+//                hwm = Integer.parseInt(datum.extractString());
+//            }
+//        } catch (final DevFailed e) {
+//            Except.print_exception(e);
+//        } catch (final NumberFormatException e) {
+//            System.err.println("ControlSystem/EventBufferHwm property: " + e);
+//        }
+//        return hwm;
+//    }
 
     /**
      * Returns next port to connect the heartbeatSocket or eventSocket
@@ -225,7 +258,7 @@ public final class EventManager {
             case EVENTS:
                 eventSocket = socket;
                 eventEndpoint = endpoint;
-                socket.setSndHWM(getServerHWM());
+                socket.setSndHWM(serverHWM);
                 logger.debug("HWM has been set to " + socket.getSndHWM());
                 break;
         }
@@ -336,8 +369,8 @@ public final class EventManager {
 
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
-        longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, getClientHWM(),
-                0, 0, EventConstants.ZMQ_RELEASE, };
+        longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
+                EventConstants.ZMQ_RELEASE, };
         longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
         return longStringArray;
     }

@@ -28,7 +28,11 @@ import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.server.InvocationContext;
+import org.tango.server.InvocationContext.CallType;
+import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 
 import fr.esrf.Tango.DevFailed;
@@ -40,11 +44,15 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
     // private Profiler profilerPeriod = new Profiler("period");
     private final DeviceLock deviceLock;
 
+    private final AroundInvokeImpl aroundInvoke;
+
     private long lastUpdateTime;
 
-    public CommandCacheEntryFactory(final CommandImpl command, final DeviceLock deviceLock) {
+    public CommandCacheEntryFactory(final CommandImpl command, final DeviceLock deviceLock,
+            final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.command = command;
+        this.aroundInvoke = aroundInvoke;
     }
 
     @Override
@@ -52,6 +60,7 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
         logger.debug("Creating entry for key = {} , command {} ", key, command.getName());
         Object result = null;
         deviceLock.lockCommand();
+        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, command.getName()));
         try {
             final long time1 = System.nanoTime();
             result = command.execute(null);
@@ -66,6 +75,8 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
             command.addErrorToHistory(e);
             throw e;
         } finally {
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, CallType.POLLING, command
+                    .getName()));
             deviceLock.lockCommand();
         }
         return result;

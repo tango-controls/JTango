@@ -36,6 +36,7 @@ import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 
 public final class AttributeCache {
@@ -46,7 +47,7 @@ public final class AttributeCache {
     private final AttributeImpl attribute;
 
     public AttributeCache(final CacheManager manager, final AttributeImpl attr, final String deviceName,
-            final DeviceLock deviceLock) {
+            final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
         attribute = attr;
         final String cacheName = "attrTangoPollingCache." + deviceName + "/" + attr.getName();
         Cache defaultCache = manager.getCache(cacheName);
@@ -56,7 +57,8 @@ public final class AttributeCache {
             // defaultCache.setStatisticsEnabled(true);
         }
         defaultCache.flush();
-        cache = new SelfPopulatingCache(defaultCache, new AttributeCacheEntryFactory(attr, deviceLock, deviceName));
+        cache = new SelfPopulatingCache(defaultCache, new AttributeCacheEntryFactory(attr, deviceLock, deviceName,
+                aroundInvoke));
         cache.getCacheConfiguration().setTimeToLiveSeconds(60);
 
     }
@@ -77,7 +79,6 @@ public final class AttributeCache {
                 // "error stopping refresh of "
                 // + attribute.getName());
             }
-
         }
     }
 

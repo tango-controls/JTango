@@ -46,6 +46,7 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.server.ServerManager;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 import org.tango.server.properties.PropertiesUtils;
 import org.tango.server.servant.DeviceImpl;
@@ -89,13 +90,16 @@ public final class TangoCacheManager {
 
     private final String deviceName;
 
+    private final AroundInvokeImpl aroundInvoke;
+
     private static int poolSize = POOL_SIZE;
 
     private static Map<String, TangoCacheManager> cacheList = new HashMap<String, TangoCacheManager>();
 
-    public TangoCacheManager(final String deviceName, final DeviceLock deviceLock) {
+    public TangoCacheManager(final String deviceName, final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.deviceName = deviceName;
+        this.aroundInvoke = aroundInvoke;
         cacheList.put(deviceName, this);
     }
 
@@ -184,7 +188,7 @@ public final class TangoCacheManager {
             if (stateCache != null) {
                 stateCache.stopRefresh();
             }
-            stateCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock);
+            stateCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock, aroundInvoke);
             if (command.getPollingPeriod() != 0) {
                 stateCache.startRefresh(pollingPool);
             }
@@ -192,7 +196,7 @@ public final class TangoCacheManager {
             if (statusCache != null) {
                 statusCache.stopRefresh();
             }
-            statusCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock);
+            statusCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock, aroundInvoke);
             if (command.getPollingPeriod() != 0) {
                 statusCache.startRefresh(pollingPool);
             }
@@ -225,7 +229,7 @@ public final class TangoCacheManager {
             startCache();
         }
         removeCommandPolling(command);
-        final CommandCache cache = new CommandCache(MANAGER, command, deviceName, deviceLock);
+        final CommandCache cache = new CommandCache(MANAGER, command, deviceName, deviceLock, aroundInvoke);
         if (command.getPollingPeriod() == 0) {
             extTrigCommandCacheMap.put(command, cache);
         } else {
@@ -260,7 +264,7 @@ public final class TangoCacheManager {
             startCache();
         }
         removeAttributePolling(attr);
-        final AttributeCache cache = new AttributeCache(MANAGER, attr, deviceName, deviceLock);
+        final AttributeCache cache = new AttributeCache(MANAGER, attr, deviceName, deviceLock, aroundInvoke);
         if (attr.getPollingPeriod() == 0) {
             extTrigAttributeCacheMap.put(attr, cache);
         } else {
@@ -417,7 +421,6 @@ public final class TangoCacheManager {
             }
             cache = cmdCache.getCache();
         }
-
         return cache;
     }
 

@@ -79,7 +79,11 @@ public final class InitImpl extends DeviceBehaviorObject {
     private final ExecutorService executor;
     private Future<Void> future;
     private final AtomicBoolean isInitDoneCorrectly = new AtomicBoolean(false);
-    private final PollingManager pollingManager;
+    private PollingManager pollingManager;
+
+    public void setPollingManager(final PollingManager pollingManager) {
+        this.pollingManager = pollingManager;
+    }
 
     /**
      * Ctr

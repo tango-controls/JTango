@@ -26,9 +26,13 @@ package org.tango.server.cache;
 
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
+import org.tango.server.InvocationContext;
+import org.tango.server.InvocationContext.CallType;
+import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 import org.tango.server.events.EventManager;
 
@@ -41,19 +45,24 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
     private final DeviceLock deviceLock;
     private long lastUpdateTime;
     private final String deviceName;
+    private final AroundInvokeImpl aroundInvoke;
 
     public StateStatusCacheEntryFactory(final CommandImpl command, final AttributeImpl attribute,
-            final DeviceLock deviceLock, final String deviceName) {
+            final DeviceLock deviceLock, final String deviceName, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.command = command;
         this.attribute = attribute;
         this.deviceName = deviceName;
+        this.aroundInvoke = aroundInvoke;
     }
 
     @Override
     public Object createEntry(final Object key) throws DevFailed {
+
         Object result = null;
         deviceLock.lockAttribute();
+        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
+                .getName()));
         try {
             synchronized (attribute) {
                 final long time1 = System.nanoTime();
@@ -73,9 +82,12 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
         } catch (final DevFailed e) {
             command.addErrorToHistory(e);
             attribute.addErrorToHistory(e);
+
             EventManager.getInstance().pushEvent(deviceName, attribute.getName(), e);
             throw e;
         } finally {
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
+                    attribute.getName()));
             deviceLock.unlockAttribute();
         }
 

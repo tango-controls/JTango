@@ -30,6 +30,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.tango.server.annotation.AroundInvoke;
 
+import fr.esrf.Tango.DevSource;
+
 /**
  * @see AroundInvoke
  * @author ABEILLE
@@ -43,42 +45,89 @@ public final class InvocationContext {
      * 
      */
     public enum ContextType {
-	/**
-	 * Before read attributes loop
-	 */
-	PRE_READ_ATTRIBUTES,
-	/**
-	 * Before read attribute
-	 */
-	PRE_READ_ATTRIBUTE,
-	/**
-	 * After read attribute
-	 */
-	POST_READ_ATTRIBUTE,
-	/**
-	 * After read attributes loop
-	 */
-	POST_READ_ATTRIBUTES,
-	/**
-	 * Before write attribute
-	 */
-	PRE_WRITE_ATTRIBUTE,
-	/**
-	 * After write attribute
-	 */
-	POST_WRITE_ATTRIBUTE,
-	/**
-	 * Before execute command
-	 */
-	PRE_COMMAND,
-	/**
-	 * After execute command
-	 */
-	POST_COMMAND
+        /**
+         * Before read attributes loop
+         */
+        PRE_READ_ATTRIBUTES,
+        /**
+         * Before read attribute
+         */
+        PRE_READ_ATTRIBUTE,
+        /**
+         * After read attribute
+         */
+        POST_READ_ATTRIBUTE,
+        /**
+         * After read attributes loop
+         */
+        POST_READ_ATTRIBUTES,
+        /**
+         * Before write attribute
+         */
+        PRE_WRITE_ATTRIBUTE,
+        /**
+         * After write attribute
+         */
+        POST_WRITE_ATTRIBUTE,
+        /**
+         * Before execute command
+         */
+        PRE_COMMAND,
+        /**
+         * After execute command
+         */
+        POST_COMMAND,
     }
 
-    private ContextType context;
-    private String[] names;
+    /**
+     * Describe how the value retrieval is performed
+     * 
+     * @author ABEILLE
+     * 
+     */
+    public enum CallType {
+        /**
+         * Call will be done on the device
+         */
+        DEV,
+        /**
+         * retrieve value in cache (updated by polling)
+         */
+        CACHE,
+        /**
+         * If polling is on, retrieve value in cache, in device otherwise
+         */
+        CACHE_DEV,
+        /**
+         * The call is done from the polling threads.
+         */
+        POLLING,
+        /**
+         * Unknown source call.
+         */
+        UNKNOWN;
+
+        public static CallType getFromDevSource(final DevSource devSource) {
+            if (devSource == null) {
+                return CallType.UNKNOWN;
+            }
+            switch (devSource.value()) {
+                case DevSource._CACHE:
+                    return CallType.CACHE;
+                case DevSource._DEV:
+                    return CallType.DEV;
+                case DevSource._CACHE_DEV:
+                    return CallType.CACHE_DEV;
+                default:
+                    return CallType.UNKNOWN;
+            }
+        }
+    }
+
+    private final ContextType context;
+    private final CallType callType;
+
+    private final String[] names;
 
     /**
      * Ctr
@@ -88,10 +137,10 @@ public final class InvocationContext {
      * @param names
      *            Command name or attributes names
      */
-    public InvocationContext(final ContextType context, final String... names) {
-	super();
-	this.context = context;
-	this.names = names;
+    public InvocationContext(final ContextType context, final CallType callType, final String... names) {
+        this.context = context;
+        this.callType = callType;
+        this.names = names;
     }
 
     /**
@@ -100,11 +149,19 @@ public final class InvocationContext {
      * @return Command names or attributes names
      */
     public String[] getNames() {
-	return Arrays.copyOf(names, names.length);
+        return Arrays.copyOf(names, names.length);
     }
 
-    public void setNames(final String... names) {
-	this.names = names;
+//    public void setNames(final String... names) {
+//        this.names = names;
+//    }
+    /**
+     * {@link CallType}
+     * 
+     * @return The call type
+     */
+    public CallType getCallType() {
+        return callType;
     }
 
     /**
@@ -113,18 +170,19 @@ public final class InvocationContext {
      * @return The context
      */
     public ContextType getContext() {
-	return context;
+        return context;
     }
 
-    public void setContext(final ContextType context) {
-	this.context = context;
-    }
+//    public void setContext(final ContextType context) {
+//        this.context = context;
+//    }
 
     @Override
     public String toString() {
-	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	builder.append("type", context);
-	builder.append("names", Arrays.toString(names));
-	return builder.toString();
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("context", context);
+        builder.append("callType", callType);
+        builder.append("names", Arrays.toString(names));
+        return builder.toString();
     }
 }
