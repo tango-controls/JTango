@@ -24,6 +24,7 @@
  */
 package org.tango.server.servant;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import org.tango.command.CommandTangoType;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributeValue;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.utils.DevFailedUtils;
@@ -342,5 +345,35 @@ public final class PollingManager {
             pollAttributes.remove(command.getName().toLowerCase(Locale.ENGLISH));
             savePollingConfig();
         }
+    }
+
+    public void removeAll() {
+        cacheManager.removeAll();
+    }
+
+    public Object getCommandCacheElement(final CommandImpl cmd) throws DevFailed {
+        Object ret;
+        try {
+            final Element element = cacheManager.getCommandCache(cmd).get(cmd.getName().toLowerCase(Locale.ENGLISH));
+            final Serializable cmdValue = element.getValue();
+            if (cmdValue instanceof org.tango.server.attribute.AttributeValue) {
+                // state or status are returned as attributevalue
+                ret = ((org.tango.server.attribute.AttributeValue) cmdValue).getValue();
+            } else {
+                ret = element.getValue();
+            }
+        } catch (final CacheException e) {
+            if (e.getCause() instanceof DevFailed) {
+                throw (DevFailed) e.getCause();
+            } else {
+                throw DevFailedUtils.newDevFailed(e.getCause());
+            }
+        }
+        return ret;
+    }
+
+    public AttributeValue getAttributeCacheElement(final AttributeImpl att) throws CacheException {
+        final Element element = cacheManager.getAttributeCache(att).get(att.getName().toLowerCase(Locale.ENGLISH));
+        return (AttributeValue) element.getValue();
     }
 }

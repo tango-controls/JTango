@@ -37,16 +37,21 @@ public final class CacheRefresher implements Runnable {
     private final SelfPopulatingCache cache;
     private final String name;
 
+//    private final Profiler profiler;
+
     public CacheRefresher(final SelfPopulatingCache cache, final String name) {
         this.cache = cache;
         this.name = name.toLowerCase(Locale.ENGLISH);
+//        profiler = new Profiler("tangoCache");
+//        profiler.start(cache.getName());
     }
 
     @Override
     public void run() {
         logger.debug("refresh {}", cache.getName());
-        // final Profiler profiler = new Profiler("tangoCache");
-        // profiler.start(attribute.getName());
+
+//        profiler.stop().print();
+//        profiler.start(cache.getName());
         try {
             cache.get(name);
             cache.refresh();
@@ -54,6 +59,5 @@ public final class CacheRefresher implements Runnable {
             logger.error("error {}", e.getCause());
         }
 
-        // profiler.stop().print();
     }
 }

@@ -30,7 +30,11 @@ import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.server.InvocationContext;
+import org.tango.server.InvocationContext.CallType;
+import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 import org.tango.server.events.EventManager;
 
@@ -48,11 +52,14 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
 
     private final String deviceName;
 
+    private final AroundInvokeImpl aroundInvoke;
+
     public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock,
-            final String deviceName) {
+            final String deviceName, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.attribute = attribute;
         this.deviceName = deviceName;
+        this.aroundInvoke = aroundInvoke;
     }
 
     @Override
@@ -74,6 +81,8 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
 
         if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
             deviceLock.lockAttribute();
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
+                    .getName()));
             try {
                 synchronized (attribute) {
                     final long time1 = System.nanoTime();
@@ -93,6 +102,8 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                 EventManager.getInstance().pushEvent(deviceName, attribute.getName(), e);
                 throw e;
             } finally {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
+                        attribute.getName()));
                 deviceLock.unlockAttribute();
             }
         }
