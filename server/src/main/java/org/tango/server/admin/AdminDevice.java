@@ -677,7 +677,20 @@ public final class AdminDevice {
     public DevVarLongStringArray zmqEventSubscriptionChange(final String[] argin) throws DevFailed {
 
         xlogger.entry();
-        if (argin.length != 4) {
+
+        //  A simple way to be used in debug
+        if (argin.length==1) {
+            if (argin[0].equals("info")) {
+                return EventManager.getInstance().getConnectionParameters();
+            }
+            else
+                DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
+                    "Command ZmqEventSubscriptionChange expect 4 input arguments");
+        }
+
+        //  Normal usage:
+        //  Subscribe to the specified event
+        if (argin.length < 4) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                     "Command ZmqEventSubscriptionChange expect 4 input arguments");
         }
