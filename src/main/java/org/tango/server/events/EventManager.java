@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
@@ -47,6 +47,7 @@ import org.tango.server.ServerManager;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import fr.esrf.Tango.DevFailed;
@@ -60,7 +61,7 @@ import fr.esrf.TangoDs.TangoConst;
  */
 public final class EventManager {
 
-    private static ZMQ.Context context;
+    private static ZContext context;
     private static final EventManager INSTANCE = new EventManager();
     private static ZMQ.Socket heartbeatSocket;
     private static ZMQ.Socket eventSocket;
@@ -74,14 +75,6 @@ public final class EventManager {
     private static ScheduledExecutorService heartBeatExecutor;
 
     private static int serverHWM;
-
-    public static void setServerHWM(final int serverHWM) {
-        EventManager.serverHWM = serverHWM;
-    }
-
-    public static void setClientHWN(final int clientHWN) {
-        EventManager.clientHWN = clientHWN;
-    }
 
     private static int clientHWN;
 
@@ -126,18 +119,15 @@ public final class EventManager {
         logger.debug("client IP address is {}", ServerRequestInterceptor.getInstance().getClientIPAddress());
 
         try {
-            context = ZMQ.context(1);
+            context = new ZContext();
             System.out.println("====================== ZMQ (" + EventUtilities.getZmqVersion()
                     + ") SERVER event system started =======================");
         } catch (final Throwable e) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
-                    "ZMQ classes not found. Event system is not available.");
+                    "ZMQ classes not found. Event system is not available: " + e.getMessage());
         }
 
         final String adminDeviceName = ServerManager.getInstance().getAdminDeviceName();
-        // TODO : without database?
-        heartbeatSocket = context.socket(ZMQ.PUB);
-        eventSocket = context.socket(ZMQ.PUB);
 
         // Get the free ports and build endpoints
         setEndpoints(SocketType.HEARTBEAT);
@@ -150,56 +140,13 @@ public final class EventManager {
                 return new Thread(r, "Event HeartBeat");
             }
         });
+        // // TODO : without database?
         final String heartbeatName = EventUtilities.buildEventName(adminDeviceName, null, "heartbeat");
         heartBeatExecutor.scheduleAtFixedRate(new HeartbeatThread(heartbeatName), 0,
                 EventConstants.EVENT_HEARTBEAT_PERIOD, TimeUnit.MILLISECONDS);
         isInitialized = true;
         xlogger.exit();
     }
-
-    /**
-     * Check the High Water Mark value for server.
-     * 
-     * @return the HWM value to be used.
-     */
-//    private int getServerHWM() {
-//
-//        int hwm = EventConstants.HWM_DEFAULT;
-//        // Check the High Water Mark value from environment
-//        final String env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
-//        try {
-//            if (env != null) {
-//                hwm = Integer.parseInt(env);
-//            }
-//        } catch (final NumberFormatException e) {
-//            System.err.println(e);
-//        }
-//        // ToDo Check HWM from Util class and Property
-//        return hwm;
-//    }
-
-    /**
-     * Check the High Water Mark value for client.
-     * 
-     * @return the HWM value to be used.
-     */
-//    private int getClientHWM() {
-//
-//        int hwm = EventConstants.HWM_DEFAULT;
-//        // Check the High Water Mark value from Control System property
-//        // ToDo replace by value from Stored Procedure
-//        try {
-//            final DbDatum datum = ApiUtil.get_db_obj().get_property("CtrlSystem", "EventBufferHwm");
-//            if (!datum.is_empty()) {
-//                hwm = Integer.parseInt(datum.extractString());
-//            }
-//        } catch (final DevFailed e) {
-//            Except.print_exception(e);
-//        } catch (final NumberFormatException e) {
-//            System.err.println("ControlSystem/EventBufferHwm property: " + e);
-//        }
-//        return hwm;
-//    }
 
     /**
      * Returns next port to connect the heartbeatSocket or eventSocket
@@ -248,7 +195,11 @@ public final class EventManager {
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
-        final ZMQ.Socket socket = context.socket(ZMQ.PUB);
+        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
+        socket.setLinger(0);
+        socket.setReconnectIVL(-1);
+        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
+        socket.bind(endpoint);
 
         switch (socketType) {
             case HEARTBEAT:
@@ -256,17 +207,13 @@ public final class EventManager {
                 heartbeatEndpoint = endpoint;
                 break;
             case EVENTS:
+                socket.setSndHWM(serverHWM);
                 eventSocket = socket;
                 eventEndpoint = endpoint;
-                socket.setSndHWM(serverHWM);
-                logger.debug("HWM has been set to " + socket.getSndHWM());
+                logger.debug("HWM has been set to {}", socket.getSndHWM());
                 break;
         }
-        socket.setLinger(0);
-        socket.setReconnectIVL(-1);
 
-        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
-        socket.bind(endpoint);
         xlogger.exit();
     }
 
@@ -310,28 +257,17 @@ public final class EventManager {
         logger.debug("closing all event resources");
 
         if (heartBeatExecutor != null) {
-            heartBeatExecutor.shutdownNow();
-        }
-
-        if (heartbeatSocket != null) {
+            heartBeatExecutor.shutdown();
             try {
-                heartbeatSocket.close();
-            } catch (final org.zeromq.ZMQException e) {
-                logger.error("cannot close heartbeat socket ", e);
-                System.err.println("cannot close heartbeat socket " + e);
-            }
-        }
-        if (eventSocket != null) {
-            try {
-                eventSocket.close();
-            } catch (final org.zeromq.ZMQException e) {
-                logger.error("cannot close event socket ", e);
-                System.err.println("cannot close event socket " + e);
+                heartBeatExecutor.awaitTermination(1, TimeUnit.SECONDS);
+            } catch (final InterruptedException e) {
+                logger.error("could not stop event hearbeat");
             }
         }
 
         if (context != null) {
-            // context.term();
+            // close all open sockets
+            context.destroy();
         }
         isInitialized = false;
         logger.debug("all event resources closed");
