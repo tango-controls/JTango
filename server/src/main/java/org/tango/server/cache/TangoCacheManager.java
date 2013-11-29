@@ -109,6 +109,7 @@ public final class TangoCacheManager {
         final CacheConfiguration defaultCacheConfiguration = new CacheConfiguration();
         defaultCacheConfiguration.setDiskPersistent(false);
         defaultCacheConfiguration.setOverflowToDisk(false);
+        defaultCacheConfiguration.setMaxElementsInMemory(1);
         config.setDefaultCacheConfiguration(defaultCacheConfiguration);
         MANAGER = CacheManager.create(config);
         final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
