@@ -275,10 +275,24 @@ public final class EventManager {
     }
 
     /**
+     * returns the connection parameters for specified event.
+     */
+    public DevVarLongStringArray getConnectionParameters() {
+        // Build the connection parameters object
+        final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
+        longStringArray.lvalue = new int[0];
+        if (heartbeatEndpoint==null || eventEndpoint==null)
+            longStringArray.svalue = new String[] { "No ZMQ event yet !" };
+        else
+            longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
+        return longStringArray;
+
+    }
+    /**
      * Initialize ZMQ event system if not already done,
      * subscribe to the specified event end
      * returns the connection parameters for specified event.
-     * 
+     *
      * @param deviceName The specified event device name
      * @param attribute The specified event attribute name
      * @param eventType The specified event type
@@ -354,7 +368,6 @@ public final class EventManager {
      * 
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
-     * @param attributeValue the attribute value to be sent as event
      * @param eventTypeName specified event type.
      * @throws DevFailed
      */
