@@ -11,7 +11,6 @@
 	</parent>
 	
 	<artifactId>JavaAPI</artifactId>
-	<version>8.4.1</version>
 	<packaging>pom</packaging>
 	<name>Java Tango API</name>
 	<description>Java Tango API</description>
@@ -67,4 +66,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<version>8.4.2-SNAPSHOT</version>
 </project>
