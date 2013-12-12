@@ -12,7 +12,7 @@
 
 
 	<artifactId>JTangoServer</artifactId>
-	<version>1.1.1-SNAPSHOT</version>
+	<version>1.1.1</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
@@ -117,22 +117,10 @@
 
 
 	<dependencies>
-	<!--TODO use release version  -->
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>1.0.9-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jzmq</artifactId>
-					<groupId>org.zeromq</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.jeromq</groupId>
-			<artifactId>jeromq</artifactId>
-			<version>0.3.0-SNAP-180713</version>
+			<version>1.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
