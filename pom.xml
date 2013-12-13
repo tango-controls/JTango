@@ -54,6 +54,7 @@
 						<exclude>**/*.txt</exclude>
 						<exclude>**/*.doc*</exclude>
 						<exclude>**/*.pdf</exclude>
+						<exclude>**/*.xml</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 					<properties>
