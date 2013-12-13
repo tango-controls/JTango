@@ -12,7 +12,7 @@
 
 
 	<artifactId>JTangoServer</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2-SNAPSHOT</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
@@ -54,6 +54,7 @@
 						<exclude>**/*.txt</exclude>
 						<exclude>**/*.doc*</exclude>
 						<exclude>**/*.pdf</exclude>
+						<exclude>**/*.xml</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 					<properties>
@@ -94,6 +95,38 @@
 			</activation>
 			<build>
 				<plugins>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<includeScope>compile</includeScope>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>attached</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<artifactId>maven-shade-plugin</artifactId>
 						<version>1.6</version>
