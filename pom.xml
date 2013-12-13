@@ -94,7 +94,6 @@
 			</activation>
 			<build>
 				<plugins>
-					<plugins>
 						<plugin>
 							<artifactId>maven-dependency-plugin</artifactId>
 							<executions>
@@ -128,22 +127,21 @@
 							</executions>
 						</plugin>
 						<plugin>
-							<plugin>
-								<artifactId>maven-shade-plugin</artifactId>
-								<version>1.6</version>
-								<executions>
-									<execution>
-										<phase>package</phase>
-										<goals>
-											<goal>shade</goal>
-										</goals>
-										<configuration>
-											<shadedArtifactAttached>true</shadedArtifactAttached>
-											<shadedClassifierName>all</shadedClassifierName>
-										</configuration>
-									</execution>
-								</executions>
-							</plugin>
+							<artifactId>maven-shade-plugin</artifactId>
+							<version>1.6</version>
+							<executions>
+								<execution>
+									<phase>package</phase>
+									<goals>
+										<goal>shade</goal>
+									</goals>
+									<configuration>
+										<shadedArtifactAttached>true</shadedArtifactAttached>
+										<shadedClassifierName>all</shadedClassifierName>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
 					</plugins>
 			</build>
 		</profile>
