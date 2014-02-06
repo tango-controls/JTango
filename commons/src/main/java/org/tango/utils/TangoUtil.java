@@ -125,15 +125,20 @@ public final class TangoUtil {
      */
     public static String getfullDeviceNameForAttribute(final String attributeName) throws DevFailed {
         String result;
-        final String[] fields = attributeName.split(DEVICE_SEP);
-        if (fields.length == 1) {
-            result = ApiUtil.get_db_obj().get_attribute_from_alias(fields[0]);
-        } else if (fields.length == 2) {
-            result = ApiUtil.get_db_obj().get_device_from_alias(fields[0]);
-        } else if (fields.length == 4) {
-            result = fields[0] + DEVICE_SEP + fields[1] + DEVICE_SEP + fields[2];
+
+        if (attributeName.contains(DBASE_NO)) {
+            result = attributeName.substring(0, attributeName.lastIndexOf(DEVICE_SEP));
         } else {
-            throw DevFailedUtils.newDevFailed("TANGO_WRONG_DATA_ERROR", "cannot retrieve device name");
+            final String[] fields = attributeName.split(DEVICE_SEP);
+            if (fields.length == 1) {
+                result = ApiUtil.get_db_obj().get_attribute_from_alias(fields[0]);
+            } else if (fields.length == 2) {
+                result = ApiUtil.get_db_obj().get_device_from_alias(fields[0]);
+            } else if (fields.length == 4) {
+                result = fields[0] + DEVICE_SEP + fields[1] + DEVICE_SEP + fields[2];
+            } else {
+                throw DevFailedUtils.newDevFailed("TANGO_WRONG_DATA_ERROR", "cannot retrieve device name");
+            }
         }
         return result;
     }
