@@ -27,16 +27,16 @@ public final class FileTangoDB implements ITangoDB {
     private final Map<String, Map<String, String[]>> classProperties = new HashMap<String, Map<String, String[]>>();
     private final Map<String, Map<String, String[]>> attributeProperties = new HashMap<String, Map<String, String[]>>();
     private final String[] devices;
-    private final String[] classes;
+    private final String className;
 
-    FileTangoDB(final String[] devices, final String[] classes) {
+    FileTangoDB(final String[] devices, final String className) {
         this.devices = Arrays.copyOf(devices, devices.length);
-        this.classes = Arrays.copyOf(classes, classes.length);
+        this.className = className;
     }
 
-    FileTangoDB(final File propertiesFiles, final String[] devices, final String[] classes) throws DevFailed {
+    FileTangoDB(final File propertiesFiles, final String[] devices, final String className) throws DevFailed {
         this.devices = Arrays.copyOf(devices, devices.length);
-        this.classes = Arrays.copyOf(classes, classes.length);
+        this.className = className;
         loadFileProperties(propertiesFiles);
     }
 
@@ -62,7 +62,7 @@ public final class FileTangoDB implements ITangoDB {
     @Override
     public String[] getDeviceList(final String serverName, final String className) throws DevFailed {
         String[] result = new String[0];
-        if (ArrayUtils.contains(classes, className)) {
+        if (this.className.equalsIgnoreCase(className)) {
             result = Arrays.copyOf(devices, devices.length);
         }
         return result;
