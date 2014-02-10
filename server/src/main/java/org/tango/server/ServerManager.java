@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server;
 
@@ -31,7 +31,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,9 +89,10 @@ public final class ServerManager {
     private String hostName;
     private String pid = "0";
 
-    private final Map<String, Class<?>> tangoClasses = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> tangoClasses = new LinkedHashMap<String, Class<?>>();
 
     private TangoExporter tangoExporter;
+    private String lastClass;
 
     private ServerManager() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -128,6 +129,7 @@ public final class ServerManager {
      *            The class that define a device with {@link Device}
      */
     public void addClass(final String tangoClass, final Class<?> deviceClass) {
+        lastClass = tangoClass;
         tangoClasses.put(tangoClass, deviceClass);
     }
 
@@ -324,14 +326,20 @@ public final class ServerManager {
         } else {
             for (int j = currentIdx + 1; j < argv.length; j++) {
                 if (!argv[j].startsWith("-")) {
+                    // several devices separated by commons
+                    final String[] devices = argv[j].split(",");
+                    for (final String device : devices) {
+                        noDbDevices.add(device);
+                    }
+
                     noDbDevices.add(argv[j]);
                     logger.warn("Device with no db: " + argv[j]);
                 } else {
                     break;
                 }
             }
-            DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
-                    .toArray(new String[tangoClasses.size()]));
+            // only one class can be loaded with no db (the last one)
+            DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
         }
         return noDbDevices;
 
@@ -357,8 +365,7 @@ public final class ServerManager {
                 DevFailedUtils.throwDevFailed(INIT_ERROR, name + " does not exists or is not a file");
             }
             logger.warn("Tango Database is not used - with file {} ", file.getPath());
-            DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), tangoClasses.keySet()
-                    .toArray(new String[tangoClasses.size()]));
+            DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
         }
 
     }
