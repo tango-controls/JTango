@@ -21,7 +21,7 @@ public class FileTangoDbTest {
     public static void loadFile() throws DevFailed {
         final String filePath = FileTangoDbTest.class.getResource("/noDbproperties.txt").getPath();
         final File file = new File(filePath);
-        DatabaseFactory.setDbFile(file, new String[] { "" }, new String[] { "" });
+        DatabaseFactory.setDbFile(file, new String[] { "" }, "");
         db = DatabaseFactory.getDatabase();
     }
 
@@ -62,7 +62,7 @@ public class FileTangoDbTest {
         db.deleteDeviceProperty("archiving/hdb-oracle/hdbarchiver.01", "DbHost");
         final Map<String, String[]> prop = db.getDeviceProperties("archiving/hdb-oracle/hdbarchiver.01", "DbHost");
         // put it back for other tests
-        Map<String, String[]> back = new HashMap<String, String[]>();
+        final Map<String, String[]> back = new HashMap<String, String[]>();
         back.put("DbHost", new String[] { "ORION" });
         db.setDeviceProperties("archiving/hdb-oracle/hdbarchiver.01", back);
         assertArrayEquals(prop.get("DbHost"), new String[] {});
