@@ -6,7 +6,7 @@
 
 	<groupId>org.tango</groupId>
 	<artifactId>JTangoParent</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 
 	<name>JTango Parent</name>
 	<description>JTango common build parameters</description>
@@ -147,7 +147,7 @@
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb</artifactId>
-				<version>3.2</version>
+				<version>3.4</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
@@ -162,7 +162,7 @@
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb-services</artifactId>
-				<version>3.2</version>
+				<version>3.4</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
