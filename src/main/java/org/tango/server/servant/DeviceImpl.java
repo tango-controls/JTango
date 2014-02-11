@@ -549,7 +549,6 @@ public final class DeviceImpl extends Device_4POA {
                 prop.update();
             }
             init.execute(stateImpl, statusImpl);
-
             isCorrectlyInit.set(true);
         } catch (final DevFailed e) {
             isCorrectlyInit.set(false);
@@ -630,7 +629,9 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
-     * @throws DevFailed
+     * Check if an init is in progress
+     * 
+     * @throws DevFailed if init is init progress
      */
     private synchronized void checkInitialization() throws DevFailed {
         if (init != null) {
@@ -845,7 +846,10 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeValue[] read_attributes(final String[] attributeNames) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        if (attributeNames.length != 1 || !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("read_attributes");
         clientIdentity = null;
         if (attributeNames.length == 0) {
@@ -884,7 +888,10 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeValue[] read_attributes_2(final String[] names, final DevSource source) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("read_attributes_2", source);
         clientIdentity = null;
         if (names.length == 0) {
@@ -925,7 +932,10 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeValue_3[] read_attributes_3(final String[] names, final DevSource source) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("read_attributes_3", source);
         clientIdentity = null;
         if (names.length == 0) {
@@ -971,7 +981,11 @@ public final class DeviceImpl extends Device_4POA {
         // profilerPeriod.start(Arrays.toString(names));
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(names));
-        checkInitialization();
+        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
+
         blackBox.insertInblackBox("read_attributes_4 " + Arrays.toString(names), source, clIdent);
         clientIdentity = clIdent;
         if (names.length == 0) {
@@ -1310,7 +1324,9 @@ public final class DeviceImpl extends Device_4POA {
     public Any command_inout(final String command, final Any argin) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("command_inout " + command);
         clientIdentity = null;
         Any argout = null;
@@ -1348,7 +1364,9 @@ public final class DeviceImpl extends Device_4POA {
     public Any command_inout_2(final String command, final Any argin, final DevSource source) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("command_inout_2 " + command, source);
         clientIdentity = null;
         Any argout = null;
@@ -1390,7 +1408,10 @@ public final class DeviceImpl extends Device_4POA {
             final ClntIdent clIdent) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry(commandName);
-        checkInitialization();
+        if (!commandName.equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !commandName.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
         blackBox.insertInblackBox("Operation command_inout_4 (cmd = " + commandName + ")", source, clIdent);
         clientIdentity = clIdent;
         Any argout = null;
@@ -2015,7 +2036,6 @@ public final class DeviceImpl extends Device_4POA {
     public DevState getState() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
         if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
             // read all attributes to check alarms
             if (stateCheckAttrAlarm) {
@@ -2070,7 +2090,6 @@ public final class DeviceImpl extends Device_4POA {
     public String getStatus() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
         if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
             status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
         } else {
