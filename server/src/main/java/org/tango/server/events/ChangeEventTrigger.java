@@ -290,7 +290,7 @@ public class ChangeEventTrigger implements IEventTrigger {
      */
     static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
         // Check if value is not numerical (always true for State and String)
-        if (attribute.isState() || attribute.isString()) {
+        if (attribute.isState() || attribute.isString() || attribute.isBoolean()) {
             return;
         }
         // Else check criteria
