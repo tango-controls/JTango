@@ -67,8 +67,8 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
         try {
             if (ri instanceof ServerRequestInfoImpl) {
                 final ServerRequestInfoImpl infoImpl = (ServerRequestInfoImpl) ri;
-                // final Connection connection = infoImpl.getConnection().getTransport();
-                final Connection connection = infoImpl.request.getConnection().getTransport();
+                final Connection connection = infoImpl.getConnection().getTransport();
+                // final Connection connection = infoImpl.request.getConnection().getTransport();
                 if (connection instanceof ServerIIOPConnection) {
                     final ServerIIOPConnection connex = (ServerIIOPConnection) connection;
                     final Socket sock = connex.getSocket();
