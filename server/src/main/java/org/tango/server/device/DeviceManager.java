@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.device;
 
@@ -165,13 +165,13 @@ public final class DeviceManager {
     }
 
     /**
-     * Configure polling of an attribute or a command
+     * Configure polling of an attribute or a command and start it
      * 
      * @param polledObject The name of the polled object (attribute or command)
      * @param pollingPeriod The polling period
      * @throws DevFailed
      */
-    public void setPollingPeriod(final String polledObject, final int pollingPeriod) throws DevFailed {
+    public void startPolling(final String polledObject, final int pollingPeriod) throws DevFailed {
         try {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList());
             attr.configurePolling(pollingPeriod);
@@ -186,7 +186,19 @@ public final class DeviceManager {
                 throw e;
             }
         }
+    }
 
+    public void stopPolling(final String polledObject) throws DevFailed {
+        try {
+            device.removeAttributePolling(polledObject);
+        } catch (final DevFailed e) {
+            if (polledObject.equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                    || polledObject.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+                device.removeCommandPolling(polledObject);
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**
