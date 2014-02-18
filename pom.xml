@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.tango</groupId>
 		<artifactId>JTangoParent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 	</parent>
 
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jacorb</groupId>
-			<artifactId>jacorb</artifactId>
+			<artifactId>jacorb-omgapi</artifactId>
 		</dependency>
 	</dependencies>
 </project>
