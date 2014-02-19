@@ -26,6 +26,7 @@ package org.tango.server.testserver;
 
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.Device;
+import org.tango.server.annotation.Init;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -41,6 +42,17 @@ public class SeveralClasses {
     @Device
     public static class Class1 {
 
+        @Init(lazyLoading = true)
+        public void init() throws DevFailed {
+            try {
+                Thread.sleep(3000);
+            } catch (final InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            DevFailedUtils.throwDevFailed("msg");
+        }
+
     }
 
     @Device
@@ -49,13 +61,13 @@ public class SeveralClasses {
     }
 
     public static void start() throws DevFailed {
-        System.setProperty("OAPort", Integer.toString(1245));
+        // System.setProperty("OAPort", Integer.toString(1245));
         ServerManager.getInstance().addClass(Class2.class.getSimpleName(), Class2.class);
         ServerManager.getInstance().addClass(Class1.class.getSimpleName(), Class1.class);
 
-        ServerManager.getInstance().startError(new String[] { "instance", "-nodb", "-dlist", "deviceName", "device2" },
-                "serverName");
-//        ServerManager.getInstance().startError(new String[] { "1" }, SeveralClasses.class.getSimpleName());
+//        ServerManager.getInstance().startError(new String[] { "instance", "-nodb", "-dlist", "deviceName", "device2" },
+//                "serverName");
+        ServerManager.getInstance().startError(new String[] { "1" }, SeveralClasses.class.getSimpleName());
     }
 
     public static void main(final String[] args) {

@@ -1,0 +1,6 @@
+analyseLocally=false
+eclipse.preferences.version=1
+extraProperties=sonar.host.url\=http\://calypso.synchrotron-soleil.fr/sonar\r\nsonar.jdbc.url\=jdbc\:mysql\://sonardb.ica\:3306/sonar?useUnicode\=true&characterEncoding\=utf8\r\nsonar.jdbc.driver\=com.mysql.jdbc.Driver
+projectKey=org.tango\:JTangoServer
+serverUrl=http\://localhost\:9000
+version=2

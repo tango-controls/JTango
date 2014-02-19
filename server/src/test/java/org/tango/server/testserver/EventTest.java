@@ -45,7 +45,7 @@ import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
 
-@Ignore("TODO: tests not fully stable (work 99% of time)")
+//@Ignore("TODO: tests not fully stable (work 99% of time)")
 public class EventTest {
 
     private static String deviceName = "tmp/test/event";
@@ -537,6 +537,8 @@ public class EventTest {
                 }
 
             }
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
         } finally {
             dev.unsubscribe_event(id);
             // put back no error
@@ -618,6 +620,7 @@ public class EventTest {
     }
 
     @Test(timeout = 10000)
+    @Ignore
     public void dataReady() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleArrayAtt", TangoConst.DATA_READY_EVENT, 100, new String[] {},
