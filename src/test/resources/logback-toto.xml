@@ -44,9 +44,11 @@
 		logging: %logger{30} - %m</Subject> <layout class="ch.qos.logback.classic.html.HTMLLayout" /> </appender> -->
 	<logger name="jacorb" level="WARN" />
 	<logger name="org.tango" level="ERROR" />
+	<logger name="org.tango.server.events" level="DEBUG" />
+	<logger name="org.tango.server.lock" level="DEBUG" />
 	<logger name="org.quartz" level="ERROR" />
 	<logger name="net.sf.ehcache" level="ERROR" />
-	<logger name="TangoClientRequests" level="ERROR" />
+	<logger name="TangoClientRequests" level="DEBUG" />
 	
 	<root level="DEBUG">
 		<appender-ref ref="CONSOLE" />
