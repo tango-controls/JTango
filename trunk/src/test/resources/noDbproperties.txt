@@ -1,0 +1,30 @@
+
+#---------------------------------------------------------
+# SERVER HdbArchiver/ora, HdbArchiver device declaration
+#---------------------------------------------------------
+
+HdbArchiver/ora/DEVICE/HdbArchiver: "archiving/hdb-oracle/hdbarchiver.01",\ 
+                                    "archiving/hdb-oracle/hdbarchiver.02"
+
+
+# --- archiving/hdb-oracle/hdbarchiver.01 properties
+
+archiving/hdb-oracle/hdbarchiver.01->DbHost: ORION
+archiving/hdb-oracle/hdbarchiver.01->diaryPath: "/tmp/archivage/tango/hdbarchiver/diary/01"
+archiving/hdb-oracle/hdbarchiver.01->hasDiary: false
+archiving/hdb-oracle/hdbarchiver.01->reservedAttributes: "tango/tangotest/1/float_scalar",\ 
+                                          "tango/tangotest/1/double_scalar",\
+                                          "tango/tangotest/2/double_scalar"
+
+#---------------------------------------------------------
+# CLASS HdbArchiver properties
+#---------------------------------------------------------
+
+CLASS/HdbArchiver->CommitPeriodInMinute: 5
+CLASS/HdbArchiver->DbONSConf: thalie:6200,euterpe:6200,calliope:6200
+CLASS/HdbArchiver->Description: "Device of Archiving system"
+CLASS/HdbArchiver->RacConnection: false
+CLASS/HdbArchiver->shortPeriodAttributes: "tango/tangotest/1/float_scalar,1",\ 
+                                          "tango/tangotest/1/double_scalar,1",\
+                                          "tango/tangotest/2/double_scalar,1"
+
