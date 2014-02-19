@@ -1,0 +1,11 @@
+1.1.2
+------
+- Migration to jacorb 3.4
+- Events: do not check criteria for boolean attributes
+- Fix Init command: it was possible to launch several init in parallel when the init is detached (@Init(lazyLoading = true)).
+- Server with several class: class startup order was not the order on insertion done with org.tango.server.ServerManager#addClass
+- No db devices: only the last added class is used.
+
+1.1.1
+-----
+Events with ZMQ
