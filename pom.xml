@@ -152,11 +152,10 @@
 
 
 	<dependencies>
-	<!--SNAPSHOT TO REMOVE  -->
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>1.0.10-SNAPSHOT</version>
+			<version>1.0.10</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
