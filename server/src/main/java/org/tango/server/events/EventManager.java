@@ -461,7 +461,7 @@ public final class EventManager {
                     System.err.println(e.errors[0].desc);
                 }
                 logger.debug("Heartbeat sent for {}", heartbeatName);
-                System.out.println("Heartbeat sent for " + heartbeatName);
+                //System.out.println("Heartbeat sent for " + heartbeatName);
             }
             xlogger.exit();
         }
