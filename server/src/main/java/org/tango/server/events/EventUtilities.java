@@ -127,7 +127,6 @@ class EventUtilities {
      * Marshall the attribute with attribute Value
      * 
      * @param attribute attribute to marshall
-     * @param attributeValue attribute value to marshall
      * @return result of the marshall action
      * @throws fr.esrf.Tango.DevFailed if marshall action failed
      */
