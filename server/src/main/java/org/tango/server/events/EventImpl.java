@@ -90,7 +90,6 @@ final class EventImpl {
      * 
      * @param eventSocket the socket to send event
      * @param fullName event full name
-     * @param attributeValue the value object to be sent.
      * @throws DevFailed
      */
 
@@ -137,7 +136,7 @@ final class EventImpl {
             final AttDataReady dataReady = new AttDataReady(attribute.getName(), attribute.getTangoType(), counter);
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(counter, false), ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(dataReady), 0);
             logger.debug("sent event: {}", fullName);
         } catch (final org.zeromq.ZMQException e) {

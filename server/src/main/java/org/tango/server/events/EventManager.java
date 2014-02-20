@@ -451,11 +451,17 @@ public final class EventManager {
             xlogger.entry();
             if (!eventImplMap.isEmpty()) {
                 // Fire heartbeat
-                heartbeatSocket.sendMore(heartbeatName);
-                heartbeatSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-                heartbeatSocket.send("0");
+                try {
+                    heartbeatSocket.sendMore(heartbeatName);
+                    heartbeatSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
+                    heartbeatSocket.send(EventUtilities.marshall(0, false), 0);
+                    //heartbeatSocket.send("0");
+                }
+                catch (DevFailed e) {
+                    System.err.println(e.errors[0].desc);
+                }
                 logger.debug("Heartbeat sent for {}", heartbeatName);
-                // System.out.println("Heartbeat sent for " + heartbeatName);
+                System.out.println("Heartbeat sent for " + heartbeatName);
             }
             xlogger.exit();
         }
