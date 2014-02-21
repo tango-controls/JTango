@@ -2174,7 +2174,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                                           final AsyncCallObject aco, final int timeout) throws DevFailed {
         DeviceData argout = null;
         final int ms_to_sleep = 10;
-        AsynReplyNotArrived except = null;
+        DevFailed except = null;
         final long t0 = System.currentTimeMillis();
         long t1 = t0;
 
@@ -2245,6 +2245,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     Any any = args.item(1).value().extract_any();
                     argin = new DeviceData(any);
                 }
+                //System.err.println(e.errors[0].desc);
 
                 //  And do the synchronous command
                 if (argin==null)
@@ -2407,6 +2408,13 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 if (except != null) {
                     ApiUtil.remove_async_request(id);
                     if (except instanceof org.omg.CORBA.TRANSIENT) {
+                        throw_dev_failed(deviceProxy, except,
+                                deviceProxy.getFull_class_name()
+                                    + "." + idl_cmd + "_reply("
+                                    + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
+                    }
+                    else
+                    if (except instanceof org.omg.CORBA.TIMEOUT) {
                         throw_dev_failed(deviceProxy, except,
                                 deviceProxy.getFull_class_name()
                                     + "." + idl_cmd + "_reply("
