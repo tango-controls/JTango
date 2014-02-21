@@ -479,7 +479,7 @@ public interface TangoConst
 	public static final int	DATA_READY_EVENT = 6;
 	public static final String[]	eventNames = {
         "change",
-        "quality_change",
+        "quality_change",	//	Deprecated !
         "periodic",
         "archive",
 		"user_event",
