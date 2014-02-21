@@ -33,80 +33,77 @@
 
 
 package fr.esrf.TangoDs;
- 
+
 
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.ErrSeverity;
 import fr.esrf.Tango.MultiDevFailed;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
-/** 
- *	Class Description:	This class extends fr.esrf.Tango.DevFailed.
- *	WARNING :	DO NOT FORGET to remove final on class
- *                   fr.esrf.Tango.DevFailed.
+
+/**
+ * Class Description:	This class extends fr.esrf.Tango.DevFailed.
+ * WARNING :	DO NOT FORGET to remove final on class
+ * fr.esrf.Tango.DevFailed.
  *
- * @author  verdier
- * @version  $Revision$
+ * @author verdier
+ * @version $Revision$
  */
 
 
-@SuppressWarnings({"CheckedExceptionClass"})
-public class NamedDevFailedList extends DevFailed
-{
-	private final Vector	err_list;	//	NamedDevFailed
-	//==========================================================================
-	//==========================================================================
-	public NamedDevFailedList(MultiDevFailed corba_ex, String dev_name, String op_name, String reason)
-	{
-		err_list = new Vector();
-		int	nb_obj_failed = corba_ex.errors.length;
-	
-		for (int i=0 ; i<nb_obj_failed ; i++)
-		{
-			NamedDevFailed	tmp_err =
-				new NamedDevFailed(corba_ex.errors[i].err_list,
-				       				corba_ex.errors[i].name,
-				       				corba_ex.errors[i].index_in_call);
-			err_list.add(tmp_err);
-		}
-		//	Build an exception summary (as string) in the DevFailed part
-		//	of this exception.
-		String	desc =
-			"Failed to execute " + op_name + " on device " + dev_name +
-			", object(s) ";
-		for (int i=0 ; i<nb_obj_failed ; i++)
-		{
-			desc += corba_ex.errors[i].name;
-			if (i != nb_obj_failed - 1)
-				desc += ", ";
-		}
+public class NamedDevFailedList extends DevFailed {
+    private final ArrayList<NamedDevFailed> err_list = new ArrayList<NamedDevFailed>();
 
-		errors = new DevError[1];
-		errors[0] = new DevError();
-		errors[0].severity = ErrSeverity.ERR;
-		errors[0].reason = reason;
-		errors[0].origin = op_name;
-		errors[0].desc   = desc;
-		System.out.println("NamedDevFailedList\n" + desc);
-	}
-	//==========================================================================
-	//==========================================================================
-	public int get_faulty_attr_nb()
-	{
-		return err_list.size();
-	}
-	//==========================================================================
-	//==========================================================================
-	public NamedDevFailed elementAt(int i)
-	{
-		return (NamedDevFailed)err_list.elementAt(i);
-	}
-	//==========================================================================
-	//==========================================================================
-	public boolean call_failed()
-	{
-		return ((err_list.size()==0) && (errors.length!=0));
-	}
+    //==========================================================================
+    //==========================================================================
+    public NamedDevFailedList(MultiDevFailed corba_ex, String dev_name, String op_name, String reason) {
+        int nb_obj_failed = corba_ex.errors.length;
+
+        for (int i = 0; i < nb_obj_failed; i++) {
+            NamedDevFailed tmp_err =
+                    new NamedDevFailed(corba_ex.errors[i].err_list,
+                            corba_ex.errors[i].name,
+                            corba_ex.errors[i].index_in_call);
+            err_list.add(tmp_err);
+        }
+        //	Build an exception summary (as string) in the DevFailed part
+        //	of this exception.
+        String desc =
+                "Failed to execute " + op_name + " on device " + dev_name +
+                        ", object(s) ";
+        for (int i = 0; i < nb_obj_failed; i++) {
+            desc += corba_ex.errors[i].name;
+            if (i != nb_obj_failed - 1)
+                desc += ", ";
+        }
+
+        errors = new DevError[1];
+        errors[0] = new DevError();
+        errors[0].severity = ErrSeverity.ERR;
+        errors[0].reason = reason;
+        errors[0].origin = op_name;
+        errors[0].desc = desc;
+        System.out.println("NamedDevFailedList\n" + desc);
+    }
+
+    //==========================================================================
+    //==========================================================================
+    public int get_faulty_attr_nb() {
+        return err_list.size();
+    }
+
+    //==========================================================================
+    //==========================================================================
+    public NamedDevFailed elementAt(int i) {
+        return err_list.get(i);
+    }
+
+    //==========================================================================
+    //==========================================================================
+    @SuppressWarnings("UnusedDeclaration")
+    public boolean call_failed() {
+        return ((err_list.size() == 0) && (errors.length != 0));
+    }
 }
