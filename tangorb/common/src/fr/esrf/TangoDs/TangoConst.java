@@ -41,8 +41,7 @@ package fr.esrf.TangoDs;
  * @version	$Revision$
  */
  
-public interface TangoConst
-{
+public interface TangoConst {
 	public static final int	COMMAND    = 0;
 	public static final int	ATTRIBUTE  = 1;
 /**
@@ -538,7 +537,7 @@ public interface TangoConst
   public static final String TANGO_LOG_PATH = "TANGO_LOG_PATH";
 
 	/**
-	 *	Values used for tango access controle.
+	 *	Values used for tango access control.
 	 */
 	public static final int	ACCESS_READ    = 0;
 	public static final int	ACCESS_WRITE   = 1;

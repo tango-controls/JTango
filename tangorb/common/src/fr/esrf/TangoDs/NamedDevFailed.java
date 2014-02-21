@@ -45,14 +45,12 @@ import fr.esrf.Tango.DevError;
  */
 
 
-public class NamedDevFailed
-{
-	public String		name;
-	public long		idx_in_call;
-	public DevError[]	err_stack;
-	//======================================================================
-	NamedDevFailed(DevError[] err, String name, long idx)
-	{
+public class NamedDevFailed {
+	public String     name;
+	public long		  idx_in_call;
+	public DevError[] err_stack;
+
+	NamedDevFailed(DevError[] err, String name, long idx) {
 		err_stack = err;
 		this.name = name;
 		idx_in_call = idx;
