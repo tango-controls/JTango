@@ -320,6 +320,39 @@ public class Except implements TangoConst, java.io.Serializable
 		ex.printStackTrace();
 	}
 	
+    //===============================================================
+    /**
+     * Returns the current code line (used as origin to throw a DevFailed)
+     * @return the current code line (used as origin to throw a DevFailed)
+     */
+    //===============================================================
+    private static String getCurrentCodeLine() {
+        //  index 0:    Thread.getTrace()
+        //  index 1:    The following line.
+        //  index 2:    The throw_exception() line.
+        //  index 3:    the calling line.
+        return  Thread.currentThread().getStackTrace()[3].toString();
+    }
+/**
+ * Generate and throw a TANGO DevFailed exception.
+ *
+ * The exception is created with a single DevError
+ * object. The DevError severity field is set to ERR
+ * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
+ * <b>DevFailed</b> exception specification
+ *
+ * @param reason The exception DevError object reason field
+ * @param desc The exception DevError object desc field.
+ *        origin will be find from java classes.
+ * @exception DevFailed The thrown exception.
+ * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
+ * <b>DevFailed</b> exception specification
+ */
+	public static void throw_exception(String reason,String desc) throws DevFailed
+	{
+		throw_exception(reason, desc, getCurrentCodeLine());
+	}
+
 /**
  * Generate and throw a TANGO DevFailed exception.
  *
@@ -335,21 +368,11 @@ public class Except implements TangoConst, java.io.Serializable
  * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
  * <b>DevFailed</b> exception specification
  */
-	public static void throw_exception(String reason,String desc,
-					   String origin)
+	public static void throw_exception(String reason,String desc, String origin)
 					   throws DevFailed
 	{
-		DevError[] err = new DevError[1];
-		err[0] = new DevError();
-	
-		err[0].desc = desc;
-		err[0].severity = ErrSeverity.ERR;
-		err[0].reason = reason;
-		err[0].origin = origin;
-	
-		throw new DevFailed(err);
+		throw_exception(reason, desc, origin, ErrSeverity.ERR);
 	}
-
 /**
  * Generate and throw a TANGO DevFailed exception.
  *
@@ -392,27 +415,36 @@ public class Except implements TangoConst, java.io.Serializable
  * @param ex The DevFailed exception
  * @param reason The exception DevError object reason field
  * @param desc The exception DevError object desc field
+ * @exception DevFailed The thrown exception.
+ * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
+ * <b>DevFailed</b> exception specification
+ */
+	public static void re_throw_exception(DevFailed ex, String reason,String desc)
+					      throws DevFailed
+	{
+		re_throw_exception(ex, reason,  desc, getCurrentCodeLine());
+	}
+/**
+ * Re-throw a TANGO DevFailed exception with one more error.
+ *
+ * The exception is re-thrown with one more DevError
+ * object. The new DevError severity field is set to ERR
+ * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
+ * <b>DevFailed</b> exception specification
+ *
+ * @param ex The DevFailed exception
+ * @param reason The exception DevError object reason field
+ * @param desc The exception DevError object desc field
  * @param origin The exception DevError object origin field
  * @exception DevFailed The thrown exception.
  * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
  * <b>DevFailed</b> exception specification
  */
 	public static void re_throw_exception(DevFailed ex,
-					      String reason,String desc,
-					      String origin)
+					      String reason,String desc, String origin)
 					      throws DevFailed
 	{
-		int nb_error = ex.errors.length;
-		DevError[] err = new DevError[nb_error + 1];
-		System.arraycopy(ex.errors, 0, err, 0, nb_error);
-		err[nb_error] = new DevError();
-	
-		err[nb_error].desc = desc;
-		err[nb_error].severity = ErrSeverity.ERR;
-		err[nb_error].reason = reason;
-		err[nb_error].origin = origin;
-	
-		throw new DevFailed(err);
+		re_throw_exception(ex, reason,  desc, origin, ErrSeverity.ERR);
 	}
 
 /**
@@ -433,8 +465,7 @@ public class Except implements TangoConst, java.io.Serializable
  * <b>DevFailed</b> exception specification
  */
 	public static void re_throw_exception(DevFailed ex,
-					      String reason,String desc,
-					      String origin,ErrSeverity sever)
+					      String reason,String desc, String origin,ErrSeverity sever)
 					      throws DevFailed
 	{
 		int nb_error = ex.errors.length;
@@ -470,8 +501,7 @@ public class Except implements TangoConst, java.io.Serializable
  * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
  * <b>DevFailed</b> exception specification
  */	
-	public static void throw_exception(SystemException ex,
-					   String origin)
+	public static void throw_exception(SystemException ex, String origin)
 					   throws DevFailed
 	{
 		DevError[] err = new DevError[1];
