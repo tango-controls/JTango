@@ -47,8 +47,17 @@ public final class DatabaseCache implements ICachableDatabase {
     @Override
     public void loadCache(final String serverName, final String hostName) throws DevFailed {
         if (isCacheAvailable) {
-            serverCache = new ServerCache(database);
-            serverCache.fillCache(serverName, hostName);
+            try {
+                serverCache = new ServerCache(database);
+                serverCache.fillCache(serverName, hostName);
+            } catch (final DevFailed e) {
+                serverCache = null;
+                logger.error("Failed to load cache for  server {} on host {}", serverName, hostName);
+                logger.error("Failed to load cache, do not use it", e);
+            } catch (final Throwable e) {
+                serverCache = null;
+                logger.error("Failed to load cache, do not use it", e);
+            }
         }
     }
 
