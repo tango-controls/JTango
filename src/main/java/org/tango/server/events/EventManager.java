@@ -281,18 +281,20 @@ public final class EventManager {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         longStringArray.lvalue = new int[0];
-        if (heartbeatEndpoint==null || eventEndpoint==null)
+        if (heartbeatEndpoint == null || eventEndpoint == null) {
             longStringArray.svalue = new String[] { "No ZMQ event yet !" };
-        else
+        } else {
             longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
+        }
         return longStringArray;
 
     }
+
     /**
      * Initialize ZMQ event system if not already done,
      * subscribe to the specified event end
      * returns the connection parameters for specified event.
-     *
+     * 
      * @param deviceName The specified event device name
      * @param attribute The specified event attribute name
      * @param eventType The specified event type
@@ -455,13 +457,12 @@ public final class EventManager {
                     heartbeatSocket.sendMore(heartbeatName);
                     heartbeatSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
                     heartbeatSocket.send(EventUtilities.marshall(0, false), 0);
-                    //heartbeatSocket.send("0");
-                }
-                catch (DevFailed e) {
-                    System.err.println(e.errors[0].desc);
+                    // heartbeatSocket.send("0");
+                } catch (final DevFailed e) {
+                    DevFailedUtils.logDevFailed(e, logger);
                 }
                 logger.debug("Heartbeat sent for {}", heartbeatName);
-                //System.out.println("Heartbeat sent for " + heartbeatName);
+                // System.out.println("Heartbeat sent for " + heartbeatName);
             }
             xlogger.exit();
         }
