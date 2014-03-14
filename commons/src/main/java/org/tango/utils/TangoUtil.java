@@ -124,8 +124,8 @@ public final class TangoUtil {
      * @throws DevFailed
      */
     public static String getfullDeviceNameForAttribute(final String attributeName) throws DevFailed {
+        checkNullOrEmptyString(attributeName);
         String result;
-
         if (attributeName.contains(DBASE_NO)) {
             result = attributeName.substring(0, attributeName.lastIndexOf(DEVICE_SEP));
         } else {
@@ -151,6 +151,7 @@ public final class TangoUtil {
      * @throws DevFailed
      */
     public static String getfullAttributeNameForAttribute(final String attributeName) throws DevFailed {
+        checkNullOrEmptyString(attributeName);
         String result;
         final String[] fields = attributeName.split(DEVICE_SEP);
         if (attributeName.contains(DBASE_NO)) {
@@ -169,6 +170,7 @@ public final class TangoUtil {
     }
 
     public static String getFullDeviceNameForCommand(final String commandName) throws DevFailed {
+        checkNullOrEmptyString(commandName);
         return getfullNameForDevice(commandName.substring(0, commandName.lastIndexOf('/')));
     }
 
@@ -180,9 +182,7 @@ public final class TangoUtil {
      * @throws DevFailed
      */
     public static String getfullNameForDevice(final String deviceName) throws DevFailed {
-        if (deviceName == null) {
-            DevFailedUtils.throwDevFailed("cannot retrieve device name", "device name is empty");
-        }
+        checkNullOrEmptyString(deviceName);
         String result;
         final String[] fields = deviceName.split(DEVICE_SEP);
 
@@ -208,6 +208,7 @@ public final class TangoUtil {
      * @throws DevFailed
      */
     public static String[] getDevicesForPattern(final String deviceNamePattern) throws DevFailed {
+        checkNullOrEmptyString(deviceNamePattern);
         String[] devices;
         // is p a device name or a device name pattern ?
         if (!deviceNamePattern.contains("*")) {
@@ -233,6 +234,12 @@ public final class TangoUtil {
     public static String getAttributeName(final String fullname) throws DevFailed {
         final String s = TangoUtil.getfullAttributeNameForAttribute(fullname);
         return s.substring(s.lastIndexOf('/') + 1);
+    }
+
+    private static void checkNullOrEmptyString(final String s) throws DevFailed {
+        if (s == null || s.isEmpty()) {
+            DevFailedUtils.throwDevFailed("string is null or empty");
+        }
     }
 
 }
