@@ -60,6 +60,7 @@ public class AttributeGroupReader implements Runnable {
                 resultGroup = attributeGroup.read();
                 attributeGroupListener.updateDeviceAttribute(resultGroup);
             } catch (final DevFailed devFailed) {
+                DevFailedUtils.logDevFailed(devFailed, logger);
                 logger.error("error extract group", devFailed);
                 logger.error(DevFailedUtils.toString(devFailed));
                 attributeGroupListener.catchDevFailed(devFailed);
@@ -86,6 +87,7 @@ public class AttributeGroupReader implements Runnable {
                 try {
                     attributeInfoExList = attributeGroup.getConfig();
                 } catch (final DevFailed devFailed) {
+                    DevFailedUtils.logDevFailed(devFailed, logger);
                     logger.error("error read attribute info", devFailed);
                     logger.error(DevFailedUtils.toString(devFailed));
                     attributeGroupListener.catchDevFailed(devFailed);
@@ -143,6 +145,7 @@ public class AttributeGroupReader implements Runnable {
                                     attributeGroupListener.updateWriteValue(attrName, tmpWriteValue);
                                 }
                             } catch (final DevFailed e) {
+                                DevFailedUtils.logDevFailed(e, logger);
                                 logger.error("error extract write value", e);
                                 logger.error(DevFailedUtils.toString(e));
                                 attributeGroupListener.updateWriteValueErrorMessage(attrName,
@@ -151,6 +154,7 @@ public class AttributeGroupReader implements Runnable {
                         }
 
                     } catch (final DevFailed devFailed) {
+                        DevFailedUtils.logDevFailed(devFailed, logger);
                         logger.error("error extract group", devFailed);
                         logger.error(DevFailedUtils.toString(devFailed));
                         hasFailed = true;
@@ -169,6 +173,7 @@ public class AttributeGroupReader implements Runnable {
                 attributeGroupListener.readingLoopFinished();
             }
         } catch (final Exception e) {
+            logger.error("error ", e);
             attributeGroupListener.catchException(e);
         }
 
