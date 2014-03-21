@@ -676,6 +676,20 @@ public class DeviceData implements TangoConst {
 
 	//===========================================
 	/**
+	 * extract method for a byte Array as unsigned in short array.
+	 */
+	//===========================================
+	public short[] extractUByteArray() {
+        byte[] bytes = devicedataDAO.extractByteArray(this);
+        short[] shorts = new short[bytes.length];
+        for (int i=0 ; i<bytes.length ; i++) {
+            shorts[i] = (short) (bytes[i] & 0xff);
+        }
+        return shorts;
+	}
+
+	//===========================================
+	/**
 	 * extract method for a short Array.
 	 */
 	//===========================================
