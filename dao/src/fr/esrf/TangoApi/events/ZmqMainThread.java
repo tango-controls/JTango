@@ -279,8 +279,10 @@ public class ZmqMainThread extends Thread {
                     "Cannot decode event  (message size !)",
                     "ZmqMainThread.checkEventMessage()");
         }
-        if (new String(inputs[NameIdx]).startsWith("tango://"))
+        if (new String(inputs[NameIdx]).startsWith("tango://")) {
+            //System.out.println("Receive " +new String(inputs[NameIdx]));
             return; //  OK
+        }
 
         //  Check what is first input ?
         byte[]  bytes = inputs[NameIdx];
@@ -321,7 +323,8 @@ public class ZmqMainThread extends Thread {
             checkEventMessage(inputs);
 
             //  Decode receive data parts
-            String  eventName = getEventName(inputs[NameIdx]);
+            //String  eventName = getEventName(inputs[NameIdx]);
+            String  eventName = new String(inputs[NameIdx]);
             boolean littleEndian = true;
             if (inputs[EndianIdx].length>0) {
                 //  Sometimes inputs[EndianIdx] could be empty (fixed in c++ 8.1)
@@ -343,15 +346,35 @@ public class ZmqMainThread extends Thread {
     }
     //===============================================================
     //===============================================================
+    private EventCallBackStruct getEventCallBackStruct(String eventName) {
+        ArrayList<String> possibleTangoHosts = EventConsumer.possibleTangoHosts;
+        Hashtable<String, EventCallBackStruct> callbackMap = ZmqEventConsumer.getEventCallbackMap();
+        if (callbackMap.containsKey(eventName)) {
+            return callbackMap.get(eventName);
+        }
+        //  Check with other TangoHosts using possibleTangoHosts as header
+        int index = eventName.indexOf("//");
+        if (index>0) {
+            index = eventName.indexOf('/', index+2); //  "//".length()
+            for (String possibleTangoHost : possibleTangoHosts) {
+                String key = possibleTangoHost + eventName.substring(index);
+                if (callbackMap.containsKey(key)) {
+                    return callbackMap.get(key);
+                }
+            }
+        }
+        return null;
+    }
+    //===============================================================
+    //===============================================================
     private void manageEventValue(String eventName,
                                   long eventCounter,
                                   byte[] recData,
                                   boolean littleEndian,
                                   boolean isExcept) throws  DevFailed {
-
-        Hashtable<String, EventCallBackStruct> callbackMap = ZmqEventConsumer.getEventCallbackMap();
-        if (callbackMap.containsKey(eventName)) {
-            EventCallBackStruct callBackStruct = callbackMap.get(eventName);
+        //System.out.println("Event name  = " + eventName);
+        EventCallBackStruct callBackStruct = getEventCallBackStruct(eventName);
+        if (callBackStruct!=null) {
             DeviceAttribute attributeValue  = null;
             AttributeInfoEx attributeConfig = null;
             AttDataReady    dataReady       = null;
@@ -518,12 +541,9 @@ public class ZmqMainThread extends Thread {
             return;
         }
 
-        //  Get only device name
+        //  Get only device name (without event type.
         int end   = name.lastIndexOf('.');
-        if (end>start)
-            name = name.substring(start, end);
-        else
-            name = name.substring(start);
+        name = name.substring(0, end);
         //System.out.println("-----------> Receive Heartbeat for " + name);
         ZmqEventConsumer.getInstance().push_structured_event_heartbeat(name);
 

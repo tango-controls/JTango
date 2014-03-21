@@ -42,6 +42,7 @@ import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.omg.CosNotifyComm.StructuredPushConsumerPOA;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -58,6 +59,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     protected static Hashtable<String, EventCallBackStruct>  event_callback_map = new Hashtable<String, EventCallBackStruct>();
     protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<String, EventCallBackStruct>();
 
+    //  Alternate tango hosts
+    static ArrayList<String>  possibleTangoHosts = new ArrayList<String>();
     //===============================================================
     //===============================================================
     abstract protected  void checkDeviceConnection(DeviceProxy device,
@@ -114,26 +117,54 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     }
     //===============================================================
     //===============================================================
-    protected void push_structured_event_heartbeat(String domain_name) {
+    private EventChannelStruct getEventChannelStruct(String channelName) {
+        if (channel_map.containsKey(channelName)) {
+            return channel_map.get(channelName);
+        }
+        //  Check with other TangoHosts using possibleTangoHosts as header
+        int index = channelName.indexOf("//");
+        if (index>0) {
+            index = channelName.indexOf('/', index+2); //  "//".length()
+            for (String possibleTangoHost : possibleTangoHosts) {
+                String key = possibleTangoHost + channelName.substring(index);
+                if (channel_map.containsKey(key))
+                    return channel_map.get(key);
+            }
+        }
+        return null;
+    }
+    //===============================================================
+    //===============================================================
+    protected void push_structured_event_heartbeat(String channelName) {
+        //  ToDo
         try {
-            if (channel_map.containsKey(domain_name)) {
-                EventChannelStruct event_channel_struct = channel_map.get(domain_name);
-                event_channel_struct.last_heartbeat = System.currentTimeMillis();
-            } else {
-                //	In case of (use_db==false)
-                //	domain name is only device name
-                //	but key is full name (//host:port/a/b/c....)
-                Enumeration keys = channel_map.keys();
-                boolean found = false;
-                while (keys.hasMoreElements() && !found) {
-                    String name = (String) keys.nextElement();
-                    EventChannelStruct event_channel_struct = channel_map.get(name);
-                    if (event_channel_struct.adm_device_proxy.name().equalsIgnoreCase(domain_name)) {
-                        event_channel_struct.last_heartbeat = System.currentTimeMillis();
-                        found = true;
-                    }
+            //  If full name try to get structure from channel_map with different tango hosts
+            if (channelName.startsWith("tango://")) {
+                EventChannelStruct  eventChannelStruct = getEventChannelStruct(channelName);
+                if (eventChannelStruct!=null) {
+                    eventChannelStruct.last_heartbeat = System.currentTimeMillis();
+                    return;
                 }
             }
+
+            //  Not Found !
+            //	In case of (use_db==false)
+            //	domain name is only device name
+            //	but key is full name (//host:port/a/b/c....)
+            Enumeration keys = channel_map.keys();
+            boolean found = false;
+            while (keys.hasMoreElements() && !found) {
+                String name = (String) keys.nextElement();
+                EventChannelStruct eventChannelStruct = channel_map.get(name);
+                //  Check with device name for adm device
+                String  admDeviceName = eventChannelStruct.adm_device_proxy.name();
+                if (admDeviceName.equalsIgnoreCase(channelName)) {
+                    eventChannelStruct.last_heartbeat = System.currentTimeMillis();
+                    found = true;
+                }
+            }
+            if (!found)
+                System.err.println(channelName + " Not found");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -143,7 +174,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     //===============================================================
     private void callEventSubscriptionAndConnect(DeviceProxy device, String attribute, String eventType)
             throws DevFailed {
-        //	EventSubscriptionChange call is now done before (PV 11/01/08)
+
         String device_name = device.name();
         String[] info = new String[]{
                 device_name, attribute, "subscribe", eventType
@@ -152,7 +183,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         argin.insert(info);
         String cmdName = getEventSubscriptionCommandName();
         ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
-                    cmdName + "\")");
+                    cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
         DeviceData argout =
                 device.get_adm_dev().command_inout(cmdName, argin);
         ApiUtil.printTrace("    command_inout done.");
@@ -212,8 +243,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                     device.setEventQueue(new EventQueue());
         }
 
-        String device_name = device.name();
-        String callback_key = device_name.toLowerCase() + "/" + attribute + "." + event_name;
+        String deviceName = device.fullName();
+        String callback_key = deviceName.toLowerCase() + "/" + attribute + "." + event_name;
         try {
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
@@ -245,9 +276,15 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             }
         }
 
-        //	Prepare filters for heartbeat events on channel_name
-        String channel_name = device_channel_map.get(device_name);
-        EventChannelStruct event_channel_struct = channel_map.get(channel_name);
+        //	Prepare filters for heartbeat events on channelName
+        String channelName = device_channel_map.get(deviceName);
+        if (channelName==null) {
+            //  If from notifd, tango host not used.
+            int start = deviceName.indexOf('/', "tango:// ".length());
+            deviceName = deviceName.substring(start+1);
+            channelName = device_channel_map.get(deviceName);
+        }
+        EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
         //	Check if a new event or a re-trying one
@@ -265,7 +302,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 new EventCallBackStruct(device,
                         attribute,
                         event_name,
-                        channel_name,
+                        channelName,
                         callback,
                         max_size,
                         evnt_id,
@@ -275,7 +312,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         filters,
                         true);
         setAdditionalInfoToEventCallBackStruct(new_event_callback_struct,
-                device_name, attribute, event_name, filters, event_channel_struct);
+                deviceName, attribute, event_name, filters, event_channel_struct);
         event_callback_map.put(callback_key, new_event_callback_struct);
 
 
