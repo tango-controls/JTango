@@ -181,8 +181,10 @@ public class DeviceProxyFactory {
 
         //	Get it if already exists
         DeviceProxy tmp_dev = proxy_table.get(fullDeviceName);
-        if (tmp_dev == null)
+        if (tmp_dev == null) {
+            //System.out.println("Create " + fullDeviceName);
             proxy_table.put(fullDeviceName, dev);    //	else add it
+        }
     }
     //===================================================================
     //===================================================================

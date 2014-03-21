@@ -36,11 +36,7 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
-import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Class Description: This class manage device connection for Tango objects. It
@@ -156,7 +152,6 @@ public class Connection implements ApiDefs {
 	public Connection() throws DevFailed {
 		iConnection = TangoFactory.getSingleton().getConnectionDAO();
 		// Check Tango Host Properties (host name, port number)
-		// ------------------------------------------------------------
 		iConnection.init(this);
 	}
 
@@ -164,10 +159,8 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It makes a connection on database server.
 	 * 
-	 * @param host
-	 *            host where database is running.
-	 * @param port
-	 *            port for database connection.
+	 * @param host host where database is running.
+	 * @param port port for database connection.
 	 */
 	// ===================================================================
 	public Connection(String host, String port) throws DevFailed {
@@ -179,12 +172,9 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It makes a connection on database server.
 	 * 
-	 * @param host
-	 *            host where database is running.
-	 * @param port
-	 *            port for database connection.
-	 * @param auto_reconnect
-	 *            do not reconnect if false.
+	 * @param host  host where database is running.
+	 * @param port  port for database connection.
+	 * @param auto_reconnect do not reconnect if false.
 	 */
 	// ===================================================================
 	public Connection(String host, String port, boolean auto_reconnect) throws DevFailed {
@@ -196,8 +186,7 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It imports the device.
 	 * 
-	 * @param devname
-	 *            name of the device to be imported.
+	 * @param devname  name of the device to be imported.
 	 */
 	// ===================================================================
 	public Connection(String devname) throws DevFailed {
@@ -221,10 +210,8 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It imports the device. And set check_access.
 	 * 
-	 * @param devname
-	 *            name of the device to be imported.
-	 * @param check_access
-	 *            set check_access value
+	 * @param devname name of the device to be imported.
+	 * @param check_access  set check_access value
 	 */
 	// ===================================================================
 	public Connection(String devname, boolean check_access) throws DevFailed {
@@ -236,12 +223,9 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It imports the device.
 	 * 
-	 * @param devname
-	 *            name of the device to be imported.
-	 * @param param
-	 *            String parameter to import device.
-	 * @param src
-	 *            Source to import device (ior, dbase...)
+	 * @param devname name of the device to be imported.
+	 * @param param String parameter to import device.
+	 * @param src   Source to import device (ior, dbase...)
 	 */
 	// ===================================================================
 	public Connection(String devname, String param, int src) throws DevFailed {
@@ -253,12 +237,9 @@ public class Connection implements ApiDefs {
 	/**
 	 * Connection constructor. It imports the device.
 	 * 
-	 * @param devname
-	 *            name of the device to be imported.
-	 * @param host
-	 *            host where database is running.
-	 * @param port
-	 *            port for database connection.
+	 * @param devname name of the device to be imported.
+	 * @param host    host where database is running.
+	 * @param port    port for database connection.
 	 */
 	// ===================================================================
 	public Connection(String devname, String host, String port) throws DevFailed {
@@ -277,11 +258,11 @@ public class Connection implements ApiDefs {
 	{
 		//GA: add test if not null
 		if (connection != null) {
-			if (devname.toLowerCase().equals(connection.devname.toLowerCase())==false)
+			if (!devname.toLowerCase().equals(connection.devname.toLowerCase()))
 				return false;
 			if (url.protocol!=connection.url.protocol)
 				return false;
-			if (url.host.equals(connection.url.host)==false)
+			if (!url.host.equals(connection.url.host))
 				return false;
 			if (url.port!=connection.url.port)
 				return false;
@@ -553,18 +534,7 @@ public class Connection implements ApiDefs {
         String  tangoHost = get_tango_host();
         String  host = tangoHost.substring(0, tangoHost.indexOf(':'));
         String  port = tangoHost.substring(tangoHost.indexOf(':'));
-
-        try {
-        //  Get FQDN for host
-            InetAddress iadd = InetAddress.getByName(host);
-            String      add  = iadd.getHostAddress();
-            host             = iadd.getCanonicalHostName();
-        }
-        catch (UnknownHostException e) {
-            Except.throw_exception("Api_GetTangoHostFailed",
-                    e.toString(), "Connection.getFullTangoHost()");
-        }
-
+        host = TangoUrl.getCanonicalName(host);
         return host+port;
 	}
 
@@ -581,8 +551,7 @@ public class Connection implements ApiDefs {
 	/**
 	 * if not a TACO command then throw a DevFailed Exception.
 	 * 
-	 * @param cmdname
-	 *            command name to be put inside reason and origin fields.
+	 * @param cmdname command name to be put inside reason and origin fields.
 	 */
 	// ==========================================================================
 	public void checkIfTaco(String cmdname) throws DevFailed {
@@ -593,8 +562,7 @@ public class Connection implements ApiDefs {
 	/**
 	 * if not a TACO command then throw a DevFailed Exception.
 	 * 
-	 * @param cmdname
-	 *            command name to be put inside reason and origin fields.
+	 * @param cmdname  command name to be put inside reason and origin fields.
 	 */
 	// ==========================================================================
 	public void checkIfTango(String cmdname) throws DevFailed {

@@ -58,6 +58,8 @@ class AccessProxy extends DeviceProxy {
     protected static String hostAddr = null;
     protected boolean forced = false;
     private static boolean muliIP = true;
+    private static final Object monitor = new Object();
+
     /**
      * Device rights table
      */
@@ -67,7 +69,6 @@ class AccessProxy extends DeviceProxy {
      */
     protected Hashtable<String, String[]> allowed_cmd_table = null;
     //===============================================================
-
     /**
      * Constructor for Access device proxy
      *
@@ -92,7 +93,6 @@ class AccessProxy extends DeviceProxy {
         }
     }
     //===============================================================
-
     /**
      * Check access for specified device
      *
@@ -133,7 +133,7 @@ class AccessProxy extends DeviceProxy {
                     array[i++] = user;
                     array[i++] = devName;
                     for (String address : addresses) {
-                        //System.out.println(" Checcking for : " + address);
+                        //System.out.println(" Checking for : " + address);
                         array[i++] = address;
                     }
 
@@ -167,9 +167,7 @@ class AccessProxy extends DeviceProxy {
         return TangoConst.ACCESS_READ;
     }
 
-    private static final Object monitor = new Object();
     //===============================================================
-
     /**
      * Check for specified device, the specified command is allowed.
      *
@@ -196,7 +194,6 @@ class AccessProxy extends DeviceProxy {
         return false;
     }
     //===============================================================
-
     /**
      * query access device to know allowed commands for the device and for a specified class
      *
