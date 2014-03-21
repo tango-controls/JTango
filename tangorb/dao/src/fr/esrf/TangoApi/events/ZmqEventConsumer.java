@@ -136,7 +136,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private void connect(DeviceProxy deviceProxy, String attributeName, String eventName, DeviceData deviceData) throws DevFailed {
-         String deviceName = deviceProxy.name();
+        String deviceName = deviceProxy.fullName();
         String adm_name = null;
         int tangoVersion = deviceData.extractLongStringArray().lvalue[0];
         try {
@@ -178,10 +178,10 @@ public class ZmqEventConsumer extends EventConsumer implements
         eventChannelStruct.setTangoRelease(tangoVersion);
 
         device_channel_map.put(deviceName, channelName);
+        //ToDo
     }
     //===============================================================
-    //ToDo
-    /*
+    /**
      *  Due to a problem when there is more than one network card,
      *  The address for ZMQ ports, must be the same than 
      *  host where deviceProxy is running.
@@ -223,7 +223,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         //  Check if address is coherent (??)
         deviceData = checkZmqAddress(deviceData, deviceProxy);
 
-        String deviceName = deviceProxy.name();
+        String deviceName = deviceProxy.fullName();
         ApiUtil.printTrace("checkDeviceConnection for " + deviceName);
         if (!device_channel_map.containsKey(deviceName)) {
             ApiUtil.printTrace("    Does NOT Exist");
@@ -247,6 +247,8 @@ public class ZmqEventConsumer extends EventConsumer implements
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
         DeviceProxy adminDevice = new DeviceProxy(cs.channelName);
+        cs.channelName = adminDevice.fullName();    //  Update name with tango host
+
         DevVarLongStringArray   lsa = cs.deviceData.extractLongStringArray();
         ApiUtil.printTrace("connect_event_channel for " + cs.channelName);
 
@@ -265,6 +267,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             eventChannelStruct.setTangoRelease(lsa.lvalue[0]);
             eventChannelStruct.setIdlVersion(lsa.lvalue[1]);
         } else {
+            //  Crate new one
             EventChannelStruct newEventChannelStruct = new EventChannelStruct();
             //newEventChannelStruct.eventChannel = eventChannel;
             newEventChannelStruct.last_heartbeat = System.currentTimeMillis();
@@ -277,6 +280,20 @@ public class ZmqEventConsumer extends EventConsumer implements
             newEventChannelStruct.setIdlVersion(lsa.lvalue[1]);
             channel_map.put(cs.channelName, newEventChannelStruct);
             ApiUtil.printTrace("Adding " + cs.channelName + " to channel_map");
+
+            //  Get possible TangoHosts and add it to list if not already in.
+            String[]    tangoHosts = adminDevice.get_db_obj().getPossibleTangoHosts();
+            for (String tangoHost : tangoHosts) {
+                tangoHost = "tango://" + tangoHost;
+                boolean found = false;
+                for (String possibleTangoHost : possibleTangoHosts) {
+                    if (possibleTangoHost.equals(tangoHost))
+                        found = true;
+                }
+                if (!found) {
+                    possibleTangoHosts.add(tangoHost);
+                }
+            }
         }
     }
 
@@ -379,7 +396,7 @@ public class ZmqEventConsumer extends EventConsumer implements
 
 
     //===============================================================
-    /*
+    /**
      * Reconnect to event
      *
      * @return true if reconnection done
