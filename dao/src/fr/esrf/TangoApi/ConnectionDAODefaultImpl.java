@@ -74,13 +74,23 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     // ===================================================================
     private String buildUrlName(final String host, final String port) {
-		return "tango://" + host + ":" + port;
+        try {
+            return "tango://" + TangoUrl.getCanonicalName(host) + ":" + port;
+        }
+        catch (DevFailed e) {
+    		return "tango://" + host + ":" + port;
+        }
     }
 
     // ===================================================================
     // ===================================================================
     private String buildUrlName(final String host, final String port, final String devname) {
-		return "tango://" + host + ":" + port + "/" + devname;
+        try {
+    		return "tango://" + TangoUrl.getCanonicalName(host) + ":" + port + "/" + devname;
+        }
+        catch (DevFailed e) {
+    		return "tango://" + host + ":" + port + "/" + devname;
+        }
     }
 
     public ConnectionDAODefaultImpl() {
@@ -116,7 +126,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     public void init(final Connection connection, final String host, final String port)
 	    	throws DevFailed {
-		connection.url = new TangoUrl(buildUrlName(host, port));
+		connection.url = new TangoUrl(buildUrlName(TangoUrl.getCanonicalName(host), port));
 		connection.setDevice_is_dbase(true);
 		connection.transparent_reconnection = true; // Always true for Database
 
@@ -137,7 +147,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     public void init(final Connection connection, final String host, final String port,
 	    	final boolean auto_reconnect) throws DevFailed {
-		connection.url = new TangoUrl(buildUrlName(host, port));
+		connection.url = new TangoUrl(buildUrlName(TangoUrl.getCanonicalName(host), port));
 		connection.setDevice_is_dbase(true);
 		connection.transparent_reconnection = auto_reconnect;
 
@@ -398,7 +408,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.host == null) {
 	    	db = ApiUtil.get_db_obj();
 		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 		}
 
 		final DbDevImportInfo info = db.import_device(connection.devname);
@@ -413,7 +423,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
             if (connection.url.host == null) {
                 db = ApiUtil.get_db_obj();
             } else {
-                db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+                db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
             }
             final DbDevImportInfo info = db.import_device(connection.devname);
             return info.hostname;
@@ -430,7 +440,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.host == null) {
 	    	db = ApiUtil.get_db_obj();
 		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 		}
 		final DbDevImportInfo info = db.import_device(connection.devname);
 		return info.server;
@@ -443,7 +453,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.host == null) {
 	    	db = ApiUtil.get_db_obj();
 		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 		}
 		if (connection.classname == null) {
 	    	final DbDevImportInfo info = db.import_device(connection.devname);
@@ -457,7 +467,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void initCtrlAccess(final Connection connection) throws DevFailed {
 		if (connection.url.use_db && connection.check_access && !connection.check_access_done) {
 
-	    	connection.access = ApiUtil.get_db_obj(connection.url.host, connection.url.strport)
+	    	connection.access = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort)
 		    	.checkAccessControl(connection.devname, connection.url);
 
 	    	//System.out.println(connection.devname + " -> " +
@@ -476,7 +486,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.host == null) {
 	    	db = ApiUtil.get_db_obj();
 		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 		}
 		final DbDevImportInfo info = db.import_device(connection.devname);
 		String result = null;
@@ -509,7 +519,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (connection.url.host == null) {
 	    	db = ApiUtil.get_db_obj();
 		} else {
-	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 		}
 		// Check if device must be imported directly from IOR
         String  local_ior = null;
@@ -583,7 +593,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                 // Prepeare the connection string
                 // ----------------------------------
                 final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
-                    + connection.url.strport + "/database";
+                    + connection.url.strPort + "/database";
                 // And connect to database.
                 // ----------------------------
                 createDevice(connection, db_corbaloc);
@@ -610,7 +620,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                         connection.ior = null;
                         Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
                             "Connection to database failed  !\n" + e, "connect_to_dbase("
-                                + connection.url.host + "," + connection.url.strport + ")");
+                                + connection.url.host + "," + connection.url.strPort + ")");
  		    		}
 				} else {
 		    		// e.printStackTrace();
@@ -618,7 +628,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		    		connection.ior = null;
     		    	Except.throw_connection_failed("TangoApi_DATABASE_CONNECTION_FAILED",
 	    		    	"Connection to database failed  !\n" + ex, "connect_to_dbase("
-		    		    	+ connection.url.host + "," + connection.url.strport + ")");
+		    		    	+ connection.url.host + "," + connection.url.strPort + ")");
 				}
 	    	}
 		}
@@ -638,7 +648,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 			 // Prepeare the connection string
 			 // ----------------------------------
 			 final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
-				 + connection.url.strport + "/" + connection.devname.toLowerCase();
+				 + connection.url.strPort + "/" + connection.devname.toLowerCase();
 			 // System.out.println("db_corbaloc=" + db_corbaloc);
 			 // And connect to device.
 			 // ----------------------------
@@ -651,7 +661,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 			 Except.throw_connection_failed("TangoApi_DEVICE_CONNECTION_FAILED",
 				 "Connection to device without database failed  !\n" + e,
 				 "Connection.dev_import_without_dbase(" + connection.url.host + ","
-					 + connection.url.strport + ")");
+					 + connection.url.strPort + ")");
 	    	 }
 		 }
     }
@@ -837,7 +847,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		// Manage Access control
 		//
 		if (connection.access == TangoConst.ACCESS_READ) {
-	    	final Database db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	    	final Database db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 	    	if (!db.isCommandAllowed(connection.get_class_name(), command)) {
 				// Check if not allowed or PB with access device
 				if (db.access_devfailed != null) {
@@ -1201,7 +1211,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ==========================================================================
     public String get_tango_host(final Connection connection) throws DevFailed {
 	    checkIfTango(connection, "get_tango_host");
-		    return connection.url.host + ":" + connection.url.strport;
+		    return connection.url.host + ":" + connection.url.strPort;
     }
 
     // ==========================================================================
@@ -1276,7 +1286,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ==========================================================================
     // ==========================================================================
     public boolean isAllowedCommand(final Connection connection, final String cmd) throws DevFailed {
-	final Database db = ApiUtil.get_db_obj(connection.url.host, connection.url.strport);
+	final Database db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
 	return db.isCommandAllowed(connection.get_class_name(), cmd);
     }
 

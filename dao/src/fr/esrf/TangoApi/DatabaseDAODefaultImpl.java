@@ -504,6 +504,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 		try {
 			DeviceData	argin = new DeviceData();
 			argin.insert(devname);
+            //System.out.println("DbImportDevice " + devname);
 			DeviceData	argout = command_inout(database, "DbImportDevice", argin);
 			info = argout.extractLongStringArray();
 			database.access = tmp_access;

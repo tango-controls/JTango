@@ -35,215 +35,203 @@
 package fr.esrf.TangoApi;
 
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttributeConfig;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevSource;
 import fr.esrf.TangoDs.Except;
-import fr.esrf.TangoDs.TangoConst;
 
 /**
- *	<b>Class Description:</b><Br>
- *	This class is a wrapper for TACO device.
- *	It is an interface between TANGO DeviceProxy and TACO device.
- *	It replace the fr.esrf.TacoApi.TacoDevice class using JNI library abd use true
- *	java classes found in Taco.jar (ESRF specific).
- *	
- * @author  verdier
- * @version	$Revision$
+ * <b>Class Description:</b><Br>
+ * This class is a wrapper for TACO device.
+ * It is an interface between TANGO DeviceProxy and TACO device.
+ * It replace the fr.esrf.TacoApi.TacoDevice class using JNI library abd use true
+ * java classes found in Taco.jar (ESRF specific).
+ *
+ * @author verdier
+ * @version $Revision$
  */
 
 
-public class TacoTangoDeviceDAODefaultImpl implements ITacoTangoDeviceDAO
-{
+public class TacoTangoDeviceDAODefaultImpl implements ITacoTangoDeviceDAO {
 
-	//======================================================
+    //======================================================
+    /* (non-Javadoc) */
+    //======================================================
+    public TacoTangoDeviceDAODefaultImpl() {
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public TacoTangoDeviceDAODefaultImpl()
-	{
-	}
-	//======================================================
+    //======================================================
+    public void init(TacoTangoDevice tacoDevice, String devname, String nethost) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported.\n" +
+                        "Patch TangORB.jar if Taco is needed.",
+                "TacoTangoDeviceDAODefaultImpl.TacoTangoDeviceDAODefaultImpl(" + devname + ")");
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public void init(TacoTangoDevice tacoDevice, String devname, String nethost) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported.\n" +
-				"Patch TangORB.jar if Taco is needed.",
-				"TacoTangoDeviceDAODefaultImpl.TacoTangoDeviceDAODefaultImpl("+devname+")");
-	}
-	//======================================================
+    //======================================================
+    public DeviceData command_inout(TacoTangoDevice tacoDevice, String command, DeviceData argin) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //======================================================
+    //======================================================
+    public CommandInfo[] commandListQuery(TacoTangoDevice tacoDevice) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //======================================================
+    //======================================================
+    public CommandInfo commandQuery(TacoTangoDevice tacoDevice, String cmdname) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public DeviceData command_inout(TacoTangoDevice tacoDevice, String command, DeviceData argin) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//======================================================
-	//======================================================
-	public CommandInfo[] commandListQuery(TacoTangoDevice tacoDevice) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//======================================================
-	//======================================================
-	public CommandInfo commandQuery(TacoTangoDevice tacoDevice, String cmdname) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//======================================================
+    //======================================================
+    public void set_rpc_protocol(TacoTangoDevice tacoDevice, int mode) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public void set_rpc_protocol(TacoTangoDevice tacoDevice, int mode)	throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-	}
+    //======================================================
+    public int get_rpc_protocol(TacoTangoDevice tacoDevice) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return -1;
+    }
 
-	//======================================================
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public int get_rpc_protocol(TacoTangoDevice tacoDevice)	throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return -1;
-	}
+    //======================================================
+    public int get_rpc_timeout(TacoTangoDevice tacoDevice) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return -1;
+    }
 
-	//======================================================
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public int get_rpc_timeout(TacoTangoDevice tacoDevice)	throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return -1;
-	}
-	//======================================================
+    //======================================================
+    public void set_rpc_timeout(TacoTangoDevice tacoDevice, int millis) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+    }
+
+    //==========================================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public void set_rpc_timeout(TacoTangoDevice tacoDevice, int millis)	throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-	}
-	//==========================================================================
+    //==========================================================================
+    public String[] dev_inform(TacoTangoDevice tacoDevice) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //==========================================================================
+    //==========================================================================
+    public DbDatum[] get_property(TacoTangoDevice tacoDevice, String[] propnames) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //==========================================================================
 	/* (non-Javadoc) */
-	//==========================================================================
-	public String[] dev_inform(TacoTangoDevice tacoDevice) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//==========================================================================
-	//==========================================================================
-	public DbDatum[] get_property(TacoTangoDevice tacoDevice, String[] propnames) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
+    //==========================================================================
+    public void set_source(TacoTangoDevice tacoDevice, DevSource src) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+    }
 
-	//==========================================================================
+    //==========================================================================
 	/* (non-Javadoc) */
-	//==========================================================================
-	public void set_source(TacoTangoDevice tacoDevice, DevSource src) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-	}
-	//==========================================================================
-	/* (non-Javadoc) */
-	//==========================================================================
-	public DevSource get_source(TacoTangoDevice tacoDevice)
-	{
-		return null;
-	}
-	
-	//==========================================================================
-	//==========================================================================
+    //==========================================================================
+    public DevSource get_source(TacoTangoDevice tacoDevice) {
+        return null;
+    }
+
+    //==========================================================================
+    //==========================================================================
 
 
-
-
-
-
-
-	//==========================================================================
+    //==========================================================================
 	/*
 	 *	Signal / Attribute management
 	 */
-	//==========================================================================
+    //==========================================================================
 
-	//==========================================================================
+    //==========================================================================
 	/* (non-Javadoc) */
-	//==========================================================================
-	public String[] get_attribute_list(TacoTangoDevice tacoDevice) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//======================================================
+    //==========================================================================
+    public String[] get_attribute_list(TacoTangoDevice tacoDevice) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public AttributeConfig[] get_attribute_config(TacoTangoDevice tacoDevice, String[] attrnames) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
-	//======================================================
+    //======================================================
+    public AttributeConfig[] get_attribute_config(TacoTangoDevice tacoDevice, String[] attrnames) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
+
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public DeviceAttribute[] read_attribute(TacoTangoDevice tacoDevice, String[] attrnames) throws DevFailed
-	{
-		Except.throw_exception("Api_TacoFailed",
-				"Taco protocol not supported",
-				"TacoTangoDeviceDAODefaultImpl.command_inout()");
-		return null;
-	}
+    //======================================================
+    public DeviceAttribute[] read_attribute(TacoTangoDevice tacoDevice, String[] attrnames) throws DevFailed {
+        Except.throw_exception("Api_TacoFailed",
+                "Taco protocol not supported",
+                "TacoTangoDeviceDAODefaultImpl.command_inout()");
+        return null;
+    }
 
 
-
-	//======================================================
+    //======================================================
 	/*
 	 *	Taco  <--> Tango  data convertion methods
 	 */
-	//======================================================
+    //======================================================
 
-	//======================================================
+    //======================================================
 	/* (non-Javadoc) */
-	//======================================================
-	public int tangoType(int taco_type)
-	{
-		return -1;
-	}
-	//======================================================
-	/* (non-Javadoc) */
-	//======================================================
-	public String[] infoToTango(TacoTangoDevice tacoDevice, String taco_info)
-	{
+    //======================================================
+    public int tangoType(int taco_type) {
+        return -1;
+    }
 
-		return null;
-	}
-	//======================================================
-	//======================================================
+    //======================================================
+	/* (non-Javadoc) */
+    //======================================================
+    public String[] infoToTango(TacoTangoDevice tacoDevice, String taco_info) {
+
+        return null;
+    }
+    //======================================================
+    //======================================================
 }
