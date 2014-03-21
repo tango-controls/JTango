@@ -316,8 +316,14 @@ public class  ZMQutils {
 	//===============================================================
     static String getFullAttributeName(String tangoHost, String deviceName, String attributeName,
                                        String eventName) throws DevFailed {
-        return ("tango://" + tangoHost +
-                "/" + deviceName + "/" + attributeName + "."+ eventName).toLowerCase();
+        //  If full name, replace Tango Host
+        if (deviceName.startsWith("tango://" )) {
+            int start = deviceName.indexOf('/', "tango://".length()+1);
+            deviceName = deviceName.substring(start+1);
+        }
+
+        return ("tango://" + tangoHost + "/" + deviceName +
+                "/" + attributeName + "."+ eventName).toLowerCase();
     }
 	//===============================================================
     /**

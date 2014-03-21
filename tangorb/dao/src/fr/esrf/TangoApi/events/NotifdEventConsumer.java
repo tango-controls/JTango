@@ -147,7 +147,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
                 orb.destroy();
             }
         } catch (org.omg.CORBA.UserException ex) {
-            System.out.println("EventConsumer.run() : Unable to start orb");
+            System.err.println("EventConsumer.run() : Unable to start orb");
             ex.printStackTrace();
             System.exit(1);
         }
@@ -191,22 +191,36 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
 
     //===============================================================
     //===============================================================
+    private EventCallBackStruct getEventCallBackStruct(String eventName) {
+        Enumeration keys = event_callback_map.keys();
+        while (keys.hasMoreElements()) {
+            String key = (String) keys.nextElement();
+            //  Notifd do not use tango host
+            int start = key.indexOf('/', "tango:// ".length());
+            String shortName = key.substring(start+1);
+            if (eventName.equalsIgnoreCase(shortName)) {
+                return event_callback_map.get(key);
+            }
+        }
+        return null;
+    }
+    //===============================================================
+    //===============================================================
     public void push_structured_event(org.omg.CosNotification.StructuredEvent notification) {
 
-        String domain_name = notification.header.fixed_header.event_type.domain_name;
-        String event_name = notification.header.fixed_header.event_name;
+        String domainName = notification.header.fixed_header.event_type.domain_name;
+        String eventType = notification.header.fixed_header.event_name;
         try {
             //	Check if Heartbeat event
-            if (event_name.equals("heartbeat")) {
-                push_structured_event_heartbeat(domain_name);
+            if (eventType.equals("heartbeat")) {
+                push_structured_event_heartbeat(domainName);
                 return;
             }
             //	Else check if event is registered and get its CB struct
-            String attr_event_name = domain_name + "." + event_name;
-            if (event_callback_map.containsKey(attr_event_name)) {
-                EventCallBackStruct event_callback_struct =
-                        event_callback_map.get(attr_event_name);
-                CallBack callback = event_callback_struct.callback;
+            String eventName = domainName + "." + eventType;
+            EventCallBackStruct callBackStruct = getEventCallBackStruct(eventName);
+            if (callBackStruct!=null) {
+                CallBack callback = callBackStruct.callback;
                 DeviceAttribute attr_value = null;
                 AttributeInfoEx attr_config = null;
                 AttDataReady data_ready = null;
@@ -225,18 +239,20 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
 
                 //	And build event data
                 EventData event_data =
-                        new EventData(event_callback_struct.device,
-                                domain_name, event_name,
-                                event_callback_struct.event_type, EventData.NOTIFD_EVENT,
+                        new EventData(callBackStruct.device,
+                                domainName, eventType,
+                                callBackStruct.event_type, EventData.NOTIFD_EVENT,
                                 attr_value, attr_config, data_ready, dev_err_list);
 
 
-                if (event_callback_struct.use_ev_queue) {
-                    EventQueue ev_queue = event_callback_struct.device.getEventQueue();
+                if (callBackStruct.use_ev_queue) {
+                    EventQueue ev_queue = callBackStruct.device.getEventQueue();
                     ev_queue.insert_event(event_data);
                 } else if (callback != null)
                     callback.push_event(event_data);
             }
+            else
+                System.err.println(eventName + " event not found");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -419,6 +435,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
             Except.throw_event_system_failed("API_NotificationServiceFailed",
                     "Failed to narrow the push supplier due to AdminLimitExceeded (hint : make sure the notifd daemon is running on this host",
                     "EventConsumer.connect_event_channel");
+            return null;    //  Just to remove warning
         }
         // Connect to the proxy consumer
         try {
