@@ -189,7 +189,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public Database get_db_obj(final DeviceProxy deviceProxy) throws DevFailed {
         checkIfUseDb(deviceProxy, "get_db_obj()");
-        return ApiUtil.get_db_obj(deviceProxy.url.host, deviceProxy.url.strport);
+        return ApiUtil.get_db_obj(deviceProxy.url.host, deviceProxy.url.strPort);
     }
 
     // ===================================================================
@@ -392,7 +392,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 	checkIfUseDb(deviceProxy, "get_class()");
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_class");
 
@@ -418,7 +418,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 	checkIfUseDb(deviceProxy, "get_class_inheritance()");
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_class_inheritance");
 	return deviceProxy.getDb_dev().get_class_inheritance();
@@ -437,7 +437,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "put_alias");
 	deviceProxy.getDb_dev().put_alias(aliasname);
@@ -455,7 +455,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_alias");
 	return deviceProxy.getDb_dev().get_alias();
@@ -473,7 +473,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 		if (deviceProxy.getDb_dev() == null) {
 	    	deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    	deviceProxy.url.strport));
+		    	deviceProxy.url.strPort));
 		}
 		// checkIfTango("import_device");
 		if (deviceProxy.url.protocol == TANGO) {
@@ -496,7 +496,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	// checkIfTango("import_device");
 	if (deviceProxy.url.protocol == TANGO) {
@@ -521,7 +521,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	deviceProxy.getDb_dev().export_device(devinfo);
     }
@@ -537,7 +537,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	deviceProxy.getDb_dev().unexport_device();
     }
@@ -556,7 +556,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	deviceProxy.getDb_dev().add_device(devinfo);
     }
@@ -572,7 +572,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	deviceProxy.getDb_dev().delete_device();
     }
@@ -594,7 +594,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	return deviceProxy.getDb_dev().get_property_list(wildcard);
     }
@@ -615,7 +615,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	    	if (deviceProxy.getDb_dev() == null) {
 			deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-				deviceProxy.url.strport));
+				deviceProxy.url.strPort));
 	    	}
 	    	return deviceProxy.getDb_dev().get_property(propnames);
 		} else {
@@ -642,7 +642,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	    if (deviceProxy.getDb_dev() == null) {
 		deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-			deviceProxy.url.strport));
+			deviceProxy.url.strPort));
 	    }
 	    return deviceProxy.getDb_dev().get_property(propname);
 	} else {
@@ -667,7 +667,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_property");
 	return deviceProxy.getDb_dev().get_property(properties);
@@ -687,7 +687,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "put_property");
 
@@ -711,7 +711,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "put_property");
 	deviceProxy.getDb_dev().put_property(properties);
@@ -731,7 +731,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_property");
 	deviceProxy.getDb_dev().delete_property(propnames);
@@ -751,7 +751,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_property");
 	deviceProxy.getDb_dev().delete_property(propname);
@@ -771,7 +771,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_property");
 	deviceProxy.getDb_dev().delete_property(properties);
@@ -827,7 +827,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "put_attribute_property");
 	deviceProxy.getDb_dev().put_attribute_property(attr);
@@ -848,7 +848,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "put_attribute_property");
 	deviceProxy.getDb_dev().put_attribute_property(attr);
@@ -870,7 +870,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_attribute_property");
 	deviceProxy.getDb_dev().delete_attribute_property(attname, propnames);
@@ -892,7 +892,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_attribute_property");
 	deviceProxy.getDb_dev().delete_attribute_property(attname, propname);
@@ -912,7 +912,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_attribute_property");
 	deviceProxy.getDb_dev().delete_attribute_property(attr);
@@ -932,7 +932,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_attribute_property");
 	deviceProxy.getDb_dev().delete_attribute_property(attr);
@@ -954,7 +954,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_attribute_property");
 	return deviceProxy.getDb_dev().get_attribute_property(attnames);
@@ -975,7 +975,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "get_attribute_property");
 	return deviceProxy.getDb_dev().get_attribute_property(attname);
@@ -995,7 +995,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	if (deviceProxy.getDb_dev() == null) {
 	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strport));
+		    deviceProxy.url.strPort));
 	}
 	checkIfTango(deviceProxy, "delete_attribute");
 	deviceProxy.getDb_dev().delete_attribute(attname);
@@ -1943,7 +1943,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             throws DevFailed {
         if (deviceProxy.getDb_dev() == null) {
             deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-                deviceProxy.url.strport));
+                deviceProxy.url.strPort));
         }
         checkIfTango(deviceProxy, "get_attribute_polling_period");
         return deviceProxy.getDb_dev().get_attribute_polling_period(attname);
@@ -1960,7 +1960,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             throws DevFailed {
         if (deviceProxy.getDb_dev() == null) {
             deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-                deviceProxy.url.strport));
+                deviceProxy.url.strPort));
         }
         checkIfTango(deviceProxy, "get_attribute_polling_period");
         return deviceProxy.getDb_dev().get_attribute_polling_period(cmdname);
@@ -2058,7 +2058,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         // Manage Access control
         // ----------------------------------
         if (deviceProxy.access == TangoConst.ACCESS_READ) {
-            final Database db = ApiUtil.get_db_obj(deviceProxy.url.host, deviceProxy.url.strport);
+            final Database db = ApiUtil.get_db_obj(deviceProxy.url.host, deviceProxy.url.strPort);
             if (!db.isCommandAllowed(deviceProxy.get_class_name(), cmdname)) {
             // Check if not allowed or PB with access device
             if (db.access_devfailed != null) {
