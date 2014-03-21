@@ -37,8 +37,10 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 
 /**
@@ -52,7 +54,7 @@ import java.net.URL;
 public class TangoUrl implements ApiDefs, java.io.Serializable {
     int protocol = TANGO;
     String host = null;
-    String strport = null;
+    String strPort = null;
     int port = -1;
     String devname = null;
     boolean fromEnv = false;
@@ -61,7 +63,6 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
 
     public static final String  NO_DATABASE = "#dbase=no";
     //===================================================================
-
     /**
      * Object Constructor.
      *
@@ -109,8 +110,8 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                         String[] array =
                                 ApiUtil.parseTangoHost(new_urlstr.substring(start, end));
                         host = array[0];
-                        strport = array[1];
-                        port = Integer.parseInt(strport);
+                        strPort = array[1];
+                        port = Integer.parseInt(strPort);
                         //	If OK remove multi tango host before retrying URL constructor
                         String tmp = new_urlstr.substring(0, comma) +
                                 new_urlstr.substring(end);
@@ -133,7 +134,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
         assert url != null;
         host = url.getHost();
         port = url.getPort();
-        strport = Integer.toString(port);
+        strPort = Integer.toString(port);
         devname = url.getFile();
 
         //	Check if tango host and port OK
@@ -149,7 +150,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                 //  if tango_host is unknown --> get it from environment
                 setFromEnv();
                 if (host!=null && !host.isEmpty())
-                    db = ApiUtil.get_db_obj(host, strport);
+                    db = ApiUtil.get_db_obj(host, strPort);
                 else
                     db = ApiUtil.get_db_obj();
             }
@@ -168,7 +169,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                 //	Get the DB used host and port
                 host = db.url.host;
                 port = db.url.port;
-                strport = Integer.toString(port);
+                strPort = Integer.toString(port);
                 fromEnv = true;
             }
         }
@@ -188,7 +189,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                         "Device name (" + devname + ") wrong definition.",
                         "TangoUrl.TangoUrl()");
         } else {
-            if (strport.endsWith("/")) {
+            if (strPort.endsWith("/")) {
                 // This a device connection (database does not need a '/' at after port)
                 Except.throw_wrong_syntax_exception("TangoApi_BAD_DEVICE_NAME",
                         "Device name (" + devname + ") wrong definition.",
@@ -202,15 +203,17 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                     "TangoUrl.TangoUrl()");
 
         //	check for dbase usage
-        if (protocol == TANGO)
+        if (protocol == TANGO) {
             if (url.getRef() != null)
                 if (url.getRef().indexOf("dbase=no") == 0)
                     use_db = false;
 
+            if (host!=null)
+                host = getCanonicalName(host);
+        }
         //trace(urlstr);
     }
     //===================================================================
-
     /**
      * Get url only from environment.
      *
@@ -224,6 +227,22 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
 
     //===================================================================
     //===================================================================
+    public static String getCanonicalName(String hostName) throws DevFailed {
+        String  canonicalHostName = null;
+        try {
+            //  Get FQDN for host and real name if alias used
+            canonicalHostName = InetAddress.getByName(hostName).getCanonicalHostName();
+            if (!canonicalHostName.contains(hostName))
+                ApiUtil.printTrace(hostName + " ========> " + canonicalHostName);
+        }
+        catch (UnknownHostException e) {
+            Except.throw_exception("Api_GetCanonicalHostNameFailed", e.toString());
+        }
+
+        return canonicalHostName;
+    }
+    //===================================================================
+    //===================================================================
     private void setFromEnv() throws DevFailed {
         String env = TangoEnv.getTangoHost();
         assert env != null;
@@ -233,8 +252,8 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
                     "TangoUrl.TangoUrl()");
         String[] array = ApiUtil.parseTangoHost(env);
         host = array[0];
-        strport = array[1];
-        port = Integer.parseInt(strport);
+        strPort = array[1];
+        port = Integer.parseInt(strPort);
         envRead = true;
         fromEnv = true;
     }
@@ -248,9 +267,11 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
     //===================================================================
     //===================================================================
     public String toString() {
-        StringBuilder sb =
-                new StringBuilder((protocol == TANGO) ? "tango" : "taco");
-        sb.append("://").append(host).append(":").append(strport);
+        StringBuilder sb = new StringBuilder();
+        if (protocol == TANGO)
+            sb.append("tango://").append(host).append(":").append(strPort);
+        else
+            sb.append("taco");
         sb.append("/").append(devname);
         if (!use_db)
             sb.append(NO_DATABASE);
@@ -270,7 +291,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
             System.out.println("	host name= " + host);
 
         //if (port>0)
-        System.out.println("	port num = " + strport);
+        System.out.println("	port num = " + strPort);
         System.out.println("	device   = " + devname);
 
         if (use_db)
