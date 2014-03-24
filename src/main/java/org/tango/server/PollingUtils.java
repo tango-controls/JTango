@@ -25,7 +25,6 @@
 package org.tango.server;
 
 import org.tango.server.properties.AttributePropertiesManager;
-import org.tango.server.servant.Constants;
 
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;

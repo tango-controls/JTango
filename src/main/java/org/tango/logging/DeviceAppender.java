@@ -26,6 +26,7 @@ package org.tango.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.server.Constants;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
@@ -49,42 +50,49 @@ public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements
     private final DeviceProxy loggerDevice;
     private final String loggingDeviceName;
     private Level level;
+    private final String deviceClassName;
+    private final String deviceName;
 
-    public DeviceAppender(final String deviceTargetName, final String loggingDeviceName) throws DevFailed {
-	loggerDevice = new DeviceProxy(deviceTargetName);
-	this.loggingDeviceName = loggingDeviceName;
-	level = Level.DEBUG;
+    public DeviceAppender(final String deviceTargetName, final String deviceClassName, final String deviceName)
+            throws DevFailed {
+        loggerDevice = new DeviceProxy(deviceTargetName);
+        this.loggingDeviceName = deviceTargetName;
+        this.deviceClassName = deviceClassName;
+        this.deviceName = deviceName;
+        level = Level.DEBUG;
     }
 
     @Override
     protected void append(final ILoggingEvent eventObject) {
-	if (eventObject.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(loggingDeviceName)
-		&& eventObject.getLevel().isGreaterOrEqual(level)) {
-	    try {
-		final String[] dvsa = new String[ARGIN_SIZE];
-		int i = 0;
-		dvsa[i++] = String.valueOf(eventObject.getTimeStamp());
-		dvsa[i++] = eventObject.getLevel().toString();
-		dvsa[i++] = eventObject.getLoggerName();
-		dvsa[i++] = eventObject.getFormattedMessage();
-		dvsa[i++] = "";
-		dvsa[i] = eventObject.getThreadName();
-		final DeviceData dd = new DeviceData();
-		dd.insert(dvsa);
-		loggerDevice.command_inout_asynch("Log", dd, true);
-	    } catch (final DevFailed e) {
-		logger.error("failed to send log to {} : {}", loggerDevice.get_name(), DevFailedUtils.toString(e));
-	    }
-	}
+        if (eventObject.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(deviceName)
+                && (eventObject.getLoggerName().equalsIgnoreCase(deviceClassName) || eventObject.getLoggerName()
+                        .equalsIgnoreCase(Constants.CLIENT_REQUESTS_LOGGER))
+                && eventObject.getLevel().isGreaterOrEqual(level)) {
+            try {
+                final String[] dvsa = new String[ARGIN_SIZE];
+                int i = 0;
+                dvsa[i++] = String.valueOf(eventObject.getTimeStamp());
+                dvsa[i++] = eventObject.getLevel().toString();
+                dvsa[i++] = eventObject.getLoggerName();
+                dvsa[i++] = eventObject.getFormattedMessage();
+                dvsa[i++] = "";
+                dvsa[i] = eventObject.getThreadName();
+                final DeviceData dd = new DeviceData();
+                dd.insert(dvsa);
+                loggerDevice.command_inout_asynch("Log", dd, true);
+            } catch (final DevFailed e) {
+                logger.error("failed to send log to {} : {}", loggerDevice.get_name(), DevFailedUtils.toString(e));
+            }
+        }
     }
 
     @Override
     public String getLoggingDeviceName() {
-	return loggingDeviceName;
+        return loggingDeviceName;
     }
 
     @Override
     public void setLevel(final int level) {
-	this.level = Level.toLevel(level, Level.DEBUG);
+        this.level = Level.toLevel(level, Level.DEBUG);
     }
 }
