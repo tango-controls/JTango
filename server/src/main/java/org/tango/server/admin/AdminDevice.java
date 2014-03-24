@@ -387,7 +387,16 @@ public final class AdminDevice {
                 DevFailedUtils.throwDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
             }
             if (config[0].equalsIgnoreCase(LoggingManager.LOGGING_TARGET_DEVICE)) {
-                LoggingManager.getInstance().addDeviceAppender(config[1], deviceName);
+                String className = "";
+                for (final DeviceClassBuilder deviceClass : classList) {
+                    if (deviceClass.containsDevice(deviceName)) {
+                        className = deviceClass.getClassName();
+                        break;
+                    }
+                }
+                if (!className.isEmpty()) {
+                    LoggingManager.getInstance().addDeviceAppender(config[1], className, deviceName);
+                }
             } else {
                 LoggingManager.getInstance().addFileAppender(config[1], deviceName);
             }
@@ -678,18 +687,18 @@ public final class AdminDevice {
 
         xlogger.entry();
 
-        //  A simple way to be used in debug
-        if (argin.length==1) {
+        // A simple way to be used in debug
+        if (argin.length == 1) {
             if (argin[0].equals("info")) {
                 return EventManager.getInstance().getConnectionParameters();
-            }
-            else
+            } else {
                 DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
-                    "Command ZmqEventSubscriptionChange expect 4 input arguments");
+                        "Command ZmqEventSubscriptionChange expect 4 input arguments");
+            }
         }
 
-        //  Normal usage:
-        //  Subscribe to the specified event
+        // Normal usage:
+        // Subscribe to the specified event
         if (argin.length < 4) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                     "Command ZmqEventSubscriptionChange expect 4 input arguments");

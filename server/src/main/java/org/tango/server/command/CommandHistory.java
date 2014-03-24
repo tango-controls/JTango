@@ -36,9 +36,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.orb.ORBManager;
+import org.tango.server.Constants;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLUtil;
-import org.tango.server.servant.Constants;
 
 import fr.esrf.Tango.AttributeDim;
 import fr.esrf.Tango.DevCmdHistory_4;

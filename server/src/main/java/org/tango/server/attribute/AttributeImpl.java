@@ -39,13 +39,13 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.attribute.AttributeTangoType;
+import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.PollingUtils;
 import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.server.properties.AttributePropertiesManager;
-import org.tango.server.servant.Constants;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 

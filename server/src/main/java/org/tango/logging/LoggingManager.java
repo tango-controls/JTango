@@ -29,10 +29,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.utils.DevFailedUtils;
 
@@ -64,166 +66,224 @@ public final class LoggingManager {
     private ch.qos.logback.classic.Logger rootLoggerBack;
 
     private LoggingManager() {
-	final Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-	if (rootLogger instanceof ch.qos.logback.classic.Logger) {
-	    rootLoggerBack = (ch.qos.logback.classic.Logger) rootLogger;
-	    rootLoggingLevel = LoggingLevel.getLevel(rootLoggerBack.getLevel()).toInt();
-	}
+        final Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        if (rootLogger instanceof ch.qos.logback.classic.Logger) {
+            rootLoggerBack = (ch.qos.logback.classic.Logger) rootLogger;
+            rootLoggingLevel = LoggingLevel.getLevel(rootLoggerBack.getLevel()).toInt();
+        }
 
     }
 
     public static LoggingManager getInstance() {
-	return instance;
+        return instance;
     }
 
     public int getRootLoggingLevel() {
-	return rootLoggingLevel;
+        return rootLoggingLevel;
     }
 
     public int getLoggingLevel(final String deviceName) {
-	int level = rootLoggingLevel;
-	if (loggingLevels.containsKey(deviceName)) {
-	    level = loggingLevels.get(deviceName);
-	}
-	return level;
+        int level = rootLoggingLevel;
+        if (loggingLevels.containsKey(deviceName)) {
+            level = loggingLevels.get(deviceName);
+        }
+        return level;
     }
 
+    /**
+     * Set the logging level of a device
+     * 
+     * @param deviceName the device name
+     * @param loggingLevel the level
+     */
     public void setLoggingLevel(final String deviceName, final int loggingLevel) {
-	logger.debug("set logging level to {} on {}", loggingLevel, deviceName);
-	if (rootLoggingLevel < loggingLevel) {
-	    setRootLoggingLevel(loggingLevel);
-	}
-	loggingLevels.put(deviceName, loggingLevel);
-	for (final DeviceAppender appender : deviceAppenders.values()) {
-	    if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
-		appender.setLevel(loggingLevel);
-		break;
-	    }
-	}
-	for (final FileAppender appender : fileAppenders.values()) {
-	    if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
-		appender.setLevel(loggingLevel);
-		break;
-	    }
-	}
+        logger.debug("set logging level to {} on {}", loggingLevel, deviceName);
+        if (rootLoggingLevel < loggingLevel) {
+            setRootLoggingLevel(loggingLevel);
+        }
+        setLoggingLevel(loggingLevel);
+        loggingLevels.put(deviceName, loggingLevel);
+        for (final DeviceAppender appender : deviceAppenders.values()) {
+            if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
+                appender.setLevel(loggingLevel);
+                break;
+            }
+        }
+        for (final FileAppender appender : fileAppenders.values()) {
+            if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
+                appender.setLevel(loggingLevel);
+                break;
+            }
+        }
     }
 
+    /**
+     * Set the level of the root logger
+     * 
+     * @param loggingLevel
+     */
     public void setRootLoggingLevel(final int loggingLevel) {
-	rootLoggingLevel = loggingLevel;
-	if (rootLoggerBack != null) {
-	    rootLoggerBack.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
-	}
+        rootLoggingLevel = loggingLevel;
+        if (rootLoggerBack != null) {
+            rootLoggerBack.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
+        }
     }
 
-    public void addDeviceAppender(final String deviceTargetName, final String loggingDeviceName) throws DevFailed {
-	if (rootLoggerBack != null) {
-	    logger.debug("add device appender {} on {}", deviceTargetName, loggingDeviceName);
-	    final DeviceAppender appender = new DeviceAppender(deviceTargetName, loggingDeviceName);
-	    deviceAppenders.put(deviceTargetName, appender);
-	    rootLoggerBack.addAppender(appender);
-	    appender.start();
-	}
+    /**
+     * Set the level of all loggers of JTangoServer
+     * 
+     * @param loggingLevel
+     */
+    public void setLoggingLevel(final int loggingLevel) {
+        if (rootLoggingLevel < loggingLevel) {
+            setRootLoggingLevel(loggingLevel);
+        }
+        final Logger tangoLogger = LoggerFactory.getLogger("org.tango");
+        if (tangoLogger instanceof ch.qos.logback.classic.Logger) {
+            final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) tangoLogger;
+            logbackLogger.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
+        }
+        final Logger blackboxLogger = LoggerFactory.getLogger(Constants.CLIENT_REQUESTS_LOGGER);
+        if (blackboxLogger instanceof ch.qos.logback.classic.Logger) {
+            final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) blackboxLogger;
+            logbackLogger.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
+        }
+
     }
 
+    /**
+     * Logging of device sent to logviewer device
+     * 
+     * @param deviceTargetName
+     * @param deviceClassName
+     * @param loggingDeviceName
+     * @throws DevFailed
+     */
+    public void addDeviceAppender(final String deviceTargetName, final String deviceClassName,
+            final String loggingDeviceName) throws DevFailed {
+        if (rootLoggerBack != null) {
+            logger.debug("add device appender {} on {}", deviceTargetName, loggingDeviceName);
+            final DeviceAppender appender = new DeviceAppender(deviceTargetName, deviceClassName, loggingDeviceName);
+            deviceAppenders.put(loggingDeviceName.toLowerCase(Locale.ENGLISH), appender);
+            rootLoggerBack.addAppender(appender);
+            // debug level by default
+            setLoggingLevel(deviceTargetName, LoggingLevel.DEBUG.toInt());
+            appender.start();
+        }
+    }
+
+    /**
+     * Add an file appender for a device
+     * 
+     * @param fileName
+     * @param deviceName
+     * @throws DevFailed
+     */
     public void addFileAppender(final String fileName, final String deviceName) throws DevFailed {
-	if (rootLoggerBack != null) {
-	    logger.debug("add file appender {} in {}", deviceName, fileName);
-	    final File f = new File(fileName);
-	    if (!f.exists()) {
-		try {
-		    f.createNewFile();
-		} catch (final IOException e) {
-		    DevFailedUtils.throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file "
-			    + fileName);
-		}
-	    }
-	    if (!f.canWrite()) {
-		DevFailedUtils
-			.throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
-	    }
-	    final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-	    final FileAppender rfAppender = new FileAppender(deviceName);
-	    fileAppenders.put(deviceName, rfAppender);
-	    rfAppender.setName("FILE-" + deviceName);
-	    rfAppender.setLevel(rootLoggingLevel);
-	    // rfAppender.setContext(appender.getContext());
-	    rfAppender.setFile(fileName);
-	    rfAppender.setAppend(true);
-	    rfAppender.setContext(loggerContext);
-	    final FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
-	    // rolling policies need to know their parent
-	    // it's one of the rare cases, where a sub-component knows about its parent
-	    rollingPolicy.setParent(rfAppender);
-	    rollingPolicy.setContext(loggerContext);
-	    rollingPolicy.setFileNamePattern(fileName + "%i");
-	    rollingPolicy.setMaxIndex(1);
-	    rollingPolicy.setMaxIndex(3);
-	    rollingPolicy.start();
+        if (rootLoggerBack != null) {
+            logger.debug("add file appender of {} in {}", deviceName, fileName);
+            final String deviceNameLower = deviceName.toLowerCase(Locale.ENGLISH);
+            final File f = new File(fileName);
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                } catch (final IOException e) {
+                    DevFailedUtils.throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file "
+                            + fileName);
+                }
+            }
+            if (!f.canWrite()) {
+                DevFailedUtils
+                        .throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
+            }
+            // debug level by default
+            setLoggingLevel(deviceName, LoggingLevel.DEBUG.toInt());
+            System.out.println("create file  " + f);
+            final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            final FileAppender rfAppender = new FileAppender(deviceNameLower);
+            fileAppenders.put(deviceNameLower, rfAppender);
+            rfAppender.setName("FILE-" + deviceNameLower);
+            rfAppender.setLevel(rootLoggingLevel);
+            // rfAppender.setContext(appender.getContext());
+            rfAppender.setFile(fileName);
+            rfAppender.setAppend(true);
+            rfAppender.setContext(loggerContext);
+            final FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
+            // rolling policies need to know their parent
+            // it's one of the rare cases, where a sub-component knows about its parent
+            rollingPolicy.setParent(rfAppender);
+            rollingPolicy.setContext(loggerContext);
+            rollingPolicy.setFileNamePattern(fileName + "%i");
+            rollingPolicy.setMaxIndex(1);
+            rollingPolicy.setMaxIndex(3);
+            rollingPolicy.start();
 
-	    final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-	    triggeringPolicy.setMaxFileSize("5MB");
-	    triggeringPolicy.setContext(loggerContext);
-	    triggeringPolicy.start();
+            final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
+            triggeringPolicy.setMaxFileSize("5MB");
+            triggeringPolicy.setContext(loggerContext);
+            triggeringPolicy.start();
 
-	    final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-	    encoder.setContext(loggerContext);
-	    encoder.setPattern("%-5level %d %X{deviceName} - %thread | %logger{25}.%M:%L - %msg%n");
-	    encoder.start();
+            final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+            encoder.setContext(loggerContext);
+            encoder.setPattern("%-5level %d %X{deviceName} - %thread | %logger{25}.%M:%L - %msg%n");
+            encoder.start();
 
-	    rfAppender.setEncoder(encoder);
-	    rfAppender.setRollingPolicy(rollingPolicy);
-	    rfAppender.setTriggeringPolicy(triggeringPolicy);
-	    rfAppender.start();
+            rfAppender.setEncoder(encoder);
+            rfAppender.setRollingPolicy(rollingPolicy);
+            rfAppender.setTriggeringPolicy(triggeringPolicy);
+            rfAppender.start();
 
-	    rootLoggerBack.addAppender(rfAppender);
-	    rfAppender.start();
+            rootLoggerBack.addAppender(rfAppender);
+            rfAppender.start();
 
-	    // OPTIONAL: print logback internal status messages
-	    // StatusPrinter.print(loggerContext);
+            // OPTIONAL: print logback internal status messages
+            // StatusPrinter.print(loggerContext);
 
-	}
+        }
     }
 
     public void removeAppender(final String loggingDeviceName, final String targetName) {
-	if (targetName.equalsIgnoreCase(LOGGING_TARGET_DEVICE) && deviceAppenders.containsKey(loggingDeviceName)) {
-	    final DeviceAppender appender = deviceAppenders.get(loggingDeviceName);
-	    appender.stop();
-	    deviceAppenders.remove(loggingDeviceName);
-	}
-	if (targetName.equalsIgnoreCase(LOGGING_TARGET_FILE) && fileAppenders.containsKey(loggingDeviceName)) {
-	    final FileAppender appender = fileAppenders.get(loggingDeviceName);
-	    appender.stop();
-	    fileAppenders.remove(loggingDeviceName);
-	}
+        final String loggingDeviceNameLower = loggingDeviceName.toLowerCase(Locale.ENGLISH);
+        if (targetName.equalsIgnoreCase(LOGGING_TARGET_DEVICE) && deviceAppenders.containsKey(loggingDeviceNameLower)) {
+            final DeviceAppender appender = deviceAppenders.get(loggingDeviceNameLower);
+            appender.stop();
+            deviceAppenders.remove(loggingDeviceNameLower);
+        }
+        if (targetName.equalsIgnoreCase(LOGGING_TARGET_FILE) && fileAppenders.containsKey(loggingDeviceNameLower)) {
+            final FileAppender appender = fileAppenders.get(loggingDeviceNameLower);
+            appender.stop();
+            fileAppenders.remove(loggingDeviceNameLower);
+        }
 
     }
 
     public String[] getLoggingTarget(final String loggingDeviceName) {
-	final List<String> targets = new ArrayList<String>();
-	if (deviceAppenders.containsKey(loggingDeviceName)) {
-	    final DeviceAppender appender = deviceAppenders.get(loggingDeviceName);
-	    targets.add(LOGGING_TARGET_FILE + LOGGING_TARGET_SEPARATOR + appender.getLoggingDeviceName());
-	}
-	if (fileAppenders.containsKey(loggingDeviceName)) {
-	    final FileAppender appender = fileAppenders.get(loggingDeviceName);
-	    targets.add(LOGGING_TARGET_FILE + LOGGING_TARGET_SEPARATOR + appender.getFile());
-	}
-	return targets.toArray(new String[targets.size()]);
+        final List<String> targets = new ArrayList<String>();
+        final String loggingDeviceNameLower = loggingDeviceName.toLowerCase(Locale.ENGLISH);
+        if (deviceAppenders.containsKey(loggingDeviceNameLower)) {
+            final DeviceAppender appender = deviceAppenders.get(loggingDeviceNameLower);
+            targets.add(LOGGING_TARGET_DEVICE + LOGGING_TARGET_SEPARATOR + appender.getLoggingDeviceName());
+        }
+        if (fileAppenders.containsKey(loggingDeviceNameLower)) {
+            final FileAppender appender = fileAppenders.get(loggingDeviceNameLower);
+            targets.add(LOGGING_TARGET_FILE + LOGGING_TARGET_SEPARATOR + appender.getFile());
+        }
+        return targets.toArray(new String[targets.size()]);
     }
 
     @SuppressWarnings("unchecked")
     public void startAll() {
-	for (final ITangoAppender appender : deviceAppenders.values()) {
-	    if (rootLoggerBack != null) {
-		rootLoggerBack.addAppender((Appender<ILoggingEvent>) appender);
-		((AppenderBase<?>) appender).start();
-	    }
-	}
+        for (final ITangoAppender appender : deviceAppenders.values()) {
+            if (rootLoggerBack != null) {
+                rootLoggerBack.addAppender((Appender<ILoggingEvent>) appender);
+                ((AppenderBase<?>) appender).start();
+            }
+        }
     }
 
     public void stopAll() {
-	for (final ITangoAppender appender : deviceAppenders.values()) {
-	    ((AppenderBase<?>) appender).stop();
-	}
+        for (final ITangoAppender appender : deviceAppenders.values()) {
+            ((AppenderBase<?>) appender).stop();
+        }
     }
 }

@@ -35,8 +35,8 @@ import org.omg.CORBA.BAD_OPERATION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.orb.ServerRequestInterceptor;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
-import org.tango.server.servant.Constants;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.ClntIdent;
@@ -46,7 +46,7 @@ import fr.esrf.Tango.LockerLanguage;
 
 public final class DeviceBlackBox {
     private final Logger logger = LoggerFactory.getLogger(DeviceBlackBox.class);
-    private final Logger clientRequestsLogger = LoggerFactory.getLogger("TangoClientRequests");
+    private final Logger clientRequestsLogger = LoggerFactory.getLogger(Constants.CLIENT_REQUESTS_LOGGER);
     private final Queue<String> blackbox = new ArrayDeque<String>(Constants.QUEUE_CAPACITY);
 
     public String[] toArray(final int size) throws DevFailed {
@@ -79,7 +79,7 @@ public final class DeviceBlackBox {
         final StringBuilder sb = new StringBuilder(dateFormat.format(new Date()));
         sb.append(" : ");
         sb.append(message);
-        clientRequestsLogger.info(message);
+        clientRequestsLogger.debug(message);
         final boolean isInserted = blackbox.offer(sb.toString());
         if (!isInserted) {
             logger.debug("{} not inserted in black box queue ", sb);
