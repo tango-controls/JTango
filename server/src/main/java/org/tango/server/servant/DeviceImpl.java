@@ -44,6 +44,7 @@ import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.DeviceState;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.InvocationContext;
 import org.tango.server.InvocationContext.CallType;
@@ -562,7 +563,7 @@ public final class DeviceImpl extends Device_4POA {
             }
         }
 
-        logger.error("init OK " + isCorrectlyInit);
+        logger.info("init OK " + isCorrectlyInit);
     }
 
     /**

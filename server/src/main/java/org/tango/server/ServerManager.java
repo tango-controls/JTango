@@ -49,7 +49,6 @@ import org.tango.server.annotation.Device;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.events.EventManager;
 import org.tango.server.export.TangoExporter;
-import org.tango.server.servant.Constants;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -299,8 +298,12 @@ public final class ServerManager {
                 System.out.println("instance list for server " + execName + ": "
                         + Arrays.toString(DatabaseFactory.getDatabase().getInstanceNameList(execName)));
             } else if (arg.startsWith("-v")) { // logging level
-                final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
-                LoggingManager.getInstance().setRootLoggingLevel(level);
+                try {
+                    final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
+                    LoggingManager.getInstance().setLoggingLevel(level);
+                } catch (final NumberFormatException e) {
+                    DevFailedUtils.throwDevFailed("Logging level error. Must be a number");
+                }
             } else if (arg.startsWith("-dlist")) {
                 noDbDevices = configureNoDB(argv, i);
                 useDb = false;

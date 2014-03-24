@@ -36,9 +36,9 @@ import org.omg.CORBA.Any;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.orb.ORBManager;
+import org.tango.server.Constants;
 import org.tango.server.idl.CleverAnyAttribute;
 import org.tango.server.idl.TangoIDLUtil;
-import org.tango.server.servant.Constants;
 
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.AttributeDim;

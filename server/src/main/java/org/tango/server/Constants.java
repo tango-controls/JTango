@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.tango.server.servant;
+package org.tango.server;
 
 public final class Constants {
 
@@ -47,4 +47,6 @@ public final class Constants {
     public static final String POLLED_OBJECT = "Polled object ";
     public static final String POLLED_ATTR = "polled_attr";
     public static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
+
+    public static final String CLIENT_REQUESTS_LOGGER = "TangoClientRequests";
 }
