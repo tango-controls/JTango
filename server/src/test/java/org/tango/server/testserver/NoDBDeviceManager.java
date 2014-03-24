@@ -29,8 +29,8 @@ import java.net.ServerSocket;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.tango.server.Constants;
 import org.tango.server.ServerManager;
-import org.tango.server.servant.Constants;
 
 import fr.esrf.Tango.DevFailed;
 

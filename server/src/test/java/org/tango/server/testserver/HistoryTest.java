@@ -34,9 +34,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tango.DeviceState;
+import org.tango.server.Constants;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
-import org.tango.server.servant.Constants;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
