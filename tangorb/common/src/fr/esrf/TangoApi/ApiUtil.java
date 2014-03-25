@@ -7,7 +7,7 @@
 //
 // $Author$
 //
-// Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,
+// Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
 //                      BP 220, Grenoble 38043
 //                      FRANCE
@@ -65,7 +65,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.6.0_jeromq  -  Wed Mar 19 13:32:17 CET 2014";
+            "8.6.0_jeromq  -  Fri Mar 21 14:54:43 CET 2014";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
