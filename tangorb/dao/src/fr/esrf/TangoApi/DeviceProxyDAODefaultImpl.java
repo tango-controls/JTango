@@ -2503,7 +2503,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
                                                   final int id) throws DevFailed {
-        DeviceAttribute[] data;
+        DeviceAttribute[] data = new DeviceAttribute[0];
         AttributeValue[] attrval;
         AttributeValue_3[] attrval_3;
         AttributeValue_4[] attrval_4;
@@ -2542,8 +2542,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 }
             }
         }
-        catch (ConnectionFailed e) {
-            try {
+//        catch (ConnectionFailed e) {
+        catch (Exception e) {
+           try {
                 //  If failed, retrieve data from request object
                 final NVList args = request.arguments();
                 final String[] attributeNames =
@@ -2554,7 +2555,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             }
             catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
-                throw e;
+				if (e instanceof DevFailed)
+	                throw (DevFailed)e;
+				else
+					Except.throw_exception(e.toString(), e.toString());
             }
         }
         ApiUtil.remove_async_request(id);
