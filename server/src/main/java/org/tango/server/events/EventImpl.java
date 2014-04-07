@@ -97,7 +97,16 @@ final class EventImpl {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
-        if (eventTrigger.doCheck() && eventTrigger.isSendEvent()) {
+        if (eventTrigger.doCheck()) {
+            if (eventTrigger.isSendEvent()) {
+                if (eventType.equals(EventType.ATT_CONF_EVENT)) {
+                    pushConfigEvent(eventSocket, fullName);
+                } else {
+                    sendEvent(eventSocket, fullName);
+                }
+            }
+        }
+        else {
             if (eventType.equals(EventType.ATT_CONF_EVENT)) {
                 pushConfigEvent(eventSocket, fullName);
             } else {
