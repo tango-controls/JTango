@@ -7,11 +7,17 @@
  */
 package org.tango.utils;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
@@ -25,8 +31,10 @@ import fr.esrf.TangoDs.TangoConst;
  */
 public final class TangoUtil {
 
-    private static final String DEVICE_SEP = "/";
+    public static final String DEVICE_SEPARATOR = "/";
+    public static final String DEVICE_PATTERN = "*";
     private static final String DBASE_NO = "#dbase=no";
+
     /**
      * Contains all tango types for scalar commands
      */
@@ -112,8 +120,139 @@ public final class TangoUtil {
         TYPE_MAP = Collections.unmodifiableMap(tmpMap3);
     }
 
+    /*
+     * http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node13.html
+     * 
+     * [protocol://][host:port/]device_name[/attribute][->property][#dbase=xx] 
+     * 
+     * From the naming schema described above, the reserved characters are :,#,/ and the reserved string is : ->.
+     */
+
+    private static final Pattern ENTITY_SPLIT_PATTERN;
+    private static final int PREFIX_INDEX = 1;
+    private static final int ATTRIBUTE_ALIAS_INDEX = 2;
+    private static final int DEVICE_NAME_INDEX = 3;
+    private static final int DEVICE_ALIAS_INDEX = 4;
+    private static final int ENTITY_INDEX = 5;
+    private static final int NO_DB_INDEX = 6;
+    static {
+        // (?: xxx ) = non capturing group
+        // ( xxx ) = capturing group. Group content is "xxx" once the matcher is finished
+
+        String nameR = "[\\w\\-\\.]+";// ie [a-zA-Z_0-9-.]
+        // String protocolR = "(?:(?:tango|taco)://)";
+        String protocolR = "(?:(?:(?:tango|taco):)?//)";// not interested in protocol
+        String hostPortR = "(?:" + nameR + ":\\d+/)";// not interested in host and port
+        String prefixR = "(" + protocolR + "?" + hostPortR + "?)";// interested in prefix
+        String deviceAliasR = "(" + nameR + ")";
+        String attributeAliasR = "(" + nameR + ")";
+        String deviceR = "(" + nameR + "/" + nameR + "/" + nameR + ")";
+        String attributeR = "(?:/(" + nameR + "))";// interested in attribute's name
+        String propertyR = "(?:->" + nameR + ")?";// not interested in property
+        String dbaseR = "(?:#dbase=(yes|(no)))?";// interested in 'no' only
+
+        // prefix is always in a group, can be empty
+        // attribute is mandatory for the purpose of splitting to "device/entity"
+        String entityR = prefixR + "(?:" + attributeAliasR + "|(?:(?:" + deviceR + "|" + deviceAliasR + ")"
+                + attributeR + "))" + propertyR + dbaseR;
+
+        // This pattern is designed for splitting full device name and entity name.
+        // It cannot be used for syntax validation.
+        ENTITY_SPLIT_PATTERN = Pattern.compile(entityR, Pattern.CASE_INSENSITIVE);
+    }
+
     private TangoUtil() {
 
+    }
+
+    /**
+     * Splits an entity name into full device name and attribute name. Aliases will be resolved against tango db first.
+     * 
+     * @param entityName the entity name to split. It can contain aliases for device or attribute
+     * @return a Map.Entry containing the full device name as key, and the attribute name as value
+     * @throws DevFailed in case of DB access problem
+     */
+    public static final Entry<String, String> splitDeviceEntity(final String entityName) throws DevFailed {
+        Entry<String, String> result = null;
+
+        Matcher matcher = ENTITY_SPLIT_PATTERN.matcher(entityName.trim());
+        if (matcher.matches()) {
+            String device = null;
+            String entity = null;
+            String prefixGroup = matcher.group(PREFIX_INDEX);
+
+            boolean noDbGroup = (matcher.group(NO_DB_INDEX) != null);
+            if (noDbGroup) {
+                // TODO cas device alias qui marche à soleil
+                if ((matcher.group(DEVICE_NAME_INDEX) != null) && (matcher.group(ENTITY_INDEX) != null)) {
+                    String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
+                    String entityGroup = matcher.group(ENTITY_INDEX);
+
+                    device = prefixGroup + deviceNameGroup;
+                    entity = entityGroup;
+                }
+            } else {
+                Database db = ApiUtil.get_db_obj();
+                if (matcher.group(ATTRIBUTE_ALIAS_INDEX) != null) {
+                    String attributeAliasGroup = matcher.group(ATTRIBUTE_ALIAS_INDEX);
+                    String fullAttributeName = db.get_attribute_from_alias(attributeAliasGroup);
+                    int lastIndexOf = fullAttributeName.lastIndexOf(DEVICE_SEPARATOR);
+                    device = prefixGroup + fullAttributeName.substring(0, lastIndexOf);// TODO exception ?
+                    entity = fullAttributeName.substring(lastIndexOf + 1);
+                } else if (matcher.group(DEVICE_ALIAS_INDEX) != null) {
+                    String deviceAliasGroup = matcher.group(DEVICE_ALIAS_INDEX);
+                    String entityGroup = matcher.group(ENTITY_INDEX);
+                    String fullDeviceName = db.get_device_from_alias(deviceAliasGroup);
+                    device = prefixGroup + fullDeviceName;
+                    entity = entityGroup;
+                } else {
+                    String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
+                    String entityGroup = matcher.group(ENTITY_INDEX);
+                    device = prefixGroup + deviceNameGroup;
+                    entity = entityGroup;
+                }
+            }
+
+            if ((device != null) && (entity != null)) {
+                result = new SimpleEntry<String, String>(device, entity);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Splits a collection of entity names and group attributes by device.
+     * 
+     * @param entityNames a list of entity names to split
+     * @return a map containing a list of attributes for each device.
+     */
+    public static Map<String, Collection<String>> splitDeviceEntities(final Collection<String> entityNames) {
+        Map<String, Collection<String>> result = new HashMap<String, Collection<String>>();
+
+        String device;
+        String entity;
+        for (String entityName : entityNames) {
+            try {
+                Entry<String, String> deviceEntity = splitDeviceEntity(entityName);
+                if (deviceEntity != null) {
+                    device = deviceEntity.getKey();
+                    entity = deviceEntity.getValue();
+                    if ((device != null) && (entity != null)) {
+                        Collection<String> attributes = result.get(device);
+                        if (attributes == null) {
+                            attributes = new HashSet<String>();
+                            result.put(device, attributes);
+                        }
+                        attributes.add(entity);
+                    }
+                }
+            } catch (DevFailed e) {
+                // nop
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -127,15 +266,16 @@ public final class TangoUtil {
         checkNullOrEmptyString(attributeName);
         String result;
         if (attributeName.contains(DBASE_NO)) {
-            result = attributeName.substring(0, attributeName.lastIndexOf(DEVICE_SEP));
+            result = attributeName.substring(0, attributeName.lastIndexOf(DEVICE_SEPARATOR));
         } else {
-            final String[] fields = attributeName.split(DEVICE_SEP);
+            final String[] fields = attributeName.split(DEVICE_SEPARATOR);
+            final Database db = ApiUtil.get_db_obj();
             if (fields.length == 1) {
-                result = ApiUtil.get_db_obj().get_attribute_from_alias(fields[0]);
+                result = getfullDeviceNameForAttribute(db.get_attribute_from_alias(fields[0]));
             } else if (fields.length == 2) {
-                result = ApiUtil.get_db_obj().get_device_from_alias(fields[0]);
+                result = db.get_device_from_alias(fields[0]);
             } else if (fields.length == 4) {
-                result = fields[0] + DEVICE_SEP + fields[1] + DEVICE_SEP + fields[2];
+                result = fields[0] + DEVICE_SEPARATOR + fields[1] + DEVICE_SEPARATOR + fields[2];
             } else {
                 throw DevFailedUtils.newDevFailed("TANGO_WRONG_DATA_ERROR", "cannot retrieve device name");
             }
@@ -153,15 +293,15 @@ public final class TangoUtil {
     public static String getfullAttributeNameForAttribute(final String attributeName) throws DevFailed {
         checkNullOrEmptyString(attributeName);
         String result;
-        final String[] fields = attributeName.split(DEVICE_SEP);
         if (attributeName.contains(DBASE_NO)) {
             result = attributeName;
         } else {
+            final String[] fields = attributeName.split(DEVICE_SEPARATOR);
             final Database db = ApiUtil.get_db_obj();
             if (fields.length == 1) {
                 result = db.get_attribute_from_alias(fields[0]);
             } else if (fields.length == 2) {
-                result = db.get_device_from_alias(fields[0]) + DEVICE_SEP + fields[1];
+                result = db.get_device_from_alias(fields[0]) + DEVICE_SEPARATOR + fields[1];
             } else {
                 result = attributeName;
             }
@@ -184,7 +324,7 @@ public final class TangoUtil {
     public static String getfullNameForDevice(final String deviceName) throws DevFailed {
         checkNullOrEmptyString(deviceName);
         String result;
-        final String[] fields = deviceName.split(DEVICE_SEP);
+        final String[] fields = deviceName.split(DEVICE_SEPARATOR);
 
         if (deviceName.contains(DBASE_NO)) {
             result = deviceName;
@@ -211,10 +351,10 @@ public final class TangoUtil {
         checkNullOrEmptyString(deviceNamePattern);
         String[] devices;
         // is p a device name or a device name pattern ?
-        if (!deviceNamePattern.contains("*")) {
+        if (!deviceNamePattern.contains(DEVICE_PATTERN)) {
             // p is a pure device name
             devices = new String[1];
-            devices[0] = TangoUtil.getfullNameForDevice(deviceNamePattern);
+            devices[0] = getfullNameForDevice(deviceNamePattern);
         } else {
             // ask the db the list of device matching pattern p
             final Database db = ApiUtil.get_db_obj();
@@ -224,20 +364,20 @@ public final class TangoUtil {
     }
 
     /**
-     * Return the attribute name part without device name It is able to resolve
-     * attribute alias before
+     * Return the attribute name part without device name
+     * It is able to resolve attribute alias before
      * 
      * @param fullname
      * @return
      * @throws DevFailed
      */
     public static String getAttributeName(final String fullname) throws DevFailed {
-        final String s = TangoUtil.getfullAttributeNameForAttribute(fullname);
-        return s.substring(s.lastIndexOf('/') + 1);
+        final String s = getfullAttributeNameForAttribute(fullname);
+        return s.substring(s.lastIndexOf(DEVICE_SEPARATOR) + 1);
     }
 
     private static void checkNullOrEmptyString(final String s) throws DevFailed {
-        if (s == null || s.isEmpty()) {
+        if ((s == null) || s.isEmpty()) {
             DevFailedUtils.throwDevFailed("string is null or empty");
         }
     }
