@@ -46,6 +46,7 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.logging.LoggingManager;
 import org.tango.orb.ORBManager;
 import org.tango.server.annotation.Device;
+import org.tango.server.annotation.TransactionType;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.events.EventManager;
 import org.tango.server.export.TangoExporter;
@@ -92,6 +93,7 @@ public final class ServerManager {
 
     private TangoExporter tangoExporter;
     private String lastClass;
+    private TransactionType transactionType;
 
     private ServerManager() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -101,7 +103,7 @@ public final class ServerManager {
             @Override
             public void run() {
                 MDC.put(SERVER_NAME_LOGGING, serverName);
-                logger.error("Shutdown hook unregister " + serverName);
+                logger.debug("Shutdown hook unregister " + serverName);
                 try {
                     ServerManager.getInstance().stop();
                 } catch (final DevFailed e) {
@@ -222,7 +224,7 @@ public final class ServerManager {
         checkArgs(args);
         serverName = this.execName + "/" + instanceName;
         MDC.put(SERVER_NAME_LOGGING, serverName);
-        logger.info("Starting server {}", serverName);
+        logger.debug("Starting server {}", serverName);
 
         final StringBuilder tmp = new StringBuilder(serverName);
 
@@ -262,7 +264,7 @@ public final class ServerManager {
             }
         } finally {
             ORBManager.shutdown();
-            logger.error("everything has been shutdown normally");
+            logger.info("everything has been shutdown normally");
             isStarted.set(false);
         }
     }
@@ -300,7 +302,8 @@ public final class ServerManager {
             } else if (arg.startsWith("-v")) { // logging level
                 try {
                     final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
-                    LoggingManager.getInstance().setLoggingLevel(level);
+                    LoggingManager.getInstance().setLoggingLevel(level,
+                            tangoClasses.values().toArray(new Class<?>[tangoClasses.size()]));
                 } catch (final NumberFormatException e) {
                     DevFailedUtils.throwDevFailed("Logging level error. Must be a number");
                 }
@@ -373,6 +376,14 @@ public final class ServerManager {
             DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
         }
 
+    }
+
+    public void setTransactionType(final TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
     }
 
     /**

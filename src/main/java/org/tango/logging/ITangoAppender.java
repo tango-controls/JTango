@@ -34,6 +34,6 @@ public interface ITangoAppender {
 
     void setLevel(final int level);
 
-    String getLoggingDeviceName();
+    String getDeviceName();
 
 }

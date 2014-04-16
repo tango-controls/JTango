@@ -25,7 +25,6 @@
 package org.tango.server.testserver;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -53,245 +52,244 @@ public class HistoryTest {
 
     @BeforeClass
     public static void connect() throws DevFailed {
-	assertThat(System.getProperty("TANGO_HOST"), notNullValue());
-	JTangoTest.start();
+        JTangoTest.start();
     }
 
     @AfterClass
     public static void disconnect() throws DevFailed {
-	ServerManager.getInstance().stop();
+        ServerManager.getInstance().stop();
     }
 
     @Test
     public void attributeHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 10 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 10 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
 
-	    // get its history
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.attribute_history("shortScalar");
+            // get its history
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.attribute_history("shortScalar");
 
-	    for (final DeviceDataHistory element : hist) {
-		assertThat(element.extractShort(), equalTo((short) 10));
-	    }
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
+            for (final DeviceDataHistory element : hist) {
+                assertThat(element.extractShort(), equalTo((short) 10));
+            }
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
 
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
-	}
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
+        }
 
     }
 
     @Test
     public void stateHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 10 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 10 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
 
-	    // get its history
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.attribute_history("State");
+            // get its history
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.attribute_history("State");
 
-	    for (final DeviceDataHistory element : hist) {
-		System.out.println(element.extractDevState().value());
-		assertThat(element.extractDevState(), equalTo(DevState.ON));
-	    }
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
+            for (final DeviceDataHistory element : hist) {
+                System.out.println(element.extractDevState().value());
+                assertThat(element.extractDevState(), equalTo(DevState.ON));
+            }
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
 
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "State");
-	}
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "State");
+        }
     }
 
     @Test
     public void stateCommandHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 10 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 10 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
 
-	    // get its history
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.command_history("State");
+            // get its history
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.command_history("State");
 
-	    for (final DeviceDataHistory element : hist) {
-		System.out.println(element.extractDevState().value());
-		assertThat(element.extractDevState(), equalTo(DevState.ON));
-	    }
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
+            for (final DeviceDataHistory element : hist) {
+                System.out.println(element.extractDevState().value());
+                assertThat(element.extractDevState(), equalTo(DevState.ON));
+            }
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
 
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "State");
-	}
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "State");
+        }
     }
 
     @Test
     public void stateSpectrumHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 10 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
-	    try {
-		Thread.sleep(100);
-	    } catch (final InterruptedException e) {
-	    }
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
-	    // get its history
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.attribute_history("stateSpectrum");
-	    System.out.println(hist.length);
-	    for (final DeviceDataHistory element : hist) {
-		final DevState[] result = element.extractDevStateArray();
-		for (final DevState element2 : result) {
-		    System.out.println(DeviceState.toString(element2));
-		}
-		System.out.println(Arrays.toString(element.extractDevStateArray()));
-		assertThat(element.extractDevStateArray(), equalTo(new DevState[] { DevState.ON, DevState.OFF,
-			DevState.UNKNOWN }));
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 10 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+            }
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
+            // get its history
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.attribute_history("stateSpectrum");
+            System.out.println(hist.length);
+            for (final DeviceDataHistory element : hist) {
+                final DevState[] result = element.extractDevStateArray();
+                for (final DevState element2 : result) {
+                    System.out.println(DeviceState.toString(element2));
+                }
+                System.out.println(Arrays.toString(element.extractDevStateArray()));
+                assertThat(element.extractDevStateArray(), equalTo(new DevState[] { DevState.ON, DevState.OFF,
+                        DevState.UNKNOWN }));
 
-	    }
+            }
 
-	} catch (final DevFailed e) {
-	    e.printStackTrace();
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
-	}
+        } catch (final DevFailed e) {
+            e.printStackTrace();
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
+        }
 
     }
 
     @Test
     public void attributeSpectrumHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 10 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
-	    try {
-		Thread.sleep(100);
-	    } catch (final InterruptedException e) {
-	    }
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
-	    // get its history
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.attribute_history("pollSpectrum");
-	    System.out.println(hist.length);
-	    for (final DeviceDataHistory element : hist) {
-		if (!element.failed) {
-		    System.out.println(Arrays.toString(element.extractLong64Array()));
-		    assertThat(element.extractLong64Array(), equalTo(new long[] { 1, 2, 0 }));
-		} else {
-		    assertThat(element.getErrStack()[0].desc, equalTo("error pollSpectrum"));
-		    System.out.println(element.getErrStack()[0].desc);
-		}
-	    }
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 10 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+            }
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
+            // get its history
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.attribute_history("pollSpectrum");
+            System.out.println(hist.length);
+            for (final DeviceDataHistory element : hist) {
+                if (!element.failed) {
+                    System.out.println(Arrays.toString(element.extractLong64Array()));
+                    assertThat(element.extractLong64Array(), equalTo(new long[] { 1, 2, 0 }));
+                } else {
+                    assertThat(element.getErrStack()[0].desc, equalTo("error pollSpectrum"));
+                    System.out.println(element.getErrStack()[0].desc);
+                }
+            }
 
-	} catch (final DevFailed e) {
-	    e.printStackTrace();
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
-	}
+        } catch (final DevFailed e) {
+            e.printStackTrace();
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
+        }
 
     }
 
     @Test
     public void commandHistory() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
 
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 100 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPolling" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
-	    // sleep to allow history to be filled
-	    try {
-		Thread.sleep(100);
-	    } catch (final InterruptedException e) {
-	    }
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.command_history("testPolling");
-	    for (final DeviceDataHistory element : hist) {
-		if (!element.failed) {
-		    // System.out.println(element.extractDouble());
-		    assertThat(element.extractDouble(), equalTo(12.0));
-		} else {
-		    assertThat(element.getErrStack()[0].desc, equalTo("error"));
-		    // System.out.println(element.getErrStack()[0].desc);
-		}
-	    }
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 100 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPolling" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
+            // sleep to allow history to be filled
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+            }
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.command_history("testPolling");
+            for (final DeviceDataHistory element : hist) {
+                if (!element.failed) {
+                    // System.out.println(element.extractDouble());
+                    assertThat(element.extractDouble(), equalTo(12.0));
+                } else {
+                    assertThat(element.getErrStack()[0].desc, equalTo("error"));
+                    // System.out.println(element.getErrStack()[0].desc);
+                }
+            }
 
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.COMMAND.toString(), "testPolling");
-	}
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.COMMAND.toString(), "testPolling");
+        }
     }
 
     @Test
     public void commandHistoryArray() throws DevFailed {
-	// install polling
-	final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
-	try {
+        // install polling
+        final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
+        try {
 
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 100 };
-	    final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final DeviceDataHistory[] hist = dev.command_history("testPollingArray");
-	    for (final DeviceDataHistory element : hist) {
-		assertThat(element.extractLongArray(), equalTo(new int[] { 1, 2 }));
-	    }
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 100 };
+            final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceDataHistory[] hist = dev.command_history("testPollingArray");
+            for (final DeviceDataHistory element : hist) {
+                assertThat(element.extractLongArray(), equalTo(new int[] { 1, 2 }));
+            }
 
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	} finally {
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray");
-	}
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        } finally {
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray");
+        }
     }
 }

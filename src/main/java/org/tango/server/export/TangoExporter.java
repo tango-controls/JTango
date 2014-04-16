@@ -174,7 +174,7 @@ public final class TangoExporter implements IExporter {
         xlogger.entry();
         if (serverName != null) {
             try {
-                logger.info("unexporting server {}", serverName);
+                logger.debug("unexporting server {}", serverName);
                 DatabaseFactory.getDatabase().unexportServer(serverName);
             } catch (final DevFailed e) {
                 logger.debug(DevFailedUtils.toString(e));
@@ -187,11 +187,11 @@ public final class TangoExporter implements IExporter {
     public DeviceImpl buildDevice(final String name, final DeviceClassBuilder classBuilder) throws DevFailed {
         final DeviceImpl devToClean = classBuilder.getDeviceImpl(name);
         if (devToClean != null) {
-            logger.info("unexporting device {}", devToClean.getName());
+            logger.debug("unexporting device {}", devToClean.getName());
             ORBUtils.unexportDevice(devToClean);
         }
         final DeviceImpl dev = classBuilder.buildDevice(name);
-        logger.info("exporting device {}", dev.getName());
+        logger.debug("exporting device {}", dev.getName());
         ORBUtils.exportDevice(dev, hostName, pid);
         return dev;
     }

@@ -1,62 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--
-
-    Copyright (C) :     2012
-
-    	Synchrotron Soleil
-    	L'Orme des merisiers
-    	Saint Aubin
-    	BP48
-    	91192 GIF-SUR-YVETTE CEDEX
-
-    This file is part of Tango.
-
-    Tango is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Tango is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with Tango.  If not, see <http://www.gnu.org/licenses/>.
-
--->
+<!-- Copyright (C) : 2012 Synchrotron Soleil L'Orme des merisiers Saint Aubin 
+	BP48 91192 GIF-SUR-YVETTE CEDEX This file is part of Tango. Tango is free 
+	software: you can redistribute it and/or modify it under the terms of the 
+	GNU Lesser General Public License as published by the Free Software Foundation, 
+	either version 3 of the License, or (at your option) any later version. Tango 
+	is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the GNU Lesser General Public License for more details. You 
+	should have received a copy of the GNU Lesser General Public License along 
+	with Tango. If not, see <http://www.gnu.org/licenses/>. -->
 <configuration>
+
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-
-		<layout class="ch.qos.logback.classic.PatternLayout">
+		<encoder>
 			<pattern>%-5level %d [%thread - %X{deviceName}] %logger{36}.%M:%L - %msg%n</pattern>
-		</layout>
+		</encoder>
 	</appender>
+
 	<appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.ConsoleAppender">
-
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<pattern>%-5level %d [%thread - %X{deviceName}] %logger{36} - %msg%n</pattern>
-		</layout>
+		<encoder>
+			<pattern>REQUEST %d [%X{deviceName}] - %msg%n</pattern>
+		</encoder>
 	</appender>
 
-	<logger name="org.jacorb" level="ERROR" >
-		<appender-ref ref="CONSOLE" />
-	</logger>
-	<logger name="org.tango" level="INFO" >
-		<appender-ref ref="CONSOLE" />
-	</logger>
-	<logger name="org.quartz" level="ERROR" >
-	<appender-ref ref="CONSOLE" />
-	</logger>
-	<logger name="net.sf.ehcache" level="ERROR" >
-		<appender-ref ref="CONSOLE" />
-	</logger>
-	<logger name="TangoClientRequests" level="ERROR">
+	<logger name="org.jacorb" level="OFF" />
+	<logger name="org.tango" level="ERROR" />
+	<logger name="org.quartz" level="OFF" />
+	<logger name="net.sf.ehcache" level="OFF"/>
+	<logger name="ch.qos.logback" level="OFF"/>
+	<logger name="TangoClientRequests" level="OFF" additivity="false">
 		<appender-ref ref="CONSOLE-REQUEST" />
 	</logger>
 
-	<!-- <root level="ERROR">
+	<root level="ERROR">
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="CONSOLE-REQUEST" />
-	</root> -->
+	</root>
 </configuration>
