@@ -68,135 +68,135 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
      *            The method to write the attribute
      */
     public ReflectAttributeBehavior(final AttributeConfiguration config, final Object businessObject,
-	    final Method getter, final Method setter) {
-	this.businessObject = businessObject;
-	this.getter = getter;
-	this.setter = setter;
-	this.config = config;
+            final Method getter, final Method setter) {
+        this.businessObject = businessObject;
+        this.getter = getter;
+        this.setter = setter;
+        this.config = config;
     }
 
     @Override
     public AttributeValue getValue() throws DevFailed {
-	final AttributeValue result;
-	Object value = null;
-	if (getter != null) {
-	    try {
-		logger.debug("read attribute {} from method {}", config.getName(), getter);
-		value = getter.invoke(businessObject);
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		throwDevFailed(e);
-	    }
-	}
-	result = buildAttributeValue(value);
-	return result;
+        final AttributeValue result;
+        Object value = null;
+        if (getter != null) {
+            try {
+                logger.debug("read attribute {} from method '{}'", config.getName(), getter);
+                value = getter.invoke(businessObject);
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                throwDevFailed(e);
+            }
+        }
+        result = buildAttributeValue(value);
+        return result;
     }
 
     private void throwDevFailed(final InvocationTargetException e) throws DevFailed {
-	if (e.getCause() instanceof DevFailed) {
-	    throw (DevFailed) e.getCause();
-	} else {
-	    DevFailedUtils.throwDevFailed(e.getCause());
-	}
+        if (e.getCause() instanceof DevFailed) {
+            throw (DevFailed) e.getCause();
+        } else {
+            DevFailedUtils.throwDevFailed(e.getCause());
+        }
     }
 
     private AttributeValue buildAttributeValue(final Object value) throws DevFailed {
-	final AttributeValue result;
-	if (value == null) {
-	    result = new AttributeValue(null);
-	} else if (value instanceof AttributeValue) {
-	    result = (AttributeValue) value;
-	} else if (value instanceof DeviceState) {
-	    final DeviceState state = (DeviceState) value;
-	    result = new AttributeValue(state.getDevState());
-	} else if (value instanceof DeviceState[]) {
-	    final DeviceState[] in = (DeviceState[]) value;
-	    final DevState[] devStates = new DevState[in.length];
-	    for (int i = 0; i < in.length; i++) {
-		devStates[i] = in[i].getDevState();
-	    }
-	    result = new AttributeValue(devStates);
-	} else {
-	    result = new AttributeValue(value);
-	}
-	return result;
+        final AttributeValue result;
+        if (value == null) {
+            result = new AttributeValue(null);
+        } else if (value instanceof AttributeValue) {
+            result = (AttributeValue) value;
+        } else if (value instanceof DeviceState) {
+            final DeviceState state = (DeviceState) value;
+            result = new AttributeValue(state.getDevState());
+        } else if (value instanceof DeviceState[]) {
+            final DeviceState[] in = (DeviceState[]) value;
+            final DevState[] devStates = new DevState[in.length];
+            for (int i = 0; i < in.length; i++) {
+                devStates[i] = in[i].getDevState();
+            }
+            result = new AttributeValue(devStates);
+        } else {
+            result = new AttributeValue(value);
+        }
+        return result;
     }
 
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
 
-	if (setter != null && setter.getParameterTypes().length == 1) {
-	    final Class<?> paramSetter = getParamSetter();
-	    try {
-		if (paramSetter.equals(DeviceState.class)) {
-		    setter.invoke(businessObject, DeviceState.getDeviceState((DevState) value.getValue()));
-		} else if (paramSetter.equals(DeviceState[].class)) {
-		    final DevState[] states = (DevState[]) value.getValue();
-		    final DeviceState[] devStates = new DeviceState[states.length];
-		    for (int i = 0; i < devStates.length; i++) {
-			devStates[i] = DeviceState.getDeviceState(states[i]);
-		    }
-		    setter.invoke(businessObject, (Object) devStates);
-		} else {
-		    final Class<?> input = getInputClass(value);
-		    checkParamTypes(value, paramSetter, input);
-		    setter.invoke(businessObject, value.getValue());
-		}
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		throwDevFailed(e);
-	    }
-	}
+        if (setter != null && setter.getParameterTypes().length == 1) {
+            final Class<?> paramSetter = getParamSetter();
+            try {
+                if (paramSetter.equals(DeviceState.class)) {
+                    setter.invoke(businessObject, DeviceState.getDeviceState((DevState) value.getValue()));
+                } else if (paramSetter.equals(DeviceState[].class)) {
+                    final DevState[] states = (DevState[]) value.getValue();
+                    final DeviceState[] devStates = new DeviceState[states.length];
+                    for (int i = 0; i < devStates.length; i++) {
+                        devStates[i] = DeviceState.getDeviceState(states[i]);
+                    }
+                    setter.invoke(businessObject, (Object) devStates);
+                } else {
+                    final Class<?> input = getInputClass(value);
+                    checkParamTypes(value, paramSetter, input);
+                    setter.invoke(businessObject, value.getValue());
+                }
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                throwDevFailed(e);
+            }
+        }
 
     }
 
     private void checkParamTypes(final AttributeValue value, final Class<?> paramSetter, final Class<?> input)
-	    throws DevFailed {
-	if (!paramSetter.isAssignableFrom(input)) {
-	    DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP,
-		    "type mismatch, expected was " + setter.getParameterTypes()[0].getCanonicalName() + ", input is "
-			    + value.getValue().getClass().getCanonicalName());
-	}
+            throws DevFailed {
+        if (!paramSetter.isAssignableFrom(input)) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP,
+                    "type mismatch, expected was " + setter.getParameterTypes()[0].getCanonicalName() + ", input is "
+                            + value.getValue().getClass().getCanonicalName());
+        }
     }
 
     private Class<?> getInputClass(final AttributeValue value) {
-	Class<?> input = value.getValue().getClass();
-	if (Number.class.isAssignableFrom(input) || Boolean.class.isAssignableFrom(input)) {
-	    input = ClassUtils.wrapperToPrimitive(value.getValue().getClass());
-	}
-	return input;
+        Class<?> input = value.getValue().getClass();
+        if (Number.class.isAssignableFrom(input) || Boolean.class.isAssignableFrom(input)) {
+            input = ClassUtils.wrapperToPrimitive(value.getValue().getClass());
+        }
+        return input;
     }
 
     private Class<?> getParamSetter() {
-	Class<?> paramSetter = setter.getParameterTypes()[0];
-	if (Number.class.isAssignableFrom(paramSetter) || Boolean.class.isAssignableFrom(paramSetter)) {
-	    paramSetter = ClassUtils.wrapperToPrimitive(setter.getParameterTypes()[0]);
-	}
-	return paramSetter;
+        Class<?> paramSetter = setter.getParameterTypes()[0];
+        if (Number.class.isAssignableFrom(paramSetter) || Boolean.class.isAssignableFrom(paramSetter)) {
+            paramSetter = ClassUtils.wrapperToPrimitive(setter.getParameterTypes()[0]);
+        }
+        return paramSetter;
     }
 
     @Override
     public AttributeConfiguration getConfiguration() {
-	return config;
+        return config;
     }
 
     @Override
     public StateMachineBehavior getStateMachine() {
-	return null;
+        return null;
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	builder.append("getter", getter);
-	builder.append("setter", setter);
-	return builder.toString();
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("getter", getter);
+        builder.append("setter", setter);
+        return builder.toString();
     }
 
 }

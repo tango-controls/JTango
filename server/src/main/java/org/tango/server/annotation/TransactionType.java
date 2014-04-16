@@ -32,17 +32,21 @@ package org.tango.server.annotation;
  */
 public enum TransactionType {
     /**
-     * One client request per device. WARNING: can lead to performance issues.
+     * One client request per server (that may contain several classes). WARNING: can lead to performance issues
      */
-    DEVICE,
+    SERVER,
     /**
      * One client request per device class (that may contain several devices). WARNING: can lead to performance issues
      */
     CLASS,
     /**
-     * One client request per server (that may contain several classes). WARNING: can lead to performance issues
+     * One client request per device. WARNING: can lead to performance issues.
      */
-    SERVER,
+    DEVICE,
+    /**
+     * One client request per attribute or command. WARNING: can lead to performance issues
+     */
+    ATTRIBUTE_COMMAND,
     /**
      * One client request per attribute. WARNING: can lead to performance issues
      */
@@ -51,10 +55,7 @@ public enum TransactionType {
      * One client request per command. WARNING: can lead to performance issues
      */
     COMMAND,
-    /**
-     * One client request per attribute or command. WARNING: can lead to performance issues
-     */
-    ATTRIBUTE_COMMAND,
+
     /**
      * All client requests can be done at the same time.
      */

@@ -330,8 +330,8 @@ public final class DeviceImpl extends Device_4POA {
         }
 
         MDC.put(MDC_KEY, name);
-        logger.info("Device {} of of {} created with tx type: {}", new Object[] { deviceName,
-                businessObject.getClass(), txType });
+        logger.debug("Device {} of of {} created with tx type: {}",
+                new Object[] { deviceName, businessObject.getClass(), txType });
 
     }
 
@@ -563,7 +563,7 @@ public final class DeviceImpl extends Device_4POA {
             }
         }
 
-        logger.info("init OK " + isCorrectlyInit);
+        logger.debug("init OK " + isCorrectlyInit);
     }
 
     /**
@@ -708,10 +708,12 @@ public final class DeviceImpl extends Device_4POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         blackBox.insertInblackBox("Attribute adm_name");
-        final String adminDeviceName = Constants.ADMIN_DEVICE_DOMAIN + "/"
-                + ServerManager.getInstance().getServerName();
-        xlogger.exit(adminDeviceName);
-        return adminDeviceName;
+        xlogger.exit();
+        return getAdminDeviceName();
+    }
+
+    public String getAdminDeviceName() {
+        return Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
     }
 
     /**
@@ -992,7 +994,7 @@ public final class DeviceImpl extends Device_4POA {
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-        if (!name.equalsIgnoreCase(adm_name())) {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
         deviceLock.lockAttribute();
@@ -1111,7 +1113,7 @@ public final class DeviceImpl extends Device_4POA {
         logger.debug("writing {}", Arrays.toString(names));
         blackBox.insertInblackBox("write_attributes_4 " + Arrays.toString(names), clIdent);
         clientIdentity = clIdent;
-        if (!name.equalsIgnoreCase(adm_name())) {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
         deviceLock.lockAttribute();
@@ -1156,7 +1158,7 @@ public final class DeviceImpl extends Device_4POA {
         blackBox.insertInblackBox("write_read_attributes_4 " + Arrays.toString(names), clIdent);
         clientIdentity = clIdent;
         AttributeValue_4[] val = null;
-        if (!name.equalsIgnoreCase(adm_name())) {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
         deviceLock.lockAttribute();
@@ -1416,7 +1418,7 @@ public final class DeviceImpl extends Device_4POA {
         blackBox.insertInblackBox("Operation command_inout_4 (cmd = " + commandName + ")", source, clIdent);
         clientIdentity = clIdent;
         Any argout = null;
-        if (!name.equalsIgnoreCase(adm_name())) {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, commandName);
         }
         deviceLock.lockCommand();
@@ -1711,7 +1713,7 @@ public final class DeviceImpl extends Device_4POA {
         xlogger.entry();
         checkInitialization();
         clientIdentity = clIdent;
-        if (!name.equalsIgnoreCase(adm_name())) {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent);
         }
         blackBox.insertInblackBox("set_attribute_config_4", clIdent);

@@ -387,14 +387,14 @@ public final class AdminDevice {
                 DevFailedUtils.throwDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
             }
             if (config[0].equalsIgnoreCase(LoggingManager.LOGGING_TARGET_DEVICE)) {
-                String className = "";
+                Class<?> className = null;
                 for (final DeviceClassBuilder deviceClass : classList) {
                     if (deviceClass.containsDevice(deviceName)) {
-                        className = deviceClass.getClassName();
+                        className = deviceClass.getDeviceClass();
                         break;
                     }
                 }
-                if (!className.isEmpty()) {
+                if (className != null) {
                     LoggingManager.getInstance().addDeviceAppender(config[1], className, deviceName);
                 }
             } else {

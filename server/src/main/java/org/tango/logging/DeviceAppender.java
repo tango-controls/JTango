@@ -26,7 +26,6 @@ package org.tango.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tango.server.Constants;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
@@ -65,8 +64,7 @@ public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements
     @Override
     protected void append(final ILoggingEvent eventObject) {
         if (eventObject.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(deviceName)
-                && (eventObject.getLoggerName().equalsIgnoreCase(deviceClassName) || eventObject.getLoggerName()
-                        .equalsIgnoreCase(Constants.CLIENT_REQUESTS_LOGGER))
+                && eventObject.getLoggerName().equalsIgnoreCase(deviceClassName)
                 && eventObject.getLevel().isGreaterOrEqual(level)) {
             try {
                 final String[] dvsa = new String[ARGIN_SIZE];
@@ -86,13 +84,17 @@ public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements
         }
     }
 
-    @Override
     public String getLoggingDeviceName() {
         return loggingDeviceName;
     }
 
     @Override
     public void setLevel(final int level) {
-        this.level = Level.toLevel(level, Level.DEBUG);
+        this.level = LoggingLevel.getLevelFromInt(level);
+    }
+
+    @Override
+    public String getDeviceName() {
+        return deviceName;
     }
 }
