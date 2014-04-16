@@ -64,7 +64,7 @@ public final class DeviceManager {
         this.device = device;
         name = device.getName();
         className = device.getClassName();
-        adminName = device.adm_name();
+        adminName = device.getAdminDeviceName();
     }
 
     /**

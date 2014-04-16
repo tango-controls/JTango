@@ -54,7 +54,7 @@ public @interface Device {
      * 
      * @return transaction type
      */
-    TransactionType transactionType() default TransactionType.NONE;
+    TransactionType transactionType() default TransactionType.DEVICE;
 
     /**
      * The device type returned by "info"

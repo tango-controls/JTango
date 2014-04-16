@@ -48,6 +48,7 @@ import org.tango.server.annotation.Schedule;
 import org.tango.server.annotation.State;
 import org.tango.server.annotation.StateMachine;
 import org.tango.server.annotation.Status;
+import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceManager;
 import org.tango.server.dynamic.DynamicManager;
@@ -67,7 +68,7 @@ import fr.esrf.Tango.DevVarLongStringArray;
  * @author FOURNEAU
  * 
  */
-@Device
+@Device(transactionType = TransactionType.NONE)
 public final class JTangoTest {
     private final Logger logger = LoggerFactory.getLogger(JTangoTest.class);
 
@@ -429,9 +430,9 @@ public final class JTangoTest {
     @Attribute
     public long[] getPollSpectrum() throws DevFailed {
         error2 = !error2;
-	if (error2) {
-	    DevFailedUtils.throwDevFailed("error pollSpectrum");
-	}
+        if (error2) {
+            DevFailedUtils.throwDevFailed("error pollSpectrum");
+        }
 
         return new long[] { 1, 2 };
     }

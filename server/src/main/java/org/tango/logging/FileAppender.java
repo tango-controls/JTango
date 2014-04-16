@@ -38,29 +38,29 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
  */
 public final class FileAppender extends RollingFileAppender<ILoggingEvent> implements ITangoAppender {
 
-    private final String loggingDeviceName;
+    private final String deviceName;
     private Level level;
 
     public FileAppender(final String loggingDeviceName) {
-	this.loggingDeviceName = loggingDeviceName;
+        this.deviceName = loggingDeviceName;
     }
 
     @Override
     protected void subAppend(final ILoggingEvent event) {
-	if (event.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(loggingDeviceName)
-		&& event.getLevel().isGreaterOrEqual(level)) {
-	    super.subAppend(event);
-	}
-    }
-
-    @Override
-    public String getLoggingDeviceName() {
-	return loggingDeviceName;
+        if (event.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(deviceName)
+                && event.getLevel().isGreaterOrEqual(level)) {
+            super.subAppend(event);
+        }
     }
 
     @Override
     public void setLevel(final int level) {
-	this.level = Level.toLevel(level, Level.DEBUG);
+        this.level = LoggingLevel.getLevelFromInt(level);
+    }
+
+    @Override
+    public String getDeviceName() {
+        return deviceName;
     }
 
 }

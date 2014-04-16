@@ -69,7 +69,10 @@ public final class LoggingManager {
         final Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         if (rootLogger instanceof ch.qos.logback.classic.Logger) {
             rootLoggerBack = (ch.qos.logback.classic.Logger) rootLogger;
-            rootLoggingLevel = LoggingLevel.getLevel(rootLoggerBack.getLevel()).toInt();
+            try {
+                rootLoggingLevel = LoggingLevel.getLevel(rootLoggerBack.getLevel()).toInt();
+            } catch (final RuntimeException e) {
+            }
         }
 
     }
@@ -101,16 +104,16 @@ public final class LoggingManager {
         if (rootLoggingLevel < loggingLevel) {
             setRootLoggingLevel(loggingLevel);
         }
-        setLoggingLevel(loggingLevel);
+        // setLoggingLevel(loggingLevel);
         loggingLevels.put(deviceName, loggingLevel);
         for (final DeviceAppender appender : deviceAppenders.values()) {
-            if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
+            if (deviceName.equalsIgnoreCase(appender.getDeviceName())) {
                 appender.setLevel(loggingLevel);
                 break;
             }
         }
         for (final FileAppender appender : fileAppenders.values()) {
-            if (deviceName.equalsIgnoreCase(appender.getLoggingDeviceName())) {
+            if (deviceName.equalsIgnoreCase(appender.getDeviceName())) {
                 appender.setLevel(loggingLevel);
                 break;
             }
@@ -134,11 +137,12 @@ public final class LoggingManager {
      * 
      * @param loggingLevel
      */
-    public void setLoggingLevel(final int loggingLevel) {
+    public void setLoggingLevel(final int loggingLevel, final Class<?>... deviceClassNames) {
+
         if (rootLoggingLevel < loggingLevel) {
             setRootLoggingLevel(loggingLevel);
         }
-        final Logger tangoLogger = LoggerFactory.getLogger("org.tango");
+        final Logger tangoLogger = LoggerFactory.getLogger("org.tango.server");
         if (tangoLogger instanceof ch.qos.logback.classic.Logger) {
             final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) tangoLogger;
             logbackLogger.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
@@ -147,6 +151,13 @@ public final class LoggingManager {
         if (blackboxLogger instanceof ch.qos.logback.classic.Logger) {
             final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) blackboxLogger;
             logbackLogger.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
+        }
+        for (int i = 0; i < deviceClassNames.length; i++) {
+            final Logger deviceLogger = LoggerFactory.getLogger(deviceClassNames[i]);
+            if (deviceLogger instanceof ch.qos.logback.classic.Logger) {
+                final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) deviceLogger;
+                logbackLogger.setLevel(LoggingLevel.getLevelFromInt(loggingLevel));
+            }
         }
 
     }
@@ -159,15 +170,17 @@ public final class LoggingManager {
      * @param loggingDeviceName
      * @throws DevFailed
      */
-    public void addDeviceAppender(final String deviceTargetName, final String deviceClassName,
+    public void addDeviceAppender(final String deviceTargetName, final Class<?> deviceClassName,
             final String loggingDeviceName) throws DevFailed {
         if (rootLoggerBack != null) {
             logger.debug("add device appender {} on {}", deviceTargetName, loggingDeviceName);
-            final DeviceAppender appender = new DeviceAppender(deviceTargetName, deviceClassName, loggingDeviceName);
+            final DeviceAppender appender = new DeviceAppender(deviceTargetName, deviceClassName.getName(),
+                    loggingDeviceName);
             deviceAppenders.put(loggingDeviceName.toLowerCase(Locale.ENGLISH), appender);
             rootLoggerBack.addAppender(appender);
             // debug level by default
-            setLoggingLevel(deviceTargetName, LoggingLevel.DEBUG.toInt());
+            setLoggingLevel(LoggingLevel.DEBUG.toInt(), deviceClassName);
+            setLoggingLevel(loggingDeviceName, LoggingLevel.DEBUG.toInt());
             appender.start();
         }
     }
