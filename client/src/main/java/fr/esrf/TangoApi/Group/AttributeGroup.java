@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
@@ -29,6 +31,8 @@ import fr.soleil.tango.clientapi.factory.ProxyFactory;
 public final class AttributeGroup {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeGroup.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeGroup.class);
+
     private String[] userAttributesNames;
     /**
      * Used to write
@@ -107,13 +111,12 @@ public final class AttributeGroup {
     }
 
     public synchronized void readAsync() {
-
+xlogger.entry(devicesMap.keySet());
         if (!readAnswersIDs.isEmpty()) {
             // remove requests to avoid memory leak
             getReadReplies();
         }
         errorsMap.clear();
-        logger.debug("read async on {}", devicesMap.keySet());
         for (final String deviceName : devicesMap.keySet()) {
             final List<String> attributeNames = attributesMap.get(deviceName);
             final DeviceProxy devElement = devicesMap.get(deviceName);
@@ -122,22 +125,28 @@ public final class AttributeGroup {
                         .size()]));
                 readAnswersIDs.put(deviceName, rid);
             } catch (final DevFailed e) {
-                DevFailedUtils.logDevFailed(e, logger);
+                logger.error("error", e);
+                logger.error("", DevFailedUtils.toString(e));
+
                 for (final String attribute : attributeNames) {
                     errorsMap.put(deviceName + "/" + attribute, e.errors);
                 }
             }
         }
+        xlogger.exit();
     }
 
     public synchronized DeviceAttribute[] getReadReplies() {
+        xlogger.entry(devicesMap.keySet());
         if (!readAnswersIDs.isEmpty()) {
-            logger.debug("getReadReplies on {}", devicesMap.keySet());
+
             final Map<String, DeviceAttribute> replies = new HashMap<String, DeviceAttribute>();
             try {
                 readReply = new ArrayList<DeviceAttribute>();
                 for (final String deviceName : devicesMap.keySet()) {
+
                     final List<String> attributeNames = attributesMap.get(deviceName);
+                    // logger.debug("getReadReplies on device {} and attributes {}", deviceName, attributeNames);
                     final DeviceProxy devElement = devicesMap.get(deviceName);
                     try {
                         final Integer id = readAnswersIDs.get(deviceName);
@@ -150,7 +159,9 @@ public final class AttributeGroup {
                             }
                         }
                     } catch (final DevFailed e) {
-                        DevFailedUtils.logDevFailed(e, logger);
+                        logger.error("error", e);
+                        logger.error("", DevFailedUtils.toString(e));
+
                         for (final String attribute : attributeNames) {
                             errorsMap.put(deviceName + "/" + attribute, e.errors);
                         }
@@ -165,11 +176,12 @@ public final class AttributeGroup {
                 readReply.add(replies.get(userAttributesName));
             }
         }
-
+        xlogger.exit();
         return readReply.toArray(new DeviceAttribute[readReply.size()]);
     }
 
     public synchronized DeviceAttribute[] read() throws DevFailed {
+        xlogger.entry();
         readAsync();
         final DeviceAttribute[] replies = getReadReplies();
         if (throwExceptions && !errorsMap.isEmpty()) {
@@ -181,6 +193,7 @@ public final class AttributeGroup {
             }
             throw new DevFailed(allErrors);
         }
+        xlogger.exit();
         return replies;
     }
 
@@ -211,7 +224,8 @@ public final class AttributeGroup {
                         false);
                 writeAnswersIDs.put(deviceName, answersID);
             } catch (final DevFailed e) {
-                DevFailedUtils.logDevFailed(e, logger);
+                logger.error("error", e);
+                logger.error("", DevFailedUtils.toString(e));
                 final DevError[] errors = e.errors;
                 final List<String> attributeNames = attributesMap.get(deviceName);
                 for (final String attribute : attributeNames) {
@@ -231,7 +245,9 @@ public final class AttributeGroup {
                         try {
                             devElement.write_attribute_reply(writeAnswersIDs.get(deviceName), timeout);
                         } catch (final DevFailed e) {
-                            DevFailedUtils.logDevFailed(e, logger);
+                            logger.error("error", e);
+                            logger.error("", DevFailedUtils.toString(e));
+
                             if (e instanceof NamedDevFailedList) {
                                 final NamedDevFailedList list = (NamedDevFailedList) e;
                                 for (int i = 0; i < list.get_faulty_attr_nb(); i++) {
@@ -304,7 +320,8 @@ public final class AttributeGroup {
                     replies.put(deviceName + "/" + attribute, subReply[i++]);
                 }
             } catch (final DevFailed e) {
-                DevFailedUtils.logDevFailed(e, logger);
+                logger.error("error", e);
+                logger.error("", DevFailedUtils.toString(e));
                 final DevError[] errors = e.errors;
                 for (final DevError error : errors) {
                     allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
