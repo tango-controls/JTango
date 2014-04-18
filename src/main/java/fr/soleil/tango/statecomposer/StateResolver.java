@@ -44,10 +44,15 @@ public final class StateResolver {
     private static class ThreadFact implements ThreadFactory {
 
         private static final AtomicInteger THREAD_NR = new AtomicInteger(0);
+        private final String threadName;
+
+        public ThreadFact(final String threadName) {
+            this.threadName = threadName;
+        }
 
         @Override
         public Thread newThread(final Runnable r) {
-            return new Thread(r, "StateResolver" + THREAD_NR.incrementAndGet());
+            return new Thread(r, threadName + "-StateResolver-" + THREAD_NR.incrementAndGet());
         }
     }
 
@@ -136,11 +141,15 @@ public final class StateResolver {
         }
     }
 
-    public void start() {
+    public void start(final String threadName) {
         if (!isSynchronous) {
-            executor = Executors.newScheduledThreadPool(1, new ThreadFact());
+            executor = Executors.newScheduledThreadPool(1, new ThreadFact(threadName));
             future = executor.scheduleAtFixedRate(refresher, 0L, period, TimeUnit.MILLISECONDS);
         }
+    }
+
+    public void start() {
+        start("");
     }
 
     public boolean isStarted() {
