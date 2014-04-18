@@ -1209,7 +1209,7 @@ public final class DeviceImpl extends Device_4POA {
     public DevCmdInfo[] command_list_query() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("command_list_query");
         // Retrieve number of command and allocate memory to send back info
         final List<CommandImpl> cmdList = getCommandList();
@@ -1240,7 +1240,7 @@ public final class DeviceImpl extends Device_4POA {
     public DevCmdInfo_2[] command_list_query_2() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("command_list_query_2");
         final DevCmdInfo_2[] back = new DevCmdInfo_2[commandList.size()];
         int i = 0;
@@ -1274,7 +1274,7 @@ public final class DeviceImpl extends Device_4POA {
     public DevCmdInfo command_query(final String commandName) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("command_query " + commandName);
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo tmp = new DevCmdInfo();
@@ -1299,7 +1299,7 @@ public final class DeviceImpl extends Device_4POA {
     public DevCmdInfo_2 command_query_2(final String commandName) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("command_query_2 " + commandName);
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo_2 tmp = new DevCmdInfo_2();
@@ -1565,7 +1565,7 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeConfig_3[] get_attribute_config_3(final String[] attributeNames) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(attributeNames));
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("get_attribute_config_3 " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
@@ -1615,7 +1615,7 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeConfig_2[] get_attribute_config_2(final String[] attributeNames) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(attributeNames));
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("get_attribute_config_2 " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
@@ -1667,7 +1667,7 @@ public final class DeviceImpl extends Device_4POA {
     public AttributeConfig[] get_attribute_config(final String[] attributeNames) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        checkInitialization();
+        // checkInitialization();
         blackBox.insertInblackBox("get_attribute_config " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
