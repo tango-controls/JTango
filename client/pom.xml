@@ -26,13 +26,17 @@
 			<timezone>1</timezone>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<connection>${scm.connection.svn.tango-cs}:api/java/client/JTangoClientLang/trunk</connection>
 		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/client/JTangoClientLang/trunk</developerConnection>
 		<url>${scm.url.svn.tango-cs}/api/java/client/JTangoClientLang/trunk</url>
 	</scm>
-	
+
+	<properties>
+		<slf4j.version>1.7.6</slf4j.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -42,7 +46,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.8-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
@@ -53,6 +57,16 @@
 			<groupId>net.sf.transmorph</groupId>
 			<artifactId>transmorph</artifactId>
 			<version>3.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-ext</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
