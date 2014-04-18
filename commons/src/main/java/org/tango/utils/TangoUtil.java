@@ -169,7 +169,8 @@ public final class TangoUtil {
      * Splits an entity name into full device name and attribute name. Aliases will be resolved against tango db first.
      * 
      * @param entityName the entity name to split. It can contain aliases for device or attribute
-     * @return a Map.Entry containing the full device name as key, and the attribute name as value
+     * @return a Map.Entry containing the full device name as key and the attribute name as value, or null if split was
+     *         not possible
      * @throws DevFailed in case of DB access problem
      */
     public static final Entry<String, String> splitDeviceEntity(final String entityName) throws DevFailed {
@@ -181,8 +182,8 @@ public final class TangoUtil {
             String entity = null;
             String prefixGroup = matcher.group(PREFIX_INDEX);
 
-            boolean noDbGroup = (matcher.group(NO_DB_INDEX) != null);
-            if (noDbGroup) {
+            boolean noDb = (matcher.group(NO_DB_INDEX) != null);
+            if (noDb) {
                 // TODO cas device alias qui marche à soleil
                 if ((matcher.group(DEVICE_NAME_INDEX) != null) && (matcher.group(ENTITY_INDEX) != null)) {
                     String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
@@ -192,17 +193,16 @@ public final class TangoUtil {
                     entity = entityGroup;
                 }
             } else {
-                Database db = ApiUtil.get_db_obj();
                 if (matcher.group(ATTRIBUTE_ALIAS_INDEX) != null) {
                     String attributeAliasGroup = matcher.group(ATTRIBUTE_ALIAS_INDEX);
-                    String fullAttributeName = db.get_attribute_from_alias(attributeAliasGroup);
+                    String fullAttributeName = ApiUtil.get_db_obj().get_attribute_from_alias(attributeAliasGroup);
                     int lastIndexOf = fullAttributeName.lastIndexOf(DEVICE_SEPARATOR);
                     device = prefixGroup + fullAttributeName.substring(0, lastIndexOf);// TODO exception ?
                     entity = fullAttributeName.substring(lastIndexOf + 1);
                 } else if (matcher.group(DEVICE_ALIAS_INDEX) != null) {
                     String deviceAliasGroup = matcher.group(DEVICE_ALIAS_INDEX);
                     String entityGroup = matcher.group(ENTITY_INDEX);
-                    String fullDeviceName = db.get_device_from_alias(deviceAliasGroup);
+                    String fullDeviceName = ApiUtil.get_db_obj().get_device_from_alias(deviceAliasGroup);
                     device = prefixGroup + fullDeviceName;
                     entity = entityGroup;
                 } else {
