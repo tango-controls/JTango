@@ -25,7 +25,6 @@ import fr.esrf.TangoApi.StateUtilities;
 import fr.esrf.TangoApi.Group.Group;
 import fr.esrf.TangoApi.Group.GroupCmdReply;
 import fr.esrf.TangoApi.Group.GroupCmdReplyList;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 /**
  * Compose several states with a priority between states synchronoulsy or not
@@ -129,8 +128,10 @@ public final class StateResolver {
 //		new DeviceProxy(deviceName).ping();
 //	    }
             // Create the group
-            group = ProxyFactory.getInstance().createGroup("statecomposer",
-                    deviceNameSet.toArray(new String[deviceNameSet.size()]));
+//            group = ProxyFactory.getInstance().createGroup("statecomposer",
+//                    deviceNameSet.toArray(new String[deviceNameSet.size()]));
+            group = new Group("statecomposer");
+            group.add(deviceNameSet.toArray(new String[deviceNameSet.size()]));
             try {
                 group.set_timeout_millis(timeout, true);
             } catch (final DevFailed e) {
