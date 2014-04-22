@@ -1,9 +1,17 @@
+1.1.4
+-----
+- logging: fix -v option.
+- logging: fix logviewer
+- add org.tango.server.ServerManager.setTransactionType(TransactionType) to set TransactionType for all server
+- insert code of JTangoServerLang in JTangoServer
+
 1.1.3
 -----
 
 - release the dependency JTangoClientLang-1.0.11: Server cache of database: skip loading cache when errors occur
 (some SQL errors are sent by database device)
 - Events fix: add marshall data on heartbeat socket
+
 1.1.2
 ------
 - Migration to jacorb 3.4
