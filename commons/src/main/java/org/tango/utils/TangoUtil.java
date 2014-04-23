@@ -182,10 +182,10 @@ public final class TangoUtil {
             String entity = null;
             String prefixGroup = matcher.group(PREFIX_INDEX);
 
-            boolean noDb = (matcher.group(NO_DB_INDEX) != null);
+            boolean noDb = matcher.group(NO_DB_INDEX) != null;
             if (noDb) {
                 // TODO cas device alias qui marche à soleil
-                if ((matcher.group(DEVICE_NAME_INDEX) != null) && (matcher.group(ENTITY_INDEX) != null)) {
+                if (matcher.group(DEVICE_NAME_INDEX) != null && matcher.group(ENTITY_INDEX) != null) {
                     String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
                     String entityGroup = matcher.group(ENTITY_INDEX);
 
@@ -213,7 +213,7 @@ public final class TangoUtil {
                 }
             }
 
-            if ((device != null) && (entity != null)) {
+            if (device != null && entity != null) {
                 result = new SimpleEntry<String, String>(device, entity);
             }
         }
@@ -238,7 +238,7 @@ public final class TangoUtil {
                 if (deviceEntity != null) {
                     device = deviceEntity.getKey();
                     entity = deviceEntity.getValue();
-                    if ((device != null) && (entity != null)) {
+                    if (device != null && entity != null) {
                         Collection<String> attributes = result.get(device);
                         if (attributes == null) {
                             attributes = new HashSet<String>();
@@ -269,11 +269,10 @@ public final class TangoUtil {
             result = attributeName.substring(0, attributeName.lastIndexOf(DEVICE_SEPARATOR));
         } else {
             final String[] fields = attributeName.split(DEVICE_SEPARATOR);
-            final Database db = ApiUtil.get_db_obj();
             if (fields.length == 1) {
-                result = getfullDeviceNameForAttribute(db.get_attribute_from_alias(fields[0]));
+                result = getfullDeviceNameForAttribute(ApiUtil.get_db_obj().get_attribute_from_alias(fields[0]));
             } else if (fields.length == 2) {
-                result = db.get_device_from_alias(fields[0]);
+                result = ApiUtil.get_db_obj().get_device_from_alias(fields[0]);
             } else if (fields.length == 4) {
                 result = fields[0] + DEVICE_SEPARATOR + fields[1] + DEVICE_SEPARATOR + fields[2];
             } else {
@@ -377,7 +376,7 @@ public final class TangoUtil {
     }
 
     private static void checkNullOrEmptyString(final String s) throws DevFailed {
-        if ((s == null) || s.isEmpty()) {
+        if (s == null || s.isEmpty()) {
             DevFailedUtils.throwDevFailed("string is null or empty");
         }
     }
