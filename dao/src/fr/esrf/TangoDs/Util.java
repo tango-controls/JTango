@@ -138,7 +138,7 @@ public class Util implements TangoConst {
     private ORB orb;
     private POA _poa;
 
-    private final Vector cmd_line_name_list = new Vector();
+    private final Vector<String> cmd_line_name_list = new Vector<String>();
     private final Vector class_name_list = new Vector();
 
     static private int serial_model = BY_DEVICE;
