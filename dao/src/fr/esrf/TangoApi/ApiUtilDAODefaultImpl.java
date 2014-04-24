@@ -250,9 +250,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             // Initial timeout for establishing a connection.
             props.put("jacorb.connection.client.connect_timeout", "300");
 
-            // Set the Largest transfert.
+            // Set the Largest transfer.
             final String str = checkORBgiopMaxMsgSize();
-            // System.out.println("Set jacorb.maxManagedBufSize  to  " + str);
             props.put("jacorb.maxManagedBufSize", str);
 			
 			//	Check for max threads
@@ -263,6 +262,9 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             // Set jacorb verbosity at minimum value
             props.put("jacorb.config.log.verbosity", "0");
             props.put("jacorb.disableClientOrbPolicies", "off");
+
+            //  Add code set to jacorb.properties
+            props.put("jacorb.codeset", "true");
 
             //  Add directory to get jacorb.properties
             props.put("jacorb.config.dir", "fr/esrf/TangoApi/etc");
