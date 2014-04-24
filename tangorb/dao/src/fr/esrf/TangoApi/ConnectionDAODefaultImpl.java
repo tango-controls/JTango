@@ -803,7 +803,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.ior = null;
 	    	Except.throw_connection_failed(e.toString(), desc, origin);
 		} else {
-	    	System.out.println("API has catched an exception for " + origin + " : \n" + e);
+	    	System.out.println("API has caught an exception for " + origin + " : \n" + e);
 	    	desc = e.getMessage();
 	    	Except.throw_communication_failed(e.toString(), desc, origin);
 		}
