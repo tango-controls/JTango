@@ -249,7 +249,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
         if (!env.contains(":"))
             Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
                     "Unknown \"TANGO_HOST\" property " + env,
-                    "TangoUrl.TangoUrl()");
+                    "TangoUrl.setFromEnv()");
         String[] array = ApiUtil.parseTangoHost(env);
         host = array[0];
         strPort = array[1];

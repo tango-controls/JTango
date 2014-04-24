@@ -84,7 +84,6 @@ class AccessProxy extends DeviceProxy {
         forced = TangoEnv.isSuperTango();
         dev_right_table = new Hashtable<String, String>();
         allowed_cmd_table = new Hashtable<String, String[]>();
-        System.out.println(devname + " -> Forced to write access = " + forced);
 
         if (!forced) {
             set_transparency_reconnection(false);
