@@ -66,7 +66,7 @@ public class DeviceProxyFactory {
      *
      * @param deviceName Device name to be created or get.
      * @return the DeviceProxy object
-     * @throws DevFailed if DeviceProxy cration failed
+     * @throws DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName) throws DevFailed {
@@ -77,7 +77,11 @@ public class DeviceProxyFactory {
         else
             fullDeviceName = new TangoUrl(deviceName).toString().toLowerCase();
 
-        String tangoHost = ApiUtil.get_default_db_obj().getUrl().getTangoHost();
+        String tangoHost;
+        if (deviceName.contains("dbase=no"))
+            tangoHost = "";
+        else
+            tangoHost = ApiUtil.get_default_db_obj().getUrl().getTangoHost();
         return get(fullDeviceName, tangoHost);
     }
     //===================================================================
@@ -89,7 +93,7 @@ public class DeviceProxyFactory {
      * @param deviceName Device name to be created or get.
      * @param tangoHost to build the url (full device name).
      * @return the DeviceProxy object
-     * @throws DevFailed if DeviceProxy cration failed
+     * @throws DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName, String tangoHost) throws DevFailed {
