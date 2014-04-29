@@ -155,9 +155,12 @@ public final class StateResolver {
 
     public boolean isStarted() {
         boolean isStarted = true;
-        if (!isSynchronous && future != null) {
-            isStarted = !future.isDone();
+        if (priorityStateManager.getDeviceStateNumberArray().length == 0) {
+            isStarted = false;
         }
+//        if (!isSynchronous && future != null) {
+//            isStarted = !future.isDone();
+//        }
         return isStarted;
 
     }
