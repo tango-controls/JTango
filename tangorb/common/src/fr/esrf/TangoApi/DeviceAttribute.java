@@ -34,40 +34,66 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
 
 /**
  * Class Description: This class manage data object for Tango device attribute
- * access. <Br>
- * <Br>
- * <Br>
- * <b> Usage example: </b> <Br>
- * <ul>
- * <i> DeviceAttribute devattr = dev.read_attribute("Current"); <Br>
- * if (devattr.hasFailed())<Br>
- * {
- * <ul>
- * Except.print_exception(devattr.getErrStack());
- * </ul>
- * else <Br>
- * {
- * <ul>
- * double current = devattr.extractDouble(); <Br>
- * System.out.println("Current : " + current);
- * </ul>
- * </ul> </i>
- * 
+ * access. <br>
+ * <br>
+ * <br>
+ * <b> Usage example: </b> <br>
+ * <ul><i>
+ *   // Read "Current" attribute<br>
+ *   DeviceAttribute deviceAttribute = deviceProxy.read_attribute("Current"); <br>
+ *   if (deviceAttribute.hasFailed()) { <br>
+ *   <ul>
+ *      Except.print_exception(deviceAttribute.getErrStack());
+ *   </ul>
+ *   else { <br>
+ *   <ul>
+ *       // If attribute read is double<br>
+ *       int type = attribute.getType();<br>
+ *       if (type==TangoConst.Tango_DEV_DOUBLE) {<br>
+ *       <ul>
+ *          double current = deviceAttribute.extractDouble(); <br>
+ *          System.out.println("Current : " + current);<br>
+ *       </ul>
+ *       }<br>
+ *       else if (type==TangoConst.Tango_DEV_ENUM) {
+ *       <ul>
+ *          // If attribute read is an enum<br>
+ *          AttributeInfoEx   info = deviceProxy.get_attribute_info_ex(attributeName);<br>
+ *          short index = deviceAttribute.extractShort();<br>
+ *          System.out.println(info.getEnumLabel(index));<br>
+ *       </ul>
+ *       }<br>
+ *   </ul>
+ *   }
+ *   <br><br><br>
+ *
+ *   // To write an enum value, use a short value<br>
+ *   short  v = 2;<br>
+ *   deviceAttribute = new DeviceAttribute("EnumAttr");<br>
+ *   deviceAttribute.insert(v);<br>
+ *   deviceProxy.write_attribute(deviceAttribute);<br>
+ *   <br><br>
+ *   // Or declare an enum like:<br>
+ *   enum Numbers { ZERO(0), ONE(1), TWO(2}, THREE(3);<br>
+ *   <ul>
+ *       public short value;<br>
+ *       private Numbers(int value) {
+ *       <ul>
+ *           this.value = (short)value;
+ *       </ul>
+ *       }
+ *   </ul>
+ *   }<br>
+ *   - - - - - <br>
+ *   // And insert enum value <br>
+ *   deviceAttribute.insert(Numbers.TWO.value);<br>
+ * </ul></i>
+ *
  * @author verdier
  * @version $Revision$
  */
@@ -84,384 +110,320 @@ public class DeviceAttribute {
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval
-     *            AttributeValue_4 IDL object.
+     * @param attributeValue_5 AttributeValue_5 IDL object.
      */
     // ===========================================
-    public DeviceAttribute(final AttributeValue_4 attrval) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(attrval);
+    public DeviceAttribute(final AttributeValue_5 attributeValue_5) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(attributeValue_5);
+    }
+
+    // ===========================================
+    /**
+     * DeviceAttribute class constructor.
+     *
+     * @param attributeValue_4 AttributeValue_4 IDL object.
+     */
+    // ===========================================
+    public DeviceAttribute(final AttributeValue_4 attributeValue_4) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(attributeValue_4);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval
-     *            AttributeValue_3 IDL object.
+     * @param attributeValue_3 AttributeValue_3 IDL object.
      */
     // ===========================================
-    public DeviceAttribute(final AttributeValue_3 attrval) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(attrval);
+    public DeviceAttribute(final AttributeValue_3 attributeValue_3) {
+    	deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(attributeValue_3);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval
-     *            AttributeValue IDL object.
+     * @param attributeValue AttributeValue IDL object.
      */
     // ===========================================
-    public DeviceAttribute(final AttributeValue attrval) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(attrval);
+    public DeviceAttribute(final AttributeValue attributeValue) {
+	    deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+    	deviceattributeDAO.init(attributeValue);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
+     * @param name Attribute name.
      */
     // ===========================================
     public DeviceAttribute(final String name) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name);
+	    deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+    	deviceattributeDAO.init(name);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
     public DeviceAttribute(final String name, final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, dim_x, dim_y);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final boolean value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final DevState value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
-    public DeviceAttribute(final String name, final boolean[] value,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final boolean[] value, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final byte value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
-    public DeviceAttribute(final String name, final byte[] value,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final byte[] value, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final short value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x  array dimention in X
+     * @param dim_y  array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final short[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final short[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final int value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final int[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final int[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name  Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final long value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final long[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name, final long[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton() .getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final float value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final float[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final float[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final double value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final double[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final double[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param value
-     *            Attribute value.
+     * @param name Attribute name.
+     * @param value Attribute value.
      */
     // ===========================================
     public DeviceAttribute(final String name, final String value) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, value);
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, value);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param name
-     *            Attribute name.
-     * @param values
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param name Attribute name.
+     * @param values Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public DeviceAttribute(final String name, final String[] values,
-	    final int dim_x, final int dim_y) {
-	deviceattributeDAO = TangoFactory.getSingleton()
-		.getDeviceAttributeDAO();
-	deviceattributeDAO.init(name, values, dim_x, dim_y);
+    public DeviceAttribute(final String name,
+                           final String[] values, final int dim_x, final int dim_y) {
+        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceattributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     // ===========================================
     public boolean hasFailed() {
-	return deviceattributeDAO.hasFailed();
+        return deviceattributeDAO.hasFailed();
     }
 
     // ===========================================
@@ -470,31 +432,29 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevError[] getErrStack() {
-	return deviceattributeDAO.getErrStack();
+        return deviceattributeDAO.getErrStack();
     }
 
     // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
      * 
-     * @param attrval
-     *            AttributeValue_3 input object
+     * @param attributeValue3 AttributeValue_3 input object
      */
     // ===========================================
-    public void setAttributeValue(final AttributeValue_3 attrval) {
-	deviceattributeDAO.setAttributeValue(attrval);
+    public void setAttributeValue(final AttributeValue_3 attributeValue3) {
+        deviceattributeDAO.setAttributeValue(attributeValue3);
     }
 
     // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
      * 
-     * @param attrval
-     *            AttributeValue input object
+     * @param attributeValue AttributeValue input object
      */
     // ===========================================
-    public void setAttributeValue(final AttributeValue attrval) {
-	deviceattributeDAO.setAttributeValue(attrval);
+    public void setAttributeValue(final AttributeValue attributeValue) {
+        deviceattributeDAO.setAttributeValue(attributeValue);
     }
 
     // ===========================================
@@ -505,592 +465,526 @@ public class DeviceAttribute {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevState argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final DevState argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevState[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final DevState[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final DevState[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final DevState[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final boolean argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final boolean argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final boolean[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final boolean[] argIn) {
+	deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final boolean[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final boolean[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte argin) {
-	deviceattributeDAO.insert_uc(argin);
+    public void insert_uc(final byte argIn) {
+        deviceattributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte[] argin) {
-	deviceattributeDAO.insert_uc(argin);
+    public void insert_uc(final byte[] argIn) {
+        deviceattributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final short argin) {
-	deviceattributeDAO.insert_uc(argin);
+    public void insert_uc(final short argIn) {
+        deviceattributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final short[] argin) {
-	deviceattributeDAO.insert_uc(argin);
+    public void insert_uc(final short[] argIn) {
+        deviceattributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            nb data.in x direction
-     * @param dim_y
-     *            nb data.in y direction
+     * @param argIn Attribute values.
+     * @param dim_x nb data.in x direction
+     * @param dim_y nb data.in y direction
      */
     // ===========================================
-    public void insert_uc(final short[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_uc(argin, dim_x, dim_y);
+    public void insert_uc(final short[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_uc(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_uc(argin, dim_x, dim_y);
+    public void insert_uc(final byte[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_uc(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final short argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final short argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final short[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final short[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final short[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final short[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short argin) {
-	deviceattributeDAO.insert_us(argin);
+    public void insert_us(final short argIn) {
+        deviceattributeDAO.insert_us(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int argin) {
-	deviceattributeDAO.insert_us(argin);
+    public void insert_us(final int argIn) {
+        deviceattributeDAO.insert_us(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short[] argin) {
-	deviceattributeDAO.insert_us(argin);
+    public void insert_us(final short[] argIn) {
+        deviceattributeDAO.insert_us(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int[] argin) {
-	deviceattributeDAO.insert_us(argin);
+    public void insert_us(final int[] argIn) {
+        deviceattributeDAO.insert_us(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_us(argin, dim_x, dim_y);
+    public void insert_us(final short[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_us(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_us(argin, dim_x, dim_y);
+    public void insert_us(final int[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_us(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final int argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final int argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final int[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final int[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final int[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final int[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final long argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final long argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final long[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final long[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final long[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final long[] argIn, final int dim_x, final int dim_y) {
+	deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int argin) {
-	deviceattributeDAO.insert_ul(argin);
+    public void insert_ul(final int argIn) {
+        deviceattributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long argin) {
-	deviceattributeDAO.insert_ul(argin);
+    public void insert_ul(final long argIn) {
+        deviceattributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int[] argin) {
-	deviceattributeDAO.insert_ul(argin);
+    public void insert_ul(final int[] argIn) {
+        deviceattributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long[] argin) {
-	deviceattributeDAO.insert_ul(argin);
+    public void insert_ul(final long[] argIn) {
+        deviceattributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_ul(argin, dim_x, dim_y);
+    public void insert_ul(final int[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_ul(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_ul(argin, dim_x, dim_y);
+    public void insert_ul(final long[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_ul(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_u64(final long argin) {
-	deviceattributeDAO.insert_u64(argin);
+    public void insert_u64(final long argIn) {
+        deviceattributeDAO.insert_u64(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_u64(final long[] argin) {
-	deviceattributeDAO.insert_u64(argin);
+    public void insert_u64(final long[] argIn) {
+        deviceattributeDAO.insert_u64(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert_u64(final long[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert_u64(argin, dim_x, dim_y);
+    public void insert_u64(final long[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert_u64(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final float argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final float argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final float[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final float[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final float[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final float[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final double argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final double argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final double[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final double[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final double[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final double[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final String argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final String argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final String[] argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final String[] argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
-     * @param dim_x
-     *            array dimention in X
-     * @param dim_y
-     *            array dimention in Y
+     * @param argIn Attribute values.
+     * @param dim_x array dimention in X
+     * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final String[] argin, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argin, dim_x, dim_y);
+    public void insert(final String[] argIn, final int dim_x, final int dim_y) {
+        deviceattributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin
-     *            Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevEncoded argin) {
-	deviceattributeDAO.insert(argin);
+    public void insert(final DevEncoded argIn) {
+        deviceattributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -1104,7 +998,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState[] extractDevStateArray() throws DevFailed {
-	return deviceattributeDAO.extractDevStateArray();
+        return deviceattributeDAO.extractDevStateArray();
     }
 
     // ===========================================
@@ -1118,7 +1012,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState extractDevState() throws DevFailed {
-	return deviceattributeDAO.extractDevState();
+        return deviceattributeDAO.extractDevState();
     }
 
     // ===========================================
@@ -1132,7 +1026,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public boolean extractBoolean() throws DevFailed {
-	return deviceattributeDAO.extractBoolean();
+        return deviceattributeDAO.extractBoolean();
     }
 
     // ===========================================
@@ -1146,7 +1040,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public boolean[] extractBooleanArray() throws DevFailed {
-	return deviceattributeDAO.extractBooleanArray();
+        return deviceattributeDAO.extractBooleanArray();
     }
 
     // ===========================================
@@ -1160,7 +1054,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short extractUChar() throws DevFailed {
-	return deviceattributeDAO.extractUChar();
+        return deviceattributeDAO.extractUChar();
     }
 
     // ===========================================
@@ -1174,7 +1068,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short[] extractUCharArray() throws DevFailed {
-	return deviceattributeDAO.extractUCharArray();
+        return deviceattributeDAO.extractUCharArray();
     }
 
     // ===========================================
@@ -1188,7 +1082,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public byte[] extractCharArray() throws DevFailed {
-	return deviceattributeDAO.extractCharArray();
+        return deviceattributeDAO.extractCharArray();
     }
 
     // ===========================================
@@ -1202,7 +1096,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short extractShort() throws DevFailed {
-	return deviceattributeDAO.extractShort();
+        return deviceattributeDAO.extractShort();
     }
 
     // ===========================================
@@ -1216,7 +1110,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short[] extractShortArray() throws DevFailed {
-	return deviceattributeDAO.extractShortArray();
+        return deviceattributeDAO.extractShortArray();
     }
 
     // ===========================================
@@ -1230,7 +1124,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int extractUShort() throws DevFailed {
-	return deviceattributeDAO.extractUShort();
+        return deviceattributeDAO.extractUShort();
     }
 
     // ===========================================
@@ -1244,7 +1138,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int[] extractUShortArray() throws DevFailed {
-	return deviceattributeDAO.extractUShortArray();
+        return deviceattributeDAO.extractUShortArray();
     }
 
     // ===========================================
@@ -1258,7 +1152,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int extractLong() throws DevFailed {
-	return deviceattributeDAO.extractLong();
+        return deviceattributeDAO.extractLong();
     }
 
     // ===========================================
@@ -1272,7 +1166,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int[] extractLongArray() throws DevFailed {
-	return deviceattributeDAO.extractLongArray();
+        return deviceattributeDAO.extractLongArray();
     }
 
     // ===========================================
@@ -1286,7 +1180,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractULong() throws DevFailed {
-	return deviceattributeDAO.extractULong();
+        return deviceattributeDAO.extractULong();
     }
 
     // ===========================================
@@ -1300,7 +1194,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractULongArray() throws DevFailed {
-	return deviceattributeDAO.extractULongArray();
+        return deviceattributeDAO.extractULongArray();
     }
 
     // ===========================================
@@ -1314,7 +1208,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractLong64() throws DevFailed {
-	return deviceattributeDAO.extractLong64();
+        return deviceattributeDAO.extractLong64();
     }
 
     // ===========================================
@@ -1328,7 +1222,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractLong64Array() throws DevFailed {
-	return deviceattributeDAO.extractLong64Array();
+        return deviceattributeDAO.extractLong64Array();
     }
 
     // ===========================================
@@ -1342,7 +1236,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractULong64() throws DevFailed {
-	return deviceattributeDAO.extractULong64();
+        return deviceattributeDAO.extractULong64();
     }
 
     // ===========================================
@@ -1356,7 +1250,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractULong64Array() throws DevFailed {
-	return deviceattributeDAO.extractULong64Array();
+        return deviceattributeDAO.extractULong64Array();
     }
 
     // ===========================================
@@ -1384,7 +1278,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public float[] extractFloatArray() throws DevFailed {
-	return deviceattributeDAO.extractFloatArray();
+        return deviceattributeDAO.extractFloatArray();
     }
 
     // ===========================================
@@ -1398,7 +1292,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public double extractDouble() throws DevFailed {
-	return deviceattributeDAO.extractDouble();
+        return deviceattributeDAO.extractDouble();
     }
 
     // ===========================================
@@ -1412,7 +1306,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public double[] extractDoubleArray() throws DevFailed {
-	return deviceattributeDAO.extractDoubleArray();
+        return deviceattributeDAO.extractDoubleArray();
     }
 
     // ===========================================
@@ -1426,7 +1320,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState extractState() throws DevFailed {
-	return deviceattributeDAO.extractState();
+        return deviceattributeDAO.extractState();
     }
 
     // ===========================================
@@ -1440,7 +1334,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public String extractString() throws DevFailed {
-	return deviceattributeDAO.extractString();
+        return deviceattributeDAO.extractString();
     }
 
     // ===========================================
@@ -1454,7 +1348,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public String[] extractStringArray() throws DevFailed {
-	return deviceattributeDAO.extractStringArray();
+        return deviceattributeDAO.extractStringArray();
     }
 
     // ===========================================
@@ -1466,7 +1360,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttrQuality getQuality() throws DevFailed {
-	return deviceattributeDAO.getQuality();
+        return deviceattributeDAO.getQuality();
     }
 
     // ===========================================
@@ -1474,12 +1368,11 @@ public class DeviceAttribute {
      * extract method for a DevEncoded
      * 
      * @return the extracted value.
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public DevEncoded extractDevEncoded() throws DevFailed {
-	return deviceattributeDAO.extractDevEncoded();
+        return deviceattributeDAO.extractDevEncoded();
     }
 
     // ===========================================
@@ -1487,167 +1380,153 @@ public class DeviceAttribute {
      * extract method for a DevEncoded[]
      * 
      * @return the extracted value.
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public DevEncoded[] extractDevEncodedArray() throws DevFailed {
-	return deviceattributeDAO.extractDevEncodedArray();
+        return deviceattributeDAO.extractDevEncodedArray();
     }
 
     // ===========================================
     /**
-     * Return attribute data format (SCALR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
+     * Return attribute data format (SCALAR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public AttrDataFormat getDataFormat() throws DevFailed {
-	return deviceattributeDAO.getDataFormat();
+        return deviceattributeDAO.getDataFormat();
     }
 
     // ===========================================
     /**
      * Return attribute time value.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public TimeVal getTimeVal() throws DevFailed {
-	return deviceattributeDAO.getTimeVal();
+        return deviceattributeDAO.getTimeVal();
     }
 
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValSec() throws DevFailed {
-	return deviceattributeDAO.getTimeValSec();
+        return deviceattributeDAO.getTimeValSec();
     }
 
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
-	return deviceattributeDAO.getTimeValMillisSec();
+        return deviceattributeDAO.getTimeValMillisSec();
     }
 
     // ===========================================
     /**
      * Return attribute name.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public String getName() throws DevFailed {
-	return deviceattributeDAO.getName();
+        return deviceattributeDAO.getName();
     }
 
     // ===========================================
     /**
      * Return number of data read.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public int getNbRead() throws DevFailed {
-	return deviceattributeDAO.getNbRead();
+        return deviceattributeDAO.getNbRead();
     }
 
     // ===========================================
     /**
      * Return number of data read.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     public AttributeDim getReadAttributeDim() throws DevFailed {
-	return deviceattributeDAO.getReadAttributeDim();
+        return deviceattributeDAO.getReadAttributeDim();
     }
 
     // ===========================================
     /**
      * Return number of data write.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     public AttributeDim getWriteAttributeDim() throws DevFailed {
-	return deviceattributeDAO.getWriteAttributeDim();
+        return deviceattributeDAO.getWriteAttributeDim();
     }
 
     // ===========================================
     /**
      * Return number of data written.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public int getNbWritten() throws DevFailed {
-	return deviceattributeDAO.getNbWritten();
+        return deviceattributeDAO.getNbWritten();
     }
 
     // ===========================================
     /**
      * Return attribute dim_x.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public int getDimX() throws DevFailed {
-	return deviceattributeDAO.getDimX();
+        return deviceattributeDAO.getDimX();
     }
 
     // ===========================================
     /**
      * Return attribute dim_y.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public int getDimY() throws DevFailed {
-	return deviceattributeDAO.getDimY();
+        return deviceattributeDAO.getDimY();
     }
 
     // ===========================================
     /**
      * Return attribute written dim_x.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public int getWrittenDimX() throws DevFailed {
-	return deviceattributeDAO.getWrittenDimX();
+        return deviceattributeDAO.getWrittenDimX();
     }
 
     // ===========================================
     /**
      * Return attribute written dim_y.
      * 
-     * @throws DevFailed
-     *             in case of read_attribute failed
+     * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
     public int getWrittenDimY() throws DevFailed {
-	return deviceattributeDAO.getWrittenDimY();
+        return deviceattributeDAO.getWrittenDimY();
     }
 
     // ===========================================
@@ -1658,7 +1537,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue getAttributeValueObject_2() throws DevFailed {
-	return deviceattributeDAO.getAttributeValueObject_2();
+        return deviceattributeDAO.getAttributeValueObject_2();
     }
 
     // ===========================================
@@ -1669,7 +1548,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue_3 getAttributeValueObject_3() throws DevFailed {
-	return deviceattributeDAO.getAttributeValueObject_3();
+        return deviceattributeDAO.getAttributeValueObject_3();
     }
 
     // ===========================================
@@ -1678,7 +1557,16 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue_4 getAttributeValueObject_4() {
-	return deviceattributeDAO.getAttributeValueObject_4();
+        return deviceattributeDAO.getAttributeValueObject_4();
+    }
+
+    // ===========================================
+    /**
+     * Return AttributeValue IDL object.
+     */
+    // ===========================================
+    public AttributeValue_5 getAttributeValueObject_5() {
+        return deviceattributeDAO.getAttributeValueObject_5();
     }
 
     // ===========================================
@@ -1690,18 +1578,18 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long getTime() throws DevFailed {
-	return deviceattributeDAO.getTime();
+        return deviceattributeDAO.getTime();
     }
 
     // ===========================================
     // ===========================================
     public int getType() throws DevFailed {
-	return deviceattributeDAO.getType();
+        return deviceattributeDAO.getType();
     }
 
     // ===========================================
     // ===========================================
     public IDeviceAttributeDAO getDeviceattributeDAO() {
-	return deviceattributeDAO;
+        return deviceattributeDAO;
     }
 }

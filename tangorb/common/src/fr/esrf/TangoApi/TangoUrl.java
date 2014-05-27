@@ -67,15 +67,16 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
      * Object Constructor.
      *
      * @throws fr.esrf.Tango.DevFailed in case of problem to find TANGO_HOST
-     * @param    urlstr    url string to connect.
+     * @param    urlStr    url string to connect.
      */
     //===================================================================
-    public TangoUrl(String urlstr) throws DevFailed {
+    public TangoUrl(String urlStr) throws DevFailed {
+
         //	Get TACO/TANGO protocol
         int idx;
-        if ((idx = urlstr.indexOf(protocol_name[TANGO] + ":")) >= 0)
+        if ((idx = urlStr.indexOf(protocol_name[TANGO] + ":")) >= 0)
             protocol = TANGO;
-        else if ((idx = urlstr.indexOf(protocol_name[TACO] + ":")) >= 0) {
+        else if ((idx = urlStr.indexOf(protocol_name[TACO] + ":")) >= 0) {
             protocol = TACO;
             use_db = false;
         }
@@ -85,36 +86,36 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
             idx = len = 0;
         else
             len = protocol_name[protocol].length() + 1;
-        String new_urlstr =
-                "http:" + urlstr.substring(idx + len);
+        String newUrlStr =
+                "http:" + urlStr.substring(idx + len);
 
         //	Build URL object
         URL url = null;
         try {
-            url = new URL(new_urlstr);
+            url = new URL(newUrlStr);
         } catch (MalformedURLException e) {
             //	Check if malformed due to multi TANGO_HOST
             boolean ok = false;
-            int comma = new_urlstr.indexOf(",");
+            int comma = newUrlStr.indexOf(",");
             if (comma > 0) {
                 //	parse TANGO_HOST part
-                int start = new_urlstr.indexOf("//");
+                int start = newUrlStr.indexOf("//");
                 if (start >= 0) {
                     start += 2;
-                    int end = new_urlstr.indexOf("/", start);
+                    int end = newUrlStr.indexOf("/", start);
 
                     if (end < 0)    //	no device name
-                        end = new_urlstr.length();
+                        end = newUrlStr.length();
 
                     if (end > start) {
                         String[] array =
-                                ApiUtil.parseTangoHost(new_urlstr.substring(start, end));
+                                ApiUtil.parseTangoHost(newUrlStr.substring(start, end));
                         host = array[0];
                         strPort = array[1];
                         port = Integer.parseInt(strPort);
                         //	If OK remove multi tango host before retrying URL constructor
-                        String tmp = new_urlstr.substring(0, comma) +
-                                new_urlstr.substring(end);
+                        String tmp = newUrlStr.substring(0, comma) +
+                                newUrlStr.substring(end);
                         try {
                             url = new URL(tmp);
                             ok = true;
@@ -211,7 +212,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
             if (host!=null)
                 host = getCanonicalName(host);
         }
-        //trace(urlstr);
+        //trace(urlStr);
     }
     //===================================================================
     /**
