@@ -4,7 +4,7 @@ package fr.esrf.Tango;
  * Generated from IDL alias "DevErrorListList".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class DevErrorListListHelper
@@ -48,19 +48,19 @@ public final class DevErrorListListHelper
 	public static fr.esrf.Tango.DevError[][] read (final org.omg.CORBA.portable.InputStream _in)
 	{
 		fr.esrf.Tango.DevError[][] _result;
-		int _l_result29 = _in.read_long();
+		int _l_result30 = _in.read_long();
 		try
 		{
 			 int x = _in.available();
-			 if ( x > 0 && _l_result29 > x )
+			 if ( x > 0 && _l_result30 > x )
 				{
-					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result29);
+					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result30);
 				}
 		}
 		catch (java.io.IOException e)
 		{
 		}
-		_result = new fr.esrf.Tango.DevError[_l_result29][];
+		_result = new fr.esrf.Tango.DevError[_l_result30][];
 		for (int i=0;i<_result.length;i++)
 		{
 			_result[i] = fr.esrf.Tango.DevErrorListHelper.read(_in);

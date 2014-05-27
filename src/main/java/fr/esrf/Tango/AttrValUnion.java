@@ -4,7 +4,7 @@ package fr.esrf.Tango;
  * Generated from IDL union "AttrValUnion".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttrValUnion
@@ -220,14 +220,14 @@ public final class AttrValUnion
 
 	public boolean union_no_data ()
 	{
-		if (discriminator != fr.esrf.Tango.AttributeDataType.NO_DATA)
+		if (discriminator != fr.esrf.Tango.AttributeDataType.ATT_NO_DATA)
 			throw new org.omg.CORBA.BAD_OPERATION();
 		return union_no_data;
 	}
 
 	public void union_no_data (boolean _x)
 	{
-		discriminator = fr.esrf.Tango.AttributeDataType.NO_DATA;
+		discriminator = fr.esrf.Tango.AttributeDataType.ATT_NO_DATA;
 		union_no_data = _x;
 	}
 

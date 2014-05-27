@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "AttDataReady".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttDataReadyHelper
@@ -66,8 +66,8 @@ public final class AttDataReadyHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.AttDataReady s)
 	{
-		java.lang.String tmpResult73 = s.name;
-out.write_string( tmpResult73 );
+		java.lang.String tmpResult75 = s.name;
+out.write_string( tmpResult75 );
 		out.write_long(s.data_type);
 		out.write_long(s.ctr);
 	}

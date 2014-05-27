@@ -3,7 +3,7 @@ package fr.esrf.Tango;
  * Generated from IDL enum "AttributeDataType".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttributeDataType
@@ -40,8 +40,8 @@ public final class AttributeDataType
 	public static final AttributeDataType DEVICE_STATE = new AttributeDataType(_DEVICE_STATE);
 	public static final int _ATT_ENCODED = 13;
 	public static final AttributeDataType ATT_ENCODED = new AttributeDataType(_ATT_ENCODED);
-	public static final int _NO_DATA = 14;
-	public static final AttributeDataType NO_DATA = new AttributeDataType(_NO_DATA);
+	public static final int _ATT_NO_DATA = 14;
+	public static final AttributeDataType ATT_NO_DATA = new AttributeDataType(_ATT_NO_DATA);
 	public int value()
 	{
 		return value;
@@ -63,7 +63,7 @@ public final class AttributeDataType
 			case _ATT_STATE: return ATT_STATE;
 			case _DEVICE_STATE: return DEVICE_STATE;
 			case _ATT_ENCODED: return ATT_ENCODED;
-			case _NO_DATA: return NO_DATA;
+			case _ATT_NO_DATA: return ATT_NO_DATA;
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
@@ -84,7 +84,7 @@ public final class AttributeDataType
 			case _ATT_STATE: return "ATT_STATE";
 			case _DEVICE_STATE: return "DEVICE_STATE";
 			case _ATT_ENCODED: return "ATT_ENCODED";
-			case _NO_DATA: return "NO_DATA";
+			case _ATT_NO_DATA: return "ATT_NO_DATA";
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}

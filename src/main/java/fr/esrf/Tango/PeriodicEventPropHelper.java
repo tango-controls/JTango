@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "PeriodicEventProp".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class PeriodicEventPropHelper
@@ -65,8 +65,8 @@ public final class PeriodicEventPropHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.PeriodicEventProp s)
 	{
-		java.lang.String tmpResult43 = s.period;
-out.write_string( tmpResult43 );
+		java.lang.String tmpResult44 = s.period;
+out.write_string( tmpResult44 );
 		fr.esrf.Tango.DevVarStringArrayHelper.write(out,s.extensions);
 	}
 }

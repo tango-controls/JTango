@@ -3,7 +3,7 @@ package fr.esrf.Tango;
  * Generated from IDL enum "DispLevel".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class DispLevel
@@ -16,6 +16,8 @@ public final class DispLevel
 	public static final DispLevel OPERATOR = new DispLevel(_OPERATOR);
 	public static final int _EXPERT = 1;
 	public static final DispLevel EXPERT = new DispLevel(_EXPERT);
+	public static final int _DL_UNKNOWN = 2;
+	public static final DispLevel DL_UNKNOWN = new DispLevel(_DL_UNKNOWN);
 	public int value()
 	{
 		return value;
@@ -25,6 +27,7 @@ public final class DispLevel
 		switch (value) {
 			case _OPERATOR: return OPERATOR;
 			case _EXPERT: return EXPERT;
+			case _DL_UNKNOWN: return DL_UNKNOWN;
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
@@ -33,6 +36,7 @@ public final class DispLevel
 		switch (value) {
 			case _OPERATOR: return "OPERATOR";
 			case _EXPERT: return "EXPERT";
+			case _DL_UNKNOWN: return "DL_UNKNOWN";
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
