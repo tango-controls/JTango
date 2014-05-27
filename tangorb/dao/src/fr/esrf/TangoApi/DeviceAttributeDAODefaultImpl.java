@@ -34,115 +34,89 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttrValUnion;
-import fr.esrf.Tango.AttributeDataType;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 
-/**
- * Class Description: This class manage data object for Tango device attribute
- * access. <Br>
- * <Br>
- * <Br>
- * <b> Usage example: </b> <Br>
- * <ul>
- * <i> DeviceAttribute devattr = dev.read_attribute("Current"); <Br>
- * if (devattr.hasFailed())<Br>
- * {
- * <ul>
- * Except.print_exception(devattr.getErrStack());
- * </ul>
- * else <Br>
- * {
- * <ul>
- * double current = devattr.extractDouble(); <Br>
- * System.out.println("Current : " + current);
- * </ul>
- * </ul></i>
- * 
- * @author verdier
- * @version $Revision$
- */
-
 public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
-    private AttributeValue_4 attrval = new AttributeValue_4();
-    private DeviceAttribute_3 devAtt_3 = null;
+    private AttributeValue_5 attributeValue_5 = new AttributeValue_5();
+    private DeviceAttribute_3 deviceAttribute_3 = null;
     private boolean use_union = true; // since IDL 4
 
     // ===========================================
     /**
      * Build a DeviceAttribute IDL object
      * 
-     * @param name
-     *            Attribute name.
+     * @param name Attribute name.
      */
     // ===========================================
     private void buildAttributeValueObject(final String name) {
-	attrval.name = name;
-	attrval.quality = AttrQuality.ATTR_VALID;
-	attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-	attrval.time = new TimeVal();
-	attrval.r_dim = new AttributeDim();
-	attrval.w_dim = new AttributeDim();
-	attrval.r_dim.dim_x = 1;
-	attrval.r_dim.dim_y = 0;
-	attrval.w_dim.dim_x = 0;
-	attrval.w_dim.dim_y = 0;
+        attributeValue_5.name = name;
+        attributeValue_5.quality = AttrQuality.ATTR_VALID;
+        attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+        attributeValue_5.time = new TimeVal();
+        attributeValue_5.r_dim = new AttributeDim();
+        attributeValue_5.w_dim = new AttributeDim();
+        attributeValue_5.r_dim.dim_x = 1;
+        attributeValue_5.r_dim.dim_y = 0;
+        attributeValue_5.w_dim.dim_x = 0;
+        attributeValue_5.w_dim.dim_y = 0;
 
-	attrval.value = new AttrValUnion();
+        attributeValue_5.value = new AttrValUnion();
 
-	final long now = System.currentTimeMillis();
-	attrval.time.tv_sec = (int) (now / 1000);
-	attrval.time.tv_usec = (int) (now - attrval.time.tv_sec * 1000) * 1000;
-	attrval.time.tv_nsec = 0;
-	attrval.err_list = new DevError[0];
+        final long now = System.currentTimeMillis();
+        attributeValue_5.time.tv_sec = (int) (now / 1000);
+        attributeValue_5.time.tv_usec = (int) (now - attributeValue_5.time.tv_sec * 1000) * 1000;
+        attributeValue_5.time.tv_nsec = 0;
+        attributeValue_5.err_list = new DevError[0];
     }
 
     public DeviceAttributeDAODefaultImpl() {
     }
 
+
     // ===========================================
     /**
      * DeviceAttribute class constructor.
-     * 
-     * @param attrval AttributeValue_4 IDL object.
+     *
+     * @param attributeValue_5 AttributeValue_5 IDL object.
      */
     // ===========================================
-    public void init(final AttributeValue_4 attrval) {
-		this.attrval = attrval;
+    public void init(AttributeValue_5 attributeValue_5) {
+        this.attributeValue_5 = attributeValue_5;
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval_3 AttributeValue_3 IDL object.
+     * @param attributeValue_4 AttributeValue_4 IDL object.
      */
     // ===========================================
-    public void init(final AttributeValue_3 attrval_3) {
-		setAttributeValue(attrval_3);
+    public void init(final AttributeValue_4 attributeValue_4) {
+		setAttributeValue(attributeValue_4);
     }
 
     // ===========================================
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval_2 AttributeValue IDL object.
+     * @param attributeValue_3 AttributeValue_3 IDL object.
      */
     // ===========================================
-    public void init(final AttributeValue attrval_2) {
-		setAttributeValue(attrval_2);
+    public void init(final AttributeValue_3 attributeValue_3) {
+		setAttributeValue(attributeValue_3);
+    }
+
+    // ===========================================
+    /**
+     * DeviceAttribute class constructor.
+     * 
+     * @param attributeValue AttributeValue IDL object.
+     */
+    // ===========================================
+    public void init(final AttributeValue attributeValue) {
+		setAttributeValue(attributeValue);
     }
 
     // ===========================================
@@ -167,8 +141,8 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public void init(final String name, final int dim_x, final int dim_y) {
 		buildAttributeValueObject(name);
-		attrval.r_dim.dim_x = dim_x;
-		attrval.r_dim.dim_y = dim_y;
+		attributeValue_5.r_dim.dim_x = dim_x;
+		attributeValue_5.r_dim.dim_y = dim_y;
     }
 
     // ===========================================
@@ -415,7 +389,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     // ===========================================
     public boolean hasFailed() {
-		return attrval.err_list != null && attrval.err_list.length > 0;
+		return attributeValue_5.err_list != null && attributeValue_5.err_list.length > 0;
     }
 
     // ===========================================
@@ -424,75 +398,82 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public DevError[] getErrStack() {
-		return attrval.err_list;
+		return attributeValue_5.err_list;
     }
 
     // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
      * 
-     * @param attrval
-     *            AttributeValue_4 input object
+     * @param attributeValue_4 AttributeValue_4 input object
      */
     // ===========================================
-    public void setAttributeValue(final AttributeValue_4 attrval) {
-		this.attrval = attrval;
+    public void setAttributeValue(final AttributeValue_4 attributeValue_4) {
+        use_union = true;
+        attributeValue_5.name = attributeValue_4.name;
+        attributeValue_5.value = attributeValue_4.value;
+        attributeValue_5.quality = attributeValue_4.quality;
+        attributeValue_5.time = attributeValue_4.time;
+        attributeValue_5.r_dim = attributeValue_4.r_dim;
+        attributeValue_5.w_dim = attributeValue_4.w_dim;
+        attributeValue_5.err_list = attributeValue_4.err_list;
+        attributeValue_5.data_format = attributeValue_4.data_format;
     }
 
     // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
      * 
-     * @param attrval_3 AttributeValue_3 input object
+     * @param attributeValue_3 AttributeValue_3 input object
      */
     // ===========================================
-    public void setAttributeValue(final AttributeValue_3 attrval_3) {
-		devAtt_3 = new DeviceAttribute_3(attrval_3);
+    public void setAttributeValue(final AttributeValue_3 attributeValue_3) {
+		deviceAttribute_3 = new DeviceAttribute_3(attributeValue_3);
 		use_union = false;
 
-		attrval.name = attrval_3.name;
-		attrval.quality = attrval_3.quality;
-		attrval.time = attrval_3.time;
-		attrval.r_dim = attrval_3.r_dim;
-		attrval.w_dim = attrval_3.w_dim;
-		attrval.err_list = attrval_3.err_list;
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.name = attributeValue_3.name;
+		attributeValue_5.quality = attributeValue_3.quality;
+		attributeValue_5.time = attributeValue_3.time;
+		attributeValue_5.r_dim = attributeValue_3.r_dim;
+		attributeValue_5.w_dim = attributeValue_3.w_dim;
+		attributeValue_5.err_list = attributeValue_3.err_list;
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
     }
 
     // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
      * 
-     * @param attrval_2 AttributeValue input object
+     * @param attributeValue AttributeValue input object
      */
     // ===========================================
-    public void setAttributeValue(final AttributeValue attrval_2) {
-		devAtt_3 = new DeviceAttribute_3(attrval_2);
+    public void setAttributeValue(final AttributeValue attributeValue) {
+		deviceAttribute_3 = new DeviceAttribute_3(attributeValue);
 		use_union = false;
-		attrval.name = attrval_2.name;
-		attrval.quality = attrval_2.quality;
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.time = attrval_2.time;
+		attributeValue_5.name = attributeValue.name;
+		attributeValue_5.quality = attributeValue.quality;
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.time = attributeValue.time;
 
-		attrval.r_dim = new AttributeDim();
-		attrval.w_dim = new AttributeDim();
-		attrval.r_dim.dim_x = attrval_2.dim_x;
-		attrval.r_dim.dim_y = attrval_2.dim_y;
-		attrval.w_dim.dim_x = 0;
-		attrval.w_dim.dim_y = 0;
-		attrval.err_list = null;
+		attributeValue_5.r_dim = new AttributeDim();
+		attributeValue_5.w_dim = new AttributeDim();
+		attributeValue_5.r_dim.dim_x = attributeValue.dim_x;
+		attributeValue_5.r_dim.dim_y = attributeValue.dim_y;
+		attributeValue_5.w_dim.dim_x = 0;
+		attributeValue_5.w_dim.dim_y = 0;
+		attributeValue_5.err_list = null;
     }
 
     // ===========================================
     // ===========================================
     public AttributeDim getReadAttributeDim() {
-		return attrval.r_dim;
+		return attributeValue_5.r_dim;
     }
 
     // ===========================================
     // ===========================================
     public AttributeDim getWriteAttributeDim() {
-		return attrval.w_dim;
+		return attributeValue_5.w_dim;
     }
 
     // ===========================================
@@ -503,19 +484,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevState argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+    public void insert(final DevState argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
 		final DevState[] values = new DevState[1];
-		values[0] = argin;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+		values[0] = argIn;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.state_att_value(values);
+	    	attributeValue_5.value.state_att_value(values);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -523,17 +504,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevState[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final DevState[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.state_att_value(argin);
+	    	attributeValue_5.value.state_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -541,19 +522,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final DevState[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final DevState[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.state_att_value(argin);
+	    	attributeValue_5.value.state_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
    	}
 
@@ -561,19 +542,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final boolean argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+    public void insert(final boolean argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
 		final boolean[] values = new boolean[1];
-		values[0] = argin;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+		values[0] = argIn;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.bool_att_value(values);
+	    	attributeValue_5.value.bool_att_value(values);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -581,17 +562,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final boolean[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final boolean[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.bool_att_value(argin);
+	    	attributeValue_5.value.bool_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -599,19 +580,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final boolean[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final boolean[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.bool_att_value(argin);
+	    	attributeValue_5.value.bool_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -619,18 +600,18 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final byte[] values = new byte[] { argin };
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+    public void insert_uc(final byte argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final byte[] values = new byte[] { argIn };
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(values);
+	    	attributeValue_5.value.uchar_att_value(values);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -638,17 +619,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert_uc(final byte[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(argin);
+	    	attributeValue_5.value.uchar_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -656,18 +637,18 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final short argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final byte[] values = new byte[] { (byte) (argin & 0xFF) };
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+    public void insert_uc(final short argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final byte[] values = new byte[] { (byte) (argIn & 0xFF) };
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(values);
+	    	attributeValue_5.value.uchar_att_value(values);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -675,21 +656,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final short[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final byte[] values = new byte[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (byte) (argin[i] & 0xFF);
+    public void insert_uc(final short[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final byte[] values = new byte[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (byte) (argIn[i] & 0xFF);
 		}
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(values);
+	    	attributeValue_5.value.uchar_att_value(values);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -697,23 +678,23 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x nb data.in x direction
      * @param dim_y nb data.in y direction
      */
     // ===========================================
-    public void insert_uc(final short[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final byte[] values = new byte[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (byte) (argin[i] & 0xFF);
+    public void insert_uc(final short[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final byte[] values = new byte[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (byte) (argIn[i] & 0xFF);
 		}
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(values);
+	    	attributeValue_5.value.uchar_att_value(values);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -721,17 +702,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_uc(final byte[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert_uc(final byte[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.uchar_att_value(argin);
+	    	attributeValue_5.value.uchar_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_uc(argin);
+	    	deviceAttribute_3.insert_uc(argIn);
 		}
     }
 
@@ -739,31 +720,31 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final short argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		insert(new short[] { argin });
+    public void insert(final short argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		insert(new short[] { argIn });
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final short[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final short[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.short_att_value(argin);
+	    	attributeValue_5.value.short_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -771,19 +752,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final short[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final short[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.short_att_value(argin);
+	    	attributeValue_5.value.short_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -791,18 +772,18 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final short[] values = new short[] { argin };
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+    public void insert_us(final short argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final short[] values = new short[] { argIn };
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(values);
+	    	attributeValue_5.value.ushort_att_value(values);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
    	}
 
@@ -810,18 +791,18 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final short[] values = new short[] { (short) (argin & 0xFFFF) };
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+    public void insert_us(final int argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final short[] values = new short[] { (short) (argIn & 0xFFFF) };
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(values);
+	    	attributeValue_5.value.ushort_att_value(values);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
     }
 
@@ -829,17 +810,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert_us(final short[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(argin);
+	    	attributeValue_5.value.ushort_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
     }
 
@@ -847,21 +828,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final short[] values = new short[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (short) (argin[i] & 0xFFFF);
+    public void insert_us(final int[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final short[] values = new short[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (short) (argIn[i] & 0xFFFF);
 		}
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(values);
+	    	attributeValue_5.value.ushort_att_value(values);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
     }
 
@@ -869,17 +850,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final short[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert_us(final short[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(argin);
+	    	attributeValue_5.value.ushort_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
     }
 
@@ -887,21 +868,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_us(final int[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final short[] values = new short[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (short) (argin[i] & 0xFFFF);
+    public void insert_us(final int[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final short[] values = new short[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (short) (argIn[i] & 0xFFFF);
 		}
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.ushort_att_value(values);
+	    	attributeValue_5.value.ushort_att_value(values);
 		} else {
-	    	devAtt_3.insert_us(argin);
+	    	deviceAttribute_3.insert_us(argIn);
 		}
     }
 
@@ -909,31 +890,31 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final int argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		insert(new int[] { argin });
+    public void insert(final int argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		insert(new int[] { argIn });
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final int[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final int[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.long_att_value(argin);
+	    	attributeValue_5.value.long_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -941,19 +922,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final int[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final int[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.long_att_value(argin);
+	    	attributeValue_5.value.long_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -961,31 +942,31 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final long argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		insert(new long[] { argin });
+    public void insert(final long argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		insert(new long[] { argIn });
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final long[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final long[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.long64_att_value(argin);
+	    	attributeValue_5.value.long64_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -993,19 +974,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final long[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final long[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.long64_att_value(argin);
+	    	attributeValue_5.value.long64_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1013,19 +994,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+    public void insert_ul(final int argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
 		final int[] values = new int[1];
-		values[0] = argin;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+		values[0] = argIn;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(values);
+	    	attributeValue_5.value.ulong_att_value(values);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1033,19 +1014,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values as unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+    public void insert_ul(final long argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
 		final int[] values = new int[1];
-		values[0] = (int) argin;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+		values[0] = (int) argIn;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(values);
+	    	attributeValue_5.value.ulong_att_value(values);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1053,17 +1034,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert_ul(final int[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(argin);
+	    	attributeValue_5.value.ulong_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1071,21 +1052,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final int[] values = new int[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (int) argin[i];
+    public void insert_ul(final long[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final int[] values = new int[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (int) argIn[i];
 		}
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(values);
+	    	attributeValue_5.value.ulong_att_value(values);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1093,17 +1074,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final int[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert_ul(final int[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(argin);
+	    	attributeValue_5.value.ulong_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1111,21 +1092,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute valuesas unsigned.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_ul(final long[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		final int[] values = new int[argin.length];
-		for (int i = 0; i < argin.length; i++) {
-	    	values[i] = (int) argin[i];
+    public void insert_ul(final long[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		final int[] values = new int[argIn.length];
+		for (int i = 0; i < argIn.length; i++) {
+	    	values[i] = (int) argIn[i];
 		}
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.ulong_att_value(values);
+	    	attributeValue_5.value.ulong_att_value(values);
 		} else {
-	    	devAtt_3.insert_ul(argin);
+	    	deviceAttribute_3.insert_ul(argIn);
 		}
     }
 
@@ -1133,19 +1114,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_u64(final long argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
+    public void insert_u64(final long argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
 		final long[] values = new long[1];
-		values[0] = argin;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+		values[0] = argIn;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong64_att_value(values);
+	    	attributeValue_5.value.ulong64_att_value(values);
 		} else {
-	    	devAtt_3.insert_u64(argin);
+	    	deviceAttribute_3.insert_u64(argIn);
 		}
     }
 
@@ -1153,17 +1134,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert_u64(final long[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert_u64(final long[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.ulong64_att_value(argin);
+	    	attributeValue_5.value.ulong64_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_u64(argin);
+	    	deviceAttribute_3.insert_u64(argIn);
 		}
     }
 
@@ -1171,19 +1152,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert_u64(final long[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert_u64(final long[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.ulong64_att_value(argin);
+	    	attributeValue_5.value.ulong64_att_value(argIn);
 		} else {
-	    	devAtt_3.insert_u64(argin);
+	    	deviceAttribute_3.insert_u64(argIn);
 		}
     }
 
@@ -1191,17 +1172,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final float argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final float argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.float_att_value(new float[] { argin });
+	    	attributeValue_5.value.float_att_value(new float[] { argIn });
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1209,17 +1190,17 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final float[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final float[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.float_att_value(argin);
+	    	attributeValue_5.value.float_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1227,19 +1208,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final float[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final float[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.float_att_value(argin);
+	    	attributeValue_5.value.float_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1247,31 +1228,31 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final double argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		insert(new double[] { argin });
+    public void insert(final double argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		insert(new double[] { argIn });
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final double[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final double[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.double_att_value(argin);
+	    	attributeValue_5.value.double_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1279,19 +1260,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final double[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final double[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.double_att_value(argin);
+	    	attributeValue_5.value.double_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
    	}
 
@@ -1299,31 +1280,31 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final String argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		insert(new String[] { argin });
+    public void insert(final String argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		insert(new String[] { argIn });
     }
 
     // ===========================================
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final String[] argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = argin.length;
-		attrval.w_dim.dim_y = 0;
+    public void insert(final String[] argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = argIn.length;
+		attributeValue_5.w_dim.dim_y = 0;
 		if (use_union) {
-	    	attrval.value.string_att_value(argin);
+	    	attributeValue_5.value.string_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1331,19 +1312,19 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
      */
     // ===========================================
-    public void insert(final String[] argin, final int dim_x, final int dim_y) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.w_dim.dim_x = dim_x;
-		attrval.w_dim.dim_y = dim_y;
+    public void insert(final String[] argIn, final int dim_x, final int dim_y) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.w_dim.dim_x = dim_x;
+		attributeValue_5.w_dim.dim_y = dim_y;
 		if (use_union) {
-	    	attrval.value.string_att_value(argin);
+	    	attributeValue_5.value.string_att_value(argIn);
 		} else {
-	    	devAtt_3.insert(argin);
+	    	deviceAttribute_3.insert(argIn);
 		}
     }
 
@@ -1351,16 +1332,16 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     /**
      * Insert method for attribute values.
      * 
-     * @param argin Attribute values.
+     * @param argIn Attribute values.
      */
     // ===========================================
-    public void insert(final DevEncoded argin) {
-		attrval.data_format = AttrDataFormat.FMT_UNKNOWN;
-		attrval.err_list = new DevError[0]; // ?? Only for DevEncoded, else
+    public void insert(final DevEncoded argIn) {
+		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
+		attributeValue_5.err_list = new DevError[0]; // ?? Only for DevEncoded, else
 		// (NullPointerException)
-		attrval.w_dim.dim_x = 1;
-		attrval.w_dim.dim_y = 0;
-		attrval.value.encoded_att_value(new DevEncoded[] { argin });
+		attributeValue_5.w_dim.dim_x = 1;
+		attributeValue_5.w_dim.dim_y = 0;
+		attributeValue_5.value.encoded_att_value(new DevEncoded[] { argIn });
     }
 
     // ===========================================
@@ -1371,13 +1352,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     private void manageExceptions(final String method_name, boolean onQuality) throws DevFailed {
-		if (attrval.err_list != null) {
-	    	if (attrval.err_list.length > 0) {
-				throw new WrongData(attrval.err_list);
+		if (attributeValue_5.err_list != null) {
+	    	if (attributeValue_5.err_list.length > 0) {
+				throw new WrongData(attributeValue_5.err_list);
 	    	}
 		}
 		if (onQuality) {
-			if (attrval.quality == AttrQuality.ATTR_INVALID) {
+			if (attributeValue_5.quality == AttrQuality.ATTR_INVALID) {
 	    		Except.throw_wrong_data_exception("AttrQuality_ATTR_INVALID",
 		    		"Attribute quality factor is INVALID", "DeviceAttribute."
 			    		+ method_name + "()");
@@ -1404,13 +1385,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		try {
 	    	if (use_union) {
 			// Check if saclar (State attribute itself !)
-			if (attrval.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
-		    	return new DevState[] { attrval.value.dev_state_att() };
+			if (attributeValue_5.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
+		    	return new DevState[] { attributeValue_5.value.dev_state_att() };
 			} else {
-		    	return attrval.value.state_att_value();
+		    	return attributeValue_5.value.state_att_value();
 			}
 	    	} else {
-				return devAtt_3.extractDevStateArray();
+				return deviceAttribute_3.extractDevStateArray();
 	    	}
 		} catch (final org.omg.CORBA.BAD_PARAM e) {
 	    	Except
@@ -1438,13 +1419,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		manageExceptions("extractDevState");
 		if (use_union) {
 	    	// Check if saclar (State attribute itself !)
-	    	if (attrval.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
-			return attrval.value.dev_state_att();
+	    	if (attributeValue_5.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
+			return attributeValue_5.value.dev_state_att();
 	    	} else {
-			return attrval.value.state_att_value()[0];
+			return attributeValue_5.value.state_att_value()[0];
 	    	}
 		} else {
-	    	return devAtt_3.extractDevState();
+	    	return deviceAttribute_3.extractDevState();
 		}
     }
 
@@ -1460,9 +1441,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public boolean extractBoolean() throws DevFailed {
 		manageExceptions("extractBoolean()");
 		if (use_union) {
-	    	return attrval.value.bool_att_value()[0];
+	    	return attributeValue_5.value.bool_att_value()[0];
 		} else {
-	    	return devAtt_3.extractBoolean();
+	    	return deviceAttribute_3.extractBoolean();
 		}
     }
 
@@ -1478,9 +1459,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public boolean[] extractBooleanArray() throws DevFailed {
 		manageExceptions("extractBooleanArray()");
 		if (use_union) {
-	    	return attrval.value.bool_att_value();
+	    	return attributeValue_5.value.bool_att_value();
 		} else {
-	    	return devAtt_3.extractBooleanArray();
+	    	return deviceAttribute_3.extractBooleanArray();
 		}
     }
 
@@ -1496,9 +1477,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public short extractUChar() throws DevFailed {
 		manageExceptions("extractUChar");
 		if (use_union) {
-	    	return attrval.value.uchar_att_value()[0];
+	    	return attributeValue_5.value.uchar_att_value()[0];
 		} else {
-	    	return devAtt_3.extractUChar();
+	    	return deviceAttribute_3.extractUChar();
 		}
     }
 
@@ -1515,15 +1496,15 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		manageExceptions("extractUCharArray()");
 
 		if (use_union) {
-	    	final byte[] argout = attrval.value.uchar_att_value();
-	    	final short[] val = new short[argout.length];
+	    	final byte[] argOut = attributeValue_5.value.uchar_att_value();
+	    	final short[] val = new short[argOut.length];
 	    	final short mask = 0xFF;
-	    	for (int i = 0; i < argout.length; i++) {
-			val[i] = (short) (mask & argout[i]);
+	    	for (int i = 0; i < argOut.length; i++) {
+			val[i] = (short) (mask & argOut[i]);
 	    	}
 	    	return val;
 		} else {
-	    	return devAtt_3.extractUCharArray();
+	    	return deviceAttribute_3.extractUCharArray();
 		}
     }
 
@@ -1540,9 +1521,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		manageExceptions("extractCharArray()");
 
 		if (use_union) {
-	    	return attrval.value.uchar_att_value();
+	    	return attributeValue_5.value.uchar_att_value();
 		} else {
-	    	return devAtt_3.extractCharArray();
+	    	return deviceAttribute_3.extractCharArray();
 		}
     }
 
@@ -1558,9 +1539,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public short extractShort() throws DevFailed {
 		manageExceptions("extractShort()");
 		if (use_union) {
-	    	return attrval.value.short_att_value()[0];
+	    	return attributeValue_5.value.short_att_value()[0];
 		} else {
-	    	return devAtt_3.extractShort();
+	    	return deviceAttribute_3.extractShort();
 		}
     }
 
@@ -1576,9 +1557,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public short[] extractShortArray() throws DevFailed {
 		manageExceptions("extractShortArray");
 		if (use_union) {
-	    	return attrval.value.short_att_value();
+	    	return attributeValue_5.value.short_att_value();
 		} else {
-	    	return devAtt_3.extractShortArray();
+	    	return deviceAttribute_3.extractShortArray();
 		}
     }
 
@@ -1594,9 +1575,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public int extractUShort() throws DevFailed {
 		manageExceptions("extractUShort");
 		if (use_union) {
-	    	return attrval.value.ushort_att_value()[0];
+	    	return attributeValue_5.value.ushort_att_value()[0];
 		} else {
-	    	return devAtt_3.extractUShort();
+	    	return deviceAttribute_3.extractUShort();
 		}
     }
 
@@ -1612,14 +1593,14 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public int[] extractUShortArray() throws DevFailed {
 		manageExceptions("extractUShortArray");
 		if (use_union) {
-	    	final short[] argout = attrval.value.ushort_att_value();
-	    	final int[] val = new int[argout.length];
-	    	for (int i = 0; i < argout.length; i++) {
-			val[i] = 0xFFFF & argout[i];
+	    	final short[] argOut = attributeValue_5.value.ushort_att_value();
+	    	final int[] val = new int[argOut.length];
+	    	for (int i = 0; i < argOut.length; i++) {
+			val[i] = 0xFFFF & argOut[i];
 	    	}
 	    	return val;
 		} else {
-	    	return devAtt_3.extractUShortArray();
+	    	return deviceAttribute_3.extractUShortArray();
 		}
     }
 
@@ -1635,9 +1616,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public int extractLong() throws DevFailed {
 		manageExceptions("extractLong");
 		if (use_union) {
-	    	return attrval.value.long_att_value()[0];
+	    	return attributeValue_5.value.long_att_value()[0];
 		} else {
-	    	return devAtt_3.extractLong();
+	    	return deviceAttribute_3.extractLong();
 		}
     }
 
@@ -1653,9 +1634,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public int[] extractLongArray() throws DevFailed {
 		manageExceptions("extractLongArray");
 		if (use_union) {
-	    	return attrval.value.long_att_value();
+	    	return attributeValue_5.value.long_att_value();
 		} else {
-	    	return devAtt_3.extractLongArray();
+	    	return deviceAttribute_3.extractLongArray();
 		}
     }
 
@@ -1671,12 +1652,12 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public long extractULong() throws DevFailed {
 		manageExceptions("extractULong");
 		if (use_union) {
-	    	final int[] argout = attrval.value.ulong_att_value();
+	    	final int[] argOut = attributeValue_5.value.ulong_att_value();
 	    	long mask = 0x7fffffff;
 	    	mask += (long) 1 << 31;
-	    	return mask & argout[0];
+	    	return mask & argOut[0];
 		} else {
-	    	return devAtt_3.extractULong();
+	    	return deviceAttribute_3.extractULong();
 		}
     }
 
@@ -1692,7 +1673,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public long[] extractULongArray() throws DevFailed {
 		manageExceptions("extractULong");
 		if (use_union) {
-	    	final int[] array = attrval.value.ulong_att_value();
+	    	final int[] array = attributeValue_5.value.ulong_att_value();
 	    	long mask = 0x7fffffff;
 	    	mask += (long) 1 << 31;
 	    	final long[] result = new long[array.length];
@@ -1701,7 +1682,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 	    	}
 	    	return result;
 		} else {
-	    	return devAtt_3.extractULongArray();
+	    	return deviceAttribute_3.extractULongArray();
 		}
     }
 
@@ -1719,7 +1700,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		if (use_union) {
 	    	return extractLong64Array()[0];
 		} else {
-	    	return devAtt_3.extractLong64();
+	    	return deviceAttribute_3.extractLong64();
 		}
     }
 
@@ -1735,9 +1716,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public long[] extractLong64Array() throws DevFailed {
 		manageExceptions("extractLong64Array");
 		if (use_union) {
-	    	return attrval.value.long64_att_value();
+	    	return attributeValue_5.value.long64_att_value();
 		} else {
-	    	return devAtt_3.extractLong64Array();
+	    	return deviceAttribute_3.extractLong64Array();
 		}
     }
 
@@ -1767,9 +1748,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public long[] extractULong64Array() throws DevFailed {
 		manageExceptions("extractULong64Array");
 		if (use_union) {
-	    	return attrval.value.ulong64_att_value();
+	    	return attributeValue_5.value.ulong64_att_value();
 		} else {
-	    	return devAtt_3.extractULong64Array();
+	    	return deviceAttribute_3.extractULong64Array();
 		}
     }
 
@@ -1799,9 +1780,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public float[] extractFloatArray() throws DevFailed {
 		manageExceptions("extractFloatArray");
 		if (use_union) {
-	    	return attrval.value.float_att_value();
+	    	return attributeValue_5.value.float_att_value();
 		} else {
-	    	return devAtt_3.extractFloatArray();
+	    	return deviceAttribute_3.extractFloatArray();
 		}
     }
 
@@ -1831,9 +1812,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public double[] extractDoubleArray() throws DevFailed {
 		manageExceptions("extractDoubleArray");
 		if (use_union) {
-	    	return attrval.value.double_att_value();
+	    	return attributeValue_5.value.double_att_value();
 		} else {
-	    	return devAtt_3.extractDoubleArray();
+	    	return deviceAttribute_3.extractDoubleArray();
 		}
     }
 
@@ -1879,9 +1860,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public String[] extractStringArray() throws DevFailed {
 		manageExceptions("extractStringArray");
 		if (use_union) {
-	    	return attrval.value.string_att_value();
+	    	return attributeValue_5.value.string_att_value();
 		} else {
-	    	return devAtt_3.extractStringArray();
+	    	return deviceAttribute_3.extractStringArray();
 		}
     }
 
@@ -1895,11 +1876,11 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public DevEncoded extractDevEncoded() throws DevFailed {
 		manageExceptions("extractDevEncoded");
-		if (attrval.value.encoded_att_value() == null) {
+		if (attributeValue_5.value.encoded_att_value() == null) {
 	    	Except.throw_exception("BAD_PARAM", "DevEcoded object is null",
 		    	"DeviceAttribute.extractDevEncoded()");
 		}
-		return attrval.value.encoded_att_value()[0];
+		return attributeValue_5.value.encoded_att_value()[0];
     }
 
     // ===========================================
@@ -1912,11 +1893,11 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public DevEncoded[] extractDevEncodedArray() throws DevFailed {
 		manageExceptions("extractDevEncoded");
-		if (attrval.value.encoded_att_value() == null) {
+		if (attributeValue_5.value.encoded_att_value() == null) {
 	    	Except.throw_exception("BAD_PARAM", "DevEcoded object is null",
 		    	"DeviceAttribute.extractDevEncoded()");
 		}
-		return attrval.value.encoded_att_value();
+		return attributeValue_5.value.encoded_att_value();
     }
 
     // ===========================================
@@ -1931,7 +1912,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public AttrQuality getQuality() throws DevFailed {
 		manageExceptions("getQuality", false);
-		return attrval.quality;
+		return attributeValue_5.quality;
     }
 
     // ===========================================
@@ -1943,7 +1924,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public AttrDataFormat getDataFormat() throws DevFailed {
-		return attrval.data_format;
+		return attributeValue_5.data_format;
     }
 
     // ===========================================
@@ -1955,7 +1936,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public TimeVal getTimeVal() throws DevFailed {
 		manageExceptions("getTimeVal");
-		return attrval.time;
+		return attributeValue_5.time;
    	}
 
     // ===========================================
@@ -1967,7 +1948,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public long getTimeValSec() throws DevFailed {
 		manageExceptions("getTimeValSec");
-		return attrval.time.tv_sec;
+		return attributeValue_5.time.tv_sec;
     }
 
     // ===========================================
@@ -1979,7 +1960,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
 		manageExceptions("getTimeValMillisSec");
-		return attrval.time.tv_sec * 1000L + attrval.time.tv_usec / 1000L;
+		return attributeValue_5.time.tv_sec * 1000L + attributeValue_5.time.tv_usec / 1000L;
     }
 
     // ===========================================
@@ -1990,13 +1971,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public String getName() throws DevFailed {
-		return attrval.name;
+		return attributeValue_5.name;
     }
 
     // ===========================================
     // ===========================================
-    private int DIM_MINI(final int x) {
-		return x == 0 ? 1 : x;
+    private static int DIM_MINI(final int y) {
+		return y == 0 ? 1 : y;
     }
 
     // ===========================================
@@ -2008,7 +1989,8 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getNbRead() throws DevFailed {
 		manageExceptions("getNbRead");
-		return attrval.r_dim.dim_x * DIM_MINI(attrval.r_dim.dim_y);
+        int ySize = attributeValue_5.r_dim.dim_y;
+		return attributeValue_5.r_dim.dim_x * DIM_MINI(ySize);
     }
 
     // ===========================================
@@ -2020,7 +2002,8 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getNbWritten() throws DevFailed {
 		manageExceptions("getNbWritten");
-		return attrval.w_dim.dim_x * DIM_MINI(attrval.w_dim.dim_y);
+        int ySize = attributeValue_5.w_dim.dim_y;
+		return attributeValue_5.w_dim.dim_x * DIM_MINI(ySize);
     }
 
     // ===========================================
@@ -2032,7 +2015,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getDimX() throws DevFailed {
 		manageExceptions("getDimX");
-		return attrval.r_dim.dim_x;
+		return attributeValue_5.r_dim.dim_x;
     }
 
     // ===========================================
@@ -2044,7 +2027,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getDimY() throws DevFailed {
 		manageExceptions("getDimY");
-		return attrval.r_dim.dim_y;
+		return attributeValue_5.r_dim.dim_y;
     }
 
     // ===========================================
@@ -2056,7 +2039,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getWrittenDimX() throws DevFailed {
 		manageExceptions("getWrittenDimX");
-		return attrval.w_dim.dim_x;
+		return attributeValue_5.w_dim.dim_x;
     }
 
     // ===========================================
@@ -2068,7 +2051,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public int getWrittenDimY() throws DevFailed {
 		manageExceptions("getWrittenDimY");
-		return attrval.w_dim.dim_y;
+		return attributeValue_5.w_dim.dim_y;
     }
 
     // ===========================================
@@ -2082,9 +2065,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		// Build a DeviceAttribute_3 from this
 		final DeviceAttribute_3DAODefaultImpl att = new DeviceAttribute_3DAODefaultImpl();
 		att.setAttributeValue(this);
-		final AttributeValue attrval = att.getAttributeValueObject_2();
-		// And return the AttributeValue object
-		return attrval;
+		return att.getAttributeValueObject_2();
     }
 
     // ===========================================
@@ -2108,12 +2089,26 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public AttributeValue_4 getAttributeValueObject_4() {
-		// Set the write value as read ones
-		// attrval.w_dim.dim_x = attrval.r_dim.dim_x;
-		// attrval.w_dim.dim_y = attrval.r_dim.dim_y;
-
 		// return attribute value 4
-		return attrval;
+		return new AttributeValue_4(
+                attributeValue_5.value,
+                attributeValue_5.quality,
+                attributeValue_5.data_format,
+                attributeValue_5.time,
+                attributeValue_5.name,
+                attributeValue_5.r_dim,
+                attributeValue_5.w_dim,
+                attributeValue_5.err_list
+        );
+    }
+
+    // ===========================================
+    /**
+     * Return AttributeValue IDL object.
+     */
+    // ===========================================
+    public AttributeValue_5 getAttributeValueObject_5() {
+        return attributeValue_5;
     }
 
     // ===========================================
@@ -2125,26 +2120,29 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     public long getTime() throws DevFailed {
 		manageExceptions("getTime");
-		return (long) attrval.time.tv_sec * 1000 + attrval.time.tv_usec / 1000;
+		return (long) attributeValue_5.time.tv_sec * 1000 + attributeValue_5.time.tv_usec / 1000;
     }
 
     // ===========================================
     // ===========================================
     public int getType() throws DevFailed {
 		if (!use_union) {
-		    return devAtt_3.getType();
+		    return deviceAttribute_3.getType();
 		}
 
+        if (attributeValue_5.data_type!=TangoConst.Tango_DEV_VOID)
+            return attributeValue_5.data_type;
+
 		// Else check for union data type
-		if (attrval.value == null || attrval.value.discriminator() == null) {
+		if (attributeValue_5.value == null || attributeValue_5.value.discriminator() == null) {
 	    	Except.throw_exception("AttributeTypeNotSet", "Attribute "
-		    	+ attrval.name + " Value Has Not Been Set",
+		    	+ attributeValue_5.name + " Value Has Not Been Set",
 		    	"DeviceAttribute.getType()");
 		}
 
 		int type = -1;
 		try {
-	    	switch (attrval.value.discriminator().value()) {
+	    	switch (attributeValue_5.value.discriminator().value()) {
     			case AttributeDataType._ATT_BOOL:
 					type = TangoConst.Tango_DEV_BOOLEAN;
 					break;
@@ -2185,14 +2183,14 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     			case AttributeDataType._ATT_ENCODED:
 					type = TangoConst.Tango_DEV_ENCODED;
 					break;
-    			case AttributeDataType._NO_DATA:
+    			case AttributeDataType._ATT_NO_DATA:
 					type = TangoConst.Tango_DEV_VOID;
 					break;
 
     			default:
 					Except.throw_exception("AttributeTypeNotSupported",
 							"Attribute Type ("
-								+ attrval.value.discriminator().value()
+								+ attributeValue_5.value.discriminator().value()
 								+ ") Not Supported",
 							"DeviceAttribute.getType()");
 	    	}

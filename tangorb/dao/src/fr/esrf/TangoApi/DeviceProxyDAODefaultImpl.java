@@ -34,37 +34,10 @@
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.events.EventConsumerUtil;
 import org.omg.CORBA.*;
 
-import fr.esrf.Tango.AttributeConfig;
-import fr.esrf.Tango.AttributeConfig_2;
-import fr.esrf.Tango.AttributeConfig_3;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValueListHelper;
-import fr.esrf.Tango.AttributeValueList_3Helper;
-import fr.esrf.Tango.AttributeValueList_4Helper;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.ClntIdentHelper;
-import fr.esrf.Tango.DevAttrHistory;
-import fr.esrf.Tango.DevAttrHistory_3;
-import fr.esrf.Tango.DevAttrHistory_4;
-import fr.esrf.Tango.DevCmdHistory;
-import fr.esrf.Tango.DevCmdHistory_4;
-import fr.esrf.Tango.DevCmdInfo;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevFailedHelper;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.DevSourceHelper;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.DevVarStringArrayHelper;
-import fr.esrf.Tango.MultiDevFailed;
-import fr.esrf.Tango.MultiDevFailedHelper;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
@@ -73,28 +46,7 @@ import fr.esrf.TangoDs.TangoConst;
 /**
  * Class Description: This class manage device connection for Tango objects. It
  * is an api between user and IDL Device object.
- * 
- * <Br>
- * <Br>
- * <Br>
- * <b> Usage example: </b> <Br>
- * <ul>
- * <i> String status; <Br>
- * DeviceProxy dev = DeviceProxyFactory.get("sys/steppermotor/1"); <Br>
- * try { <Br>
- * <ul>
- * DeviceData data = dev.command_inout("DevStatus"); <Br>
- * status = data.extractString(); <Br>
- * </ul>
- * } <Br>
- * catch (DevFailed e) { <Br>
- * <ul>
- * status = "Unknown status"; <Br>
- * Except.print_exception(e); <Br>
- * </ul>
- * } <Br>
- * </ul></i>
- * 
+ *
  * @author verdier
  * @version $Revision$
  */
@@ -255,8 +207,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * return the device status.
      * 
-     * @param src
-     *            Source to read status. It could be ApiDefs.FROM_CMD to read it
+     * @param src Source to read status. It could be ApiDefs.FROM_CMD to read it
      *            from a command_inout or ApiDefs.FROM_ATTR to read it from
      *            CORBA attribute.
      */
@@ -296,15 +247,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ===========================================================
     public DevState state(final DeviceProxy deviceProxy) throws DevFailed {
-	return state(deviceProxy, ApiDefs.FROM_ATTR);
+	    return state(deviceProxy, ApiDefs.FROM_ATTR);
     }
 
     // ===========================================================
     /**
      * return the device state.
      * 
-     * @param src
-     *            Source to read state. It could be ApiDefs.FROM_CMD to read it
+     * @param src Source to read state. It could be ApiDefs.FROM_CMD to read it
      *            from a command_inout or ApiDefs.FROM_ATTR to read it from
      *            CORBA attribute.
      */
@@ -344,13 +294,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * return the IDL device command_query for the specified command.
      * 
-     * @param cmdname
-     *            command name to be used for the command_query
+     * @param commandName command name to be used for the command_query
      * @return the command information..
      */
     // ===========================================================
-    public CommandInfo command_query(final DeviceProxy deviceProxy, final String cmdname)
-	            throws DevFailed {
+    public CommandInfo command_query(final DeviceProxy deviceProxy,
+                                     final String commandName) throws DevFailed {
 
         build_connection(deviceProxy);
 
@@ -362,10 +311,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             try {
                 // Check IDL version
                 if (deviceProxy.device_2 != null) {
-                    final DevCmdInfo_2 tmp = deviceProxy.device_2.command_query_2(cmdname);
+                    final DevCmdInfo_2 tmp = deviceProxy.device_2.command_query_2(commandName);
                     info = new CommandInfo(tmp);
                 } else {
-                    final DevCmdInfo tmp = deviceProxy.device.command_query(cmdname);
+                    final DevCmdInfo tmp = deviceProxy.device.command_query(commandName);
                     info = new CommandInfo(tmp);
                 }
             } catch (final Exception e) {
@@ -375,7 +324,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             }
         } else {
             // TACO device
-            info = deviceProxy.taco_device.commandQuery(cmdname);
+            info = deviceProxy.taco_device.commandQuery(commandName);
         }
         return info;
     }
@@ -389,19 +338,19 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public String get_class(final DeviceProxy deviceProxy) throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_class()");
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_class");
+        checkIfUseDb(deviceProxy, "get_class()");
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_class");
 
-	final String classname = super.get_class_name(deviceProxy);
-	if (classname != null) {
-	    return classname;
-	} else {
-	    return deviceProxy.getDb_dev().get_class();
-	}
+        final String classname = super.get_class_name(deviceProxy);
+        if (classname != null) {
+            return classname;
+        } else {
+            return deviceProxy.getDb_dev().get_class();
+        }
     }
 
     // ==========================================================================
@@ -415,32 +364,31 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public String[] get_class_inheritance(final DeviceProxy deviceProxy) throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_class_inheritance()");
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_class_inheritance");
-	return deviceProxy.getDb_dev().get_class_inheritance();
+        checkIfUseDb(deviceProxy, "get_class_inheritance()");
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_class_inheritance");
+        return deviceProxy.getDb_dev().get_class_inheritance();
     }
 
     // ==========================================================================
     /**
      * Set an alias for a device name
      * 
-     * @param aliasname
-     *            alias name.
+     * @param aliasName  alias name.
      */
     // ==========================================================================
-    public void put_alias(final DeviceProxy deviceProxy, final String aliasname) throws DevFailed {
-	checkIfUseDb(deviceProxy, "put_alias()");
+    public void put_alias(final DeviceProxy deviceProxy, final String aliasName) throws DevFailed {
+        checkIfUseDb(deviceProxy, "put_alias()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "put_alias");
-	deviceProxy.getDb_dev().put_alias(aliasname);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "put_alias");
+        deviceProxy.getDb_dev().put_alias(aliasName);
     }
 
     // ==========================================================================
@@ -451,14 +399,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public String get_alias(final DeviceProxy deviceProxy) throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_alias()");
+        checkIfUseDb(deviceProxy, "get_alias()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_alias");
-	return deviceProxy.getDb_dev().get_alias();
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_alias");
+        return deviceProxy.getDb_dev().get_alias();
     }
 
     // ==========================================================================
@@ -492,38 +440,37 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public DbDevImportInfo import_device(final DeviceProxy deviceProxy) throws DevFailed {
 
-	checkIfUseDb(deviceProxy, "import_device()");
+        checkIfUseDb(deviceProxy, "import_device()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	// checkIfTango("import_device");
-	if (deviceProxy.url.protocol == TANGO) {
-	    return deviceProxy.getDb_dev().import_device();
-	} else {
-	    return new DbDevImportInfo(dev_inform(deviceProxy));
-	}
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        // checkIfTango("import_device");
+        if (deviceProxy.url.protocol == TANGO) {
+            return deviceProxy.getDb_dev().import_device();
+        } else {
+            return new DbDevImportInfo(dev_inform(deviceProxy));
+        }
     }
 
     // ==========================================================================
     /**
      * Update the export info for this device in the database.
      * 
-     * @param devinfo
-     *            Device information to export.
+     * @param devinfo Device information to export.
      */
     // ==========================================================================
-    public void export_device(final DeviceProxy deviceProxy, final DbDevExportInfo devinfo)
-	    throws DevFailed {
-	checkIfTango(deviceProxy, "export_device");
-	checkIfUseDb(deviceProxy, "export_device()");
+    public void export_device(final DeviceProxy deviceProxy,
+                              final DbDevExportInfo devinfo) throws DevFailed {
+        checkIfTango(deviceProxy, "export_device");
+        checkIfUseDb(deviceProxy, "export_device()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	deviceProxy.getDb_dev().export_device(devinfo);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        deviceProxy.getDb_dev().export_device(devinfo);
     }
 
     // ==========================================================================
@@ -532,14 +479,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void unexport_device(final DeviceProxy deviceProxy) throws DevFailed {
-	checkIfTango(deviceProxy, "unexport_device");
-	checkIfUseDb(deviceProxy, "unexport_device()");
+        checkIfTango(deviceProxy, "unexport_device");
+        checkIfUseDb(deviceProxy, "unexport_device()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	deviceProxy.getDb_dev().unexport_device();
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        deviceProxy.getDb_dev().unexport_device();
     }
 
     // ==========================================================================
@@ -551,14 +498,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void add_device(final DeviceProxy deviceProxy, final DbDevInfo devinfo) throws DevFailed {
-	checkIfTango(deviceProxy, "add_device");
-	checkIfUseDb(deviceProxy, "add_device()");
+        checkIfTango(deviceProxy, "add_device");
+        checkIfUseDb(deviceProxy, "add_device()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	deviceProxy.getDb_dev().add_device(devinfo);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        deviceProxy.getDb_dev().add_device(devinfo);
     }
 
     // ==========================================================================
@@ -567,14 +514,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void delete_device(final DeviceProxy deviceProxy) throws DevFailed {
-	checkIfTango(deviceProxy, "delete_device");
-	checkIfUseDb(deviceProxy, "delete_device()");
+        checkIfTango(deviceProxy, "delete_device");
+        checkIfUseDb(deviceProxy, "delete_device()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	deviceProxy.getDb_dev().delete_device();
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        deviceProxy.getDb_dev().delete_device();
     }
 
     // ==========================================================================
@@ -582,29 +529,27 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Query the database for a list of device properties for the pecified
      * object.
      * 
-     * @param wildcard
-     *            propertie's wildcard (* matches any charactere).
+     * @param wildcard propertie's wildcard (* matches any charactere).
      * @return properties in DbDatum objects.
      */
     // ==========================================================================
-    public String[] get_property_list(final DeviceProxy deviceProxy, final String wildcard)
-	    throws DevFailed {
-	checkIfTango(deviceProxy, "get_property_list");
-	checkIfUseDb(deviceProxy, "get_property_list()");
+    public String[] get_property_list(final DeviceProxy deviceProxy,
+                                      final String wildcard) throws DevFailed {
+        checkIfTango(deviceProxy, "get_property_list");
+        checkIfUseDb(deviceProxy, "get_property_list()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	return deviceProxy.getDb_dev().get_property_list(wildcard);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        return deviceProxy.getDb_dev().get_property_list(wildcard);
     }
 
     // ==========================================================================
     /**
      * Query the database for a list of device properties for this device.
      * 
-     * @param propnames
-     *            list of property names.
+     * @param propnames list of property names.
      * @return properties in DbDatum objects.
      */
     // ==========================================================================
@@ -630,25 +575,24 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Query the database for a device property for this device.
      * 
-     * @param propname
-     *            property name.
+     * @param propertyName  property name.
      * @return property in DbDatum objects.
      */
     // ==========================================================================
-    public DbDatum get_property(final DeviceProxy deviceProxy, final String propname)
-	    throws DevFailed {
-	if (deviceProxy.url.protocol == TANGO) {
-	    checkIfUseDb(deviceProxy, "get_property()");
+    public DbDatum get_property(final DeviceProxy deviceProxy,
+                                final String propertyName)  throws DevFailed {
+        if (deviceProxy.url.protocol == TANGO) {
+            checkIfUseDb(deviceProxy, "get_property()");
 
-	    if (deviceProxy.getDb_dev() == null) {
-		deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-			deviceProxy.url.strPort));
-	    }
-	    return deviceProxy.getDb_dev().get_property(propname);
-	} else {
-	    final String[] propnames = { propname };
-	    return deviceProxy.taco_device.get_property(propnames)[0];
-	}
+            if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+            }
+            return deviceProxy.getDb_dev().get_property(propertyName);
+        } else {
+            final String[] propnames = { propertyName };
+            return deviceProxy.taco_device.get_property(propnames)[0];
+        }
     }
 
     // ==========================================================================
@@ -656,21 +600,20 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Query the database for a list of device properties for this device. The
      * property names are specified by the DbDatum array objects.
      * 
-     * @param properties
-     *            list of property DbDatum objects.
+     * @param properties list of property DbDatum objects.
      * @return properties in DbDatum objects.
      */
     // ==========================================================================
-    public DbDatum[] get_property(final DeviceProxy deviceProxy, final DbDatum[] properties)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_property()");
+    public DbDatum[] get_property(final DeviceProxy deviceProxy,
+                                  final DbDatum[] properties) throws DevFailed {
+        checkIfUseDb(deviceProxy, "get_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_property");
-	return deviceProxy.getDb_dev().get_property(properties);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_property");
+        return deviceProxy.getDb_dev().get_property(properties);
     }
 
     // ==========================================================================
@@ -678,22 +621,21 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Insert or update a property for this device The property name and its
      * value are specified by the DbDatum
      * 
-     * @param prop
-     *            Property name and value
+     * @param prop  Property name and value
      */
     // ==========================================================================
     public void put_property(final DeviceProxy deviceProxy, final DbDatum prop) throws DevFailed {
-	checkIfUseDb(deviceProxy, "put_property()");
+        checkIfUseDb(deviceProxy, "put_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "put_property");
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "put_property");
 
-	final DbDatum[] properties = new DbDatum[1];
-	properties[0] = prop;
-	put_property(deviceProxy, properties);
+        final DbDatum[] properties = new DbDatum[1];
+        properties[0] = prop;
+        put_property(deviceProxy, properties);
     }
 
     // ==========================================================================
@@ -701,80 +643,76 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Insert or update a list of properties for this device The property names
      * and their values are specified by the DbDatum array.
      * 
-     * @param properties
-     *            Properties names and values array.
+     * @param properties Properties names and values array.
      */
     // ==========================================================================
-    public void put_property(final DeviceProxy deviceProxy, final DbDatum[] properties)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "put_property()");
+    public void put_property(final DeviceProxy deviceProxy,
+                             final DbDatum[] properties) throws DevFailed {
+        checkIfUseDb(deviceProxy, "put_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "put_property");
-	deviceProxy.getDb_dev().put_property(properties);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "put_property");
+        deviceProxy.getDb_dev().put_property(properties);
     }
 
     // ==========================================================================
     /**
      * Delete a list of properties for this device.
      * 
-     * @param propnames
-     *            Property names.
+     * @param propertyNames  Property names.
      */
     // ==========================================================================
-    public void delete_property(final DeviceProxy deviceProxy, final String[] propnames)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_property()");
+    public void delete_property(final DeviceProxy deviceProxy,
+                                final String[] propertyNames) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_property");
-	deviceProxy.getDb_dev().delete_property(propnames);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_property");
+        deviceProxy.getDb_dev().delete_property(propertyNames);
     }
 
     // ==========================================================================
     /**
      * Delete a property for this device.
      * 
-     * @param propname
-     *            Property name.
+     * @param propertyName Property name.
      */
     // ==========================================================================
-    public void delete_property(final DeviceProxy deviceProxy, final String propname)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_property()");
+    public void delete_property(final DeviceProxy deviceProxy,
+                                final String propertyName) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_property");
-	deviceProxy.getDb_dev().delete_property(propname);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_property");
+        deviceProxy.getDb_dev().delete_property(propertyName);
     }
 
     // ==========================================================================
     /**
      * Delete a list of properties for this device.
      * 
-     * @param properties
-     *            Property DbDatum objects.
+     * @param properties  Property DbDatum objects.
      */
     // ==========================================================================
-    public void delete_property(final DeviceProxy deviceProxy, final DbDatum[] properties)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_property()");
+    public void delete_property(final DeviceProxy deviceProxy,
+                                final DbDatum[] properties) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_property");
-	deviceProxy.getDb_dev().delete_property(properties);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_property");
+        deviceProxy.getDb_dev().delete_property(properties);
     }
 
     // ============================================
@@ -789,27 +727,26 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public String[] get_attribute_list(final DeviceProxy deviceProxy) throws DevFailed {
+        build_connection(deviceProxy);
 
-	build_connection(deviceProxy);
+        if (deviceProxy.url.protocol == TANGO) {
+            // Read All attribute config
+            final String[] wildcard = new String[1];
 
-	if (deviceProxy.url.protocol == TANGO) {
-	    // Read All attribute config
-	    final String[] wildcard = new String[1];
-
-	    if (deviceProxy.device_3 != null) {
-		wildcard[0] = TangoConst.Tango_AllAttr_3;
-	    } else {
-		wildcard[0] = TangoConst.Tango_AllAttr;
-	    }
-	    final AttributeInfo[] ac = get_attribute_info(deviceProxy, wildcard);
-	    final String[] result = new String[ac.length];
-	    for (int i = 0; i < ac.length; i++) {
-		result[i] = ac[i].name;
-	    }
-	    return result;
-	} else {
-	    return deviceProxy.taco_device.get_attribute_list();
-	}
+            if (deviceProxy.device_3 != null) {
+                wildcard[0] = TangoConst.Tango_AllAttr_3;
+            } else {
+               wildcard[0] = TangoConst.Tango_AllAttr;
+            }
+            final AttributeInfo[] ac = get_attribute_info(deviceProxy, wildcard);
+            final String[] result = new String[ac.length];
+            for (int i = 0; i < ac.length; i++) {
+                result[i] = ac[i].name;
+            }
+            return result;
+        } else {
+            return deviceProxy.taco_device.get_attribute_list();
+        }
     }
 
     // ==========================================================================
@@ -821,16 +758,16 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      *            attribute names and properties (names and values) array.
      */
     // ==========================================================================
-    public void put_attribute_property(final DeviceProxy deviceProxy, final DbAttribute[] attr)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "put_attribute_property()");
+    public void put_attribute_property(final DeviceProxy deviceProxy,
+                                       final DbAttribute[] attr) throws DevFailed {
+        checkIfUseDb(deviceProxy, "put_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "put_attribute_property");
-	deviceProxy.getDb_dev().put_attribute_property(attr);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "put_attribute_property");
+        deviceProxy.getDb_dev().put_attribute_property(attr);
     }
 
     // ==========================================================================
@@ -842,100 +779,96 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      *            attribute name and properties (names and values).
      */
     // ==========================================================================
-    public void put_attribute_property(final DeviceProxy deviceProxy, final DbAttribute attr)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "put_attribute_property()");
+    public void put_attribute_property(final DeviceProxy deviceProxy,
+                                       final DbAttribute attr) throws DevFailed {
+        checkIfUseDb(deviceProxy, "put_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "put_attribute_property");
-	deviceProxy.getDb_dev().put_attribute_property(attr);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "put_attribute_property");
+        deviceProxy.getDb_dev().put_attribute_property(attr);
     }
 
     // ==========================================================================
     /**
      * Delete a list of properties for this object.
      * 
-     * @param attname
-     *            attribute name.
-     * @param propnames
-     *            Property names.
+     * @param attributeName  attribute name.
+     * @param propertyNames Property names.
      */
     // ==========================================================================
-    public void delete_attribute_property(final DeviceProxy deviceProxy, final String attname,
-	    final String[] propnames) throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_attribute_property()");
+    public void delete_attribute_property(final DeviceProxy deviceProxy, final String attributeName,
+	    final String[] propertyNames) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_attribute_property");
-	deviceProxy.getDb_dev().delete_attribute_property(attname, propnames);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_attribute_property");
+        deviceProxy.getDb_dev().delete_attribute_property(attributeName, propertyNames);
     }
 
     // ==========================================================================
     /**
      * Delete a property for this object.
      * 
-     * @param attname
+     * @param attributeName
      *            attribute name.
-     * @param propname
+     * @param propertyName
      *            Property name.
      */
     // ==========================================================================
-    public void delete_attribute_property(final DeviceProxy deviceProxy, final String attname,
-	    final String propname) throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_attribute_property()");
+    public void delete_attribute_property(final DeviceProxy deviceProxy, final String attributeName,
+	                                      final String propertyName) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_attribute_property");
-	deviceProxy.getDb_dev().delete_attribute_property(attname, propname);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_attribute_property");
+        deviceProxy.getDb_dev().delete_attribute_property(attributeName, propertyName);
     }
 
     // ==========================================================================
     /**
      * Delete a list of properties for this object.
      * 
-     * @param attr
-     *            DbAttribute objects specifying attributes.
+     * @param attr DbAttribute objects specifying attributes.
      */
     // ==========================================================================
-    public void delete_attribute_property(final DeviceProxy deviceProxy, final DbAttribute attr)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_attribute_property()");
+    public void delete_attribute_property(final DeviceProxy deviceProxy,
+                                          final DbAttribute attr) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_attribute_property");
-	deviceProxy.getDb_dev().delete_attribute_property(attr);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_attribute_property");
+        deviceProxy.getDb_dev().delete_attribute_property(attr);
     }
 
     // ==========================================================================
     /**
      * Delete a list of properties for this object.
      * 
-     * @param attr
-     *            DbAttribute objects array specifying attributes.
+     * @param attr  DbAttribute objects array specifying attributes.
      */
     // ==========================================================================
-    public void delete_attribute_property(final DeviceProxy deviceProxy, final DbAttribute[] attr)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_attribute_property()");
+    public void delete_attribute_property(final DeviceProxy deviceProxy,
+                                          final DbAttribute[] attr) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_attribute_property");
-	deviceProxy.getDb_dev().delete_attribute_property(attr);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_attribute_property");
+        deviceProxy.getDb_dev().delete_attribute_property(attr);
     }
 
     // ==========================================================================
@@ -943,62 +876,59 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Query the database for a list of device attribute properties for this
      * device.
      * 
-     * @param attnames
-     *            list of attribute names.
+     * @param attnames list of attribute names.
      * @return properties in DbAttribute objects array.
      */
     // ==========================================================================
     public DbAttribute[] get_attribute_property(final DeviceProxy deviceProxy,
-	    final String[] attnames) throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_attribute_property()");
+	                                            final String[] attnames) throws DevFailed {
+        checkIfUseDb(deviceProxy, "get_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_attribute_property");
-	return deviceProxy.getDb_dev().get_attribute_property(attnames);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_attribute_property");
+        return deviceProxy.getDb_dev().get_attribute_property(attnames);
     }
 
     // ==========================================================================
     /**
      * Query the database for a device attribute property for this device.
      * 
-     * @param attname
-     *            attribute name.
+     * @param attributeName  attribute name.
      * @return property in DbAttribute object.
      */
     // ==========================================================================
-    public DbAttribute get_attribute_property(final DeviceProxy deviceProxy, final String attname)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "get_attribute_property()");
+    public DbAttribute get_attribute_property(final DeviceProxy deviceProxy,
+                                              final String attributeName) throws DevFailed {
+        checkIfUseDb(deviceProxy, "get_attribute_property()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "get_attribute_property");
-	return deviceProxy.getDb_dev().get_attribute_property(attname);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "get_attribute_property");
+        return deviceProxy.getDb_dev().get_attribute_property(attributeName);
     }
 
     // ==========================================================================
     /**
      * Delete an attribute for this object.
      * 
-     * @param attname
-     *            attribute name.
+     * @param attributeName  attribute name.
      */
     // ==========================================================================
-    public void delete_attribute(final DeviceProxy deviceProxy, final String attname)
-	    throws DevFailed {
-	checkIfUseDb(deviceProxy, "delete_attribute()");
+    public void delete_attribute(final DeviceProxy deviceProxy,
+                                 final String attributeName) throws DevFailed {
+        checkIfUseDb(deviceProxy, "delete_attribute()");
 
-	if (deviceProxy.getDb_dev() == null) {
-	    deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
-		    deviceProxy.url.strPort));
-	}
-	checkIfTango(deviceProxy, "delete_attribute");
-	deviceProxy.getDb_dev().delete_attribute(attname);
+        if (deviceProxy.getDb_dev() == null) {
+            deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
+                deviceProxy.url.strPort));
+        }
+        checkIfTango(deviceProxy, "delete_attribute");
+        deviceProxy.getDb_dev().delete_attribute(attributeName);
     }
 
     // ===========================================================
@@ -1008,114 +938,136 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Get the attributes configuration for the specified device.
      * 
-     * @param attnames
-     *            attribute names to request config.
+     * @param attributeNames attribute names to request config.
      * @return the attributes configuration.
      */
     // ==========================================================================
-    public AttributeInfo[] get_attribute_info(final DeviceProxy deviceProxy, final String[] attnames)
-	    throws DevFailed {
+    public AttributeInfo[] get_attribute_info(final DeviceProxy deviceProxy,
+                                              final String[] attributeNames) throws DevFailed {
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	try {
-	    AttributeInfo[] result;
-	    AttributeConfig[] ac = new AttributeConfig[0];
-	    AttributeConfig_2[] ac_2 = null;
-	    if (deviceProxy.url.protocol == TANGO) {
-		// Check IDL version
-		if (deviceProxy.device_2 != null) {
-		    ac_2 = deviceProxy.device_2.get_attribute_config_2(attnames);
-		} else {
-		    ac = deviceProxy.device.get_attribute_config(attnames);
-		}
-	    } else {
-		ac = deviceProxy.taco_device.get_attribute_config(attnames);
-	    }
+        try {
+            AttributeInfo[] result;
+            AttributeConfig[] ac = new AttributeConfig[0];
+            AttributeConfig_2[] ac_2 = null;
+            if (deviceProxy.url.protocol == TANGO) {
+            // Check IDL version
+            if (deviceProxy.device_2 != null) {
+                ac_2 = deviceProxy.device_2.get_attribute_config_2(attributeNames);
+            } else {
+                ac = deviceProxy.device.get_attribute_config(attributeNames);
+            }
+            } else {
+            ac = deviceProxy.taco_device.get_attribute_config(attributeNames);
+            }
 
-	    // Convert AttributeConfig(_2) object to AttributeInfo object
-	    final int size = ac_2 != null ? ac_2.length : ac.length;
-	    result = new AttributeInfo[size];
-	    for (int i = 0; i < size; i++) {
-		if (ac_2 != null) {
-		    result[i] = new AttributeInfo(ac_2[i]);
-		} else {
-		    result[i] = new AttributeInfo(ac[i]);
-		}
-	    }
-	    return result;
-	} catch (final DevFailed e) {
-	    throw e;
-	} catch (final Exception e) {
-	    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
-	    throw_dev_failed(deviceProxy, e, "get_attribute_config", true);
-	    return null;
-	}
+            // Convert AttributeConfig(_2) object to AttributeInfo object
+            final int size = ac_2 != null ? ac_2.length : ac.length;
+            result = new AttributeInfo[size];
+            for (int i = 0; i < size; i++) {
+            if (ac_2 != null) {
+                result[i] = new AttributeInfo(ac_2[i]);
+            } else {
+                result[i] = new AttributeInfo(ac[i]);
+            }
+            }
+            return result;
+        }
+        catch (final DevFailed e) {
+            throw e;
+        }
+        catch (final Exception e) {
+            ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
+            throw_dev_failed(deviceProxy, e, "get_attribute_config", true);
+            return null;
+        }
     }
 
     // ==========================================================================
     /**
      * Get the extended attributes configuration for the specified device.
-     * 
-     * @param attnames
-     *            attribute names to request config.
+     *
+     * @param attributeNames attribute names to request config.
      * @return the attributes configuration.
      */
     // ==========================================================================
-    public AttributeInfoEx[] get_attribute_info_ex(final DeviceProxy deviceProxy,
-	    final String[] attnames) throws DevFailed {
+    public AttributeInfoEx[] get_attribute_info_ex(
+            final DeviceProxy deviceProxy, final String[] attributeNames) throws DevFailed {
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	// try 2 times for reconnection if requested
-	AttributeInfoEx[] result = null;
-	boolean done = false;
-	final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
-	for (int i = 0; i < retries && !done; i++) {
-	    try {
-		AttributeConfig_3[] ac_3 = null;
-		AttributeConfig_2[] ac_2 = null;
-		AttributeConfig[] ac = null;
-		if (deviceProxy.url.protocol == TANGO) {
-		    // Check IDL version
-		    if (deviceProxy.device_3 != null) {
-			ac_3 = deviceProxy.device_3.get_attribute_config_3(attnames);
-		    } else if (deviceProxy.device_2 != null) {
-			ac_2 = deviceProxy.device_2.get_attribute_config_2(attnames);
-		    } else {
-			Except.throw_non_supported_exception("TangoApi_IDL_NOT_SUPPORTED",
-				"Not supported by the IDL version used by device", deviceProxy
-					.getFull_class_name()
-					+ ".get_attribute_info_ex()");
-		    }
-		} else {
-		    ac = deviceProxy.taco_device.get_attribute_config(attnames);
-		}
+        // try 2 times for reconnection if requested
+        AttributeInfoEx[] result = null;
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int i=0 ; i<retries && !done ; i++) {
+            try {
+            AttributeConfig_5[] attributeConfigList_5 = null;
+            AttributeConfig_3[] attributeConfigList_3 = null;
+            AttributeConfig_2[] attributeConfigList_2 = null;
+            AttributeConfig[] ac = null;
+            if (deviceProxy.url.protocol == TANGO) {
+                // Check IDL version
+                if (deviceProxy.device_5 != null) {
+                    attributeConfigList_5 =
+                            deviceProxy.device_5.get_attribute_config_5(attributeNames);
+                }
+                else if (deviceProxy.device_3 != null) {
+                    attributeConfigList_3 =
+                            deviceProxy.device_3.get_attribute_config_3(attributeNames);
+                }
+                else if (deviceProxy.device_2 != null) {
+                    attributeConfigList_2 =
+                            deviceProxy.device_2.get_attribute_config_2(attributeNames);
+                }
+                else {
+                Except.throw_non_supported_exception("TangoApi_IDL_NOT_SUPPORTED",
+                    "Not supported by the IDL version used by device", deviceProxy
+                        .getFull_class_name()
+                        + ".get_attribute_info_ex()");
+                }
+            }
+            else {
+                ac = deviceProxy.taco_device.get_attribute_config(attributeNames);
+            }
 
-		// Convert AttributeConfig(_3) object to AttributeInfo object
-		int size;
-		if (ac_3 != null) {
-		    size = ac_3.length;
-		} else if (ac_2 != null) {
-		    size = ac_2.length;
-		} else {
-		    size = ac.length;
-		}
-		result = new AttributeInfoEx[size];
-		for (int n = 0; n < size; n++) {
-		    if (ac_3 != null) {
-			result[n] = new AttributeInfoEx(ac_3[n]);
-		    } else if (ac_2 != null) {
-			result[n] = new AttributeInfoEx(ac_2[n]);
-		    } else if (ac != null) {
-			result[n] = new AttributeInfoEx(ac[n]);
-		    }
-		}
-		done = true;
-	    } catch (final DevFailed e) {
-		throw e;
-	    } catch (final Exception e) {
-		manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
+            // Convert AttributeConfig(_3) object to AttributeInfo object
+            int size;
+            if (attributeConfigList_5 != null) {
+                size = attributeConfigList_5.length;
+            }
+            else if (attributeConfigList_3 != null) {
+                size = attributeConfigList_3.length;
+            }
+            else if (attributeConfigList_2 != null) {
+                size = attributeConfigList_2.length;
+            }
+            else {
+                size = ac.length;
+            }
+            result = new AttributeInfoEx[size];
+            for (int n=0 ; n<size ; n++) {
+                if (attributeConfigList_5 != null) {
+                    result[n] = new AttributeInfoEx(attributeConfigList_5[n]);
+                }
+                else if (attributeConfigList_3 != null) {
+                    result[n] = new AttributeInfoEx(attributeConfigList_3[n]);
+                }
+                else if (attributeConfigList_2 != null) {
+                    result[n] = new AttributeInfoEx(attributeConfigList_2[n]);
+                }
+                else if (ac != null) {
+                    result[n] = new AttributeInfoEx(ac[n]);
+                }
+            }
+            done = true;
+	    }
+        catch (final DevFailed e) {
+		    throw e;
+	    }
+        catch (final Exception e) {
+		    manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
 			+ ".get_attribute_config_ex");
 	    }
 	}
@@ -1133,9 +1085,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     @Deprecated
-    public AttributeInfo[] get_attribute_config(final DeviceProxy deviceProxy,
-	    final String[] attnames) throws DevFailed {
-	return get_attribute_info(deviceProxy, attnames);
+        public AttributeInfo[] get_attribute_config(final DeviceProxy deviceProxy,
+            final String[] attnames) throws DevFailed {
+        return get_attribute_info(deviceProxy, attnames);
     }
 
     // ==========================================================================
@@ -1149,9 +1101,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public AttributeInfo get_attribute_info(final DeviceProxy deviceProxy, final String attname)
 	    throws DevFailed {
-	final String[] attnames = ApiUtil.toStringArray(attname);
-	final AttributeInfo[] ac = get_attribute_info(deviceProxy, attnames);
-	return ac[0];
+        final String[] attnames = ApiUtil.toStringArray(attname);
+        final AttributeInfo[] ac = get_attribute_info(deviceProxy, attnames);
+        return ac[0];
     }
 
     // ==========================================================================
@@ -1165,9 +1117,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public AttributeInfoEx get_attribute_info_ex(final DeviceProxy deviceProxy, final String attname)
 	    throws DevFailed {
-	final String[] attnames = ApiUtil.toStringArray(attname);
-	final AttributeInfoEx[] ac = get_attribute_info_ex(deviceProxy, attnames);
-	return ac[0];
+        final String[] attnames = ApiUtil.toStringArray(attname);
+        final AttributeInfoEx[] ac = get_attribute_info_ex(deviceProxy, attnames);
+        return ac[0];
     }
 
     // ==========================================================================
@@ -1181,9 +1133,9 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     @Deprecated
-    public AttributeInfo get_attribute_config(final DeviceProxy deviceProxy, final String attname)
-	    throws DevFailed {
-	return get_attribute_info(deviceProxy, attname);
+        public AttributeInfo get_attribute_config(final DeviceProxy deviceProxy, final String attname)
+            throws DevFailed {
+        return get_attribute_info(deviceProxy, attname);
     }
 
     // ==========================================================================
@@ -1195,16 +1147,16 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public AttributeInfo[] get_attribute_info(final DeviceProxy deviceProxy) throws DevFailed {
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	final String[] attnames = new String[1];
-	if (deviceProxy.device_3 != null) {
-	    attnames[0] = TangoConst.Tango_AllAttr_3;
-	} else {
-	    attnames[0] = TangoConst.Tango_AllAttr;
-	}
+        final String[] attnames = new String[1];
+        if (deviceProxy.device_3 != null) {
+            attnames[0] = TangoConst.Tango_AllAttr_3;
+        } else {
+            attnames[0] = TangoConst.Tango_AllAttr;
+        }
 
-	return get_attribute_info(deviceProxy, attnames);
+        return get_attribute_info(deviceProxy, attnames);
     }
 
     // ==========================================================================
@@ -1216,16 +1168,16 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public AttributeInfoEx[] get_attribute_info_ex(final DeviceProxy deviceProxy) throws DevFailed {
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	final String[] attnames = new String[1];
-	if (deviceProxy.device_3 != null) {
-	    attnames[0] = TangoConst.Tango_AllAttr_3;
-	} else {
-	    attnames[0] = TangoConst.Tango_AllAttr;
-	}
+        final String[] attnames = new String[1];
+        if (deviceProxy.device_3 != null) {
+            attnames[0] = TangoConst.Tango_AllAttr_3;
+        } else {
+            attnames[0] = TangoConst.Tango_AllAttr;
+        }
 
-	return get_attribute_info_ex(deviceProxy, attnames);
+        return get_attribute_info_ex(deviceProxy, attnames);
     }
 
     // ==========================================================================
@@ -1238,7 +1190,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     @Deprecated
     public AttributeInfo[] get_attribute_config(final DeviceProxy deviceProxy) throws DevFailed {
-	return get_attribute_info(deviceProxy);
+	    return get_attribute_info(deviceProxy);
     }
 
     // ==========================================================================
@@ -1251,22 +1203,22 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     public void set_attribute_info(final DeviceProxy deviceProxy, final AttributeInfo[] attr)
 	    throws DevFailed {
-	checkIfTango(deviceProxy, "set_attribute_config");
+        checkIfTango(deviceProxy, "set_attribute_config");
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	try {
-	    final AttributeConfig[] config = new AttributeConfig[attr.length];
-	    for (int i = 0; i < attr.length; i++) {
-		config[i] = attr[i].get_attribute_config_obj();
-	    }
-	    deviceProxy.device.set_attribute_config(config);
-	} catch (final DevFailed e) {
-	    throw e;
-	} catch (final Exception e) {
-	    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
-	    throw_dev_failed(deviceProxy, e, "set_attribute_info", true);
-	}
+        try {
+            final AttributeConfig[] config = new AttributeConfig[attr.length];
+            for (int i = 0; i < attr.length; i++) {
+            config[i] = attr[i].get_attribute_config_obj();
+            }
+            deviceProxy.device.set_attribute_config(config);
+        } catch (final DevFailed e) {
+            throw e;
+        } catch (final Exception e) {
+            ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
+            throw_dev_failed(deviceProxy, e, "set_attribute_info", true);
+        }
     }
 
     // ==========================================================================
@@ -1283,41 +1235,47 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 	build_connection(deviceProxy);
 
-	if (deviceProxy.access == TangoConst.ACCESS_READ) {
-	    // pind the device to throw execption
-	    // if failed (for reconnection)
-	    // ping(deviceProxy);
-
-        throwNotAuthorizedException(deviceProxy.devname + ".set_attribute_info()",
-		    "DeviceProxy.set_attribute_info()");
-	}
-	try {
-	    if (deviceProxy.device_4 != null) {
-		final AttributeConfig_3[] config = new AttributeConfig_3[attr.length];
-		for (int i = 0; i < attr.length; i++) {
-		    config[i] = attr[i].get_attribute_config_obj_3();
-		}
-		deviceProxy.device_4.set_attribute_config_4(config, DevLockManager.getInstance()
-			.getClntIdent());
-	    } else if (deviceProxy.device_3 != null) {
-		final AttributeConfig_3[] config = new AttributeConfig_3[attr.length];
-		for (int i = 0; i < attr.length; i++) {
-		    config[i] = attr[i].get_attribute_config_obj_3();
-		}
-		deviceProxy.device_3.set_attribute_config_3(config);
-	    } else {
-		final AttributeConfig[] config = new AttributeConfig[attr.length];
-		for (int i = 0; i < attr.length; i++) {
-		    config[i] = attr[i].get_attribute_config_obj();
-		}
-		deviceProxy.device.set_attribute_config(config);
-	    }
-	} catch (final DevFailed e) {
-	    throw e;
-	} catch (final Exception e) {
-	    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
-	    throw_dev_failed(deviceProxy, e, "set_attribute_info", true);
-	}
+        if (deviceProxy.access == TangoConst.ACCESS_READ) {
+            throwNotAuthorizedException(deviceProxy.devname +
+                    ".set_attribute_info()", "DeviceProxy.set_attribute_info()");
+        }
+        try {
+            if (deviceProxy.device_5 != null) {
+                final AttributeConfig_5[] config = new AttributeConfig_5[attr.length];
+                for (int i = 0; i < attr.length; i++) {
+                    config[i] = attr[i].get_attribute_config_obj_5();
+                }
+                deviceProxy.device_5.set_attribute_config_5(config,
+                        DevLockManager.getInstance().getClntIdent());
+            }
+            else if (deviceProxy.device_4 != null) {
+                final AttributeConfig_3[] config = new AttributeConfig_3[attr.length];
+                for (int i = 0; i < attr.length; i++) {
+                    config[i] = attr[i].get_attribute_config_obj_3();
+                }
+                deviceProxy.device_4.set_attribute_config_4(config,
+                        DevLockManager.getInstance().getClntIdent());
+            }
+            else if (deviceProxy.device_3 != null) {
+                final AttributeConfig_3[] config = new AttributeConfig_3[attr.length];
+                for (int i = 0; i < attr.length; i++) {
+                    config[i] = attr[i].get_attribute_config_obj_3();
+                }
+                deviceProxy.device_3.set_attribute_config_3(config);
+            }
+            else {
+                final AttributeConfig[] config = new AttributeConfig[attr.length];
+                for (int i = 0; i < attr.length; i++) {
+                    config[i] = attr[i].get_attribute_config_obj();
+                }
+                deviceProxy.device.set_attribute_config(config);
+            }
+        } catch (final DevFailed e) {
+            throw e;
+        } catch (final Exception e) {
+            ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
+            throw_dev_failed(deviceProxy, e, "set_attribute_info", true);
+        }
     }
 
     // ==========================================================================
@@ -1360,108 +1318,122 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
     public AttributeValue read_attribute_value(final DeviceProxy deviceProxy, final String attname)
 	    throws DevFailed {
-	checkIfTango(deviceProxy, "read_attribute_value");
+        checkIfTango(deviceProxy, "read_attribute_value");
 
-	build_connection(deviceProxy);
+        build_connection(deviceProxy);
 
-	AttributeValue[] attrval;
-	if (deviceProxy.getAttnames_array() == null) {
-	    deviceProxy.setAttnames_array(new String[1]);
-	}
-	deviceProxy.getAttnames_array()[0] = attname;
-	try {
-	    if (deviceProxy.device_2 != null) {
-		attrval = deviceProxy.device_2.read_attributes_2(deviceProxy.getAttnames_array(),
-			deviceProxy.dev_src);
-	    } else {
-		attrval = deviceProxy.device.read_attributes(deviceProxy.getAttnames_array());
-	    }
-	    return attrval[0];
-	} catch (final DevFailed e) {
-	    Except.throw_connection_failed(e, "TangoApi_CANNOT_READ_ATTRIBUTE",
-		    "Cannot read attribute:   " + attname, deviceProxy.getFull_class_name()
-			    + ".read_attribute()");
-	    return null;
-	} catch (final Exception e) {
-	    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
-	    throw_dev_failed(deviceProxy, e, "device.read_attributes()", false);
-	    return null;
-	}
+        AttributeValue[] attrval;
+        if (deviceProxy.getAttnames_array() == null) {
+            deviceProxy.setAttnames_array(new String[1]);
+        }
+        deviceProxy.getAttnames_array()[0] = attname;
+        try {
+            if (deviceProxy.device_2 != null) {
+            attrval = deviceProxy.device_2.read_attributes_2(deviceProxy.getAttnames_array(),
+                deviceProxy.dev_src);
+            } else {
+            attrval = deviceProxy.device.read_attributes(deviceProxy.getAttnames_array());
+            }
+            return attrval[0];
+        } catch (final DevFailed e) {
+            Except.throw_connection_failed(e, "TangoApi_CANNOT_READ_ATTRIBUTE",
+                "Cannot read attribute:   " + attname, deviceProxy.getFull_class_name()
+                    + ".read_attribute()");
+            return null;
+        } catch (final Exception e) {
+            ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
+            throw_dev_failed(deviceProxy, e, "device.read_attributes()", false);
+            return null;
+        }
     }
 
     // ==========================================================================
     /**
      * Read the attribute values for the specified device.
      * 
-     * @param attnames
+     * @param attributeNames
      *            attribute names to request values.
      * @return the attribute values.
      */
     // ==========================================================================
-    public DeviceAttribute[] read_attribute(final DeviceProxy deviceProxy, final String[] attnames)
+    public DeviceAttribute[] read_attribute(final DeviceProxy deviceProxy, final String[] attributeNames)
 	    throws DevFailed {
 	DeviceAttribute[] attr;
 
 	build_connection(deviceProxy);
 
 	// Read attributes on device server
-	AttributeValue[] attrval = new AttributeValue[0];
-	AttributeValue_3[] attrval_3 = new AttributeValue_3[0];
-	AttributeValue_4[] attrval_4 = new AttributeValue_4[0];
+	AttributeValue[] attributeValues = new AttributeValue[0];
+	AttributeValue_3[] attributeValues_3 = new AttributeValue_3[0];
+	AttributeValue_4[] attributeValues_4 = new AttributeValue_4[0];
+	AttributeValue_5[] attributeValues_5 = new AttributeValue_5[0];
 	if (deviceProxy.url.protocol == TANGO) {
 	    // try 2 times for reconnection if requested
 	    boolean done = false;
 	    final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
 	    for (int i = 0; i < retries && !done; i++) {
-		try {
-		    if (deviceProxy.device_4 != null) {
-			attrval_4 = deviceProxy.device_4.read_attributes_4(attnames,
-				deviceProxy.dev_src, DevLockManager.getInstance().getClntIdent());
-		    } else if (deviceProxy.device_3 != null) {
-			attrval_3 = deviceProxy.device_3.read_attributes_3(attnames,
-				deviceProxy.dev_src);
-		    } else if (deviceProxy.device_2 != null) {
-			attrval = deviceProxy.device_2.read_attributes_2(attnames,
-				deviceProxy.dev_src);
-		    } else {
-			attrval = deviceProxy.device.read_attributes(attnames);
-		    }
-		    done = true;
-		} catch (final DevFailed e) {
-		    // Except.print_exception(e);
-		    final StringBuilder sb = new StringBuilder(attnames[0]);
-		    for (int j = 1; j < attnames.length; j++) {
-			sb.append(", ").append(attnames[j]);
-		    }
-		    Except.throw_connection_failed(e, "TangoApi_CANNOT_READ_ATTRIBUTE",
-			    "Cannot read attribute(s):   " + sb.toString(), deviceProxy
-				    .getFull_class_name()
-				    + ".read_attribute()");
-		} catch (final Exception e) {
-		    manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
-			    + ".read_attribute");
-		}
+            try {
+                if (deviceProxy.device_5 != null) {
+                    attributeValues_5 = deviceProxy.device_5.read_attributes_5(
+                            attributeNames, deviceProxy.dev_src,
+                            DevLockManager.getInstance().getClntIdent());
+                }
+                else if (deviceProxy.device_4 != null) {
+                    attributeValues_4 = deviceProxy.device_4.read_attributes_4(
+                            attributeNames, deviceProxy.dev_src,
+                            DevLockManager.getInstance().getClntIdent());
+                }
+                else if (deviceProxy.device_3 != null) {
+                    attributeValues_3 = deviceProxy.device_3.read_attributes_3(
+                            attributeNames, deviceProxy.dev_src);
+                }
+                else if (deviceProxy.device_2 != null) {
+                    attributeValues = deviceProxy.device_2.read_attributes_2(
+                            attributeNames, deviceProxy.dev_src);
+                }
+                else {
+                    attributeValues = deviceProxy.device.read_attributes(attributeNames);
+                }
+                done = true;
+            } catch (final DevFailed e) {
+                // Except.print_exception(e);
+                final StringBuilder sb = new StringBuilder(attributeNames[0]);
+                for (int j = 1; j < attributeNames.length; j++) {
+                    sb.append(", ").append(attributeNames[j]);
+                }
+                Except.throw_connection_failed(e, "TangoApi_CANNOT_READ_ATTRIBUTE",
+                    "Cannot read attribute(s):   " + sb.toString(),
+                        deviceProxy.getFull_class_name() + ".read_attribute()");
+            } catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy,
+                        retries, i, e, this.getClass() + ".read_attribute");
+            }
 	    }
 	    // Build a Device Attribute Object
 	    // Depends on Device_impl version
-	    if (deviceProxy.device_4 != null) {
-		attr = new DeviceAttribute[attrval_4.length];
-		for (int i = 0; i < attrval_4.length; i++) {
-		    attr[i] = new DeviceAttribute(attrval_4[i]);
-		}
+	    if (deviceProxy.device_5 != null) {
+            attr = new DeviceAttribute[attributeValues_5.length];
+            for (int i = 0; i < attributeValues_5.length; i++) {
+                attr[i] = new DeviceAttribute(attributeValues_5[i]);
+            }
+	    } else if (deviceProxy.device_4 != null) {
+            attr = new DeviceAttribute[attributeValues_4.length];
+            for (int i = 0; i < attributeValues_4.length; i++) {
+                attr[i] = new DeviceAttribute(attributeValues_4[i]);
+            }
 	    } else if (deviceProxy.device_3 != null) {
-		attr = new DeviceAttribute[attrval_3.length];
-		for (int i = 0; i < attrval_3.length; i++) {
-		    attr[i] = new DeviceAttribute(attrval_3[i]);
-		}
+            attr = new DeviceAttribute[attributeValues_3.length];
+            for (int i = 0; i < attributeValues_3.length; i++) {
+                attr[i] = new DeviceAttribute(attributeValues_3[i]);
+            }
 	    } else {
-		attr = new DeviceAttribute[attrval.length];
-		for (int i = 0; i < attrval.length; i++) {
-		    attr[i] = new DeviceAttribute(attrval[i]);
-		}
+            attr = new DeviceAttribute[attributeValues.length];
+            for (int i = 0; i < attributeValues.length; i++) {
+                attr[i] = new DeviceAttribute(attributeValues[i]);
+            }
 	    }
 	} else {
-	    attr = deviceProxy.taco_device.read_attribute(attnames);
+	    attr = deviceProxy.taco_device.read_attribute(attributeNames);
 	}
 	return attr;
     }
@@ -1470,8 +1442,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Write the attribute value for the specified device.
      * 
-     * @param devattr
-     *            attribute name and value.
+     * @param devattr attribute name and value.
      */
     // ==========================================================================
     public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute devattr)
@@ -1492,14 +1463,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Write the attribute values for the specified device.
      * 
-     * @param devattr
-     *            attribute names and values.
+     * @param deviceAttributes  attribute names and values.
      */
     // ==========================================================================
-    public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute[] devattr)
-	    	throws DevFailed {
+    public void write_attribute(final DeviceProxy deviceProxy,
+                                final DeviceAttribute[] deviceAttributes) throws DevFailed {
 		checkIfTango(deviceProxy, "write_attribute");
-
 		build_connection(deviceProxy);
 
 		//
@@ -1514,17 +1483,18 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 	"DeviceProxy.write_attribute()");
 		}
 		// Build an AttributeValue IDL object array
-		AttributeValue_4[] attrval_4 = new AttributeValue_4[0];
-		AttributeValue[] attrval = new AttributeValue[0];
-		if (deviceProxy.device_4 != null) {
-	    	attrval_4 = new AttributeValue_4[devattr.length];
-	    	for (int i = 0; i < devattr.length; i++) {
-			attrval_4[i] = devattr[i].getAttributeValueObject_4();
+        AttributeValue_4[] attributeValues_4 = new AttributeValue_4[0];
+		AttributeValue[] attributeValues = new AttributeValue[0];
+
+		if (deviceProxy.device_5 != null || deviceProxy.device_4 != null) {
+	    	attributeValues_4 = new AttributeValue_4[deviceAttributes.length];
+	    	for (int i=0 ; i<deviceAttributes.length ; i++) {
+                attributeValues_4[i] = deviceAttributes[i].getAttributeValueObject_4();
 	    	}
 		} else {
-	    	attrval = new AttributeValue[devattr.length];
-	    	for (int i = 0; i < devattr.length; i++) {
-			attrval[i] = devattr[i].getAttributeValueObject_2();
+	    	attributeValues = new AttributeValue[deviceAttributes.length];
+	    	for (int i = 0; i < deviceAttributes.length; i++) {
+                attributeValues[i] = deviceAttributes[i].getAttributeValueObject_2();
 	    	}
 		}
 		boolean done = false;
@@ -1532,13 +1502,18 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		for (int i = 0; i < retries && !done; i++) {
 	    	// write attributes on device server
 	    	try {
-				if (deviceProxy.device_4 != null) {
-		    		deviceProxy.device_4.write_attributes_4(attrval_4, DevLockManager.getInstance()
-			    		.getClntIdent());
-				} else if (deviceProxy.device_3 != null) {
-		    		deviceProxy.device_3.write_attributes_3(attrval);
+				if (deviceProxy.device_5 != null) {
+		    		deviceProxy.device_5.write_attributes_4(
+                            attributeValues_4, DevLockManager.getInstance().getClntIdent());
+				} else
+                if (deviceProxy.device_4 != null) {
+		    		deviceProxy.device_4.write_attributes_4(
+                            attributeValues_4, DevLockManager.getInstance().getClntIdent());
+				} else
+                if (deviceProxy.device_3 != null) {
+		    		deviceProxy.device_3.write_attributes_3(attributeValues);
 				} else {
-		    		deviceProxy.device.write_attributes(attrval);
+		    		deviceProxy.device.write_attributes(attributeValues);
 				}
 				done = true;
 	    	} catch (final DevFailed e) {
@@ -1558,35 +1533,44 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Write and then read the attribute values, for the specified device.
      * 
-     * @param devattr
-     *            attribute names and values.
+     * @param deviceAttributes attribute names and values.
+     */
+    // ==========================================================================
+    public DeviceAttribute[] write_read_attribute(
+                final DeviceProxy deviceProxy,
+			    final DeviceAttribute[] deviceAttributes) throws DevFailed {
+        return write_read_attribute(deviceProxy, deviceAttributes, new String[0]);
+    }
+    // ==========================================================================
+    /**
+     * Write and then read the attribute values, for the specified device.
+     *
+     * @param deviceAttributes attribute names and values to be written.
+     * @param readNames attribute names to read.
      */
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(final DeviceProxy deviceProxy,
-			    final DeviceAttribute[] devattr) throws DevFailed {
+			    final DeviceAttribute[] deviceAttributes, final String[] readNames) throws DevFailed {
 
 		checkIfTango(deviceProxy, "write_read_attribute");
-
 		build_connection(deviceProxy);
 
-		//
 		// Manage Access control
-		//
 		if (deviceProxy.access == TangoConst.ACCESS_READ) {
-	    	// pind the device to throw execption
-	    	// if failed (for reconnection)
+	    	// ping the device to throw exception if failed (for reconnection)
 	    	ping(deviceProxy);
-
         	throwNotAuthorizedException(deviceProxy.devname + ".write_read_attribute()",
 		    	"DeviceProxy.write_read_attribute()");
 		}
 		// Build an AttributeValue IDL object array
-		AttributeValue_4[] in_attrval_4 = new AttributeValue_4[0];
-		AttributeValue_4[] out_attrval_4 = new AttributeValue_4[0];
-		if (deviceProxy.device_4 != null) {
-	    	in_attrval_4 = new AttributeValue_4[devattr.length];
-	    	for (int i = 0; i < devattr.length; i++) {
-			in_attrval_4[i] = devattr[i].getAttributeValueObject_4();
+		AttributeValue_4[] attributeValues_4 = new AttributeValue_4[0];
+		AttributeValue_4[] outAttrValues_4 = new AttributeValue_4[0];
+		AttributeValue_5[] outAttrValues_5 = new AttributeValue_5[0];
+
+		if (deviceProxy.device_5 != null || deviceProxy.device_4 != null) {
+	    	attributeValues_4 = new AttributeValue_4[deviceAttributes.length];
+	    	for (int i=0 ; i<deviceAttributes.length ; i++) {
+			    attributeValues_4[i] = deviceAttributes[i].getAttributeValueObject_4();
 	    	}
 		} else {
 	    	Except.throw_connection_failed("TangoApi_READ_ONLY_MODE",
@@ -1600,9 +1584,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		for (int i = 0; i < retries && !done; i++) {
 	    	// write attributes on device server
 	    	try {
-			if (deviceProxy.device_4 != null) {
-		    	out_attrval_4 = deviceProxy.device_4.write_read_attributes_4(in_attrval_4,
-			    	DevLockManager.getInstance().getClntIdent());
+                if (deviceProxy.device_5 != null) {
+                    outAttrValues_5 = deviceProxy.device_5.write_read_attributes_5(
+                            attributeValues_4, readNames,
+                            DevLockManager.getInstance().getClntIdent());
+                } else
+                if (deviceProxy.device_4 != null) {
+                    outAttrValues_4 = deviceProxy.device_4.write_read_attributes_4(
+                            attributeValues_4, DevLockManager.getInstance().getClntIdent());
 			}
 			done = true;
 	    	} catch (final DevFailed e) {
@@ -1619,13 +1608,19 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 		// Build a Device Attribute Object
 		// Depends on Device_impl version
-		final DeviceAttribute[] attr = new DeviceAttribute[out_attrval_4.length];
-		if (deviceProxy.device_4 != null) {
-	    	for (int i = 0; i < out_attrval_4.length; i++) {
-			attr[i] = new DeviceAttribute(out_attrval_4[i]);
+		final DeviceAttribute[] attributes = new DeviceAttribute[outAttrValues_4.length];
+		if (deviceProxy.device_5 != null) {
+	    	for (int i=0 ; i<outAttrValues_5.length; i++) {
+                attributes[i] = new DeviceAttribute(outAttrValues_5[i]);
 	    	}
 		}
-		return attr;
+        else
+		if (deviceProxy.device_4 != null) {
+	    	for (int i = 0; i < outAttrValues_4.length; i++) {
+                attributes[i] = new DeviceAttribute(outAttrValues_4[i]);
+	    	}
+		}
+		return attributes;
     }
 
     // ==========================================================================
@@ -1648,20 +1643,20 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * polling period.
      * 
      * @param deviceProxy device proxy instance.
-     * @param objname command/attribute name to be polled.
-     * @param objtype command or attribute.
+     * @param objectName command/attribute name to be polled.
+     * @param objectType command or attribute.
      * @param period  polling period.
      * @throws fr.esrf.Tango.DevFailed if command failed
      */
     // ==========================================================================
-    private void poll_object(final DeviceProxy deviceProxy, final String objname,
-	    	final String objtype, final int period) throws DevFailed {
+    private void poll_object(final DeviceProxy deviceProxy, final String objectName,
+	    	final String objectType, final int period) throws DevFailed {
 		final DevVarLongStringArray lsa = new DevVarLongStringArray();
 		lsa.lvalue = new int[1];
 		lsa.svalue = new String[3];
 		lsa.svalue[0] = deviceProxy.devname;
-		lsa.svalue[1] = objtype;
-		lsa.svalue[2] = objname.toLowerCase();
+		lsa.svalue[1] = objectType;
+		lsa.svalue[2] = objectName.toLowerCase();
 		lsa.lvalue[0] = period;
 
 		// Send command on administration device.
@@ -1691,7 +1686,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 	    	}
 	    	// Not this exception then re-throw it
 	    	Except.throw_communication_failed(e, "TangoApi_CANNOT_POLL_OBJECT",
-		    	"Cannot poll object " + objname, deviceProxy.getFull_class_name()
+		    	"Cannot poll object " + objectName, deviceProxy.getFull_class_name()
 			    	+ ".poll_object()");
 		}
     }
@@ -1822,21 +1817,27 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     .getFull_class_name()
                     + ".command_history()");
 	    }
-
+//  ToDo DeviceDataHistory
         DeviceDataHistory[] histo = new DeviceDataHistory[0];
         try {
             // Check IDL revision to know kind of history.
-            if (deviceProxy.device_4 != null) {
-            final DevCmdHistory_4 cmd_histo = deviceProxy.device_4.command_inout_history_4(
-                cmdname, nb);
-            histo = ConversionUtil.histo4ToDeviceDataHistoryArray(cmdname, cmd_histo);
-            } else {
-            final DevCmdHistory[] cmd_histo = deviceProxy.device_2.command_inout_history_2(
-                cmdname, nb);
-            histo = new DeviceDataHistory[cmd_histo.length];
-            for (int i = 0; i < cmd_histo.length; i++) {
-                histo[i] = new DeviceDataHistory(cmdname, cmd_histo[i]);
+            if (deviceProxy.device_5 != null) {
+                final DevCmdHistory_4 cmdHistory =
+                        deviceProxy.device_5.command_inout_history_4(cmdname, nb);
+                histo = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
             }
+            else if (deviceProxy.device_4 != null) {
+                final DevCmdHistory_4 cmdHistory =
+                        deviceProxy.device_4.command_inout_history_4(cmdname, nb);
+                histo = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
+            }
+            else {
+                final DevCmdHistory[] cmdHistory =
+                        deviceProxy.device_2.command_inout_history_2(cmdname, nb);
+                histo = new DeviceDataHistory[cmdHistory.length];
+                for (int i = 0; i < cmdHistory.length; i++) {
+                    histo[i] = new DeviceDataHistory(cmdname, cmdHistory[i]);
+                }
             }
         } catch (final DevFailed e) {
             throw e;
@@ -1850,52 +1851,59 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Return the history for attribute polled.
      * 
-     * @param attname attribute name to read polled history.
-     * @param nb nb data to read.
+     * @param attributeName attribute name to read polled history.
+     * @param nbData nb data to read.
      */
     // ==========================================================================
     public DeviceDataHistory[] attribute_history(final DeviceProxy deviceProxy,
-            final String attname, final int nb) throws DevFailed {
+            final String attributeName, final int nbData) throws DevFailed {
         checkIfTango(deviceProxy, "attribute_history");
-
         build_connection(deviceProxy);
 
         if (DeviceProxy.isCheck_idl() && get_idl_version(deviceProxy) < 2) {
             Except.throw_non_supported_exception("TangoApi_IDL_NOT_SUPPORTED",
-                "Not supported by the IDL version used by device", deviceProxy
-                    .getFull_class_name()
-                    + ".attribute_history()");
+                "Not supported by the IDL version used by device",
+                    deviceProxy.getFull_class_name() + ".attribute_history()");
         }
 
-        DeviceDataHistory[] histo = new DeviceDataHistory[0];
+        DeviceDataHistory[] deviceDataHistories = new DeviceDataHistory[0];
         try {
             // Check IDL revision to know kind of history.
-            if (deviceProxy.device_4 != null) {
-            final DevAttrHistory_4 att_histo = deviceProxy.device_4.read_attribute_history_4(
-                attname, nb);
-            histo = ConversionUtil.histo4ToDeviceDataHistoryArray(att_histo);
-            } else if (deviceProxy.device_3 != null) {
-            final DevAttrHistory_3[] att_histo = deviceProxy.device_3.read_attribute_history_3(
-                attname, nb);
+            if (deviceProxy.device_5 != null) {
+                final DevAttrHistory_5 attrHistory_5 =
+                        deviceProxy.device_5.read_attribute_history_5(attributeName, nbData);
+                deviceDataHistories =
+                        ConversionUtil.attributeHistoryToDeviceDataHistoryArray(attrHistory_5);
+            }
+            else if (deviceProxy.device_4 != null) {
+                final DevAttrHistory_4 attrHistory_4 =
+                        deviceProxy.device_4.read_attribute_history_4(attributeName, nbData);
+                deviceDataHistories =
+                        ConversionUtil.attributeHistoryToDeviceDataHistoryArray(attrHistory_4);
+            }
+            else if (deviceProxy.device_3 != null) {
+                final DevAttrHistory_3[] attrHistories_3 =
+                        deviceProxy.device_3.read_attribute_history_3(attributeName, nbData);
 
-            histo = new DeviceDataHistory[att_histo.length];
-            for (int i = 0; i < att_histo.length; i++) {
-                histo[i] = new DeviceDataHistory(att_histo[i]);
+                deviceDataHistories = new DeviceDataHistory[attrHistories_3.length];
+                for (int i = 0; i < attrHistories_3.length; i++) {
+                    deviceDataHistories[i] = new DeviceDataHistory(attrHistories_3[i]);
+                }
             }
-            } else if (deviceProxy.device_2 != null) {
-            final DevAttrHistory[] att_histo = deviceProxy.device_2.read_attribute_history_2(
-                attname, nb);
-            histo = new DeviceDataHistory[att_histo.length];
-            for (int i = 0; i < att_histo.length; i++) {
-                histo[i] = new DeviceDataHistory(att_histo[i]);
-            }
+            else if (deviceProxy.device_2 != null) {
+                final DevAttrHistory[] attrHistories = deviceProxy.device_2.read_attribute_history_2(
+                    attributeName, nbData);
+                deviceDataHistories = new DeviceDataHistory[attrHistories.length];
+                for (int i=0 ; i<attrHistories.length ; i++) {
+                    deviceDataHistories[i] = new DeviceDataHistory(attrHistories[i]);
+                }
             }
         } catch (final DevFailed e) {
             throw e;
         } catch (final Exception e) {
             throw_dev_failed(deviceProxy, e, "read_attribute_history()", false);
         }
-        return histo;
+        return deviceDataHistories;
     }
 
     // ==========================================================================
@@ -2077,14 +2085,21 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         // Create the request object
         // ----------------------------------
         Request request;
-        if (deviceProxy.device_4 != null) {
+        if (deviceProxy.device_5 != null) {
+            request = deviceProxy.device_5._request("command_inout_4");
+            setRequestArgsForCmd(request, cmdname, data_in, get_source(deviceProxy), DevLockManager
+                .getInstance().getClntIdent());
+        }
+        else if (deviceProxy.device_4 != null) {
             request = deviceProxy.device_4._request("command_inout_4");
             setRequestArgsForCmd(request, cmdname, data_in, get_source(deviceProxy), DevLockManager
                 .getInstance().getClntIdent());
-        } else if (deviceProxy.device_2 != null) {
+        }
+        else if (deviceProxy.device_2 != null) {
             request = deviceProxy.device_2._request("command_inout_2");
             setRequestArgsForCmd(request, cmdname, data_in, get_source(deviceProxy), null);
-        } else {
+        }
+        else {
             request = deviceProxy.device._request("command_inout");
             setRequestArgsForCmd(request, cmdname, data_in, null, null);
         }
@@ -2221,11 +2236,16 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                                           final AsyncCallObject aco) throws DevFailed {
         DeviceData data;
         try {
-            if (deviceProxy.device_4 != null) {
+            if (deviceProxy.device_5 != null) {
                 check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_4");
-            } else if (deviceProxy.device_2 != null) {
+            }
+            else if (deviceProxy.device_4 != null) {
+                check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_4");
+            }
+            else if (deviceProxy.device_2 != null) {
                 check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout_2");
-            } else {
+            }
+            else {
                 check_asynch_reply(deviceProxy, aco.request, aco.id, "command_inout");
             }
             // If no exception, extract the any from return value,
@@ -2317,20 +2337,29 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         // Create the request object
         // ----------------------------------
         Request request;
-        if (deviceProxy.device_4 != null) {
+        if (deviceProxy.device_5 != null) {
+            request = deviceProxy.device_5._request("read_attributes_5");
+            setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy),
+                    DevLockManager.getInstance().getClntIdent(), AttributeValueList_5Helper.type());
+            request.exceptions().add(MultiDevFailedHelper.type());
+        }
+        else if (deviceProxy.device_4 != null) {
             request = deviceProxy.device_4._request("read_attributes_4");
             setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy),
                     DevLockManager.getInstance().getClntIdent(), AttributeValueList_4Helper.type());
             request.exceptions().add(MultiDevFailedHelper.type());
-        } else if (deviceProxy.device_3 != null) {
+        }
+        else if (deviceProxy.device_3 != null) {
             request = deviceProxy.device_3._request("read_attributes_3");
             setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy), null,
                 AttributeValueList_3Helper.type());
-        } else if (deviceProxy.device_2 != null) {
+        }
+        else if (deviceProxy.device_2 != null) {
             request = deviceProxy.device_2._request("read_attributes_2");
             setRequestArgsForReadAttr(request, attnames, get_source(deviceProxy), null,
                 AttributeValueListHelper.type());
-        } else {
+        }
+        else {
             request = deviceProxy.device._request("read_attributes");
             setRequestArgsForReadAttr(request, attnames, null, null,
                     AttributeValueListHelper.type());
@@ -2504,41 +2533,53 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     public DeviceAttribute[] read_attribute_reply(final DeviceProxy deviceProxy,
                                                   final int id) throws DevFailed {
         DeviceAttribute[] data = new DeviceAttribute[0];
-        AttributeValue[] attrval;
-        AttributeValue_3[] attrval_3;
-        AttributeValue_4[] attrval_4;
+        AttributeValue[] attributeValues;
+        AttributeValue_3[] attributeValues_3;
+        AttributeValue_4[] attributeValues_4;
+        AttributeValue_5[] attributeValues_5;
         final Request request = ApiUtil.get_async_request(id);
 
         // If no exception, extract the any from return value,
         final Any any = request.return_value();
         try {
-            if (deviceProxy.device_4 != null) {
+            if (deviceProxy.device_5 != null) {
+                check_asynch_reply(deviceProxy, request, id, "read_attributes_5");
+                    attributeValues_5 = AttributeValueList_5Helper.extract(any);
+                    data = new DeviceAttribute[attributeValues_5.length];
+                    for (int i = 0; i < attributeValues_5.length; i++) {
+                        data[i] = new DeviceAttribute(attributeValues_5[i]);
+                }
+            }
+            else if (deviceProxy.device_4 != null) {
                 check_asynch_reply(deviceProxy, request, id, "read_attributes_4");
-                    attrval_4 = AttributeValueList_4Helper.extract(any);
-                    data = new DeviceAttribute[attrval_4.length];
-                    for (int i = 0; i < attrval_4.length; i++) {
-                        data[i] = new DeviceAttribute(attrval_4[i]);
+                    attributeValues_4 = AttributeValueList_4Helper.extract(any);
+                    data = new DeviceAttribute[attributeValues_4.length];
+                    for (int i = 0; i < attributeValues_4.length; i++) {
+                        data[i] = new DeviceAttribute(attributeValues_4[i]);
                 }
-            } else if (deviceProxy.device_3 != null) {
+            }
+            else if (deviceProxy.device_3 != null) {
                 check_asynch_reply(deviceProxy, request, id, "read_attributes_3");
-                    attrval_3 = AttributeValueList_3Helper.extract(any);
-                    data = new DeviceAttribute[attrval_3.length];
-                    for (int i = 0; i < attrval_3.length; i++) {
-                        data[i] = new DeviceAttribute(attrval_3[i]);
+                    attributeValues_3 = AttributeValueList_3Helper.extract(any);
+                    data = new DeviceAttribute[attributeValues_3.length];
+                    for (int i = 0; i < attributeValues_3.length; i++) {
+                        data[i] = new DeviceAttribute(attributeValues_3[i]);
                 }
-            } else if (deviceProxy.device_2 != null) {
+            }
+            else if (deviceProxy.device_2 != null) {
                 check_asynch_reply(deviceProxy, request, id, "read_attributes_2");
-                    attrval = AttributeValueListHelper.extract(any);
-                    data = new DeviceAttribute[attrval.length];
-                    for (int i = 0; i < attrval.length; i++) {
-                        data[i] = new DeviceAttribute(attrval[i]);
+                    attributeValues = AttributeValueListHelper.extract(any);
+                    data = new DeviceAttribute[attributeValues.length];
+                    for (int i = 0; i < attributeValues.length; i++) {
+                        data[i] = new DeviceAttribute(attributeValues[i]);
                 }
-            } else {
+            }
+            else {
                 check_asynch_reply(deviceProxy, request, id, "read_attributes");
-                    attrval = AttributeValueListHelper.extract(any);
-                    data = new DeviceAttribute[attrval.length];
-                    for (int i = 0; i < attrval.length; i++) {
-                        data[i] = new DeviceAttribute(attrval[i]);
+                    attributeValues = AttributeValueListHelper.extract(any);
+                    data = new DeviceAttribute[attributeValues.length];
+                    for (int i = 0; i < attributeValues.length; i++) {
+                        data[i] = new DeviceAttribute(attributeValues[i]);
                 }
             }
         }
@@ -2668,42 +2709,45 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
 		// Build idl argin object
 		Request request;
-		final String[] attnames = new String[attribs.length];
+		final String[] attributeNames = new String[attribs.length];
 
 		Any any;
-		if (deviceProxy.device_4 != null) {
-	    	final AttributeValue_4[] attrval_4 = new AttributeValue_4[attribs.length];
-	    	for (int i = 0; i < attribs.length; i++) {
-                attrval_4[i] = attribs[i].getAttributeValueObject_4();
-                attrval_4[i].err_list = new DevError[0];
-                attnames[i] = attrval_4[i].name;
+		if (deviceProxy.device_5 != null || deviceProxy.device_4 != null) {
+	    	final AttributeValue_4[] attributeValues_4 = new AttributeValue_4[attribs.length];
+	    	for (int i=0; i<attribs.length ; i++) {
+                attributeValues_4[i] = attribs[i].getAttributeValueObject_4();
+                attributeValues_4[i].err_list = new DevError[0];
+                attributeNames[i] = attributeValues_4[i].name;
             }
 	    	request = deviceProxy.device_4._request("write_attributes_4");
 
 	    	any = request.add_in_arg();
-	    	AttributeValueList_4Helper.insert(any, attrval_4);
+	    	AttributeValueList_4Helper.insert(any, attributeValues_4);
 
 	    	any = request.add_in_arg();
 	    	ClntIdentHelper.insert(any, DevLockManager.getInstance().getClntIdent());
 	    	request.exceptions().add(MultiDevFailedHelper.type());
-		} else {
-	    	final AttributeValue[] attrval = new AttributeValue[attribs.length];
+		}
+        else {
+	    	final AttributeValue[] attributeValues = new AttributeValue[attribs.length];
 	    	for (int i = 0; i < attribs.length; i++) {
-			    attrval[i] = attribs[i].getAttributeValueObject_2();
-			    attnames[i] = attrval[i].name;
+			    attributeValues[i] = attribs[i].getAttributeValueObject_2();
+			    attributeNames[i] = attributeValues[i].name;
 	    	}
 
 	    	// Create the request object
 	    	if (deviceProxy.device_3 != null) {
-			request = deviceProxy.device_3._request("write_attributes_3");
-	    	} else if (deviceProxy.device_2 != null) {
+			    request = deviceProxy.device_3._request("write_attributes_3");
+	    	}
+            else if (deviceProxy.device_2 != null) {
 	    		request = deviceProxy.device_2._request("write_attributes");
-	    	} else {
+	    	}
+            else {
     			request = deviceProxy.device._request("write_attributes");
 	    	}
 
 	    	any = request.add_in_arg();
-	    	AttributeValueListHelper.insert(any, attrval);
+	    	AttributeValueListHelper.insert(any, attributeValues);
 		}
 
 		request.exceptions().add(DevFailedHelper.type());
@@ -2714,7 +2758,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		boolean done = false;
 		// try 2 times for reconnection if requested
 		final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
-		for (int i = 0; i < retries && !done; i++) {
+		for (int i=0 ; i<retries && !done ; i++) {
 	    	try {
                 if (forget) {
                     request.send_oneway();
@@ -2722,12 +2766,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     request.send_deferred();
                     // store request reference to read reply later
                     id = ApiUtil.put_async_request(new AsyncCallObject(request, deviceProxy, ATT_W,
-                        attnames));
+                        attributeNames));
                 }
                 done = true;
 	    	} catch (final Exception e) {
-                manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
-                    + ".write_attribute_asynch");
+                manageExceptionReconnection(deviceProxy,
+                        retries, i, e, this.getClass() + ".write_attribute_asynch");
 	    	}
 		}
 		return id;
@@ -2744,7 +2788,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 		    throws DevFailed {
 		final Request request = ApiUtil.get_async_request(id);
         try {
-            if (deviceProxy.device_4 != null) {
+            if (deviceProxy.device_5 != null || deviceProxy.device_4 != null) {
                 check_asynch_reply(deviceProxy, request, id, "write_attributes_4");
             } else if (deviceProxy.device_3 != null) {
                 check_asynch_reply(deviceProxy, request, id, "write_attributes_3");
@@ -2762,20 +2806,20 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 final Any any = args.item(0).value();
 
                 if (deviceProxy.idl_version>=4) {
-                    AttributeValue_4[]    attVal_4 =
+                    AttributeValue_4[]    attributeValues_4 =
                             AttributeValueList_4Helper.extract(any);
 
-                    deviceAttributes = new DeviceAttribute[attVal_4.length];
-                    for (int i=0 ;  i<attVal_4.length ; i++) {
-                        deviceAttributes[i] = new DeviceAttribute(attVal_4[i]);
+                    deviceAttributes = new DeviceAttribute[attributeValues_4.length];
+                    for (int i=0 ;  i<attributeValues_4.length ; i++) {
+                        deviceAttributes[i] = new DeviceAttribute(attributeValues_4[i]);
                     }
                 }
                 else if (deviceProxy.idl_version>=3) {
-                    AttributeValue[]    attVal =
+                    AttributeValue[]    attributeValues =
                             AttributeValueListHelper.extract(any);
-                    deviceAttributes = new DeviceAttribute[attVal.length];
-                    for (int i=0 ;  i<attVal.length ; i++) {
-                        deviceAttributes[i] = new DeviceAttribute(attVal[i]);
+                    deviceAttributes = new DeviceAttribute[attributeValues.length];
+                    for (int i=0 ;  i<attributeValues.length ; i++) {
+                        deviceAttributes[i] = new DeviceAttribute(attributeValues[i]);
                     }
                 }
                 else
