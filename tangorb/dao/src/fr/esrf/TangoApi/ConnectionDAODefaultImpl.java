@@ -34,22 +34,12 @@
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.Tango.*;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
 
-import fr.esrf.Tango.DevCmdInfo;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevInfo;
-import fr.esrf.Tango.DevInfo_3;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.Device;
-import fr.esrf.Tango.DeviceHelper;
-import fr.esrf.Tango.Device_2Helper;
-import fr.esrf.Tango.Device_3Helper;
-import fr.esrf.Tango.Device_4Helper;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 
@@ -269,8 +259,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     // ===================================================================
     public synchronized void build_connection(final Connection connection) throws DevFailed {
-		if (connection.device == null && connection.device_2 == null &&
-                connection.device_3 == null && connection.device_4 == null) {
+		if (!connection.deviceCreated()) {
 	    		if (connection.devname != null) {
 
 				final long t = System.currentTimeMillis();
@@ -358,35 +347,52 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		set_obj_timeout(connection, connection.getDev_timeout());
 
 		// Construct the Object
-		if (connection.getObj()._is_a("IDL:Tango/Device_4:1.0")) {
+		if (connection.getObj()._is_a("IDL:Tango/Device_5:1.0")) {
+	    	System.out.println(connection.devname + " Device is a Tango/Device_5:1.0 !!!!!!!!!");
+	    	connection.device_5 = Device_5Helper.narrow(connection.getObj());
+	    	connection.device_4 = connection.device_5;
+	    	connection.device_3 = connection.device_5;
+	    	connection.device_2 = connection.device_5;
+	    	connection.device = connection.device_5;
+	    	connection.idl_version = 5;
+        }
+        else if (connection.getObj()._is_a("IDL:Tango/Device_4:1.0")) {
 	    	// System.out.println("Device is a Tango/Device_4:1.0 !!!!!!!!!");
+            connection.device_5 = null;
 	    	connection.device_4 = Device_4Helper.narrow(connection.getObj());
 	    	connection.device_3 = connection.device_4;
 	    	connection.device_2 = connection.device_4;
 	    	connection.device = connection.device_4;
 	    	connection.idl_version = 4;
-		} else if (connection.getObj()._is_a("IDL:Tango/Device_3:1.0")) {
+		}
+        else if (connection.getObj()._is_a("IDL:Tango/Device_3:1.0")) {
 	    	// System.out.println("Device is a Tango/Device_3:1.0 !!!!!!!!!");
+            connection.device_5 = null;
 	    	connection.device_4 = null;
 	    	connection.device_3 = Device_3Helper.narrow(connection.getObj());
 	    	connection.device_2 = connection.device_3;
 	    	connection.device = connection.device_3;
 	    	connection.idl_version = 3;
-		} else if (connection.getObj()._is_a("IDL:Tango/Device_2:1.0")) {
+		}
+        else if (connection.getObj()._is_a("IDL:Tango/Device_2:1.0")) {
 	    	System.err.println("Device " + connection.get_name() + " is a Tango/Device_2:1.0 !!!!!!!!!");
+            connection.device_5 = null;
 	    	connection.device_4 = null;
 	    	connection.device_3 = null;
 	    	connection.device_2 = Device_2Helper.narrow(connection.getObj());
 	    	connection.device = connection.device_2;
 	    	connection.idl_version = 2;
-		} else if (connection.getObj()._is_a("IDL:Tango/Device:1.0")) {
+		}
+        else if (connection.getObj()._is_a("IDL:Tango/Device:1.0")) {
 	    	System.err.println("Device " + connection.get_name() + " is a Tango/Device:1.0 !!!!!!!!!");
+            connection.device_5 = null;
 	    	connection.device_4 = null;
 	    	connection.device_3 = null;
 	    	connection.device_2 = null;
 	    	connection.device = DeviceHelper.narrow(connection.getObj());
 	    	connection.idl_version = 1;
-		} else {
+		}
+        else {
 	    	System.err.println("TangoApi_DEVICE_IDL_UNKNOWN!");
 	    	Except.throw_non_supported_exception("TangoApi_DEVICE_IDL_UNKNOWN", connection.devname
 		    	+ " has an IDL revision not supported !", "Connection.createDevice("
@@ -561,6 +567,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device_2 = null;
 	    	connection.device_3 = null;
 	    	connection.device_4 = null;
+	    	connection.device_5 = null;
 	    	connection.ior = null;
 	    	throw e;
 		} catch (final Exception e) {
@@ -568,6 +575,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device_2 = null;
 	    	connection.device_3 = null;
 	    	connection.device_4 = null;
+	    	connection.device_5 = null;
 	    	connection.ior = null;
 	    	final String reason = "TangoApi_CANNOT_IMPORT_DEVICE";
 	    	final String s = connection.isAlready_connected() ? "Re-" : "";
@@ -679,6 +687,9 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
         //  Set new instances to connection object
         connection.setObj(obj);
         switch (connection.idl_version) {
+            case 5:
+                connection.device_5 = Device_5Helper.narrow(obj);
+                break;
             case 4:
                 connection.device_4 = Device_4Helper.narrow(obj);
                 break;
@@ -781,6 +792,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device_2 = null;
 	    	connection.device_3 = null;
 	    	connection.device_4 = null;
+	    	connection.device_5 = null;
 	    	connection.ior = null;
 	    	Except.throw_connection_failed(e.toString(), desc, origin);
 		} else if (e.toString().contains("org.omg.CORBA.TRANSIENT")
@@ -792,6 +804,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device_2 = null;
 	    	connection.device_3 = null;
 	    	connection.device_4 = null;
+	    	connection.device_5 = null;
 	    	connection.ior = null;
 	    	Except.throw_connection_failed(e.toString(), desc, origin);
 		} else if (e.toString().startsWith("java.lang.RuntimeException")) {
@@ -800,6 +813,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.device_2 = null;
 	    	connection.device_3 = null;
 	    	connection.device_4 = null;
+	    	connection.device_5 = null;
 	    	connection.ior = null;
 	    	Except.throw_connection_failed(e.toString(), desc, origin);
 		} else {
@@ -874,7 +888,10 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		final int retries = connection.transparent_reconnection ? 2 : 1;
 		for (int i=0 ; i<retries && !done ; i++) {
 	    	try {
-				if (connection.device_4 != null) {
+				if (connection.device_5 != null) {
+		    		received = connection.device_5.command_inout_4(command, argin.extractAny(),
+			    		connection.dev_src, DevLockManager.getInstance().getClntIdent());
+                } else if (connection.device_4 != null) {
 		    		received = connection.device_4.command_inout_4(command, argin.extractAny(),
 			    		connection.dev_src, DevLockManager.getInstance().getClntIdent());
                 } else if (connection.device_2 != null) {
@@ -1290,6 +1307,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	return db.isCommandAllowed(connection.get_class_name(), cmd);
     }
 
+    // ==========================================================================
+    // ==========================================================================
     protected void manageExceptionReconnection(final Connection deviceProxy, final int retries,
 	    final int i, final Exception e, final String origin) throws DevFailed {
 		ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
@@ -1301,6 +1320,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	deviceProxy.device_2 = null;
 	    	deviceProxy.device_3 = null;
 	    	deviceProxy.device_4 = null;
+	    	deviceProxy.device_5 = null;
 	    	deviceProxy.ior = null;
 	    	build_connection(deviceProxy);
 
