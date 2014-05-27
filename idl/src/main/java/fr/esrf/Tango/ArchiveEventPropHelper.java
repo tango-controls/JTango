@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "ArchiveEventProp".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class ArchiveEventPropHelper
@@ -67,12 +67,12 @@ public final class ArchiveEventPropHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.ArchiveEventProp s)
 	{
-		java.lang.String tmpResult44 = s.rel_change;
-out.write_string( tmpResult44 );
-		java.lang.String tmpResult45 = s.abs_change;
+		java.lang.String tmpResult45 = s.rel_change;
 out.write_string( tmpResult45 );
-		java.lang.String tmpResult46 = s.period;
+		java.lang.String tmpResult46 = s.abs_change;
 out.write_string( tmpResult46 );
+		java.lang.String tmpResult47 = s.period;
+out.write_string( tmpResult47 );
 		fr.esrf.Tango.DevVarStringArrayHelper.write(out,s.extensions);
 	}
 }

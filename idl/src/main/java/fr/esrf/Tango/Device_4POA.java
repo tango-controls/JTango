@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL interface "Device_4".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public abstract class Device_4POA
@@ -159,8 +159,8 @@ public abstract class Device_4POA
 			case 4: // _get_status
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult122 = status();
-_out.write_string( tmpResult122 );
+			java.lang.String tmpResult125 = status();
+_out.write_string( tmpResult125 );
 				break;
 			}
 			case 5: // set_attribute_config_3
@@ -181,8 +181,8 @@ _out.write_string( tmpResult122 );
 			case 6: // _get_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult123 = name();
-_out.write_string( tmpResult123 );
+			java.lang.String tmpResult126 = name();
+_out.write_string( tmpResult126 );
 				break;
 			}
 			case 7: // read_attributes
@@ -235,8 +235,8 @@ _out.write_string( tmpResult123 );
 			case 10: // _get_adm_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult124 = adm_name();
-_out.write_string( tmpResult124 );
+			java.lang.String tmpResult127 = adm_name();
+_out.write_string( tmpResult127 );
 				break;
 			}
 			case 11: // info_3
@@ -512,8 +512,8 @@ _out.write_string( tmpResult124 );
 			case 29: // _get_description
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult125 = description();
-_out.write_string( tmpResult125 );
+			java.lang.String tmpResult128 = description();
+_out.write_string( tmpResult128 );
 				break;
 			}
 			case 30: // read_attributes_3

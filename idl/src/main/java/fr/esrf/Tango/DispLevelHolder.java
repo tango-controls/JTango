@@ -3,7 +3,7 @@ package fr.esrf.Tango;
  * Generated from IDL enum "DispLevel".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class DispLevelHolder

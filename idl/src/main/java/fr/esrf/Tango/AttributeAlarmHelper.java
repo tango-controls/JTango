@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "AttributeAlarm".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttributeAlarmHelper
@@ -70,18 +70,18 @@ public final class AttributeAlarmHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.AttributeAlarm s)
 	{
-		java.lang.String tmpResult47 = s.min_alarm;
-out.write_string( tmpResult47 );
-		java.lang.String tmpResult48 = s.max_alarm;
+		java.lang.String tmpResult48 = s.min_alarm;
 out.write_string( tmpResult48 );
-		java.lang.String tmpResult49 = s.min_warning;
+		java.lang.String tmpResult49 = s.max_alarm;
 out.write_string( tmpResult49 );
-		java.lang.String tmpResult50 = s.max_warning;
+		java.lang.String tmpResult50 = s.min_warning;
 out.write_string( tmpResult50 );
-		java.lang.String tmpResult51 = s.delta_t;
+		java.lang.String tmpResult51 = s.max_warning;
 out.write_string( tmpResult51 );
-		java.lang.String tmpResult52 = s.delta_val;
+		java.lang.String tmpResult52 = s.delta_t;
 out.write_string( tmpResult52 );
+		java.lang.String tmpResult53 = s.delta_val;
+out.write_string( tmpResult53 );
 		fr.esrf.Tango.DevVarStringArrayHelper.write(out,s.extensions);
 	}
 }

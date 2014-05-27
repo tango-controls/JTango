@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "ChangeEventProp".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class ChangeEventPropHelper
@@ -66,10 +66,10 @@ public final class ChangeEventPropHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.ChangeEventProp s)
 	{
-		java.lang.String tmpResult41 = s.rel_change;
-out.write_string( tmpResult41 );
-		java.lang.String tmpResult42 = s.abs_change;
+		java.lang.String tmpResult42 = s.rel_change;
 out.write_string( tmpResult42 );
+		java.lang.String tmpResult43 = s.abs_change;
+out.write_string( tmpResult43 );
 		fr.esrf.Tango.DevVarStringArrayHelper.write(out,s.extensions);
 	}
 }

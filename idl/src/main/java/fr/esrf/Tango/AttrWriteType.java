@@ -3,7 +3,7 @@ package fr.esrf.Tango;
  * Generated from IDL enum "AttrWriteType".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttrWriteType
@@ -20,6 +20,8 @@ public final class AttrWriteType
 	public static final AttrWriteType WRITE = new AttrWriteType(_WRITE);
 	public static final int _READ_WRITE = 3;
 	public static final AttrWriteType READ_WRITE = new AttrWriteType(_READ_WRITE);
+	public static final int _WT_UNKNOWN = 4;
+	public static final AttrWriteType WT_UNKNOWN = new AttrWriteType(_WT_UNKNOWN);
 	public int value()
 	{
 		return value;
@@ -31,6 +33,7 @@ public final class AttrWriteType
 			case _READ_WITH_WRITE: return READ_WITH_WRITE;
 			case _WRITE: return WRITE;
 			case _READ_WRITE: return READ_WRITE;
+			case _WT_UNKNOWN: return WT_UNKNOWN;
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}
@@ -41,6 +44,7 @@ public final class AttrWriteType
 			case _READ_WITH_WRITE: return "READ_WITH_WRITE";
 			case _WRITE: return "WRITE";
 			case _READ_WRITE: return "READ_WRITE";
+			case _WT_UNKNOWN: return "WT_UNKNOWN";
 			default: throw new org.omg.CORBA.BAD_PARAM();
 		}
 	}

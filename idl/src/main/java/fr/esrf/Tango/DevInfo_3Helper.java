@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "DevInfo_3".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class DevInfo_3Helper
@@ -69,16 +69,16 @@ public final class DevInfo_3Helper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.DevInfo_3 s)
 	{
-		java.lang.String tmpResult78 = s.dev_class;
-out.write_string( tmpResult78 );
-		java.lang.String tmpResult79 = s.server_id;
-out.write_string( tmpResult79 );
-		java.lang.String tmpResult80 = s.server_host;
+		java.lang.String tmpResult80 = s.dev_class;
 out.write_string( tmpResult80 );
-		out.write_long(s.server_version);
-		java.lang.String tmpResult81 = s.doc_url;
+		java.lang.String tmpResult81 = s.server_id;
 out.write_string( tmpResult81 );
-		java.lang.String tmpResult82 = s.dev_type;
+		java.lang.String tmpResult82 = s.server_host;
 out.write_string( tmpResult82 );
+		out.write_long(s.server_version);
+		java.lang.String tmpResult83 = s.doc_url;
+out.write_string( tmpResult83 );
+		java.lang.String tmpResult84 = s.dev_type;
+out.write_string( tmpResult84 );
 	}
 }

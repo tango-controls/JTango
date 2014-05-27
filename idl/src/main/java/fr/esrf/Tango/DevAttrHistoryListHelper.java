@@ -4,7 +4,7 @@ package fr.esrf.Tango;
  * Generated from IDL alias "DevAttrHistoryList".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class DevAttrHistoryListHelper
@@ -48,19 +48,19 @@ public final class DevAttrHistoryListHelper
 	public static fr.esrf.Tango.DevAttrHistory[] read (final org.omg.CORBA.portable.InputStream _in)
 	{
 		fr.esrf.Tango.DevAttrHistory[] _result;
-		int _l_result30 = _in.read_long();
+		int _l_result31 = _in.read_long();
 		try
 		{
 			 int x = _in.available();
-			 if ( x > 0 && _l_result30 > x )
+			 if ( x > 0 && _l_result31 > x )
 				{
-					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result30);
+					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result31);
 				}
 		}
 		catch (java.io.IOException e)
 		{
 		}
-		_result = new fr.esrf.Tango.DevAttrHistory[_l_result30];
+		_result = new fr.esrf.Tango.DevAttrHistory[_l_result31];
 		for (int i=0;i<_result.length;i++)
 		{
 			_result[i]=fr.esrf.Tango.DevAttrHistoryHelper.read(_in);
