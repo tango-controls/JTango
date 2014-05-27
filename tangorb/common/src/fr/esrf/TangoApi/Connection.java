@@ -39,8 +39,8 @@ import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoDs.TangoConst;
 
 /**
- * Class Description: This class manage device connection for Tango objects. It
- * is an api between user and IDL Device object.
+ * Class Description: This class manage device connection for Tango objects.
+ * It is an api between user and IDL Device object.
  * 
  * @author verdier
  * @version $Revision$
@@ -70,6 +70,10 @@ public class Connection implements ApiDefs {
 	 *	Device IDL_4 object used for TANGO device access
 	 */
 	protected Device_4	device_4 = null;
+	/**
+	 *	Device IDL_5 object used for TANGO device access
+	 */
+	protected Device_5	device_5 = null;
 	/**
 	 *	TACO Device object used for TANGO interface.
 	 */
@@ -296,14 +300,22 @@ public class Connection implements ApiDefs {
 	}
 
 	// ===================================================================
+	// ===================================================================
+    @SuppressWarnings("SimplifiableIfStatement")
+    public boolean deviceCreated() {
+        if (device_5!=null) return true;
+        if (device_4!=null) return true;
+        if (device_3!=null) return true;
+        if (device_2!=null) return true;
+        return device!=null;
+    }
+	// ===================================================================
 	/**
 	 * Change the timeout value for a device call.
 	 * 
-	 * @param millis
-	 *            New value of the timeout in milliseconds.
-	 * @throws DevFailed
-	 *             if orb.create_policy throws an org.omg.CORBA.PolicyError
-	 *             exception.
+	 * @param millis  New value of the timeout in milliseconds.
+	 * @throws DevFailed  if orb.create_policy throws an
+     *              org.omg.CORBA.PolicyError.
 	 */
 	// ===================================================================
 	public void set_timeout_millis(int millis) throws DevFailed {
@@ -319,8 +331,7 @@ public class Connection implements ApiDefs {
 	 */
 	// ===================================================================
 	public int get_timeout() {
-		try
-		{
+		try {
 			return iConnection.get_timeout_millis(this);
 		}
 		catch(DevFailed e)
@@ -354,10 +365,8 @@ public class Connection implements ApiDefs {
 	/**
 	 * Send a command to a device server.
 	 * 
-	 * @param command
-	 *            Command name to send to the device.
-	 * @param argin
-	 *            input command argument.
+	 * @param command  Command name to send to the device.
+	 * @param argin input command argument.
 	 * @return the output argument of the command.
 	 * @throws DevFailed
 	 */
@@ -370,8 +379,7 @@ public class Connection implements ApiDefs {
 	/**
 	 * Send a command to a device server.
 	 * 
-	 * @param command
-	 *            Command name.
+	 * @param command Command name.
 	 * @return the output argument of the command.
 	 * @throws DevFailed
 	 */
@@ -453,8 +461,7 @@ public class Connection implements ApiDefs {
 	/**
 	 * Set the device data source
 	 * 
-	 * @param new_src
-	 *            new data source (CACHE_DEV, CACHE or DEV).
+	 * @param new_src  new data source (CACHE_DEV, CACHE or DEV).
 	 */
 	// ==========================================================================
 	public void set_source(DevSource new_src) throws DevFailed {

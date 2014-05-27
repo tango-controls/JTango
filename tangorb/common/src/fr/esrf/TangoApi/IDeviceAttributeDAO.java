@@ -34,17 +34,7 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 
 public interface IDeviceAttributeDAO {
 
@@ -52,8 +42,15 @@ public interface IDeviceAttributeDAO {
     /**
      * DeviceAttribute class constructor.
      * 
-     * @param attrval
-     *            AttributeValue_4 IDL object.
+     * @param attrval  AttributeValue_5 IDL object.
+     */
+    public void init(AttributeValue_5 attrval);
+
+    // ===========================================
+    /**
+     * DeviceAttribute class constructor.
+     *
+     * @param attrval  AttributeValue_4 IDL object.
      */
     public void init(AttributeValue_4 attrval);
 
@@ -1117,7 +1114,7 @@ public interface IDeviceAttributeDAO {
 
     // ===========================================
     /**
-     * Return attribute data format (SCALR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
+     * Return attribute data format (SCALAR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
      * 
      * @throws DevFailed
@@ -1245,6 +1242,12 @@ public interface IDeviceAttributeDAO {
      * Return AttributeValue IDL object.
      */
     AttributeValue_4 getAttributeValueObject_4();
+
+    // ===========================================
+    /**
+     * Return AttributeValue IDL object.
+     */
+    AttributeValue_5 getAttributeValueObject_5();
 
     // ===========================================
     /**

@@ -36,6 +36,7 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
+import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
@@ -65,29 +66,36 @@ public class DeviceDataHistory {
 	/**
 	 *	Data source DeviceDataHistory.COMMAND or DeviceDataHistory.ATTRIBUTE
 	 */
-	public int				source;
+	public int source;
 	/**
 	 *	Command/Attribute name.
 	 */
-	public String			name;
+	public String name;
 	/**
 	 *	true if command/attribute failed.
 	 */
-	public boolean			failed;
+	public boolean failed;
 	/**
 	 *	Error list if any in reading Command/Attribute.
 	 */
-	public DevError[]		errors;
+	public DevError[] errors;
+    /**
+     * Data format  (SCALAR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
+     */
+    public AttrDataFormat dataFormat;
+    /**
+     * Data type
+     */
+    public int dataType = TangoConst.Tango_DEV_VOID;
 	
 	// ===========================================
 	/**
 	 * Constructor from a DevCmdHistory.
 	 */
 	// ===========================================
-	public DeviceDataHistory(String cmdname, DevCmdHistory cmd_hist) throws DevFailed {
+	public DeviceDataHistory(String cmdName, DevCmdHistory cmd_hist) throws DevFailed {
 		devicedatahistoryDAO = TangoFactory.getSingleton().getDeviceDataHistoryDAO();
-		devicedatahistoryDAO.init(this, cmdname, cmd_hist);
-
+		devicedatahistoryDAO.init(this, cmdName, cmd_hist);
 	}
 
 	// ===========================================
@@ -95,10 +103,9 @@ public class DeviceDataHistory {
 	 * Constructor from an AttributeValue.
 	 */
 	// ===========================================
-	public DeviceDataHistory(DevAttrHistory att_histo) throws DevFailed {
+	public DeviceDataHistory(DevAttrHistory attrHistory) throws DevFailed {
 		devicedatahistoryDAO = TangoFactory.getSingleton().getDeviceDataHistoryDAO();
-		devicedatahistoryDAO.init(this, att_histo);
-
+		devicedatahistoryDAO.init(this, attrHistory);
 	}
 
 	// ===========================================
@@ -106,10 +113,9 @@ public class DeviceDataHistory {
 	 * Constructor from an AttributeValue for Device_3Impl.
 	 */
 	// ===========================================
-	public DeviceDataHistory(DevAttrHistory_3 att_histo) throws DevFailed {
+	public DeviceDataHistory(DevAttrHistory_3 devAttrHistory_3) throws DevFailed {
 		devicedatahistoryDAO = TangoFactory.getSingleton().getDeviceDataHistoryDAO();
-		devicedatahistoryDAO.init(this, att_histo);
-
+		devicedatahistoryDAO.init(this, devAttrHistory_3);
 	}
 	// ===========================================
 	/**
@@ -119,7 +125,6 @@ public class DeviceDataHistory {
 	public DeviceDataHistory(String name, int source, TimeVal time) throws DevFailed {
 		devicedatahistoryDAO = TangoFactory.getSingleton().getDeviceDataHistoryDAO();
 		devicedatahistoryDAO.init(this, name, source, time);
-
 	}
 
 	// ===========================================
@@ -130,7 +135,6 @@ public class DeviceDataHistory {
 	public DeviceDataHistory(String name, int source, long t) throws DevFailed {
 		devicedatahistoryDAO = TangoFactory.getSingleton().getDeviceDataHistoryDAO();
 		devicedatahistoryDAO.init(this, name, source, t);
-
 	}
 	// ===========================================
 	/**
@@ -147,7 +151,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public TimeVal getTimeVal() {
 		return devicedatahistoryDAO.getTimeVal(this);
-
 	}
 
 	// ===========================================
@@ -157,7 +160,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public long getTimeValSec() {
 		return devicedatahistoryDAO.getTimeValSec(this);
-
 	}
 
 	// ===========================================
@@ -167,7 +169,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public long getTime() {
 		return devicedatahistoryDAO.getTime(this);
-
 	}
 
 	// ===========================================
@@ -185,7 +186,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public AttrQuality getAttrQuality() throws DevFailed {
 		return devicedatahistoryDAO.getAttrQuality(this);
-
 	}
 
 	// ===========================================
@@ -211,7 +211,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public int getDimX() throws DevFailed {
 		return devicedatahistoryDAO.getDimX(this);
-
 	}
 
 	// ===========================================
@@ -221,7 +220,6 @@ public class DeviceDataHistory {
 	// ===========================================
 	public int getDimY() throws DevFailed {
 		return devicedatahistoryDAO.getDimY(this);
-
 	}
 
 	// ********** Extract Methods for basic types *********************
@@ -233,17 +231,17 @@ public class DeviceDataHistory {
 	// ===========================================
 	public Any extractAny()  throws DevFailed{
 		return devicedatahistoryDAO.extractAny(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a boolean.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public boolean extractBoolean()  throws DevFailed{
 		return devicedatahistoryDAO.extractBoolean(this);
-
 	}
 
 	// ===========================================
@@ -255,116 +253,126 @@ public class DeviceDataHistory {
 	// ===========================================
 	public short extractUChar() throws DevFailed {
 		return devicedatahistoryDAO.extractUChar(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a short.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public short extractShort()  throws DevFailed{
 		return devicedatahistoryDAO.extractShort(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned short.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public short extractUShort()  throws DevFailed{
 		return devicedatahistoryDAO.extractUShort(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a long.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public int extractLong()  throws DevFailed{
 		return devicedatahistoryDAO.extractLong(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned long.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public int extractULong()  throws DevFailed{
 		return devicedatahistoryDAO.extractULong(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a long64.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public long extractLong64()  throws DevFailed{
 		return devicedatahistoryDAO.extractLong64(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned long64.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public long extractULong64()  throws DevFailed{
 		return devicedatahistoryDAO.extractULong64(this);
-
 	}
 	// ===========================================
 	/**
 	 * extract method for a float.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public float extractFloat()  throws DevFailed{
 		return devicedatahistoryDAO.extractFloat(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a double.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public double extractDouble()  throws DevFailed{
 		return devicedatahistoryDAO.extractDouble(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a String.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public String extractString()  throws DevFailed{
 		return devicedatahistoryDAO.extractString(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a DevState.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public DevState extractDevState() throws DevFailed {
 		return devicedatahistoryDAO.extractDevState(this);
-
 	}
 	
 	// ===========================================
 	/**
 	 * extract method for a DevEncoded.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public DevEncoded extractDevEncoded() throws DevFailed {
 		return devicedatahistoryDAO.extractDevEncoded(this);
-
 	}
 
 	// ********** Extract Methods for sequence types *********************
@@ -372,21 +380,23 @@ public class DeviceDataHistory {
 	// ===========================================
 	/**
 	 * extract method for a byte Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public boolean[] extractBooleanArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractBooleanArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a byte Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public byte[] extractByteArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractByteArray(this);
-
 	}
 
 	// ===========================================
@@ -398,133 +408,146 @@ public class DeviceDataHistory {
 	// ===========================================
 	public short[] extractUCharArray() throws DevFailed {
 		return devicedatahistoryDAO.extractUCharArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a short Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public short[] extractShortArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractShortArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned short Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public short[] extractUShortArray() throws DevFailed {
 		return devicedatahistoryDAO.extractUShortArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a long Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public int[] extractLongArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractLongArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned long Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public int[] extractULongArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractULongArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a long64 Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public long[] extractLong64Array()  throws DevFailed{
 		return devicedatahistoryDAO.extractLong64Array(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for an unsigned long64 Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public long[] extractULong64Array()  throws DevFailed{
 		return devicedatahistoryDAO.extractULong64Array(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a float Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public float[] extractFloatArray() throws DevFailed {
 		return devicedatahistoryDAO.extractFloatArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a double Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public double[] extractDoubleArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractDoubleArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a String Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public String[] extractStringArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractStringArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a DevState Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public DevState[] extractDevStateArray() throws DevFailed {
 		return devicedatahistoryDAO.extractDevStateArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a DevEncoded Array.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public DevEncoded[] extractDevEncodedArray() throws DevFailed {
 		return devicedatahistoryDAO.extractDevEncodedArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a DevVarLongStringArray.
+     *
+     * @return the extracted value.
 	 */
 	// ===========================================
 	public DevVarLongStringArray extractLongStringArray() throws DevFailed {
 		return devicedatahistoryDAO.extractLongStringArray(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * extract method for a DevVarDoubleStringArray.
-	 */
+     *
+     * @return the extracted value.
+     */
 	// ===========================================
 	public DevVarDoubleStringArray extractDoubleStringArray()  throws DevFailed{
 		return devicedatahistoryDAO.extractDoubleStringArray(this);
@@ -533,6 +556,8 @@ public class DeviceDataHistory {
 	//===========================================
 	/**
 	 *	Returns true if attribute failed
+     *
+     * @return true if has failed, false otherwise.
 	 */
 	//===========================================
 	public boolean hasFailed() {
@@ -549,6 +574,8 @@ public class DeviceDataHistory {
 	// ===========================================
 	/**
 	 * Returns the attribute errors list
+     *
+	 * @return the attribute errors list
 	 */
 	// ===========================================
 	public DevError[] getErrStack() {
@@ -558,6 +585,8 @@ public class DeviceDataHistory {
 	// ===========================================
 	/**
 	 * Returns the attribute type
+     *
+	 * @return the attribute type
 	 */
 	// ===========================================
 	public TypeCode type() {
@@ -566,7 +595,9 @@ public class DeviceDataHistory {
 
 	// ===========================================
 	/**
-	 * Return attribute name.
+	 * Returns attribute name.
+     *
+	 * @return attribute name.
 	 */
 	// ===========================================
 	public String getName() {
@@ -575,22 +606,24 @@ public class DeviceDataHistory {
 
 	// ===========================================
 	/**
-	 * Return number of data read.
+	 * Returns number of data read.
+     *
+	 * @return number of data read.
 	 */
 	// ===========================================
 	public int getNbRead() {
 		return devicedatahistoryDAO.getNbRead(this);
-
 	}
 
 	// ===========================================
 	/**
-	 * Return number of data written.
+	 * Returns number of data written.
+     *
+	 * @return number of data written.
 	 */
 	// ===========================================
 	public int getNbWritten() {
 		return devicedatahistoryDAO.getNbWritten(this);
-
 	}
 
 	// ===========================================
@@ -611,32 +644,35 @@ public class DeviceDataHistory {
 	}
 	// ===========================================
 	/**
-	 * Return attribute written dim_x.
+	 * Returns attribute written dim_x.
+     *
+	 * @return attribute written dim_x.
 	 */
 	// ===========================================
 	public int getWrittenDimX() {
 		return devicedatahistoryDAO.getWrittenDimX(this);
-
 	}
 
 	// ===========================================
 	/**
-	 * Return attribute written dim_y.
+	 * Returns attribute written dim_y.
+     *
+	 * @return attribute written dim_y.
 	 */
 	// ===========================================
 	public int getWrittenDimY() {
 		return devicedatahistoryDAO.getWrittenDimY(this);
-
 	}
 
 	// ===========================================
 	/**
 	 * Returns attribute Tango type.
+     *
+	 * @return attribute Tango type.
 	 */
 	// ===========================================
 	public int getType() throws DevFailed {
 		return devicedatahistoryDAO.getType(this);
-
 	}
 	
 	

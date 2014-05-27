@@ -302,6 +302,33 @@ public class AttributeInfo implements java.io.Serializable
 		this.level = info.level;
 		this.extensions = info.extensions;
 	}
+	//==============================================================
+	/**
+	 *	Constructor from IDL AttributeConfig_3 object
+	 */
+	//==============================================================
+    public AttributeInfo(AttributeConfig_5 info)
+	{
+		this.name = info.name;
+		this.writable = info.writable;
+		this.data_format = info.data_format;
+		this.data_type = info.data_type;
+		this.max_dim_x = info.max_dim_x;
+		this.max_dim_y = info.max_dim_y;
+		this.description = info.description;
+		this.label = info.label;
+		this.unit = info.unit;
+		this.standard_unit = info.standard_unit;
+		this.display_unit = info.display_unit;
+		this.format = info.format;
+		this.min_value = info.min_value;
+		this.max_value = info.max_value;
+		this.min_alarm = info.att_alarm.min_alarm;
+		this.max_alarm = info.att_alarm.max_alarm;
+		this.writable_attr_name = info.writable_attr_name;
+		this.level = info.level;
+		this.extensions = info.extensions;
+	}
 
 	//==============================================================
 	/**
