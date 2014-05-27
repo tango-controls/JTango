@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL interface "Device_3".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public class _Device_3Stub
@@ -622,8 +622,8 @@ public class _Device_3Stub
 				try
 				{
 					_os = _request( "read_attribute_history_3", true);
-					java.lang.String tmpResult101 = name;
-_os.write_string( tmpResult101 );
+					java.lang.String tmpResult104 = name;
+_os.write_string( tmpResult104 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory_3[] _result = fr.esrf.Tango.DevAttrHistoryList_3Helper.read(_is);
@@ -1124,8 +1124,8 @@ _os.write_string( tmpResult101 );
 				try
 				{
 					_os = _request( "command_inout_2", true);
-					java.lang.String tmpResult102 = command;
-_os.write_string( tmpResult102 );
+					java.lang.String tmpResult105 = command;
+_os.write_string( tmpResult105 );
 					_os.write_any(argin);
 					fr.esrf.Tango.DevSourceHelper.write(_os,source);
 					_is = _invoke(_os);
@@ -1231,8 +1231,8 @@ _os.write_string( tmpResult102 );
 				try
 				{
 					_os = _request( "read_attribute_history_2", true);
-					java.lang.String tmpResult103 = name;
-_os.write_string( tmpResult103 );
+					java.lang.String tmpResult106 = name;
+_os.write_string( tmpResult106 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory[] _result = fr.esrf.Tango.DevAttrHistoryListHelper.read(_is);
@@ -1835,8 +1835,8 @@ _os.write_string( tmpResult103 );
 				try
 				{
 					_os = _request( "command_inout_history_2", true);
-					java.lang.String tmpResult104 = command;
-_os.write_string( tmpResult104 );
+					java.lang.String tmpResult107 = command;
+_os.write_string( tmpResult107 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdHistory[] _result = fr.esrf.Tango.DevCmdHistoryListHelper.read(_is);
@@ -2144,8 +2144,8 @@ _os.write_string( tmpResult104 );
 				try
 				{
 					_os = _request( "command_inout", true);
-					java.lang.String tmpResult105 = command;
-_os.write_string( tmpResult105 );
+					java.lang.String tmpResult108 = command;
+_os.write_string( tmpResult108 );
 					_os.write_any(argin);
 					_is = _invoke(_os);
 					org.omg.CORBA.Any _result = _is.read_any();
@@ -2250,8 +2250,8 @@ _os.write_string( tmpResult105 );
 				try
 				{
 					_os = _request( "command_query", true);
-					java.lang.String tmpResult106 = command;
-_os.write_string( tmpResult106 );
+					java.lang.String tmpResult109 = command;
+_os.write_string( tmpResult109 );
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdInfo _result = fr.esrf.Tango.DevCmdInfoHelper.read(_is);
 					return _result;
@@ -2355,8 +2355,8 @@ _os.write_string( tmpResult106 );
 				try
 				{
 					_os = _request( "command_query_2", true);
-					java.lang.String tmpResult107 = command;
-_os.write_string( tmpResult107 );
+					java.lang.String tmpResult110 = command;
+_os.write_string( tmpResult110 );
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdInfo_2 _result = fr.esrf.Tango.DevCmdInfo_2Helper.read(_is);
 					return _result;

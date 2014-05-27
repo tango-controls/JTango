@@ -3,7 +3,7 @@ package fr.esrf.Tango;
  * Generated from IDL enum "AttributeDataType".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class AttributeDataTypeHelper
@@ -17,7 +17,7 @@ public final class AttributeDataTypeHelper
 			{
 				if (_type == null)
 				{
-					_type = org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.AttributeDataTypeHelper.id(),"AttributeDataType",new String[]{"ATT_BOOL","ATT_SHORT","ATT_LONG","ATT_LONG64","ATT_FLOAT","ATT_DOUBLE","ATT_UCHAR","ATT_USHORT","ATT_ULONG","ATT_ULONG64","ATT_STRING","ATT_STATE","DEVICE_STATE","ATT_ENCODED","NO_DATA"});
+					_type = org.omg.CORBA.ORB.init().create_enum_tc(fr.esrf.Tango.AttributeDataTypeHelper.id(),"AttributeDataType",new String[]{"ATT_BOOL","ATT_SHORT","ATT_LONG","ATT_LONG64","ATT_FLOAT","ATT_DOUBLE","ATT_UCHAR","ATT_USHORT","ATT_ULONG","ATT_ULONG64","ATT_STRING","ATT_STATE","DEVICE_STATE","ATT_ENCODED","ATT_NO_DATA"});
 				}
 			}
 		}

@@ -5,7 +5,7 @@ package fr.esrf.Tango;
  * Generated from IDL struct "ZmqCallInfo".
  *
  * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at Dec 11, 2012 4:18:48 PM
+ * @version generated at May 14, 2014 1:27:02 PM
  */
 
 public final class ZmqCallInfoHelper
@@ -70,8 +70,8 @@ public final class ZmqCallInfoHelper
 	{
 		out.write_long(s.version);
 		out.write_ulong(s.ctr);
-		java.lang.String tmpResult84 = s.method_name;
-out.write_string( tmpResult84 );
+		java.lang.String tmpResult87 = s.method_name;
+out.write_string( tmpResult87 );
 		fr.esrf.Tango.DevVarCharArrayHelper.write(out,s.oid);
 		out.write_boolean(s.call_is_except);
 	}
