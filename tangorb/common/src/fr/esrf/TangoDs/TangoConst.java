@@ -390,6 +390,10 @@ public interface TangoConst {
  */
 	public static final int	Tango_DEV_ENCODED	=		28;
 /**
+ * Constant for the TANGO Enum
+ */
+	public static final int	Tango_DEV_ENUM	   =		29;
+/**
  * Array with TANGO data type name. To get the type name for type Tango_DEV_LONG, 
  * use Tango_CmdArgTypeName[Tango_DEV_LONG]
  */
@@ -423,6 +427,7 @@ public interface TangoConst {
 		"DevVarULong64Array",
 		"DevInt",
 		"DevEncoded",
+		"DevEnum",
 	};
 
 //-------------------------------------------------------------------------
