@@ -297,9 +297,7 @@ public class  ZMQutils {
         byte[]  resp = controlSocket.recv(0);
         controlSocket.close();
         if (resp.length>0) {
-            Except.throw_exception("API_InternalCommunicationError",
-                    new String(resp),
-                    "sendToZmqControlSocket()");
+            Except.throw_exception("API_InternalCommunicationError", new String(resp));
         }
         ApiUtil.printTrace("---> Message sent");
     }
@@ -315,15 +313,19 @@ public class  ZMQutils {
      */
 	//===============================================================
     static String getFullAttributeName(String tangoHost, String deviceName, String attributeName,
-                                       String eventName) throws DevFailed {
+                                       int idl, String eventName) throws DevFailed {
         //  If full name, replace Tango Host
         if (deviceName.startsWith("tango://" )) {
             int start = deviceName.indexOf('/', "tango://".length()+1);
             deviceName = deviceName.substring(start+1);
         }
 
-        return ("tango://" + tangoHost + "/" + deviceName +
-                "/" + attributeName + "."+ eventName).toLowerCase();
+        if (idl>=5)
+            return ("tango://" + tangoHost + "/" + deviceName +
+                    "/" + attributeName + ".idl"+ idl + "_" + eventName).toLowerCase();
+        else
+            return ("tango://" + tangoHost + "/" + deviceName +
+                    "/" + attributeName + "."+ eventName).toLowerCase();
     }
 	//===============================================================
     /**
@@ -343,17 +345,18 @@ public class  ZMQutils {
      * @param tgHost        specified device tango_host
      * @param deviceName    specified device
      * @param attributeName specified attribute
+     * @param idl           device idl version
      * @param eventName     specified event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
-    static void  disConnectEvent(String tgHost, String deviceName, String attributeName,
-                                 String eventName) throws DevFailed{
+    static void  disConnectEvent(String tgHost, String deviceName,
+                                 String attributeName, int idl, String eventName) throws DevFailed{
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
             for (String tangoHost : tangoHosts) {
                 byte[]  buffer = getBufferToDisConnectEvent(
-                        tangoHost, deviceName, attributeName, eventName);
+                        tangoHost, deviceName, attributeName, idl, eventName);
                 sendToZmqControlSocket(buffer);
             }
         }
@@ -364,24 +367,24 @@ public class  ZMQutils {
      * @param tangoHost     specified tango host
      * @param deviceName    specified device
      * @param attributeName specified attribute
+     * @param idl           device idl version
      * @param eventName     specified event
      * @return  the buffer buffer to disconnect event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     private static byte[] getBufferToDisConnectEvent(String tangoHost, String deviceName,
-                         String attributeName, String eventName) throws DevFailed{
+                         String attributeName, int idl, String eventName) throws DevFailed{
         byte[]  buffer = new byte[0];
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(getFullAttributeName(tangoHost,
-                                deviceName, attributeName, eventName));
+                                deviceName, attributeName, idl, eventName));
             buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_EVENT, false, stringList);
         }
         catch (Exception e) {
             e.printStackTrace();
-            Except.throw_exception("API_ConversionFailed",
-                    e.toString(), "ZMQtest.codeBufferToDisConnectEvent()");
+            Except.throw_exception("API_ConversionFailed", e.toString());
         }
         return buffer;
     }
@@ -398,7 +401,7 @@ public class  ZMQutils {
      */
 	//===============================================================
     static void connectEvent(String tgHost, String deviceName, String attributeName,
-                   DevVarLongStringArray lsa, String eventName, boolean forceConnect) throws DevFailed {
+                   DevVarLongStringArray lsa, String eventName,  boolean forceConnect) throws DevFailed {
         String[]    tangoHosts = ApiUtil.get_db_obj(tgHost).getPossibleTangoHosts();
         if (tangoHosts!=null) {
             int n = 0;
@@ -410,8 +413,7 @@ public class  ZMQutils {
             }
         }
         else
-            Except.throw_exception("Api_NoTangoHost",
-                "No TANGO_HOST defined", "ZMQutils.connectEvent()" );
+            Except.throw_exception("Api_NoTangoHost", "No TANGO_HOST defined");
     }
 	//===============================================================
     /**
@@ -433,7 +435,8 @@ public class  ZMQutils {
         try {
             ArrayList<String>   stringList = new ArrayList<String>();
             stringList.add(lsa.svalue[1]);                          //  EndPoint
-            stringList.add(getFullAttributeName(tangoHost, deviceName, attributeName, eventName));    //  Event name
+            stringList.add(getFullAttributeName(tangoHost, deviceName,
+                    attributeName, lsa.lvalue[1], eventName));    //  Event name
             ArrayList<Integer>  intList = new ArrayList<Integer>();
             intList.add(lsa.lvalue[0]);     //  Tango release
             intList.add(lsa.lvalue[1]);     //  IDL version
@@ -447,8 +450,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             e.printStackTrace();
-            Except.throw_exception("API_ConversionFailed",
-                    e.toString(), "ZMQtest.codeBufferToConnectHeartbeat()");
+            Except.throw_exception("API_ConversionFailed", e.toString());
         }
         return buffer;
     }
@@ -499,8 +501,7 @@ public class  ZMQutils {
             throw e;
         }
         catch (Exception e) {
-            Except.throw_exception("API_ConversionFailed",
-                    e.toString(), "ZMQtest.codeBufferToConnectHeartbeat()");
+            Except.throw_exception("API_ConversionFailed", e.toString());
         }
         return buffer;
     }
@@ -526,8 +527,7 @@ public class  ZMQutils {
             throw e;
         }
         catch (Exception e) {
-            Except.throw_exception("API_ConversionFailed",
-                    e.toString(), "ZMQtest.codeBufferToDisconnectHeartbeat()");
+            Except.throw_exception("API_ConversionFailed", e.toString());
         }
         return buffer;
     }
@@ -553,11 +553,18 @@ public class  ZMQutils {
             String deviceName, String attributeName, String eventName) throws DevFailed {
 
         //System.out.println("ZmqEventSubscriptionChange for\n -" +
-        //        deviceName + "\n - " + attributeName + "\n - " + eventName);
-        DeviceData argin    = new DeviceData();
-        String[]	strArray = { deviceName, attributeName, "subscribe", eventName};
-        argin.insert(strArray);
-        DeviceData argout = adminDevice.command_inout("ZmqEventSubscriptionChange", argin);
+        //        deviceName + "\n - " + attributeName + "\n - " + eventName +
+        //        "\n - idl: " + adminDevice.get_idl_version());
+        DeviceData argIn    = new DeviceData();
+        String[]	strArray = {
+                deviceName,
+                attributeName,
+                "subscribe",
+                eventName,
+                Integer.toString(adminDevice.get_idl_version()),
+        };
+        argIn.insert(strArray);
+        DeviceData argout = adminDevice.command_inout("ZmqEventSubscriptionChange", argIn);
         return argout.extractLongStringArray();
     }
 	//===============================================================
@@ -579,8 +586,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception " + e + " has been catch",
-                    "ZMQutils.deMarshallErrorList()");
+                    "An exception " + e + " has been catch");
             return null;    //  Cannot occur
         }
     }
@@ -600,8 +606,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception \'" + e + "\' has been catch",
-                    "ZMQutils.deMarshallZmqCallInfo()");
+                    "An exception \'" + e + "\' has been catch");
             return null;    //  Cannot occur
         }
     }
@@ -624,8 +629,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception " + e + " has been catch",
-                    "ZMQutils.deMarshallAttDataReady()");
+                    "An exception " + e + " has been catch");
             return null;    //  Cannot occur
         }
     }
@@ -638,19 +642,24 @@ public class  ZMQutils {
      * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
-    static AttributeInfoEx deMarshallAttributeConfig(byte[] recData, boolean littleIndian) throws DevFailed{
+    static AttributeInfoEx deMarshallAttributeConfig(byte[] recData, boolean littleIndian, int idl) throws DevFailed{
         try {
             //  Remove the 4 first bytes (added for c++ alignment)
             byte[]  buffer = new byte[recData.length-4];
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
             CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
-            AttributeConfig_3 attributeConfig_3 = AttributeConfig_3Helper.read(is);
-            return new AttributeInfoEx(attributeConfig_3);
+            if (idl>=5) {
+                AttributeConfig_5 attributeConfig_5 = AttributeConfig_5Helper.read(is);
+                return new AttributeInfoEx(attributeConfig_5);
+            }
+            else {
+                AttributeConfig_3 attributeConfig_3 = AttributeConfig_3Helper.read(is);
+                return new AttributeInfoEx(attributeConfig_3);
+            }
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception " + e + " has been catch",
-                    "ZMQutils.deMarshallAttributeConfig()");
+                    "An exception " + e + " has been catch");
             return null;    //  Cannot occur
         }
     }
@@ -675,13 +684,16 @@ public class  ZMQutils {
 
             //  Check device IDL
             if (idl<4) {
-                Except.throw_exception("SeverToOld",
-                        "ZMQ events are not supported for IDL " + idl,
-                        "XMQutils.deMarshallAttribute()");
+                Except.throw_exception("SeverTooOld",
+                        "ZMQ events are not supported for IDL " + idl);
             }
-            else {
+            else if (idl<5) {
                 AttributeValue_4    attributeValue_4 = AttributeValue_4Helper.read(is);
                 return new DeviceAttribute(attributeValue_4);
+            }
+            else {
+                AttributeValue_5    attributeValue_5 = AttributeValue_5Helper.read(is);
+                return new DeviceAttribute(attributeValue_5);
             }
         }
         catch (DevFailed e) {
@@ -689,8 +701,7 @@ public class  ZMQutils {
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
-                    "An exception " + e + " has been catch",
-                    "ZMQutils.deMarshallAttribute()");
+                    "An exception " + e + " has been catch");
         }
         return null;    //  Cannot occur
     }
@@ -707,14 +718,18 @@ public class  ZMQutils {
         int pos = eventName.lastIndexOf('.');
         if (pos>0) {
             String  strType = eventName.substring(pos+1);
+            //  Since tango 9, idl revision has been added
+            if (strType.startsWith("idl")) {
+                strType = strType.substring(strType.indexOf('_')+1);
+            }
+
             for (int i=0 ; type<0 && i<TangoConst.eventNames.length ; i++)
                 if (strType.equals(TangoConst.eventNames[i]))
                     type = i;
         }
         if (type<0)
             Except.throw_exception("Api_BadParameterException",
-                    "Cannot find event type for "+eventName,
-                    "ZMQutils.getEventType()");
+                    "Cannot find event type for "+eventName);
         return type;
     }
 
@@ -778,8 +793,7 @@ public class  ZMQutils {
             case ZMQ_CONNECT_MCAST_EVENT:
             default:
                 Except.throw_exception("API_NotImplemented",
-                        "Command " + controlStructure.commandCode + "  NOT yet implemented",
-                        "ZMQutils.decodeControlBuffer()");
+                        "Command " + controlStructure.commandCode + "  NOT yet implemented");
         }
 
         return controlStructure;

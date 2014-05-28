@@ -256,8 +256,8 @@ public class ZmqEventConsumer extends EventConsumer implements
         ZMQutils.connectHeartbeat(adminDevice.get_tango_host(), adminDevice.name(), lsa, false);
 
         //  Build the buffer to connect event and send it
-        ZMQutils.connectEvent(cs.tangoHost,
-                cs.deviceName, cs.attributeName, lsa, cs.eventName, false);
+        ZMQutils.connectEvent(cs.tangoHost, cs.deviceName, cs.attributeName,
+                lsa, cs.eventName, false);
         if (cs.reconnect) {
             EventChannelStruct eventChannelStruct = channel_map.get(cs.channelName);
            // eventChannelStruct.eventChannel = eventChannel;
@@ -385,7 +385,9 @@ public class ZmqEventConsumer extends EventConsumer implements
     protected void unsubscribeTheEvent(EventCallBackStruct callbackStruct) throws DevFailed {
         ZMQutils.disConnectEvent(callbackStruct.device.get_tango_host(),
                 callbackStruct.device.name(),
-                callbackStruct.attr_name, callbackStruct.event_name);
+                callbackStruct.attr_name,
+                callbackStruct.device.get_idl_version(),
+                callbackStruct.event_name);
     }
 
     //===============================================================
