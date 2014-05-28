@@ -390,23 +390,24 @@ public class ZmqMainThread extends Thread {
                 devErrorList = ZMQutils.deMarshallErrorList(recData, littleEndian);
             }
             else {
-                //  Else check event type
-                switch (ZMQutils.getEventType(eventName)) {
-                    case TangoConst.ATT_CONF_EVENT:
-                        attributeConfig = ZMQutils.deMarshallAttributeConfig(recData, littleEndian);
-                        break;
-                    case TangoConst.DATA_READY_EVENT:
-                        dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
-                        break;
-                    default:
-                        //  ToDo needs idl version
-                        Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
-                        EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
-                        if (eventChannelStruct!=null) {
-                            int idl = eventChannelStruct.getIdlVersion();
-                            attributeValue =
-                                    ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
-                        }
+                //  ToDo needs idl version
+                Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
+                EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
+                if (eventChannelStruct!=null) {
+                    int idl = eventChannelStruct.getIdlVersion();
+
+                    //  Else check event type
+                    switch (ZMQutils.getEventType(eventName)) {
+                        case TangoConst.ATT_CONF_EVENT:
+                            attributeConfig =
+                                    ZMQutils.deMarshallAttributeConfig(recData, littleEndian, idl);
+                            break;
+                        case TangoConst.DATA_READY_EVENT:
+                            dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
+                            break;
+                        default:
+                            attributeValue = ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
+                    }
                 }
             }
             if (pushTheEvent) {
@@ -636,28 +637,19 @@ public class ZmqMainThread extends Thread {
     //===============================================================
     private void connectIfNotDone(ZMQ.Socket socket, ZMQutils.ControlStructure controlStructure){
 
-        //  To replace following problem in waiting ZMQ 3.2
-        if (ApiUtil.getZmqVersion()<3.20) {
-            if (controlStructure.forceReconnection)
-                controlStructure.forceReconnection = isForcedJustified(controlStructure);
-            else
-                traceZmqSubscription(controlStructure.eventName, true);
-        }
+        traceZmqSubscription(controlStructure.eventName, true);
         //  Check if not already connected or forced (re connection)
         if (controlStructure.forceReconnection || !alreadyConnected(controlStructure.endPoint)) {
             ApiUtil.printTrace("Set socket buffer for HWM to " + controlStructure.hwm);
 
             //  Check if it ia a reconnection -> disconnect before connection
-            //  Not available in ZMQ 3.1
-            if (ApiUtil.getZmqVersion()>=3.20) {
-                if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint)) {
-					try {
-	                    socket.disconnect(controlStructure.endPoint);
-					}
-					catch (org.zeromq.ZMQException e) {
-						System.err.println(e);
-					}
-				}
+            if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint)) {
+                try {
+                    socket.disconnect(controlStructure.endPoint);
+                }
+                catch (org.zeromq.ZMQException e) {
+                    System.err.println(e);
+                }
             }
 
             //  Do the connection

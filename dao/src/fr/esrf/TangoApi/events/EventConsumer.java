@@ -176,8 +176,12 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
 
         String device_name = device.name();
-        String[] info = new String[]{
-                device_name, attribute, "subscribe", eventType
+        String[] info = new String[] {
+                device_name,
+                attribute,
+                "subscribe",
+                eventType,
+                Integer.toString(device.get_idl_version())
         };
         DeviceData argin = new DeviceData();
         argin.insert(info);
@@ -244,7 +248,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         }
 
         String deviceName = device.fullName();
-        String callback_key = deviceName.toLowerCase() + "/" + attribute + "." + event_name;
+        String callback_key = deviceName.toLowerCase() + "/" + attribute;
+        if (device.get_idl_version()>=5)
+            callback_key += ".idl" + device.get_idl_version()+ "_" + event_name;
+        else
+            callback_key += "." + event_name;
         try {
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
