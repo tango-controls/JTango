@@ -36,7 +36,6 @@ package hzg.wpn.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
@@ -59,12 +58,25 @@ public class ReflectionUtils {
     public static <T extends Exception> Object invoke(Method method, Object object, Object[] args, Class<T> exceptionToThrow) throws T {
         try {
             return method.invoke(object, args);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            try {
-                throw exceptionToThrow.getConstructor(Throwable.class).newInstance(e);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
-                throw new RuntimeException(String.format("Can not invoke method[%1$s] on object[%2$s] with args[%3$s]", method.getName(), object.toString(), Arrays.toString(args)), e);
-            }
+        } catch (IllegalAccessException e) {
+            throw handleException(exceptionToThrow, e);
+        } catch (InvocationTargetException e) {
+            throw handleException(exceptionToThrow, e);
+        }
+
+    }
+
+    private static <T extends Throwable> T handleException(Class<T> exceptionToThrow, Throwable e) {
+        try {
+            return exceptionToThrow.getConstructor(Throwable.class).newInstance(e);
+        } catch (InstantiationException e1) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e1) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e1) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e1) {
+            throw new RuntimeException(e);
         }
 
     }
