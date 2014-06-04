@@ -7,10 +7,11 @@
 //
 //  $Author: ingvord $
 //
-//  Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
-//                         European Synchrotron Radiation Facility
-//                       BP 220, Grenoble 38043
-//                       FRANCE
+//  Copyright (C) :      2014
+//                         Helmholtz-Zentrum Geesthacht
+//                       Max-Planck-Strasse, 1, Geesthacht 21502
+//                       GERMANY
+// 			http://hzg.de
 //
 //  This file is part of Tango.
 //
