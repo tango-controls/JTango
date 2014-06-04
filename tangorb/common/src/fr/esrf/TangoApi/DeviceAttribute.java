@@ -44,7 +44,8 @@ import fr.esrf.Tango.factory.TangoFactory;
  * <br>
  * <b> Usage example: </b> <br>
  * <ul><i>
- *   // Read "Current" attribute<br>
+ *   <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *   // Read "Current" attribute</font><br>
  *   DeviceAttribute deviceAttribute = deviceProxy.read_attribute("Current"); <br>
  *   if (deviceAttribute.hasFailed()) { <br>
  *   <ul>
@@ -52,17 +53,19 @@ import fr.esrf.Tango.factory.TangoFactory;
  *   </ul>
  *   else { <br>
  *   <ul>
- *       // If attribute read is double<br>
  *       int type = attribute.getType();<br>
  *       if (type==TangoConst.Tango_DEV_DOUBLE) {<br>
  *       <ul>
+ *          <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *          // If attribute read is double</font><br>
  *          double current = deviceAttribute.extractDouble(); <br>
  *          System.out.println("Current : " + current);<br>
  *       </ul>
  *       }<br>
  *       else if (type==TangoConst.Tango_DEV_ENUM) {
  *       <ul>
- *          // If attribute read is an enum<br>
+ *       <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *          // If attribute read is an enum</font><br>
  *          AttributeInfoEx   info = deviceProxy.get_attribute_info_ex(attributeName);<br>
  *          short index = deviceAttribute.extractShort();<br>
  *          System.out.println(info.getEnumLabel(index));<br>
@@ -72,13 +75,15 @@ import fr.esrf.Tango.factory.TangoFactory;
  *   }
  *   <br><br><br>
  *
- *   // To write an enum value, use a short value<br>
- *   short  v = 2;<br>
+ *   <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *   // To write an enum value, use a short value</font><br>
+ *   short  index = 2;<br>
  *   deviceAttribute = new DeviceAttribute("EnumAttr");<br>
- *   deviceAttribute.insert(v);<br>
+ *   deviceAttribute.insert(index);<br>
  *   deviceProxy.write_attribute(deviceAttribute);<br>
  *   <br><br>
- *   // Or declare an enum like:<br>
+ *   <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *   // Or declare an enum like:</font><br>
  *   enum Numbers { ZERO(0), ONE(1), TWO(2}, THREE(3);<br>
  *   <ul>
  *       public short value;<br>
@@ -90,7 +95,8 @@ import fr.esrf.Tango.factory.TangoFactory;
  *   </ul>
  *   }<br>
  *   - - - - - <br>
- *   // And insert enum value <br>
+ *   <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
+ *   // And insert enum value </font><br>
  *   deviceAttribute.insert(Numbers.TWO.value);<br>
  * </ul></i>
  *

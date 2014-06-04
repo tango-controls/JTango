@@ -587,6 +587,16 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	 */
 	// ==========================================================================
 	public DeviceAttribute[] write_read_attribute(DeviceProxy deviceProxy, DeviceAttribute[] devattr) throws DevFailed;
+    // ==========================================================================
+    /**
+     *	Write and then read the attribute values, for the specified device.
+     *
+     * @param deviceAttributes attribute names and values to be written.
+     * @param readNames attribute names to read.
+     */
+    // ==========================================================================
+    public DeviceAttribute[] write_read_attribute(DeviceProxy deviceProxy,
+                    DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
 
 	//==========================================================================
 	//==========================================================================
