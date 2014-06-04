@@ -101,7 +101,9 @@ public final class DeviceProxyWrapper implements TangoProxy {
         try {
             DeviceAttribute deviceAttribute = this.proxy.read_attribute(attrName);
             return readAttributeValue(attrName, deviceAttribute);
-        } catch (DevFailed | ValueExtractionException e) {
+        } catch (DevFailed e) {
+            throw new TangoProxyException(e);
+        } catch (ValueExtractionException e) {
             throw new TangoProxyException(e);
         }
     }
@@ -122,7 +124,9 @@ public final class DeviceProxyWrapper implements TangoProxy {
 
             long time = deviceAttribute.getTimeValMillisSec();
             return new AbstractMap.SimpleImmutableEntry<T, Long>(result, time);
-        } catch (DevFailed | ValueExtractionException e) {
+        } catch (DevFailed e) {
+            throw new TangoProxyException(e);
+        } catch (ValueExtractionException e) {
             throw new TangoProxyException(e);
         }
     }
@@ -153,7 +157,9 @@ public final class DeviceProxyWrapper implements TangoProxy {
             Quality quality = Quality.fromAttrQuality(deviceAttribute.getQuality());
 
             return new Triplet<T, Long, Quality>(result, time, quality);
-        } catch (DevFailed | ValueExtractionException e) {
+        } catch (DevFailed e) {
+            throw new TangoProxyException(e);
+        } catch (ValueExtractionException e) {
             throw new TangoProxyException(e);
         }
     }
@@ -177,7 +183,9 @@ public final class DeviceProxyWrapper implements TangoProxy {
             TangoDataFormat<T> dataFormat = TangoDataFormat.createForAttrDataFormat(attributeInfo.data_format);
             dataFormat.insert(dataWrapper, value, devDataType);
             this.proxy.write_attribute(deviceAttribute);
-        } catch (DevFailed | ValueInsertionException e) {
+        } catch (DevFailed e) {
+            throw new TangoProxyException(e);
+        } catch (ValueInsertionException e) {
             throw new TangoProxyException(e);
         }
     }
@@ -212,11 +220,11 @@ public final class DeviceProxyWrapper implements TangoProxy {
         }
     }
 
-    private final ConcurrentMap<String, TangoEventDispatcher<?>> dispatchers = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, TangoEventDispatcher<?>> dispatchers = new ConcurrentHashMap<String, TangoEventDispatcher<?>>();
 
     private final Object subscriptionGuard = new Object();
 
-    private final Set<String> subscriptionSet = new HashSet<>();
+    private final Set<String> subscriptionSet = new HashSet<String>();
 
     @Override
     public void subscribeToEvent(String attrName, TangoEvent event) throws TangoProxyException {
@@ -228,7 +236,7 @@ public final class DeviceProxyWrapper implements TangoProxy {
 
         if (dispatcher != null) return;
 
-        dispatcher = new TangoEventDispatcher<>();
+        dispatcher = new TangoEventDispatcher<Object>();
         TangoEventDispatcher<?> oldDispatcher = dispatchers.putIfAbsent(eventKey, dispatcher);
         if (oldDispatcher != null) dispatcher = oldDispatcher;//this may create unused dispatcher instance
 
@@ -312,8 +320,8 @@ public final class DeviceProxyWrapper implements TangoProxy {
                 .toString();
     }
 
-    private final ConcurrentMap<String, TangoAttributeInfoWrapper> attributeInfo = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, TangoCommandInfoWrapper> commandInfo = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, TangoAttributeInfoWrapper> attributeInfo = new ConcurrentHashMap<String, TangoAttributeInfoWrapper>();
+    private final ConcurrentMap<String, TangoCommandInfoWrapper> commandInfo = new ConcurrentHashMap<String, TangoCommandInfoWrapper>();
     private final Object commandInfoQueryGuard = new Object();
     private final Object attributeInfoQueryGuard = new Object();
 

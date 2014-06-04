@@ -57,10 +57,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeriodicListener,
         ITangoArchiveListener, ITangoUserListener {
-    private final Queue<WeakReference<TangoEventListener<T>>> listeners = new ConcurrentLinkedQueue<>();
+    private final Queue<WeakReference<TangoEventListener<T>>> listeners = new ConcurrentLinkedQueue<
+            WeakReference<TangoEventListener<T>>>();
 
     public void addListener(TangoEventListener<T> listener) {
-        listeners.add(new WeakReference<>(listener));
+        listeners.add(new WeakReference<TangoEventListener<T>>(listener));
     }
 
     @Override
@@ -79,7 +80,7 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
             }
             TangoDataWrapper data = TangoDataWrapper.create(deviceAttribute);
             TangoDataFormat<T> format = TangoDataFormat.createForAttrDataFormat(deviceAttribute.getDataFormat());
-            EventData<T> result = new EventData<>(format.extract(data), deviceAttribute.getTimeValMillisSec());
+            EventData<T> result = new EventData<T>(format.extract(data), deviceAttribute.getTimeValMillisSec());
             for (Iterator<WeakReference<TangoEventListener<T>>> iterator = listeners.iterator(); iterator.hasNext(); ) {
                 WeakReference<TangoEventListener<T>> weakRef = iterator.next();
                 TangoEventListener<T> listener = weakRef.get();
