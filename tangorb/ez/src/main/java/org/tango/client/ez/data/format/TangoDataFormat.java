@@ -132,7 +132,9 @@ public abstract class TangoDataFormat<T> {
             int devDataType = data.getType();
             TangoDataType<T> type = getDataType(devDataType);
             return type.extract(data);
-        } catch (DevFailed | UnknownTangoDataType e) {
+        } catch (DevFailed e) {
+            throw new ValueExtractionException(e);
+        } catch (UnknownTangoDataType e) {
             throw new ValueExtractionException(e);
         }
     }
