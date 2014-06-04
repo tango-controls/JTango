@@ -863,49 +863,60 @@ public class DeviceProxy extends Connection implements ApiDefs  {
 	/**
 	 * Write the attribute value for the specified device.
 	 *
-	 * @param devattr
+	 * @param deviceAttribute
 	 *            attribute name and value.
 	 */
 	// ==========================================================================
-	public void write_attribute(DeviceAttribute devattr) throws DevFailed {
-		deviceProxy.write_attribute(this, devattr);
+	public void write_attribute(DeviceAttribute deviceAttribute) throws DevFailed {
+		deviceProxy.write_attribute(this, deviceAttribute);
 	}
 
 	// ==========================================================================
 	/**
 	 * Write the attribute values for the specified device.
 	 *
-	 * @param devattr
+	 * @param deviceAttributes
 	 *            attribute names and values.
 	 */
 	// ==========================================================================
-	public void write_attribute(DeviceAttribute[] devattr) throws DevFailed {
-		deviceProxy.write_attribute(this, devattr);
+	public void write_attribute(DeviceAttribute[] deviceAttributes) throws DevFailed {
+		deviceProxy.write_attribute(this, deviceAttributes);
 	}
 
 	// ==========================================================================
 	/**
 	 *	Write and then read the attribute values, for the specified device.
 	 *
-	 * @param devattr
-	 *            attribute names and values.
+	 * @param deviceAttribute attribute name and values.
 	 */
 	// ==========================================================================
-	public DeviceAttribute write_read_attribute(DeviceAttribute devattr) throws DevFailed {
+	public DeviceAttribute write_read_attribute(DeviceAttribute deviceAttribute) throws DevFailed {
 		return deviceProxy.write_read_attribute(this,
-					new DeviceAttribute[] {devattr})[0];
+					new DeviceAttribute[] {deviceAttribute})[0];
+	}
+	// ==========================================================================
+	/**
+	 *	Write and then read the attribute values, for the specified device.
+	 *
+     * @param deviceAttributes attribute names and values to be written.
+     * @param readNames attribute names to read.
+	 */
+	// ==========================================================================
+	public DeviceAttribute[] write_read_attribute(DeviceAttribute[] deviceAttributes,
+                                                String[] readNames) throws DevFailed {
+		return deviceProxy.write_read_attribute(this, deviceAttributes, readNames);
 	}
 
 	// ==========================================================================
 	/**
 	 *	Write and then read the attribute values, for the specified device.
 	 *
-	 * @param devattr
+	 * @param deviceAttributes
 	 *            attribute names and values.
 	 */
 	// ==========================================================================
-	public DeviceAttribute[] write_read_attribute(DeviceAttribute[] devattr) throws DevFailed {
-		return deviceProxy.write_read_attribute(this, devattr);
+	public DeviceAttribute[] write_read_attribute(DeviceAttribute[] deviceAttributes) throws DevFailed {
+		return deviceProxy.write_read_attribute(this, deviceAttributes);
 	}
 
 	// ==========================================================================
