@@ -53,7 +53,7 @@ public interface TangoProxy {
      */
     String getName();
 
-    boolean hasAttribute(String attrName);
+    boolean hasAttribute(String attrName) throws TangoProxyException;
 
     TangoAttributeInfoWrapper getAttributeInfo(String attrName) throws TangoProxyException;
 
