@@ -19,6 +19,12 @@ public final class TangoGroupAttribute {
     private final String[] attributeNamesGroup;
     private DeviceAttribute[] deviceAttributes;
 
+    /**
+     * Build the group and read attributes
+     * 
+     * @param attributeNames
+     * @throws DevFailed
+     */
     public TangoGroupAttribute(final String... attributeNames) throws DevFailed {
         attributeNamesGroup = attributeNames;
         group = ProxyFactory.getInstance().createAttributeGroup(true, attributeNames);
@@ -26,13 +32,15 @@ public final class TangoGroupAttribute {
     }
 
     /**
-     * @param groupName
+     * AttributesValuesRefreshingThread
+     * 
      * @param throwExceptions
      * @param attributeNames
      * @throws DevFailed
      */
     public TangoGroupAttribute(final boolean throwExceptions, final String... attributeNames) throws DevFailed {
         this(throwExceptions, true, attributeNames);
+
     }
 
     /**
@@ -48,6 +56,7 @@ public final class TangoGroupAttribute {
         if (readValue) {
             initDeviceAttributes();
         }
+
     }
 
     private void initDeviceAttributes() throws DevFailed {
