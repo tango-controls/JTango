@@ -94,10 +94,21 @@ public final class AttributeGroup {
             final String deviceName = TangoUtil.getfullDeviceNameForAttribute(attributeName);
             final String fullAttribute = TangoUtil.getfullAttributeNameForAttribute(attributeName);
             userAttributesNames[i] = fullAttribute;
-            final DeviceProxy device = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-            devices[i++] = device;
-            if (!devicesMap.containsKey(deviceName)) {
-                devicesMap.put(deviceName, device);
+            try {
+                final DeviceProxy device = ProxyFactory.getInstance().createDeviceProxy(deviceName);
+                devices[i++] = device;
+                if (!devicesMap.containsKey(deviceName)) {
+                    devicesMap.put(deviceName, device);
+                }
+            } catch (final DevFailed e) {
+                if (throwExceptions) {
+                    throw e;
+                } else {
+                    devices[i++] = null;
+                    if (!devicesMap.containsKey(deviceName)) {
+                        devicesMap.put(deviceName, null);
+                    }
+                }
             }
             final String attribute = fullAttribute.split("/")[3];
             if (!attributesMap.containsKey(deviceName)) {
@@ -111,7 +122,7 @@ public final class AttributeGroup {
     }
 
     public synchronized void readAsync() {
-xlogger.entry(devicesMap.keySet());
+        xlogger.entry(devicesMap.keySet());
         if (!readAnswersIDs.isEmpty()) {
             // remove requests to avoid memory leak
             getReadReplies();
@@ -120,16 +131,18 @@ xlogger.entry(devicesMap.keySet());
         for (final String deviceName : devicesMap.keySet()) {
             final List<String> attributeNames = attributesMap.get(deviceName);
             final DeviceProxy devElement = devicesMap.get(deviceName);
-            try {
-                final int rid = devElement.read_attribute_asynch(attributeNames.toArray(new String[attributeNames
-                        .size()]));
-                readAnswersIDs.put(deviceName, rid);
-            } catch (final DevFailed e) {
-                logger.error("error", e);
-                logger.error("", DevFailedUtils.toString(e));
+            if (devElement != null) {
+                try {
+                    final int rid = devElement.read_attribute_asynch(attributeNames.toArray(new String[attributeNames
+                            .size()]));
+                    readAnswersIDs.put(deviceName, rid);
+                } catch (final DevFailed e) {
+                    logger.error("error", e);
+                    logger.error("", DevFailedUtils.toString(e));
 
-                for (final String attribute : attributeNames) {
-                    errorsMap.put(deviceName + "/" + attribute, e.errors);
+                    for (final String attribute : attributeNames) {
+                        errorsMap.put(deviceName + "/" + attribute, e.errors);
+                    }
                 }
             }
         }
@@ -148,22 +161,24 @@ xlogger.entry(devicesMap.keySet());
                     final List<String> attributeNames = attributesMap.get(deviceName);
                     // logger.debug("getReadReplies on device {} and attributes {}", deviceName, attributeNames);
                     final DeviceProxy devElement = devicesMap.get(deviceName);
-                    try {
-                        final Integer id = readAnswersIDs.get(deviceName);
-                        if (id != null) {// can be null if read_attribute_asynch has failed (i.e. a device is down)
-                            final DeviceAttribute[] subReply = devElement.read_attribute_reply(id, timeout);
-                            // memorize the replies per attribute name
-                            int i = 0;
-                            for (final String attribute : attributeNames) {
-                                replies.put(deviceName + "/" + attribute, subReply[i++]);
+                    if (devElement != null) {
+                        try {
+                            final Integer id = readAnswersIDs.get(deviceName);
+                            if (id != null) {// can be null if read_attribute_asynch has failed (i.e. a device is down)
+                                final DeviceAttribute[] subReply = devElement.read_attribute_reply(id, timeout);
+                                // memorize the replies per attribute name
+                                int i = 0;
+                                for (final String attribute : attributeNames) {
+                                    replies.put(deviceName + "/" + attribute, subReply[i++]);
+                                }
                             }
-                        }
-                    } catch (final DevFailed e) {
-                        logger.error("error", e);
-                        logger.error("", DevFailedUtils.toString(e));
+                        } catch (final DevFailed e) {
+                            logger.error("error", e);
+                            logger.error("", DevFailedUtils.toString(e));
 
-                        for (final String attribute : attributeNames) {
-                            errorsMap.put(deviceName + "/" + attribute, e.errors);
+                            for (final String attribute : attributeNames) {
+                                errorsMap.put(deviceName + "/" + attribute, e.errors);
+                            }
                         }
                     }
                 }
@@ -219,17 +234,19 @@ xlogger.entry(devicesMap.keySet());
         for (final String deviceName : devicesMap.keySet()) {
             final DeviceProxy devElement = devicesMap.get(deviceName);
             final List<DeviceAttribute> list = inputs.get(deviceName);
-            try {
-                final int answersID = devElement.write_attribute_asynch(list.toArray(new DeviceAttribute[list.size()]),
-                        false);
-                writeAnswersIDs.put(deviceName, answersID);
-            } catch (final DevFailed e) {
-                logger.error("error", e);
-                logger.error("", DevFailedUtils.toString(e));
-                final DevError[] errors = e.errors;
-                final List<String> attributeNames = attributesMap.get(deviceName);
-                for (final String attribute : attributeNames) {
-                    errorsMap.put(deviceName + "/" + attribute, errors);
+            if (devElement != null) {
+                try {
+                    final int answersID = devElement.write_attribute_asynch(
+                            list.toArray(new DeviceAttribute[list.size()]), false);
+                    writeAnswersIDs.put(deviceName, answersID);
+                } catch (final DevFailed e) {
+                    logger.error("error", e);
+                    logger.error("", DevFailedUtils.toString(e));
+                    final DevError[] errors = e.errors;
+                    final List<String> attributeNames = attributesMap.get(deviceName);
+                    for (final String attribute : attributeNames) {
+                        errorsMap.put(deviceName + "/" + attribute, errors);
+                    }
                 }
             }
         }
@@ -241,7 +258,7 @@ xlogger.entry(devicesMap.keySet());
             try {
                 for (final String deviceName : devicesMap.keySet()) {
                     final DeviceProxy devElement = devicesMap.get(deviceName);
-                    if (writeAnswersIDs.get(deviceName) != null) {
+                    if (devElement != null && writeAnswersIDs.get(deviceName) != null) {
                         try {
                             devElement.write_attribute_reply(writeAnswersIDs.get(deviceName), timeout);
                         } catch (final DevFailed e) {
@@ -311,23 +328,25 @@ xlogger.entry(devicesMap.keySet());
         for (final String deviceName : devicesMap.keySet()) {
             final List<String> attributeNames = attributesMap.get(deviceName);
             final DeviceProxy devElement = devicesMap.get(deviceName);
-            try {
-                final AttributeInfoEx[] subReply = devElement.get_attribute_info_ex(attributeNames
-                        .toArray(new String[attributeNames.size()]));
-                int i = 0;
-                // order reply per attribute
-                for (final String attribute : attributeNames) {
-                    replies.put(deviceName + "/" + attribute, subReply[i++]);
-                }
-            } catch (final DevFailed e) {
-                logger.error("error", e);
-                logger.error("", DevFailedUtils.toString(e));
-                final DevError[] errors = e.errors;
-                for (final DevError error : errors) {
-                    allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
-                }
-                for (final String attribute : attributeNames) {
-                    errorsMap.put(deviceName + "/" + attribute, errors);
+            if (devElement != null) {
+                try {
+                    final AttributeInfoEx[] subReply = devElement.get_attribute_info_ex(attributeNames
+                            .toArray(new String[attributeNames.size()]));
+                    int i = 0;
+                    // order reply per attribute
+                    for (final String attribute : attributeNames) {
+                        replies.put(deviceName + "/" + attribute, subReply[i++]);
+                    }
+                } catch (final DevFailed e) {
+                    logger.error("error", e);
+                    logger.error("", DevFailedUtils.toString(e));
+                    final DevError[] errors = e.errors;
+                    for (final DevError error : errors) {
+                        allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
+                    }
+                    for (final String attribute : attributeNames) {
+                        errorsMap.put(deviceName + "/" + attribute, errors);
+                    }
                 }
             }
         }
