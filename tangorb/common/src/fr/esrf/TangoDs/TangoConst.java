@@ -481,6 +481,7 @@ public interface TangoConst {
 	public static final int	USER_EVENT       = 4;
 	public static final int	ATT_CONF_EVENT   = 5;
 	public static final int	DATA_READY_EVENT = 6;
+	public static final int	INTERFACE_CHANGE = 7;
 	public static final String[]	eventNames = {
         "change",
         "quality_change",	//	Deprecated !
@@ -489,6 +490,7 @@ public interface TangoConst {
 		"user_event",
 		"attr_conf",
 		"data_ready",
+		"intr_change",
 	};
 	public static final boolean	NOT_STATELESS = false;
 	public static final boolean	STATELESS     = true;
