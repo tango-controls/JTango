@@ -46,6 +46,7 @@ import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
+import fr.esrf.TangoApi.DeviceInterface;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.zeromq.ZMQ;
@@ -378,6 +379,7 @@ public class ZmqMainThread extends Thread {
             DeviceAttribute attributeValue  = null;
             AttributeInfoEx attributeConfig = null;
             AttDataReady    dataReady       = null;
+            DeviceInterface deviceInterface = null;
             DevError[]      devErrorList    = null;
 
             //  Manage ZMQ counter (queue has reached HWM ?)
@@ -405,6 +407,9 @@ public class ZmqMainThread extends Thread {
                         case TangoConst.DATA_READY_EVENT:
                             dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
                             break;
+                        case TangoConst.INTERFACE_CHANGE:
+                            deviceInterface = ZMQutils.deMarshallAttInterfaceChange(recData, littleEndian);
+                            break;
                         default:
                             attributeValue = ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
                     }
@@ -417,7 +422,7 @@ public class ZmqMainThread extends Thread {
                         new EventData(callBackStruct.device,
                                 deviceName, eventName,
                                 callBackStruct.event_type, EventData.ZMQ_EVENT,
-                                attributeValue, attributeConfig, dataReady, devErrorList));
+                                attributeValue, attributeConfig, dataReady, deviceInterface, devErrorList));
             }
         }
         else
@@ -498,7 +503,7 @@ public class ZmqMainThread extends Thread {
                 new EventData(callBackStruct.device,
                         deviceName, eventName,
                         callBackStruct.event_type, EventData.ZMQ_EVENT,
-                        null, null, null, devErrorList));
+                        null, null, null, null, devErrorList));
         callBackStruct.setZmqCounter(eventCounter);
         return true;
     }
@@ -523,7 +528,7 @@ public class ZmqMainThread extends Thread {
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
         //  First part is heartbeat name
         String  name = new String(inputs[NameIdx]);
-        //System.out.println(name);
+        //System.out.println("heartbeat : " + name);
 
         //  Check if name is coherent
         int start = name.indexOf("dserver/");

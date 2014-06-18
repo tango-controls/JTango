@@ -273,6 +273,38 @@ public class EventConsumerUtil {
     }
     //===============================================================
     /**
+     * Subscribe on specified event
+     *
+     * @param device    specified device
+     * @param event     specified event type
+     * @param callback  callback class
+     * @param max_size  maximum size for event queue
+     * @param stateless stateless subscription if true
+     * @return  event ID.
+     * @throws DevFailed if subscription failed
+     */
+    //===============================================================
+    public int subscribe_event(DeviceProxy device,
+                               int event,
+                               CallBack callback,
+                               int max_size,
+                               boolean stateless) throws DevFailed {
+        ApiUtil.printTrace("INTERFACE_CHANGE: trying to subscribe_event to " + device.name());
+        int id;
+        //  If already connected, subscribe directly on same channel
+        EventConsumer   consumer = isChannelAlreadyConnected(device);
+        if (consumer!=null) {
+            id = consumer.subscribe_event(device, event, callback, max_size, stateless);
+        }
+
+        //  If ZMQ jni library can be loaded, try to connect on ZMQ event system
+        id = ZmqEventConsumer.getInstance().subscribe_event(
+                device, event, callback, max_size, stateless);
+
+        return id;
+    }
+    //===============================================================
+    /**
      * Subscribe on specified event using notifd
      *
      * @param device    specified device

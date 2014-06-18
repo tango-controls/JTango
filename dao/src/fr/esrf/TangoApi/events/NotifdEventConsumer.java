@@ -155,6 +155,17 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
     }
     //===============================================================
     //===============================================================
+    public int subscribe_event(DeviceProxy device,
+                               int event,
+                               CallBack callback,
+                               int max_size,
+                               boolean stateless)
+            throws DevFailed {
+        //  Cannot be used with notifd (IDL 5 only)
+        return 0;
+    }
+    //===============================================================
+    //===============================================================
     private java.lang.Object extractAttributeObject(org.omg.CosNotification.StructuredEvent notification)
             throws org.omg.CORBA.TypeCodePackage.BadKind {
         TypeCode ty = notification.remainder_of_body.type();
@@ -242,7 +253,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
                         new EventData(callBackStruct.device,
                                 domainName, eventType,
                                 callBackStruct.event_type, EventData.NOTIFD_EVENT,
-                                attr_value, attr_config, data_ready, dev_err_list);
+                                attr_value, attr_config, data_ready, null, dev_err_list);
 
 
                 if (callBackStruct.use_ev_queue) {
@@ -701,7 +712,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
             EventData event_data =
                     new EventData(eventChannelStruct.adm_device_proxy,
                             domain_name, callbackStruct.event_name, EventData.NOTIFD_EVENT,
-                            callbackStruct.event_type, null, null, null, errors);
+                            callbackStruct.event_type, null, null, null, null, errors);
 
             event_data.device = callbackStruct.device;
             event_data.name = callbackStruct.device.name();

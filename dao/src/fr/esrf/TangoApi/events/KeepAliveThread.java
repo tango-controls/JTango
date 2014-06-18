@@ -37,7 +37,6 @@ package fr.esrf.TangoApi.events;
 
 import fr.esrf.TangoDs.TangoConst;
 
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -124,6 +123,8 @@ class KeepAliveThread extends Thread implements TangoConst {
     //===============================================================
     static boolean heartbeatHasBeenSkipped(EventChannelStruct eventChannelStruct) {
         long now = System.currentTimeMillis();
+        //System.out.println(now + "-" + eventChannelStruct.last_heartbeat + "=" +
+        //        (now - eventChannelStruct.last_heartbeat));
         return ((now - eventChannelStruct.last_heartbeat) > EVENT_HEARTBEAT_PERIOD);
     }
     //===============================================================
@@ -139,15 +140,12 @@ class KeepAliveThread extends Thread implements TangoConst {
         long now = System.currentTimeMillis();
 
         // check the list of not yet connected events and try to subscribe
-        int cnt = 0;
         while (channel_names.hasMoreElements()) {
             String name = (String) channel_names.nextElement();
             EventChannelStruct eventChannelStruct = EventConsumer.getChannelMap().get(name);
             if ((now - eventChannelStruct.last_subscribed) > EVENT_RESUBSCRIBE_PERIOD / 3) {
                 reSubscribeByName(eventChannelStruct, name);
             }
-            //System.out.println(new Date() + ":\t" + channel_names.toString() +
-            //        "\n\t\t(" + cnt++ + ")  checkIfHeartbeatSkipped for " + name);
             eventChannelStruct.consumer.checkIfHeartbeatSkipped(name, eventChannelStruct);
 
         }// end while  channel_names.hasMoreElements()
