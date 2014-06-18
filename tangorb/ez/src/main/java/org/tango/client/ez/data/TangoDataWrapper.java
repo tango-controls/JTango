@@ -37,8 +37,6 @@ package org.tango.client.ez.data;
 import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
-import fr.esrf.TangoDs.Attribute;
-import fr.esrf.TangoDs.WAttribute;
 
 /**
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
@@ -52,14 +50,6 @@ public abstract class TangoDataWrapper {
 
     public static TangoDataWrapper create(DeviceData data) {
         return new TangoDeviceDataWrapper(data);
-    }
-
-    public static TangoDataWrapper create(WAttribute attr) {
-        return new TangoWAttributeWrapper(attr);
-    }
-
-    public static TangoDataWrapper create(Attribute attribute) {
-        return new TangoAttributeWrapper(attribute);
     }
 
     //TODO return generic token instead of int
