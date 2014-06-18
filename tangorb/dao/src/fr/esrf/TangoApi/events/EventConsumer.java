@@ -35,8 +35,7 @@
 package fr.esrf.TangoApi.events;
 
 
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
@@ -176,6 +175,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
 
         String device_name = device.name();
+        if (attribute==null)
+            attribute = "";
         String[] info = new String[] {
                 device_name,
                 attribute,
@@ -186,7 +187,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceData argin = new DeviceData();
         argin.insert(info);
         String cmdName = getEventSubscriptionCommandName();
-        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
+        //ApiUtil.printTrace
+        System.out.println(device.get_adm_dev().name() + ".command_inout(\"" +
                     cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
         DeviceData argout =
                 device.get_adm_dev().command_inout(cmdName, argin);
@@ -231,8 +233,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
         //	Set the event name;
         String event_name = eventNames[event];
-        ApiUtil.printTrace("=============> subscribing for " + device.name() + "/" +
-                attribute + "/" +event_name);
+        ApiUtil.printTrace("=============> subscribing for " + device.name() +
+                ((attribute==null)? "" : "/" + attribute) + "." +event_name);
 
         //	Check if already connected
         checkIfAlreadyConnected(device, attribute, event_name, callback, max_size, stateless);
@@ -248,15 +250,20 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         }
 
         String deviceName = device.fullName();
-        String callback_key = deviceName.toLowerCase() + "/" + attribute;
-        if (device.get_idl_version()>=5)
-            callback_key += ".idl" + device.get_idl_version()+ "_" + event_name;
+        String callback_key = deviceName.toLowerCase();
+        if (device.get_idl_version()>=5) {
+            if (event_name.equals("intr_change"))
+                callback_key += "." + event_name;
+            else
+                callback_key += "/" + attribute + ".idl" + device.get_idl_version()+ "_" + event_name;
+        }
         else
-            callback_key += "." + event_name;
+            callback_key += "/" + attribute + "." + event_name;
         try {
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
-            callEventSubscriptionAndConnect(device, attribute.toLowerCase(), event_name);
+            String  att = (attribute==null)? null : attribute.toLowerCase();
+            callEventSubscriptionAndConnect(device, att, event_name);
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
@@ -334,6 +341,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 (event == QUALITY_EVENT) ||
                 (event == ARCHIVE_EVENT) ||
                 (event == USER_EVENT) ||
+                (event == INTERFACE_CHANGE) ||
                 (event == ATT_CONF_EVENT)) {
             new PushAttrValueLater(new_event_callback_struct).start();
         }
@@ -418,7 +426,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         EventData eventData =
                 new EventData(cs.device, callbackKey,
                         cs.event_name, source,
-                        cs.event_type, null, null, null, e.errors);
+                        cs.event_type, null, null, null, null, e.errors);
 
         if (cs.use_ev_queue) {
             EventQueue ev_queue = cs.device.getEventQueue();
@@ -523,11 +531,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             int eventSource = (event_channel_struct.consumer instanceof NotifdEventConsumer)?
                     EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
             DevError[] errors = {error};
-            String domain_name = callback_struct.device.name() + "/" + callback_struct.attr_name.toLowerCase();
+            String domain_name = callback_struct.device.name();
+            if (callback_struct.attr_name!=null)
+                domain_name += "/" + callback_struct.attr_name.toLowerCase();
             EventData event_data =
                     new EventData(event_channel_struct.adm_device_proxy,
                             domain_name, callback_struct.event_name, callback_struct.event_type,
-                            eventSource, null, null, null, errors);
+                            eventSource, null, null, null, null, errors);
 
             CallBack callback = callback_struct.callback;
             event_data.device = callback_struct.device;
@@ -558,6 +568,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //	Else do the synchronous call
         DeviceAttribute da = null;
         AttributeInfoEx info = null;
+        DeviceInterface deviceInterface = null;
         DevError[] err = null;
         String domain_name = callbackStruct.device.name() + "/" + callbackStruct.attr_name;
         boolean old_transp = callbackStruct.device.get_transparency_reconnection();
@@ -566,6 +577,10 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             callbackStruct.setSynchronousDone(false);
             if (callbackStruct.event_name.equals(eventNames[ATT_CONF_EVENT])) {
                 info = callbackStruct.device.get_attribute_info_ex(callbackStruct.attr_name);
+            }
+            else
+            if (callbackStruct.event_name.equals(eventNames[INTERFACE_CHANGE])) {
+                deviceInterface = new DeviceInterface(callbackStruct.device);
             }
             else {
                 da = callbackStruct.device.read_attribute(callbackStruct.attr_name);
@@ -582,13 +597,14 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         callbackStruct.device.set_transparency_reconnection(old_transp);
 
         //  Build event data and push it.
+        //  ToDo DevIntrChange
         EventData eventData =
                 new EventData(callbackStruct.device,
                         domain_name,
                         callbackStruct.event_name,
                         callbackStruct.event_type,
                         getSource(eventChannelStruct.consumer),
-                        da, info, null, err);
+                        da, info, null, deviceInterface, err);
 
         if (callbackStruct.use_ev_queue) {
             EventQueue ev_queue = callbackStruct.device.getEventQueue();
@@ -627,12 +643,21 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         public void run() {
              //	Then read attribute
             DeviceAttribute deviceAttribute = null;
-            AttributeInfoEx info = null;
+            AttributeInfoEx attributeInfo = null;
+            DeviceInterface deviceInterface = null;
             DevError[] err = null;
-            String eventName = cb_struct.device.name() + "/" + cb_struct.attr_name.toLowerCase();
+            String eventName = cb_struct.device.name();
+            if (cb_struct.event_type!=INTERFACE_CHANGE) {
+
+                eventName += "/" + cb_struct.attr_name.toLowerCase();
+            }
             try {
+                if (cb_struct.event_type==INTERFACE_CHANGE) {
+                    deviceInterface = new DeviceInterface(cb_struct.device);
+                }
+                else
                 if (cb_struct.event_type==ATT_CONF_EVENT) {
-                    info = cb_struct.device.get_attribute_info_ex(cb_struct.attr_name);
+                    attributeInfo = cb_struct.device.get_attribute_info_ex(cb_struct.attr_name);
                 }
                 else {
                     deviceAttribute = cb_struct.device.read_attribute(cb_struct.attr_name);
@@ -650,7 +675,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                             cb_struct.event_name,
                             cb_struct.event_type,
                             eventSource,
-                            deviceAttribute, info, null, err);
+                            deviceAttribute, attributeInfo, null, deviceInterface, err);
             if (cb_struct.use_ev_queue) {
                 EventQueue ev_queue = cb_struct.device.getEventQueue();
                 ev_queue.insert_event(event_data);

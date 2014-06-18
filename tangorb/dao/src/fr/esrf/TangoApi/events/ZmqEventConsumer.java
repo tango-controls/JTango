@@ -109,6 +109,151 @@ public class ZmqEventConsumer extends EventConsumer implements
 
     }
 
+    //===============================================================
+    /**
+     * Subscribe event on device (Interface Change Event)
+     * @param device device to subscribe
+     * @param event event to subscribe
+     * @param callback method to be called when receive an event
+     * @param max_size  queue maximum size if use queue
+     * @param stateless subscription stateless if true
+     * @return the event ID
+     * @throws DevFailed if subscription failed.
+     */
+    //===============================================================
+    public int subscribe_event(DeviceProxy device,
+                               int event,
+                               CallBack callback,
+                               int max_size,
+                               boolean stateless)
+            throws DevFailed {
+        //	Set the event name;
+        String event_name = eventNames[event];
+        ApiUtil.printTrace("=============> subscribing for " + device.name() + "." + event_name);
+
+        //	if no callback (null), create EventQueue
+        if (callback == null && max_size >= 0) {
+            //	Check if already created (in case of reconnection stateless mode)
+            if (device.getEventQueue() == null)
+                if (max_size > 0)
+                    device.setEventQueue(new EventQueue(max_size));
+                else
+                    device.setEventQueue(new EventQueue());
+        }
+
+        String deviceName = device.fullName();
+        String callback_key = deviceName.toLowerCase();
+
+        //  Not added for Interface change event (Special case)
+        /*
+        if (device.get_idl_version()>=5)
+            callback_key += ".idl" + device.get_idl_version()+ "_" + event_name;
+        else
+        */
+            callback_key += "." + event_name;
+        try {
+            //	Inform server that we want to subscribe and try to connect
+            ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
+            callEventSubscriptionAndConnect(device, event_name);
+            ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
+        } catch (DevFailed e) {
+            //  re throw if not stateless
+            if (!stateless || e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+                throw e;
+            }
+            else {
+                //	Build Event CallBack Structure and add it to map
+                subscribe_event_id++;
+                EventCallBackStruct new_event_callback_struct =
+                        new EventCallBackStruct(device,
+                                event_name,
+                                "",
+                                callback,
+                                max_size,
+                                subscribe_event_id,
+                                event,
+                                false);
+                failed_event_callback_map.put(callback_key, new_event_callback_struct);
+                return subscribe_event_id;
+            }
+        }
+
+        //	Prepare filters for heartbeat events on channelName
+        String channelName = device_channel_map.get(deviceName);
+        if (channelName==null) {
+            //  If from notifd, tango host not used.
+            int start = deviceName.indexOf('/', "tango:// ".length());
+            deviceName = deviceName.substring(start+1);
+            channelName = device_channel_map.get(deviceName);
+        }
+        EventChannelStruct event_channel_struct = channel_map.get(channelName);
+        event_channel_struct.last_subscribed = System.currentTimeMillis();
+
+        //	Check if a new event or a re-trying one
+        int evnt_id;
+        EventCallBackStruct failed_struct = failed_event_callback_map.get(callback_key);
+        if (failed_struct == null) {
+            //	It is a new one
+            subscribe_event_id++;
+            evnt_id = subscribe_event_id;
+        } else
+            evnt_id = failed_struct.id;
+
+        //	Build Event CallBack Structure if any
+        EventCallBackStruct new_event_callback_struct =
+                new EventCallBackStruct(device,
+                        event_name,
+                        channelName,
+                        callback,
+                        max_size,
+                        evnt_id,
+                        event,
+                        true);
+        new_event_callback_struct.consumer  = this;
+        event_callback_map.put(callback_key, new_event_callback_struct);
+
+
+        //	Thread to read the attribute by a simple synchronous call and
+        //	force callback execution after release monitor.
+        //	This is necessary for the first point in "change" mode,
+        //	but it is not necessary to be serialized in case of
+        //	read attribute or callback execution a little bit long.
+        if ((event == CHANGE_EVENT) ||
+                (event == PERIODIC_EVENT) ||
+                (event == QUALITY_EVENT) ||
+                (event == ARCHIVE_EVENT) ||
+                (event == USER_EVENT) ||
+                (event == INTERFACE_CHANGE) ||
+                (event == ATT_CONF_EVENT)) {
+            new PushAttrValueLater(new_event_callback_struct).start();
+        }
+        return evnt_id;
+    }
+    //===============================================================
+    //===============================================================
+    private void callEventSubscriptionAndConnect(DeviceProxy device, String eventType)
+            throws DevFailed {
+        //  Done for IDL>=5 and not for notifd event system
+        String device_name = device.name();
+        String[] info = new String[] {
+                device_name,
+                "",
+                "subscribe",
+                eventType,
+                Integer.toString(device.get_idl_version())
+        };
+        DeviceData argin = new DeviceData();
+        argin.insert(info);
+        String cmdName = getEventSubscriptionCommandName();
+        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
+                cmdName + "\") for " + device_name + eventType);
+        DeviceData argout =
+                device.get_adm_dev().command_inout(cmdName, argin);
+        ApiUtil.printTrace("    command_inout done.");
+
+        //	And then connect to device
+        checkDeviceConnection(device, null, argout, eventType);
+    }
    //===============================================================
    //===============================================================
     @Override
@@ -120,7 +265,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     @Override
     protected void checkIfAlreadyConnected(DeviceProxy device, String attribute, String event_name, CallBack callback, int max_size, boolean stateless) throws DevFailed {
-        //  Nothing to do
+        //  Nothing to do (only override)
     }
 
     //===============================================================
@@ -219,7 +364,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     @Override
     protected  void checkDeviceConnection(DeviceProxy deviceProxy,
                         String attribute, DeviceData deviceData, String event_name) throws DevFailed {
-
+// ToDo now attributeName is null
         //  Check if address is coherent (??)
         deviceData = checkZmqAddress(deviceData, deviceProxy);
 

@@ -320,9 +320,14 @@ public class  ZMQutils {
             deviceName = deviceName.substring(start+1);
         }
 
-        if (idl>=5)
-            return ("tango://" + tangoHost + "/" + deviceName +
+        if (idl>=5) {
+            //  Special case (for interface change do not add idl)
+            if (eventName.equals(TangoConst.eventNames[TangoConst.INTERFACE_CHANGE]))
+                return ("tango://" + tangoHost + "/" + deviceName + "."+ eventName).toLowerCase();
+            else
+                return ("tango://" + tangoHost + "/" + deviceName +
                     "/" + attributeName + ".idl"+ idl + "_" + eventName).toLowerCase();
+        }
         else
             return ("tango://" + tangoHost + "/" + deviceName +
                     "/" + attributeName + "."+ eventName).toLowerCase();
@@ -424,7 +429,7 @@ public class  ZMQutils {
      * @param lsa   the subscription parameters
      * @param eventName     specified event
      * @param forceConnect   Force reconnection if true
-     * @return the beffer built to connect event
+     * @return the buffer built to connect event
      * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
@@ -556,9 +561,10 @@ public class  ZMQutils {
         //        deviceName + "\n - " + attributeName + "\n - " + eventName +
         //        "\n - idl: " + adminDevice.get_idl_version());
         DeviceData argIn    = new DeviceData();
+
         String[]	strArray = {
                 deviceName,
-                attributeName,
+                (attributeName==null)? "" : attributeName,
                 "subscribe",
                 eventName,
                 Integer.toString(adminDevice.get_idl_version()),
@@ -626,6 +632,29 @@ public class  ZMQutils {
             System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
             CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
             return AttDataReadyHelper.read(is);
+        }
+        catch (Exception e) {
+            Except.throw_exception("Api_ConversionFailed",
+                    "An exception " + e + " has been catch");
+            return null;    //  Cannot occur
+        }
+    }
+	//===============================================================
+    /**
+     * De Marshall data from a receive byte buffer
+     * @param recData   receive data
+     * @param littleIndian endianness to de marshall
+     * @return the data after de marshaling
+     * @throws DevFailed in case of de marshaling failed
+     */
+	//===============================================================
+    static DeviceInterface deMarshallAttInterfaceChange(byte[] recData, boolean littleIndian) throws DevFailed {
+        try {
+            //  Remove the 4 first bytes (added for c++ alignment)
+            byte[]  buffer = new byte[recData.length-4];
+            System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
+            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
+            return new DeviceInterface(DevIntrChangeHelper.read(is));
         }
         catch (Exception e) {
             Except.throw_exception("Api_ConversionFailed",
