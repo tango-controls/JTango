@@ -116,6 +116,12 @@ public abstract class EventDispatcher extends CallBack
         return event_supplier.subscribe_event(attr_name,
                 DATA_READY_EVENT, this, filters, stateless);
     }
+    //=======================================================================
+    //=======================================================================
+    protected int subscribe_interface_change_event(boolean stateless)
+            throws DevFailed {
+        return event_supplier.subscribe_event(INTERFACE_CHANGE, this, stateless);
+    }
 
     //=======================================================================
     //=======================================================================
