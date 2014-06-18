@@ -1087,36 +1087,43 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
 		build_connection(connection);
 
-		try {
-	    	CommandInfo[] result;
-	    	if (connection.url.protocol == TACO) {
-			result = connection.taco_device.commandListQuery();
-	    	} else {
-			// Check IDL revision
-			if (connection.device_2 != null) {
-		    	final DevCmdInfo_2[] tmp = connection.device_2.command_list_query_2();
-		    	result = new CommandInfo[tmp.length];
-		    	for (int i = 0; i < tmp.length; i++) {
-				result[i] = new CommandInfo(tmp[i]);
-		    	}
-			} else {
-		    	final DevCmdInfo[] tmp = connection.device.command_list_query();
-		    	result = new CommandInfo[tmp.length];
-		    	for (int i = 0; i < tmp.length; i++) {
-				result[i] = new CommandInfo(tmp[i]);
-		    	}
-			}
-	    	}
-	    	return result;
-		} catch (final DevFailed e) {
-	    	final String reason = "TangoApi_CANNOT__READ_CMD_LIST";
-	    	final String desc = "Cannot read command list for " + connection.devname;
-	    	final String origin = "Connection.command_list_query()";
-	    	Except.throw_connection_failed(e, reason, desc, origin);
-		} catch (final Exception e) {
-	    	ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(connection);
-	    	throw_dev_failed(connection, e, "command_list_query", false);
-		}
+        final int retries = connection.transparent_reconnection ? 2 : 1;
+        for (int oneTry=1 ; oneTry<=retries ; oneTry++) {
+            try {
+                CommandInfo[] result;
+                if (connection.url.protocol == TACO) {
+                    result = connection.taco_device.commandListQuery();
+                } else {
+                    // Check IDL revision
+                    if (connection.device_2 != null) {
+                        final DevCmdInfo_2[] tmp = connection.device_2.command_list_query_2();
+                        result = new CommandInfo[tmp.length];
+                        for (int i = 0; i < tmp.length; i++) {
+                            result[i] = new CommandInfo(tmp[i]);
+                        }
+                    } else {
+                        final DevCmdInfo[] tmp = connection.device.command_list_query();
+                        result = new CommandInfo[tmp.length];
+                        for (int i = 0; i < tmp.length; i++) {
+                            result[i] = new CommandInfo(tmp[i]);
+                        }
+                    }
+                }
+                return result;
+            } catch (final DevFailed e) {
+                if (oneTry>=retries) {
+                    final String reason = "TangoApi_CANNOT__READ_CMD_LIST";
+                    final String desc = "Cannot read command list for " + connection.devname;
+                    final String origin = "Connection.command_list_query()";
+                    Except.throw_connection_failed(e, reason, desc, origin);
+                }
+            } catch (final Exception e) {
+                if (oneTry>=retries) {
+                    ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(connection);
+                    throw_dev_failed(connection, e, "command_list_query", false);
+                }
+            }
+        }
 		return null;
     }
 
