@@ -63,8 +63,8 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
     public AttributeEventInfo events = null;
     public String[] extensions = null;
     public String[] sys_extensions = null;
-    protected boolean isMemorized;
-    protected boolean isSetAtInit;
+    public boolean isMemorized;
+    public boolean isSetAtInit;
     public Memorized memorized = Memorized.UNKNOWN;
     public String   root_attr_name = null;
     public String[] enum_label = null;
