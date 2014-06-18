@@ -61,6 +61,8 @@ public class TangoEventsAdapter implements java.io.Serializable {
             tango_att_config_source = new Hashtable<String, TangoAttConfig>();
     private Hashtable<String, TangoDataReady>
             tango_data_ready_source = new Hashtable<String, TangoDataReady>();
+    private Hashtable<String, TangoInterfaceChange>
+            tango_interface_change_source = new Hashtable<String, TangoInterfaceChange>();
     static final Object moni = new Object();
 
     //=======================================================================
@@ -221,13 +223,13 @@ public class TangoEventsAdapter implements java.io.Serializable {
     }
 
     //=======================================================================
-   /**
+    /**
      * Add listener for archive event
-    * @param  listener the specified listener
-    * @param attr_name the attribute name
-    * @param filters filter array
-    * @throws DevFailed in case of connection failed
-    */
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @param filters filter array
+     * @throws DevFailed in case of connection failed
+     */
     //=======================================================================
     public void addTangoArchiveListener(ITangoArchiveListener listener, String attr_name, String[] filters)
             throws DevFailed {
@@ -544,8 +546,54 @@ public class TangoEventsAdapter implements java.io.Serializable {
                 tango_data_ready.removeTangoDataReadyListener(listener);
         }
     }
-
-
+    //=======================================================================
+    /**
+     * Add listener for change event
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @throws DevFailed in case of connection failed
+     */
+    //=======================================================================
+    public void addTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String attr_name)
+            throws DevFailed {
+        addTangoInterfaceChangeListener(listener, attr_name, false);
+    }
+    //=======================================================================
+    /**
+     * Add listener for Change event
+     * @param  listener the specified listener
+     * @param deviceName the device name
+     * @param stateless if true: will re-try if failed
+     * @throws DevFailed in case of connection failed and stateless is false
+     */
+    //=======================================================================
+    public void addTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String deviceName, boolean stateless)
+            throws DevFailed {
+        TangoInterfaceChange interfaceChange;
+        if ((interfaceChange = tango_interface_change_source.get(deviceName)) == null) {
+            interfaceChange = new TangoInterfaceChange(device_proxy);
+            tango_interface_change_source.put(deviceName, interfaceChange);
+        }
+        synchronized (moni) {
+            interfaceChange.addTangoInterfaceChangeListener(listener, stateless);
+        }
+    }
+    //=======================================================================
+    /**
+     * Remove listener for change event
+     * @param  listener the specified listener
+     * @param deviceName the device name
+     * @throws DevFailed if specified listener not found
+     */
+    //=======================================================================
+    public void removeTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String deviceName)
+            throws DevFailed {
+        synchronized (moni) {
+            TangoInterfaceChange interfaceChange_change;
+            if ((interfaceChange_change = tango_interface_change_source.get(deviceName)) != null)
+                interfaceChange_change.removeTangoInterfaceChangeListener(listener);
+        }
+    }
     //=======================================================================
     //=======================================================================
     public String device_name() {

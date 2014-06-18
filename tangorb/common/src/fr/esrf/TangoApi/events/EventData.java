@@ -39,6 +39,7 @@ import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevError;
 import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceAttribute;
+import fr.esrf.TangoApi.DeviceInterface;
 import fr.esrf.TangoApi.DeviceProxy;
 
 /**
@@ -53,6 +54,7 @@ public class EventData implements java.io.Serializable {
     public DeviceAttribute attr_value;
     public AttributeInfoEx attr_config;
     public AttDataReady data_ready;
+    public DeviceInterface deviceInterface;
     public DevError[] errors;
     public boolean err;
     public long date;
@@ -60,7 +62,7 @@ public class EventData implements java.io.Serializable {
     public static final int    ZMQ_EVENT    = 0;
     public static final int    NOTIFD_EVENT = 1;
     //-=============================================
-    /*
+    /**
      * Creates a new instance of EventData
      */
     //-=============================================
@@ -73,6 +75,7 @@ public class EventData implements java.io.Serializable {
                 DeviceAttribute attr_value,
                 AttributeInfoEx attr_config,
                 AttDataReady data_ready,
+                DeviceInterface deviceInterface,
                 DevError[] errors) {
         this.device = device;
         this.name = name;
@@ -82,6 +85,7 @@ public class EventData implements java.io.Serializable {
         this.attr_value = attr_value;
         this.attr_config = attr_config;
         this.data_ready = data_ready;
+        this.deviceInterface = deviceInterface;
         this.errors = errors;
         err = (errors != null);
         date = System.currentTimeMillis();
