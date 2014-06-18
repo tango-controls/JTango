@@ -1114,7 +1114,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	//==========================================================================
 	/**
 	 *	@return	mode RPC protocol mode  used
-	 *	@return	mode RPC protocol mode  used
 	 *		(TangoApi.TacoDevice.<b>D_TCP</b> or TangoApi.TacoDevice.<b>D_UDP</b>).
 	 */
 	//==========================================================================
@@ -1155,5 +1154,28 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void unsubscribe_event(DeviceProxy deviceProxy, int event_id) throws DevFailed;
+
+    //==========================================================================
+    /**
+     *	Subscribe to an event.
+     *
+     *	@param	event		event name.
+     *	@param  callback	event callback.
+     *	@param  stateless	If true, do not throw exception if connection failed.
+     */
+    //==========================================================================
+    public abstract int subscribe_event(DeviceProxy deviceProxy,
+                                int event, CallBack callback, boolean stateless) throws DevFailed;
+    //==========================================================================
+    /**
+     *	Subscribe to event to be stored in an event queue.
+     *
+     *	@param	event		event name.
+     *	@param  max_size	event queue maximum size.
+     *	@param  stateless	If true, do not throw exception if connection failed.
+     */
+    //==========================================================================
+    public abstract int subscribe_event(DeviceProxy deviceProxy,
+                                int event, int max_size, boolean stateless) throws DevFailed;
 
 }

@@ -65,6 +65,13 @@ public class TangORBversion implements java.io.Serializable {
      */
     public String slf4j = null;
 
+    public String guava;
+    public String javatuples;
+    public String transmorph;
+    public String cal10n;
+
+
+
     public String jarfile;
     private static final String[] packages = {
             "API",
@@ -72,6 +79,10 @@ public class TangORBversion implements java.io.Serializable {
             "JacORB",
             "ZMQ",
             "slf4j",
+            "guava",
+            "javatuples",
+            "transmorph",
+            "cal10n",
     };
 
     //========================================================================
@@ -85,19 +96,23 @@ public class TangORBversion implements java.io.Serializable {
         String separator = System.getProperty("path.separator");
 
         //	Parse for TangORB jar file path
-        String target = "TangORB";
+        String target = "JTango";
         int start, end;
-        if ((start = classpath.indexOf(target)) < 0)
-            Except.throw_exception("TangORB_NotFound",
-                    "TangORB jar file not found in CLASSPATH",
-                    "TangORBversion.TangORBversion()");
+        if ((start=classpath.indexOf(target)) < 0) {
+            target = "TangORB";
+            if ((start=classpath.indexOf(target)) < 0)
+                Except.throw_exception("TangORB_NotFound",
+                        "TangORB jar file not found in CLASSPATH",
+                        "TangORBversion.TangORBversion()");
+        }
+
         if ((start = classpath.lastIndexOf(separator, start)) < 0)
             start = 0;
         else
             start++;
 
         //	Search end
-        if ((end = classpath.indexOf(separator, start)) < 0)
+        if ((end=classpath.indexOf(separator, start)) < 0)
             jarfile = classpath.substring(start);
         else
             jarfile = classpath.substring(start, end);
@@ -127,8 +142,7 @@ public class TangORBversion implements java.io.Serializable {
         //	Check if file exists
         if (!new File(jarfile).exists())
             Except.throw_exception("FileNotFoundException",
-                    jarfile + " No such file or directory",
-                    "TangORBversion.initObject()");
+                    jarfile + " No such file or directory");
 
         // Retrieve the manifest file from the jar file
         JarFile jf = new JarFile(jarfile);
@@ -147,24 +161,35 @@ public class TangORBversion implements java.io.Serializable {
         //	Display package versions
         for (int i = 0; i < packages.length; i++) {
             String target = packages[i] + "-Version";
-            String vers = attr.getValue(target);
-            if (vers != null)
-            {
+            String version = attr.getValue(target);
+            if (version != null) {
                 switch (i) {
                     case 0:
-                        api = vers.trim();
+                        api = version.trim();
                         break;
                     case 1:
-                        Tango = vers.trim();
+                        Tango = version.trim();
                         break;
                     case 2:
-                        JacORB = vers.trim();
+                        JacORB = version.trim();
                         break;
                     case 3:
-                        ZMQ = vers.trim();
+                        ZMQ = version.trim();
                         break;
                     case 4:
-                        slf4j = vers.trim();
+                        slf4j = version.trim();
+                        break;
+                    case 5:
+                        guava = version.trim();
+                        break;
+                    case 6:
+                        javatuples = version.trim();
+                        break;
+                    case 7:
+                        transmorph = version.trim();
+                        break;
+                    case 8:
+                        cal10n = version.trim();
                         break;
                }
             }
@@ -179,39 +204,57 @@ public class TangORBversion implements java.io.Serializable {
         for (String pack : packages)
             if (pack.length() > max_length)
                 max_length = pack.length();
-        String versStr = " version";
-        max_length += versStr.length() + 3;
 
         //	Display package versions
-        String str = "";
-        for (int i = 0; i < packages.length; i++) {
-            str += packages[i] + versStr;
-            for (int j = packages[i].length() + versStr.length();
-                 j < max_length; j++)
-                str += ".";
+        StringBuilder sb = new StringBuilder();
+        for (int i=0 ; i<packages.length ; i++) {
             switch (i) {
                 case 0:
-                    str += api;
+                    sb.append(buildVersion(packages[i], api, max_length));
                     break;
                 case 1:
-                    str += Tango;
+                    sb.append(buildVersion(packages[i], Tango, max_length));
                     break;
                 case 2:
-                    str += JacORB;
+                    sb.append(buildVersion(packages[i],JacORB, max_length));
                     break;
                 case 3:
-                    str += ZMQ;
+                    sb.append(buildVersion(packages[i], ZMQ, max_length));
                     break;
                 case 4:
-                    str += slf4j;
+                    sb.append(buildVersion(packages[i], slf4j, max_length));
+                    break;
+                case 5:
+                    sb.append(buildVersion(packages[i], guava, max_length));
+                    break;
+                case 6:
+                    sb.append(buildVersion(packages[i], javatuples, max_length));
+                    break;
+                case 7:
+                    sb.append(buildVersion(packages[i], transmorph, max_length));
+                    break;
+                case 8:
+                    sb.append(buildVersion(packages[i], cal10n, max_length));
                     break;
             }
-            if (i < packages.length - 1)
-                str += "\n";
         }
-        return str;
+        return sb.toString().trim();
     }
 
+    //========================================================================
+    //========================================================================
+    private String buildVersion(String packageName, String release, int maxLength) {
+        if (release==null || release.isEmpty())
+            return "";
+
+        int length = maxLength - packageName.length()+3;
+
+        StringBuilder   sb = new StringBuilder(packageName + " version");
+        for (int j=0 ; j<length ; j++)
+            sb.append(".");
+        sb.append(release).append('\n');
+        return sb.toString();
+    }
     //========================================================================
     //========================================================================
     public static void main(String[] args) {
