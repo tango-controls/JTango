@@ -88,6 +88,30 @@ public class EventCallBackStruct implements java.io.Serializable {
         this.filter_ok = filter_ok;
         this.use_ev_queue = (callback == null);
     }
+    //-======================================================================
+    /*
+     * Creates a new instance of EventCallBackStruct
+     * For Interface change event no attribute and no filters
+     */
+    //=======================================================================
+    public EventCallBackStruct(DeviceProxy device,
+                               String event_name,
+                               String channel_name,
+                               CallBack callback,
+                               int max_size,
+                               int id,
+                               int event_type,
+                               boolean filter_ok) {
+        this.device = device;
+        this.event_name = event_name;
+        this.channel_name = channel_name;
+        this.callback = callback;
+        this.max_size = max_size;
+        this.event_type = event_type;
+        this.id = id;
+        this.filter_ok = filter_ok;
+        this.use_ev_queue = (callback == null);
+    }
     //=======================================================================
     //=======================================================================
     public String toString() {
