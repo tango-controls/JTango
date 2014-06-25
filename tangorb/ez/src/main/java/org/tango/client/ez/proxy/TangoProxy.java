@@ -98,4 +98,9 @@ public interface TangoProxy {
     DeviceProxy toDeviceProxy();
 
     TangoEventsAdapter toTangoEventsAdapter();
+
+    /**
+     * Drops all cached values, aka command and attribute infos
+     */
+    void reset();
 }
