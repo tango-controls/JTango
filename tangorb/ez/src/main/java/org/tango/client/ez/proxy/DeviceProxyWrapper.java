@@ -141,13 +141,13 @@ public final class DeviceProxyWrapper implements TangoProxy {
         }
     }
 
-    private <T> T readAttributeValue(String attrName, DeviceAttribute deviceAttribute) throws DevFailed, ValueExtractionException {
+    private <T> T readAttributeValue(String attrName, DeviceAttribute deviceAttribute) throws TangoProxyException, DevFailed, ValueExtractionException {
         if (deviceAttribute.hasFailed()) {
             throw new DevFailed(deviceAttribute.getErrStack());
         }
         TangoDataWrapper dataWrapper = TangoDataWrapper.create(deviceAttribute);
-        AttributeInfo attributeInfo = this.proxy.get_attribute_info(attrName);
-        TangoDataFormat<T> dataFormat = TangoDataFormat.createForAttrDataFormat(attributeInfo.data_format);
+        TangoAttributeInfoWrapper attributeInfo = getAttributeInfo(attrName);
+        TangoDataFormat<T> dataFormat = TangoDataFormat.createForAttrDataFormat(attributeInfo.toAttributeInfo().data_format);
         return dataFormat.extract(dataWrapper);
     }
 
@@ -190,9 +190,9 @@ public final class DeviceProxyWrapper implements TangoProxy {
         TangoDataWrapper dataWrapper = TangoDataWrapper.create(deviceAttribute);
 
         try {
-            AttributeInfo attributeInfo = this.proxy.get_attribute_info(attrName);
-            int devDataType = attributeInfo.data_type;
-            TangoDataFormat<T> dataFormat = TangoDataFormat.createForAttrDataFormat(attributeInfo.data_format);
+            TangoAttributeInfoWrapper attributeInfo = getAttributeInfo(attrName);
+            int devDataType = attributeInfo.toAttributeInfo().data_type;
+            TangoDataFormat<T> dataFormat = TangoDataFormat.createForAttrDataFormat(attributeInfo.toAttributeInfo().data_format);
             dataFormat.insert(dataWrapper, value, devDataType);
             this.proxy.write_attribute(deviceAttribute);
         } catch (DevFailed e) {
@@ -220,14 +220,14 @@ public final class DeviceProxyWrapper implements TangoProxy {
         try {
             DeviceData argin = new DeviceData();
             TangoDataWrapper arginWrapper = TangoDeviceAttributeWrapper.create(argin);
-            CommandInfo cmdInfo = this.proxy.command_query(cmd);
-            TangoDataType<T> typeIn = TangoDataTypes.forTangoDevDataType(cmdInfo.in_type);
+            TangoCommandInfoWrapper cmdInfo = getCommandInfo(cmd);
+            TangoDataType<T> typeIn = TangoDataTypes.forTangoDevDataType(cmdInfo.toCommandInfo().in_type);
             typeIn.insert(arginWrapper, value);
 
             DeviceData argout = this.proxy.command_inout(cmd, argin);
             TangoDataWrapper argoutWrapper = TangoDataWrapper.create(argout);
 
-            TangoDataType<V> typeOut = TangoDataTypes.forTangoDevDataType(cmdInfo.out_type);
+            TangoDataType<V> typeOut = TangoDataTypes.forTangoDevDataType(cmdInfo.toCommandInfo().out_type);
             return typeOut.extract(argoutWrapper);
         } catch (Exception e) {
             logger.error("DeviceProxyWrapper#executeCommand has failed.", e);
@@ -432,5 +432,11 @@ public final class DeviceProxyWrapper implements TangoProxy {
     @Override
     public TangoEventsAdapter toTangoEventsAdapter() {
         return eventsAdapter;
+    }
+
+    @Override
+    public void reset() {
+        commandInfo.clear();
+        attributeInfo.clear();
     }
 }
