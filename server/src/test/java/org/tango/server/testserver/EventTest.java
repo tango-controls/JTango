@@ -170,6 +170,7 @@ public class EventTest {
                         eventsNb++;
                         previousValue = value;
                         value = eventData.attr_value.extractBoolean();
+                        assertThat(eventData.attr_value.getTime(), equalTo(34567L));
                     }
                 }
             }
