@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
@@ -52,43 +52,43 @@ public final class AttributeValue implements Cloneable, Serializable {
     private int yDim = 1;
 
     public AttributeValue() {
-	super();
+        super();
     }
 
     public AttributeValue(final Object value) throws DevFailed {
-	super();
-	setValue(value);
-	quality = AttrQuality.ATTR_VALID;
-	time = System.currentTimeMillis();
+        super();
+        setValue(value);
+        quality = AttrQuality.ATTR_VALID;
+        time = System.currentTimeMillis();
     }
 
     public AttributeValue(final Object value, final AttrQuality quality) throws DevFailed {
-	super();
-	setValue(value);
-	this.quality = quality;
-	time = System.currentTimeMillis();
+        super();
+        setValue(value);
+        this.quality = quality;
+        time = System.currentTimeMillis();
     }
 
     public AttributeValue(final Object value, final AttrQuality quality, final int xDim, final int yDim) {
-	super();
-	this.value = value;
-	this.quality = quality;
-	time = System.currentTimeMillis();
-	this.xDim = xDim;
-	this.yDim = yDim;
+        super();
+        this.value = value;
+        this.quality = quality;
+        time = System.currentTimeMillis();
+        this.xDim = xDim;
+        this.yDim = yDim;
     }
 
     public AttributeValue(final Object value, final AttrQuality quality, final int xDim, final int yDim, final long time) {
-	super();
-	this.value = value;
-	this.quality = quality;
-	this.time = time;
-	this.xDim = xDim;
-	this.yDim = yDim;
+        super();
+        this.value = value;
+        this.quality = quality;
+        this.time = time;
+        this.xDim = xDim;
+        this.yDim = yDim;
     }
 
     public Object getValue() {
-	return value;
+        return value;
     }
 
     /**
@@ -106,44 +106,65 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @throws DevFailed
      */
     public void setValue(final Object value) throws DevFailed {
-	time = System.currentTimeMillis();
-	if (value != null) {
-	    if (!value.getClass().isArray()) { // SCALAR
-		// check if this value can be an attribute value
-		if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass())) {
-		    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
-		}
-		setXDim(1);
-		setYDim(0);
-	    } else if (!value.getClass().getComponentType().isArray()) {// SPECTRUM
-		// check if this value can be an attribute value
-		if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass().getComponentType())) {
-		    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
-		}
-		setXDim(Array.getLength(value));
-		setYDim(0);
-	    } else { // IMAGE
-		final int y = Array.getLength(value);
-		setYDim(y);
-		if (y > 0) {
-		    final Object xArray = Array.get(value, 0);
-		    // check if this value can be an attribute value
-		    if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(xArray.getClass().getComponentType())) {
-			DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
-		    }
-		    setXDim(Array.getLength(xArray));
-		} else {
-		    setXDim(0);
-		}
-	    }
-	    this.value = value;
-	} else {
-	    this.value = null;
-	}
+        if (time == 0) {
+            time = System.currentTimeMillis();
+        }
+        if (value != null) {
+            if (!value.getClass().isArray()) { // SCALAR
+                // check if this value can be an attribute value
+                if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass())) {
+                    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                }
+                setXDim(1);
+                setYDim(0);
+            } else if (!value.getClass().getComponentType().isArray()) {// SPECTRUM
+                // check if this value can be an attribute value
+                if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass().getComponentType())) {
+                    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                }
+                setXDim(Array.getLength(value));
+                setYDim(0);
+            } else { // IMAGE
+                final int y = Array.getLength(value);
+                setYDim(y);
+                if (y > 0) {
+                    final Object xArray = Array.get(value, 0);
+                    // check if this value can be an attribute value
+                    if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(xArray.getClass().getComponentType())) {
+                        DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                    }
+                    setXDim(Array.getLength(xArray));
+                } else {
+                    setXDim(0);
+                }
+            }
+            this.value = value;
+        } else {
+            this.value = null;
+        }
+    }
+
+    /**
+     * Set Value and time. cf {@link #setValue(Object)} for details
+     * 
+     * @param value
+     * @param time
+     * @throws DevFailed
+     */
+    public void setValue(final Object value, final long time) throws DevFailed {
+        this.setValue(value);
+        this.setTime(time);
+    }
+
+    void setValueWithoutDim(final Object value) throws DevFailed {
+        if (time == 0) {
+            time = System.currentTimeMillis();
+        }
+        this.value = value;
     }
 
     public AttrQuality getQuality() {
-	return AttrQuality.from_int(quality.value());
+        return AttrQuality.from_int(quality.value());
     }
 
     /**
@@ -152,27 +173,26 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @param quality
      */
     public void setQuality(final AttrQuality quality) {
-	// copy value
-	this.quality = AttrQuality.from_int(quality.value());
+        // copy value
+        this.quality = AttrQuality.from_int(quality.value());
     }
 
     public long getTime() {
-	return time;
+        return time;
     }
 
     /**
-     * Time is set to System.currentTimeMillis() in {@link #setValue(Object)}. Must be called after setValue to override
-     * time
+     * Set timestamp. By default, time is set to System.currentTimeMillis() in {@link #setValue(Object)}.
      * 
      * @param time
      *            timestamp in milliseconds
      */
     public void setTime(final long time) {
-	this.time = time;
+        this.time = time;
     }
 
     public int getXDim() {
-	return xDim;
+        return xDim;
     }
 
     /**
@@ -181,11 +201,11 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @param xDim
      */
     public void setXDim(final int xDim) {
-	this.xDim = xDim;
+        this.xDim = xDim;
     }
 
     public int getYDim() {
-	return yDim;
+        return yDim;
     }
 
     /**
@@ -194,28 +214,28 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @param yDim
      */
     public void setYDim(final int yDim) {
-	this.yDim = yDim;
+        this.yDim = yDim;
     }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-	final AttributeValue newValue = (AttributeValue) super.clone();
-	newValue.quality = AttrQuality.from_int(quality.value());
-	try {
-	    newValue.value = org.tango.utils.ArrayUtils.deepCopy(value);
-	} catch (final IOException e) {
-	    throw new CloneNotSupportedException(e.getMessage());
-	} catch (final ClassNotFoundException e) {
-	    throw new CloneNotSupportedException(e.getMessage());
-	}
-	return newValue;
+        final AttributeValue newValue = (AttributeValue) super.clone();
+        newValue.quality = AttrQuality.from_int(quality.value());
+        try {
+            newValue.value = org.tango.utils.ArrayUtils.deepCopy(value);
+        } catch (final IOException e) {
+            throw new CloneNotSupportedException(e.getMessage());
+        } catch (final ClassNotFoundException e) {
+            throw new CloneNotSupportedException(e.getMessage());
+        }
+        return newValue;
     }
 
     @Override
     public String toString() {
-	final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
-		ToStringStyle.SHORT_PREFIX_STYLE);
-	return reflectionToStringBuilder.toString();
+        final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
+                ToStringStyle.SHORT_PREFIX_STYLE);
+        return reflectionToStringBuilder.toString();
     }
 
 }

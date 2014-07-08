@@ -506,7 +506,10 @@ public final class JTangoTest {
     // BOOLEAN
 
     public AttributeValue isBooleanScalar() throws DevFailed {
-        return new AttributeValue(booleanScalar, AttrQuality.ATTR_CHANGING);
+        final AttributeValue val = new AttributeValue(booleanScalar, AttrQuality.ATTR_CHANGING);
+        val.setTime(123456L);
+        val.setValue(booleanScalar);
+        return val;
     }
 
     public void setBooleanScalar(final boolean booleanScalar) {
