@@ -178,7 +178,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      */
     public void updateValue() throws DevFailed {
         xlogger.entry(getName());
-
         // invoke on device
         try {
             final AttributeValue returnedValue = (AttributeValue) behavior.getValue().clone();
@@ -196,6 +195,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      * @throws DevFailed
      */
     public void updateValue(final AttributeValue inValue) throws DevFailed {
+
         xlogger.entry(getName());
         if (inValue == null) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
@@ -211,9 +211,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             if (inValue.getValue() != null) {
                 checkUpdateErrors(inValue);
                 // get as array if necessary (for image)
-                if (readValue.getYDim() > 0) {
-                    readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
-                }
+                readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
+
                 // force conversion to check types
                 TangoIDLAttributeUtil.toAttributeValue4(this, readValue, null);
                 if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
@@ -221,9 +220,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     try {
                         writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
                         // get as array if necessary (for image)
-                        if (writeValue.getYDim() > 0) {
-                            writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
-                        }
+                        writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
                     } catch (final CloneNotSupportedException e) {
                         throw DevFailedUtils.newDevFailed(e);
                     }
