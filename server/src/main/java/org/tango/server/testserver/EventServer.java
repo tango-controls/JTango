@@ -131,9 +131,12 @@ public class EventServer {
     @AttributeProperties(changeEventAbsolute = "100")
     private boolean booleanAtt = false;
 
-    public boolean getBooleanAtt() {
+    public AttributeValue getBooleanAtt() throws DevFailed {
+        final AttributeValue val = new AttributeValue();
         booleanAtt = !booleanAtt;
-        return booleanAtt;
+        val.setTime(34567L);
+        val.setValue(booleanAtt);
+        return val;
     }
 
     @Attribute(isPolled = true, pollingPeriod = 100)
