@@ -197,27 +197,33 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      */
     public void updateValue(final AttributeValue inValue) throws DevFailed {
         xlogger.entry(getName());
-        readValue = new AttributeValue();
+        if (inValue == null) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
+        }
+        try {
+            // copy value
+            readValue = (AttributeValue) inValue.clone();
+        } catch (final CloneNotSupportedException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
         try {
 
-            // get as array if necessary (for image)
             if (inValue.getValue() != null) {
                 checkUpdateErrors(inValue);
-                readValue.setValue(ArrayUtils.from2DArrayToArray(inValue.getValue()));
-                // force dim for image
-                readValue.setXDim(inValue.getXDim());
-                readValue.setYDim(inValue.getYDim());
+                // get as array if necessary (for image)
+                if (readValue.getYDim() > 0) {
+                    readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
+                }
                 // force conversion to check types
                 TangoIDLAttributeUtil.toAttributeValue4(this, readValue, null);
                 if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
                     // write value is managed by the user
                     try {
-                        final AttributeValue val = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
-                        writeValue = new AttributeValue();
-                        writeValue.setValue(ArrayUtils.from2DArrayToArray(val.getValue()));
-                        // force dim for image
-                        writeValue.setXDim(val.getXDim());
-                        writeValue.setYDim(val.getYDim());
+                        writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
+                        // get as array if necessary (for image)
+                        if (writeValue.getYDim() > 0) {
+                            writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
+                        }
                     } catch (final CloneNotSupportedException e) {
                         throw DevFailedUtils.newDevFailed(e);
                     }
@@ -237,7 +243,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             readValue.setQuality(AttrQuality.ATTR_INVALID);
             readValue.setXDim(0);
             readValue.setYDim(0);
-            readValue.setTime(System.currentTimeMillis());
             lastError = e;
             throw e;
         }
