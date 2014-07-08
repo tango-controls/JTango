@@ -220,7 +220,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     try {
                         writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
                         // get as array if necessary (for image)
-                        writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
+                        writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(writeValue.getValue()));
                     } catch (final CloneNotSupportedException e) {
                         throw DevFailedUtils.newDevFailed(e);
                     }
