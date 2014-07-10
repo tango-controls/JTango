@@ -234,7 +234,10 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             } else {
                 DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
             }
-            updateQuality(inValue);
+            // check alarms if necessary
+            if (!inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
+                updateQuality(inValue);
+            }
             updateDefaultWritePart();
         } catch (final DevFailed e) {
             readValue.setQuality(AttrQuality.ATTR_INVALID);
@@ -278,16 +281,13 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void updateQuality(final AttributeValue returnedValue) {
         isOutOfLimits = false;
         isDeltaAlarm = false;
-        final AttrQuality currentQuality = returnedValue.getQuality();
-        readValue.setQuality(currentQuality);
         final AttributePropertiesImpl props = config.getAttributeProperties();
         final boolean isAlarmNotConfigured = props.getMaxAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
                 && props.getMinAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
                 && props.getMaxWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
                 && props.getMinWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
                 && props.getDeltaT().equals(AttributePropertiesImpl.NOT_SPECIFIED);
-        if (currentQuality.equals(AttrQuality.ATTR_VALID) && !config.getWritable().equals(AttrWriteType.WRITE)
-                && isNumber() && !isAlarmNotConfigured) {
+        if (!config.getWritable().equals(AttrWriteType.WRITE) && isNumber() && !isAlarmNotConfigured) {
             final double maxAlarm = props.getMaxAlarmDouble();
             final double minAlarm = props.getMinAlarmDouble();
             final double maxWarning = props.getMaxWarningDouble();
