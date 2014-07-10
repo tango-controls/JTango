@@ -422,6 +422,14 @@ public final class JTangoTest {
         return Arrays.copyOf(longSpectrum, longSpectrum.length);
     }
 
+    @Attribute
+    @AttributeProperties(minAlarm = "2")
+    private final double invalidQuality = 0;
+
+    public AttributeValue getInvalidQuality() throws DevFailed {
+        return new AttributeValue(invalidQuality, AttrQuality.ATTR_INVALID);
+    }
+
     public void setLongSpectrum(final long[] longSpectrum) {
         this.longSpectrum = new long[longSpectrum.length];
         System.arraycopy(longSpectrum, 0, this.longSpectrum, 0, longSpectrum.length);
