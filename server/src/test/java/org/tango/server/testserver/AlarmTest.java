@@ -46,92 +46,111 @@ public class AlarmTest extends NoDBDeviceManager {
 
     @BeforeClass
     public static void before() throws DevFailed {
-	final ITangoDB db = DatabaseFactory.getDatabase();
-	final String propName = "StateCheckAttrAlarm";
-	final Map<String, String[]> map = new HashMap<String, String[]>();
-	map.put(propName, new String[] { "true" });
-	db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
-	new DeviceProxy(deviceName).command_inout("Init");
+        final ITangoDB db = DatabaseFactory.getDatabase();
+        final String propName = "StateCheckAttrAlarm";
+        final Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { "true" });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        new DeviceProxy(deviceName).command_inout("Init");
     }
 
     @Test
     public void testAlarmSpectrum() throws DevFailed {
-	final String attrName = "longSpectrum";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(new long[] { -10, 1 });
-	ta.read();
-	// System.out.println(ta.getQuality().value());
-	// System.out.println(DeviceState.toString(dev.state()));
-	// System.out.println(dev.status());
-	assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
-	assertThat(dev.state(), equalTo(DevState.ALARM));
-	assertThat(dev.status(), anything("Alarm : Value too low for longSpectrum"));
+        final String attrName = "longSpectrum";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(new long[] { -10, 1 });
+        ta.read();
+        // System.out.println(ta.getQuality().value());
+        // System.out.println(DeviceState.toString(dev.state()));
+        // System.out.println(dev.status());
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
+        assertThat(dev.state(), equalTo(DevState.ALARM));
+        assertThat(dev.status(), anything("Alarm : Value too low for longSpectrum"));
     }
 
     @Test
     public void testAlarmScalar() throws DevFailed {
-	final String attrName = "doubleScalar";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(-10.0);
-	ta.read();
-	// System.out.println(ta.getQuality().value());
-	// System.out.println(DeviceState.toString(dev.state()));
-	// System.out.println(dev.status());
-	assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
-	assertThat(dev.state(), equalTo(DevState.ALARM));
-	assertThat(dev.status(), anything("Alarm : Value too low for doubleScalar"));
+        final String attrName = "doubleScalar";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(-10.0);
+        ta.read();
+        // System.out.println(ta.getQuality().value());
+        // System.out.println(DeviceState.toString(dev.state()));
+        // System.out.println(dev.status());
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
+        assertThat(dev.state(), equalTo(DevState.ALARM));
+        assertThat(dev.status(), anything("Alarm : Value too low for doubleScalar"));
     }
 
     @Test
     public void testDeltaScalar() throws DevFailed {
-	System.out.println("test deltaAttribute");
-	final String attrName = "deltaAttribute";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(-10.0);
-	try {
-	    Thread.sleep(20);
-	} catch (final InterruptedException e) {
-	}
-	// System.out.println(ta.getQuality().value());
-	// System.out.println(DeviceState.toString(dev.state()));
-	// System.out.println(dev.status());
-	ta.read();
-	assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
-	assertThat(dev.state(), equalTo(DevState.ALARM));
-	assertThat(dev.status(), anything("Alarm : RDS (R-W delta) for doubleScalar"));
+        System.out.println("test deltaAttribute");
+        final String attrName = "deltaAttribute";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(-10.0);
+        try {
+            Thread.sleep(20);
+        } catch (final InterruptedException e) {
+        }
+        // System.out.println(ta.getQuality().value());
+        // System.out.println(DeviceState.toString(dev.state()));
+        // System.out.println(dev.status());
+        ta.read();
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_ALARM.value()));
+        assertThat(dev.state(), equalTo(DevState.ALARM));
+        assertThat(dev.status(), anything("Alarm : RDS (R-W delta) for doubleScalar"));
     }
 
     @Test
     public void testWarning() throws DevFailed {
-	final String attrName = "longSpectrum";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(new long[] { 4, 3 });
-	ta.read();
-	// System.out.println(ta.getQuality().value());
-	// System.out.println(DeviceState.toString(dev.state()));
-	// System.out.println(dev.status());
-	assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_WARNING.value()));
-	assertThat(dev.state(), equalTo(DevState.ALARM));
-	assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
+        final String attrName = "longSpectrum";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(new long[] { 4, 3 });
+        ta.read();
+        // System.out.println(ta.getQuality().value());
+        // System.out.println(DeviceState.toString(dev.state()));
+        // System.out.println(dev.status());
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_WARNING.value()));
+        assertThat(dev.state(), equalTo(DevState.ALARM));
+        assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
+
+    }
+
+    @Test
+    public void testInvalid() throws DevFailed {
+        final String attrName = "invalidQuality";
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        try {
+            ta.read();
+        } catch (final DevFailed e) {
+            // ignore exception with quality invalid
+
+        }
+        // System.out.println(ta.getQuality().value());
+        // System.out.println(DeviceState.toString(dev.state()));
+        // System.out.println(dev.status());
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_INVALID.value()));
+//        assertThat(dev.state(), equalTo(DevState.ALARM));
+//        assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
 
     }
 
     @Test(expected = DevFailed.class)
     public void testMaxValueSpectrum() throws DevFailed {
-	final String attrName = "longSpectrum";
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(new long[] { -200, 120 });
+        final String attrName = "longSpectrum";
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(new long[] { -200, 120 });
     }
 
     @Test(expected = DevFailed.class)
     public void testMaxValueScalar() throws DevFailed {
-	final String attrName = "doubleScalar";
-	final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
-	ta.write(-200.0);
+        final String attrName = "doubleScalar";
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        ta.write(-200.0);
     }
 
 }
