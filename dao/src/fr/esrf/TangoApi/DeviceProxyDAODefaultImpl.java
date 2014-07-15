@@ -2597,6 +2597,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         }
 //        catch (ConnectionFailed e) {
         catch (Exception e) {
+            if (e instanceof AsynReplyNotArrived)
+                throw (AsynReplyNotArrived) e;
            try {
                 //  If failed, retrieve data from request object
                 final NVList args = request.arguments();
