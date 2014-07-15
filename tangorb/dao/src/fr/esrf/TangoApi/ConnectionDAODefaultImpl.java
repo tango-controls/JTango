@@ -260,8 +260,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     // ===================================================================
     public synchronized void build_connection(final Connection connection) throws DevFailed {
 		if (!connection.deviceCreated()) {
-	    		if (connection.devname != null) {
-
+            if (connection.devname != null) {
 				final long t = System.currentTimeMillis();
 				final long delay = t - connection.getPrev_failed_t0();
 				boolean try_reconnection = true;
@@ -269,36 +268,45 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 				// Check if connection on database or on a device
 				if (connection.isDevice_is_dbase()) {
 		    		connect_to_dbase(connection);
-				} else {
+				}
+                else {
 		    		try {
-					// url.trace();
-					// Check if Tango or taco device
-					if (connection.url.protocol == TANGO) {
-			    		// Do not reconnect if to soon
-			    		if (connection.isPrev_failed()
-				    		&& delay < ApiUtil.getReconnectionDelay()) {
-							try_reconnection = false;
-							throw connection.getPrev_failed();
-			    		}
-						//if (!connection.devname.startsWith("tango"))
-				    	//	System.out.println(" Try reconnection on " +
-						//			connection.devname +":	" + delay + " ms");
-			    		connection.setPrev_failed_t0(t);
+                        // url.trace();
+                        // Check if Tango or taco device
+                        if (connection.url.protocol == TANGO) {
+                            if (connection instanceof DeviceProxy) {
+                                //  Set admin device to null to force reconnection.
+                                ((DeviceProxy) connection).setAdm_dev(null);
+                            }
 
-			    		// Check if connection with database or without
-			    		if (connection.url.use_db) {
-							dev_import(connection);
-			    		} else {
-							dev_import_without_dbase(connection);
-			    		}
-			    		connection.setPrev_failed(null);
-					} else if (connection.url.protocol == TACO) {
-			    		if (connection.taco_device == null) {
-							connection.taco_device = new TacoTangoDevice(connection.devname,
-								connection.url.host);
-			    			}
-						}
-		    		} catch (final DevFailed e) {
+                            // Do not reconnect if to soon
+                            if (connection.isPrev_failed()
+                                && delay < ApiUtil.getReconnectionDelay()) {
+                                try_reconnection = false;
+                                throw connection.getPrev_failed();
+                            }
+                            //if (!connection.devname.startsWith("tango"))
+                            //	System.out.println(" Try reconnection on " +
+                            //			connection.devname +":	" + delay + " ms");
+                            connection.setPrev_failed_t0(t);
+
+                            // Check if connection with database or without
+                            if (connection.url.use_db) {
+                                dev_import(connection);
+                            } else {
+                                dev_import_without_dbase(connection);
+                            }
+                            connection.setPrev_failed(null);
+                        }
+                        else
+                        if (connection.url.protocol == TACO) {
+                            if (connection.taco_device == null) {
+                                connection.taco_device =
+                                    new TacoTangoDevice(connection.devname, connection.url.host);
+                            }
+                        }
+		    		}
+                    catch (final DevFailed e) {
 						if (try_reconnection) {
 			    			connection.setPrev_failed_t0(t);
 			    			connection.setPrev_failed(e);
@@ -1283,7 +1291,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      */
     // ==========================================================================
     public boolean get_transparency_reconnection(final Connection connection) {
-	return connection.transparent_reconnection;
+	    return connection.transparent_reconnection;
     }
 
     // ==========================================================================
@@ -1292,26 +1300,26 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      */
     // ==========================================================================
     public void set_transparency_reconnection(final Connection connection, final boolean val) {
-	connection.transparent_reconnection = val;
+	    connection.transparent_reconnection = val;
     }
 
     // ==========================================================================
     // ==========================================================================
     public int getAccessControl(final Connection connection) {
-	return connection.access;
+	    return connection.access;
     }
 
     // ==========================================================================
     // ==========================================================================
     public void setAccessControl(final Connection connection, final int access) {
-	connection.access = access;
+	    connection.access = access;
     }
 
     // ==========================================================================
     // ==========================================================================
     public boolean isAllowedCommand(final Connection connection, final String cmd) throws DevFailed {
 	final Database db = ApiUtil.get_db_obj(connection.url.host, connection.url.strPort);
-	return db.isCommandAllowed(connection.get_class_name(), cmd);
+	    return db.isCommandAllowed(connection.get_class_name(), cmd);
     }
 
     // ==========================================================================
@@ -1319,7 +1327,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     protected void manageExceptionReconnection(final Connection deviceProxy, final int retries,
 	    final int i, final Exception e, final String origin) throws DevFailed {
 		ApiUtilDAODefaultImpl.removePendingRepliesOfDevice(deviceProxy);
-		if (i == 0
+		if (i==0
 			&& (e.toString().contains("org.omg.CORBA.TRANSIENT") ||
 				e.toString().contains("org.omg.CORBA.OBJECT_NOT_EXIST") ||
                 e.toString().contains("org.omg.CORBA.COMM_FAILURE"))) {
@@ -1332,7 +1340,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	build_connection(deviceProxy);
 
 	    	if (i == retries - 1) {
-			throw_dev_failed(deviceProxy, e, origin, false);
+			    throw_dev_failed(deviceProxy, e, origin, false);
 	    	}
 		} else {
 	    	throw_dev_failed(deviceProxy, e, origin, false);
