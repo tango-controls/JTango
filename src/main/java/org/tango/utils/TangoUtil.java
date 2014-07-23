@@ -19,6 +19,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttrWriteType;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.ApiUtil;
+import fr.esrf.TangoApi.Database;
+import fr.esrf.TangoDs.TangoConst;
+
 /**
  * Some utilities for tango
  */
