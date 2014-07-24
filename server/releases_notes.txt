@@ -1,3 +1,7 @@
+1.1.5
+-----
+- fix timestamp management. In some cases timestamp set in the device was not send to client. 
+
 1.1.4
 -----
 - logging: fix -v option.
