@@ -1589,6 +1589,26 @@ public class DeviceProxy extends Connection implements ApiDefs {
     }
     // ==========================================================================
     /**
+     * Subscribe to event  on a device(different to Interface Change Event) to be stored in an event queue.
+     *
+     * @param attr_name attribute name.
+     * @param event     event name.
+     * @param max_size  event queue maximum size.
+     * @param stateless If true, do not throw exception if connection failed.
+     */
+    // ==========================================================================
+    public int subscribe_event(String attr_name, int event, int max_size, String[] filters, boolean stateless)
+            throws DevFailed {
+        if (!useEvents())
+            Except.throw_exception("NO_EVENT", "Event system not available");
+        if (event==TangoConst.INTERFACE_CHANGE)
+            Except.throw_exception("BAD_EVENT",
+                    TangoConst.eventNames[event] + " cannot be applied to a device");
+        return deviceProxy.subscribe_event(this, attr_name, event, max_size, filters, stateless);
+    }
+    // ==========================================================================
+    // ==========================================================================
+    /**
      * Subscribe to an event (Interface Change Event).
      *
      * @param event     event name.
