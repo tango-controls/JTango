@@ -494,7 +494,7 @@ class DevLockManager {
             for (int i = 0; i < devices.size(); i++) {
                 final LockedDevice ld = devices.get(i);
                 if (ld.name.equals(devname)) {
-                    System.out.println("------- >removing " + devname);
+                    //System.out.println("------- >removing " + devname);
                     devices.remove(ld);
                 }
             }
