@@ -1595,7 +1595,7 @@ public class DeviceAttribute {
 
     // ===========================================
     // ===========================================
-    public IDeviceAttributeDAO getDeviceattributeDAO() {
+    public IDeviceAttributeDAO getDeviceAttributeDAO() {
         return deviceattributeDAO;
     }
 }
