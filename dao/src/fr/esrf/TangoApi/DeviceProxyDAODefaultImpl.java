@@ -1607,32 +1607,36 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 			}
 			done = true;
 	    	} catch (final DevFailed e) {
-			// Except.print_exception(e);
-			throw e;
+                // Except.print_exception(e);
+                throw e;
 	    	} catch (final MultiDevFailed e) {
 			throw new NamedDevFailedList(e, name(deviceProxy),
 				"DeviceProxy.write_read_attribute", "MultiDevFailed");
 	    	} catch (final Exception e) {
-			manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
+			    manageExceptionReconnection(deviceProxy, retries, i, e, this.getClass()
 				+ ".write_read_attribute");
 	    	}
 		} // End of for ( ; ; )
 
 		// Build a Device Attribute Object
 		// Depends on Device_impl version
-		final DeviceAttribute[] attributes = new DeviceAttribute[outAttrValues_4.length];
 		if (deviceProxy.device_5 != null) {
+            final DeviceAttribute[] attributes = new DeviceAttribute[outAttrValues_5.length];
 	    	for (int i=0 ; i<outAttrValues_5.length; i++) {
                 attributes[i] = new DeviceAttribute(outAttrValues_5[i]);
 	    	}
+            return attributes;
 		}
         else
 		if (deviceProxy.device_4 != null) {
+            final DeviceAttribute[] attributes = new DeviceAttribute[outAttrValues_4.length];
 	    	for (int i = 0; i < outAttrValues_4.length; i++) {
                 attributes[i] = new DeviceAttribute(outAttrValues_4[i]);
 	    	}
+            return attributes;
 		}
-		return attributes;
+        else
+            return null; // Cannot be possible (write_read did not exist before
     }
 
     // ==========================================================================
@@ -2599,7 +2603,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         catch (Exception e) {
             if (e instanceof AsynReplyNotArrived)
                 throw (AsynReplyNotArrived) e;
-           try {
+            try {
                 //  If failed, retrieve data from request object
                 final NVList args = request.arguments();
                 final String[] attributeNames =
