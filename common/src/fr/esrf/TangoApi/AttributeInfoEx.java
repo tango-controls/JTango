@@ -66,7 +66,7 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
     public boolean isMemorized;
     public boolean isSetAtInit;
     public Memorized memorized = Memorized.UNKNOWN;
-    public String   root_attr_name = null;
+    public String   root_attr_name = "Not specified";
     public String[] enum_label = null;
 
     /**

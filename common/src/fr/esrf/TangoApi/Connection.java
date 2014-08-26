@@ -611,6 +611,15 @@ public class Connection implements ApiDefs {
 	public boolean isAllowedCommand(String cmd) throws DevFailed {
 		return iConnection.isAllowedCommand(this, cmd);
 	}
+    // ==========================================================================
+    /**
+     *
+     * @return the device_5 object if connected, null otherwise.
+     */
+    // ==========================================================================
+    public Device_5 getDevice_5() {
+        return device_5;
+    }
 
 	public IConnectionDAO getIConnection() {
 		return iConnection;
