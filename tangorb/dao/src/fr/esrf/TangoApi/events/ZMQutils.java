@@ -80,6 +80,9 @@ public class  ZMQutils {
     private static double  zmqVersion = -1.0;
 
     private static final int HWM_DEFAULT = 1000;
+    public static final String SUBSCRIBE_COMMAND = "ZmqEventSubscriptionChange";
+    public static final String SUBSCRIBE_COMMAND_NOT_FOUND =
+                                    "Command " + SUBSCRIBE_COMMAND + " not found";
 	//===============================================================
 	//===============================================================
     static ZMQutils getInstance() {
@@ -543,26 +546,26 @@ public class  ZMQutils {
      * @param deviceName    specified device
      * @param attributeName specified attribute
      * @param eventName     specified event
-     * @return the event subscription info.
-     *  svalue[0]:  heartbeat endpoint.
-     *  svalue[1]:  event endpoint.
-     *  lvalue[0]:  Tango lib release.
-     *  lvalue[1]:  Device IDL version.
-     *  lvalue[2]:  sub HWM.
-     *  lvalue[3]:  rate (for multi cast).
-     *  lvalue[4]:  ivl (for multi cast).
+     * @return the event subscription info:
+     *          svalue[0]:  heartbeat endpoint.
+     *          svalue[1]:  event endpoint.
+     *          lvalue[0]:  Tango lib release.
+     *          lvalue[1]:  Device IDL version.
+     *          lvalue[2]:  sub HWM.
+     *          lvalue[3]:  rate (for multi cast).
+     *          lvalue[4]:  ivl (for multi cast).
      * @throws DevFailed in case of admin device connection failed
      */
 	//===============================================================
     static DevVarLongStringArray getEventSubscriptionInfoFromAdmDevice(DeviceProxy adminDevice,
             String deviceName, String attributeName, String eventName) throws DevFailed {
 
-        //System.out.println("ZmqEventSubscriptionChange for\n -" +
+        //System.out.println(SUBSCRIBE_COMMAND + " for\n -" +
         //        deviceName + "\n - " + attributeName + "\n - " + eventName +
         //        "\n - idl: " + adminDevice.get_idl_version());
-        DeviceData argIn    = new DeviceData();
+        DeviceData argIn = new DeviceData();
 
-        String[]	strArray = {
+        String[] strArray = {
                 deviceName,
                 (attributeName==null)? "" : attributeName,
                 "subscribe",
@@ -570,8 +573,8 @@ public class  ZMQutils {
                 Integer.toString(adminDevice.get_idl_version()),
         };
         argIn.insert(strArray);
-        DeviceData argout = adminDevice.command_inout("ZmqEventSubscriptionChange", argIn);
-        return argout.extractLongStringArray();
+        DeviceData argOut = adminDevice.command_inout(SUBSCRIBE_COMMAND, argIn);
+        return argOut.extractLongStringArray();
     }
 	//===============================================================
     /**
