@@ -158,7 +158,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
-            if (!stateless || e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+            if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                 throw e;
             }
             else {
@@ -233,7 +233,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     private void callEventSubscriptionAndConnect(DeviceProxy device, String eventType)
             throws DevFailed {
-        //  Done for IDL>=5 and not for notifd event system
+        //  Done for IDL>=5 and not for notifd event system (no attribute name)
         String device_name = device.name();
         String[] info = new String[] {
                 device_name,
@@ -258,7 +258,7 @@ public class ZmqEventConsumer extends EventConsumer implements
    //===============================================================
     @Override
     protected String getEventSubscriptionCommandName() {
-        return "ZmqEventSubscriptionChange";
+        return ZMQutils.SUBSCRIBE_COMMAND;
     }
 
     //===============================================================
@@ -590,7 +590,6 @@ public class ZmqEventConsumer extends EventConsumer implements
             if (eventCallBackStruct.channel_name.equals(name) && (eventCallBackStruct.callback != null)) {
                 try {
                     EventChannelStruct channelStruct = channel_map.get(name);
-
 
                     DevVarLongStringArray   lsa =
                             ZMQutils.getEventSubscriptionInfoFromAdmDevice(

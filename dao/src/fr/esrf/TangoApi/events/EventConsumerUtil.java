@@ -253,7 +253,7 @@ public class EventConsumerUtil {
             }
             catch (DevFailed e) {
                 ApiUtil.printTrace(e.errors[0].desc);
-                if (e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+                if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                     //  If not a ZMQ server, try on notifd system.
                     id = subscribeEventWithNotifd(device, attribute,
                             event, callback, max_size, filters,stateless);
