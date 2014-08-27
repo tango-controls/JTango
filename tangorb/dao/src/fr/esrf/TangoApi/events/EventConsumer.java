@@ -175,7 +175,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
 
         String device_name = device.name();
-        if (attribute==null)
+        if (attribute==null) // Interface change event on device.
             attribute = "";
         String[] info = new String[] {
                 device_name,
@@ -184,18 +184,17 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 eventType,
                 Integer.toString(device.get_idl_version())
         };
-        DeviceData argin = new DeviceData();
-        argin.insert(info);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(info);
         String cmdName = getEventSubscriptionCommandName();
-        //ApiUtil.printTrace
-        System.out.println(device.get_adm_dev().name() + ".command_inout(\"" +
+        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
                     cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
-        DeviceData argout =
-                device.get_adm_dev().command_inout(cmdName, argin);
+        DeviceData argOut =
+                device.get_adm_dev().command_inout(cmdName, argIn);
         ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
-        checkDeviceConnection(device, attribute, argout, eventType);
+        checkDeviceConnection(device, attribute, argOut, eventType);
     }
     //===============================================================
     //===============================================================
@@ -267,7 +266,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
-            if (!stateless || e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+            if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                 throw e;
             }
             else {
@@ -378,7 +377,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
                     }
                     catch (DevFailed e) {
-                        if (e.errors[0].desc.equals("Command ZmqEventSubscriptionChange not found")) {
+                        if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                             try {
                                 //  Try for notifd
                                 eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
