@@ -394,6 +394,10 @@ public interface TangoConst {
  */
 	public static final int	Tango_DEV_ENUM	   =		29;
 /**
+ * Constant for the TANGO pipe blob
+ */
+	public static final int	Tango_DEV_PIPE_BLOB	   =    30;
+/**
  * Array with TANGO data type name. To get the type name for type Tango_DEV_LONG, 
  * use Tango_CmdArgTypeName[Tango_DEV_LONG]
  */
@@ -428,6 +432,7 @@ public interface TangoConst {
 		"DevInt",
 		"DevEncoded",
 		"DevEnum",
+		"DevPipeBlob",
 	};
 
 //-------------------------------------------------------------------------
