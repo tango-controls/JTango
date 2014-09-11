@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,50 +27,48 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Class Description:
- * This class manage a vector of DbDatum for attribute properties read/write
- * and the attribute name associated.
+ * This class manage a list of DbDatum for pipe properties read/write
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 25296 $
  */
 
 
-public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable {
-    public String name;
+public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
+
+    private String name;
 
     //===========================================================
     /**
-     * Default constructor for the DbAttribute Object.
+     * Default constructor for the DbPipe Object.
      *
      * @param name Attribute name.
      */
     //===========================================================
-    public DbAttribute(String name) {
+    public DbPipe(String name) {
         super();
         this.name = name;
     }
-
-
     //===========================================================
     /**
-     * get the DbDatum object by index.
+     * return pipe name.
      *
-     * @param idx index of the DbDatum expected.
+     * @return the pipe name.
      */
     //===========================================================
-    public DbDatum datum(int idx) {
-        return elementAt(idx);
+    public String getName() {
+        return name;
     }
 
     //===========================================================
@@ -80,10 +78,8 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      * @param name index of the DbDatum expected.
      */
     //===========================================================
-    public DbDatum datum(String name) {
-        DbDatum datum;
-        for (int i = 0; i < size(); i++) {
-            datum = elementAt(i);
+    public DbDatum getDatum(String name) {
+        for (DbDatum datum : this) {
             if (name.equalsIgnoreCase(datum.name))
                 return datum;
         }
@@ -98,7 +94,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name) {
-        addElement(new DbDatum(name, ""));
+        add(new DbDatum(name, ""));
     }
     //===========================================================
     /**
@@ -109,7 +105,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, String value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
@@ -120,7 +116,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, short value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
@@ -131,7 +127,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, int value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
@@ -142,7 +138,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, double value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
 
 
@@ -155,7 +151,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, String[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
@@ -166,7 +162,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, short[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
@@ -177,7 +173,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, int[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
@@ -188,18 +184,18 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public void add(String name, double[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
      * Return the property name
      *
-     * @param idx index of property
+     * @param index property index
      * @return property name
      */
     //===========================================================
-    public String get_property_name(int idx) {
-        return datum(idx).name;
+    public String getPropertyName(int index) {
+        return get(index).name;
     }
 
     //===========================================================
@@ -210,21 +206,21 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      * @return property values in an array of Strings
      */
     //===========================================================
-    public String[] get_value(int idx) {
-        return datum(idx).extractStringArray();
+    public String[] getValue(int idx) {
+        return get(idx).extractStringArray();
     }
     //===========================================================
     /**
      * Return the property value as a String object
      *
-     * @param idx index of property
+     * @param index index of property
      * @return property value in a String object.
      */
     //===========================================================
-    public String get_string_value(int idx) {
-        String[] array = datum(idx).extractStringArray();
+    public String getStringValue(int index) {
+        String[] array = get(index).extractStringArray();
         String str = "";
-        for (int i = 0; i < array.length; i++) {
+        for (int i=0 ; i<array.length ; i++) {
             str += array[i];
             if (i < array.length - 1)
                 str += "\n";
@@ -239,8 +235,8 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      * @return property value in an array of Strings
      */
     //===========================================================
-    public String[] get_value(String name) {
-        return datum(name).extractStringArray();
+    public String[] getValue(String name) {
+        return getDatum(name).extractStringArray();
     }
     //===========================================================
     /**
@@ -250,9 +246,9 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      * @return property value in aString object if exists, null otherwise
      */
     //===========================================================
-    public String get_string_value(String name) {
+    public String getStringValue(String name) {
         //  Check if datum exists for name
-        DbDatum datum = datum(name);
+        DbDatum datum = getDatum(name);
         if (datum == null)
             return null;
 
@@ -275,11 +271,8 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public boolean is_empty(String name) {
-        DbDatum datum = datum(name);
-        if (datum == null)
-            return true;
-        else
-            return datum.is_empty();
+        DbDatum datum = getDatum(name);
+        return datum==null || datum.is_empty();
     }
     //===========================================================
     /**
@@ -288,10 +281,10 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      * @return a list of properties found;
      */
     //===========================================================
-    public String[] get_property_list() {
+    public String[] getPropertyList() {
         String[] array = new String[size()];
-        for (int i = 0; i < size(); i++)
-            array[i] = datum(i).name;
+        for (int i=0 ; i<size(); i++)
+            array[i] = get(i).name;
         return array;
     }
 }

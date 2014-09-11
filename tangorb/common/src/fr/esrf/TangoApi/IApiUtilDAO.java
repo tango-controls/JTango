@@ -266,48 +266,6 @@ public interface IApiUtilDAO {
      * Methods to convert data.
      */
     // ==========================================================================
-    // ==========================================================================
-    /**
-     * Convert arguments to one String array
-     */
-    // ==========================================================================
-    public String[] toStringArray(String objname, String[] argin);
-
-    // ==========================================================================
-    /**
-     * Convert arguments to one String array
-     */
-    // ==========================================================================
-    public String[] toStringArray(String objname, String argin);
-
-    // ==========================================================================
-    /**
-     * Convert arguments to one String array
-     */
-    // ==========================================================================
-    public String[] toStringArray(String argin);
-
-    // ==========================================================================
-    /**
-     * Convert a DbAttribute class array to a StringArray.
-     * 
-     * @param objname object name (used in first index of output array)..
-     * @param attr    DbAttribute array to be converted
-     * @return the String array created from input argument.
-     */
-    // ==========================================================================
-    public String[] toStringArray(String objname, DbAttribute[] attr, int mode);
-
-    // ==========================================================================
-    /**
-     * Convert a StringArray to a DbAttribute class array
-     * 
-     * @param array String array to be converted
-     * @param mode  decode argout params mode (mode=2 added 26/10/04)
-     * @return the DbAtribute class array created from input argument.
-     */
-    // ==========================================================================
-    public DbAttribute[] toDbAttributeArray(String[] array, int mode) throws DevFailed;
 
     // ==========================================================================
     // ==========================================================================

@@ -46,6 +46,9 @@ import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.Request;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -78,7 +81,7 @@ import java.util.Vector;
 
 public class DeviceProxy extends Connection implements ApiDefs {
 
-    private IDeviceProxyDAO deviceProxy = null;
+    private IDeviceProxyDAO deviceProxyDAO = null;
 
     static final private boolean check_idl = false;
 
@@ -113,8 +116,8 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public DeviceProxy() throws DevFailed {
         super();
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this);
         DeviceProxyFactory.add(this);
     }
 
@@ -127,8 +130,8 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public DeviceProxy(DbDevImportInfo info) throws DevFailed {
         super(info);
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this, info.name);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this, info.name);
         //System.out.println("=========== " + devname + " created ============");
         DeviceProxyFactory.add(this);
     }
@@ -142,8 +145,8 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public DeviceProxy(String devname) throws DevFailed {
         super(devname);
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this, devname);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this, devname);
         //System.out.println("=========== " + devname + " created ============");
         DeviceProxyFactory.add(this);
     }
@@ -158,8 +161,8 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     DeviceProxy(String devname, boolean check_access) throws DevFailed {
         super(devname, check_access);
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this, devname, check_access);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this, devname, check_access);
         DeviceProxyFactory.add(this);
     }
 
@@ -173,8 +176,8 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public DeviceProxy(String devname, String ior) throws DevFailed {
         super(devname, ior);
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this, devname, ior);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this, devname, ior);
         DeviceProxyFactory.add(this);
     }
 
@@ -189,19 +192,19 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public DeviceProxy(String devname, String host, String port) throws DevFailed {
         super(devname, host, port);
-        deviceProxy = TangoFactory.getSingleton().getDeviceProxyDAO();
-        deviceProxy.init(this, devname, host, host);
+        deviceProxyDAO = TangoFactory.getSingleton().getDeviceProxyDAO();
+        deviceProxyDAO.init(this, devname, host, host);
         DeviceProxyFactory.add(this);
     }
 
     public boolean use_db() {
-        return deviceProxy.use_db(this);
+        return deviceProxyDAO.use_db(this);
     }
 
     //==========================================================================
     //==========================================================================
     public Database get_db_obj() throws DevFailed {
-        return deviceProxy.get_db_obj(this);
+        return deviceProxyDAO.get_db_obj(this);
     }
 
     // ===================================================================
@@ -210,7 +213,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     protected void import_admin_device(DbDevImportInfo info) throws DevFailed {
-        deviceProxy.import_admin_device(this, info);
+        deviceProxyDAO.import_admin_device(this, info);
     }
 
     // ===================================================================
@@ -219,7 +222,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     protected void import_admin_device(String origin) throws DevFailed {
-        deviceProxy.import_admin_device(this, origin);
+        deviceProxyDAO.import_admin_device(this, origin);
     }
 
     // ===========================================================
@@ -228,7 +231,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public String name() {
-        return deviceProxy.name(this);
+        return deviceProxyDAO.name(this);
     }
     // ===========================================================
     /**
@@ -245,7 +248,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public String status() throws DevFailed {
-        return deviceProxy.status(this);
+        return deviceProxyDAO.status(this);
     }
 
     // ===========================================================
@@ -258,7 +261,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public String status(boolean src) throws DevFailed {
-        return deviceProxy.status(this, src);
+        return deviceProxyDAO.status(this, src);
     }
 
     // ===========================================================
@@ -267,7 +270,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public DevState state() throws DevFailed {
-        return deviceProxy.state(this);
+        return deviceProxyDAO.state(this);
     }
 
     // ===========================================================
@@ -281,7 +284,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public DevState state(boolean src) throws DevFailed {
-        return deviceProxy.state(this, src);
+        return deviceProxyDAO.state(this, src);
     }
 
     // ===========================================================
@@ -293,7 +296,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===========================================================
     public CommandInfo command_query(String cmdname) throws DevFailed {
-        return deviceProxy.command_query(this, cmdname);
+        return deviceProxyDAO.command_query(this, cmdname);
     }
 
     // ===========================================================
@@ -306,7 +309,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String get_class() throws DevFailed {
-        return deviceProxy.get_class(this);
+        return deviceProxyDAO.get_class(this);
     }
 
     // ==========================================================================
@@ -320,7 +323,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] get_class_inheritance() throws DevFailed {
-        return deviceProxy.get_class_inheritance(this);
+        return deviceProxyDAO.get_class_inheritance(this);
     }
 
     // ==========================================================================
@@ -332,7 +335,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void put_alias(String aliasname) throws DevFailed {
-        deviceProxy.put_alias(this, aliasname);
+        deviceProxyDAO.put_alias(this, aliasname);
     }
 
     // ==========================================================================
@@ -343,7 +346,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String get_alias() throws DevFailed {
-        return deviceProxy.get_alias(this);
+        return deviceProxyDAO.get_alias(this);
     }
 
     // ==========================================================================
@@ -354,7 +357,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceInfo get_info() throws DevFailed {
-        return deviceProxy.get_info(this);
+        return deviceProxyDAO.get_info(this);
     }
 
     // ==========================================================================
@@ -365,7 +368,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbDevImportInfo import_device() throws DevFailed {
-        return deviceProxy.import_device(this);
+        return deviceProxyDAO.import_device(this);
     }
 
     // ==========================================================================
@@ -376,7 +379,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void export_device(DbDevExportInfo devinfo) throws DevFailed {
-        deviceProxy.export_device(this, devinfo);
+        deviceProxyDAO.export_device(this, devinfo);
     }
 
     // ==========================================================================
@@ -385,7 +388,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void unexport_device() throws DevFailed {
-        deviceProxy.unexport_device(this);
+        deviceProxyDAO.unexport_device(this);
     }
 
     // ==========================================================================
@@ -396,7 +399,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void add_device(DbDevInfo devinfo) throws DevFailed {
-        deviceProxy.add_device(this, devinfo);
+        deviceProxyDAO.add_device(this, devinfo);
     }
 
     // ==========================================================================
@@ -405,7 +408,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_device() throws DevFailed {
-        deviceProxy.delete_device(this);
+        deviceProxyDAO.delete_device(this);
     }
 
     // ==========================================================================
@@ -418,7 +421,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] get_property_list(String wildcard) throws DevFailed {
-        return deviceProxy.get_property_list(this, wildcard);
+        return deviceProxyDAO.get_property_list(this, wildcard);
     }
 
     // ==========================================================================
@@ -430,7 +433,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbDatum[] get_property(String[] propnames) throws DevFailed {
-        return deviceProxy.get_property(this, propnames);
+        return deviceProxyDAO.get_property(this, propnames);
     }
 
     // ==========================================================================
@@ -442,7 +445,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbDatum get_property(String propname) throws DevFailed {
-        return deviceProxy.get_property(this, propname);
+        return deviceProxyDAO.get_property(this, propname);
     }
 
     // ==========================================================================
@@ -455,7 +458,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbDatum[] get_property(DbDatum[] properties) throws DevFailed {
-        return deviceProxy.get_property(this, properties);
+        return deviceProxyDAO.get_property(this, properties);
     }
 
     // ==========================================================================
@@ -467,7 +470,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void put_property(DbDatum prop) throws DevFailed {
-        deviceProxy.put_property(this, prop);
+        deviceProxyDAO.put_property(this, prop);
     }
 
     // ==========================================================================
@@ -479,7 +482,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void put_property(DbDatum[] properties) throws DevFailed {
-        deviceProxy.put_property(this, properties);
+        deviceProxyDAO.put_property(this, properties);
     }
 
     // ==========================================================================
@@ -490,7 +493,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_property(String[] propnames) throws DevFailed {
-        deviceProxy.delete_property(this, propnames);
+        deviceProxyDAO.delete_property(this, propnames);
     }
 
     // ==========================================================================
@@ -501,7 +504,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_property(String propname) throws DevFailed {
-        deviceProxy.delete_property(this, propname);
+        deviceProxyDAO.delete_property(this, propname);
     }
 
     // ==========================================================================
@@ -512,7 +515,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_property(DbDatum[] properties) throws DevFailed {
-        deviceProxy.delete_property(this, properties);
+        deviceProxyDAO.delete_property(this, properties);
     }
 
     // ============================================
@@ -527,7 +530,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] get_attribute_list() throws DevFailed {
-        return deviceProxy.get_attribute_list(this);
+        return deviceProxyDAO.get_attribute_list(this);
     }
 
     // ==========================================================================
@@ -539,7 +542,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void put_attribute_property(DbAttribute[] attr) throws DevFailed {
-        deviceProxy.put_attribute_property(this, attr);
+        deviceProxyDAO.put_attribute_property(this, attr);
     }
 
     // ==========================================================================
@@ -551,7 +554,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void put_attribute_property(DbAttribute attr) throws DevFailed {
-        deviceProxy.put_attribute_property(this, attr);
+        deviceProxyDAO.put_attribute_property(this, attr);
     }
 
     // ==========================================================================
@@ -563,7 +566,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_attribute_property(String attname, String[] propnames) throws DevFailed {
-        deviceProxy.delete_attribute_property(this, attname, propnames);
+        deviceProxyDAO.delete_attribute_property(this, attname, propnames);
     }
 
     // ==========================================================================
@@ -575,7 +578,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_attribute_property(String attname, String propname) throws DevFailed {
-        deviceProxy.delete_attribute_property(this, attname, propname);
+        deviceProxyDAO.delete_attribute_property(this, attname, propname);
     }
 
     // ==========================================================================
@@ -586,7 +589,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_attribute_property(DbAttribute attr) throws DevFailed {
-        deviceProxy.delete_attribute_property(this, attr);
+        deviceProxyDAO.delete_attribute_property(this, attr);
     }
 
     // ==========================================================================
@@ -597,7 +600,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_attribute_property(DbAttribute[] attr) throws DevFailed {
-        deviceProxy.delete_attribute_property(this, attr);
+        deviceProxyDAO.delete_attribute_property(this, attr);
     }
 
     // ==========================================================================
@@ -610,7 +613,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbAttribute[] get_attribute_property(String[] attnames) throws DevFailed {
-        return deviceProxy.get_attribute_property(this, attnames);
+        return deviceProxyDAO.get_attribute_property(this, attnames);
     }
 
     // ==========================================================================
@@ -622,7 +625,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DbAttribute get_attribute_property(String attname) throws DevFailed {
-        return deviceProxy.get_attribute_property(this, attname);
+        return deviceProxyDAO.get_attribute_property(this, attname);
     }
 
     // ==========================================================================
@@ -633,7 +636,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void delete_attribute(String attname) throws DevFailed {
-        deviceProxy.delete_attribute(this, attname);
+        deviceProxyDAO.delete_attribute(this, attname);
     }
 
     // ===========================================================
@@ -648,7 +651,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo[] get_attribute_info(String[] attnames) throws DevFailed {
-        return deviceProxy.get_attribute_info(this, attnames);
+        return deviceProxyDAO.get_attribute_info(this, attnames);
     }
 
     // ==========================================================================
@@ -660,7 +663,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfoEx[] get_attribute_info_ex(String[] attnames) throws DevFailed {
-        return deviceProxy.get_attribute_info_ex(this, attnames);
+        return deviceProxyDAO.get_attribute_info_ex(this, attnames);
     }
 
     // ==========================================================================
@@ -673,7 +676,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo[] get_attribute_config(String[] attnames) throws DevFailed {
-        return deviceProxy.get_attribute_info(this, attnames);
+        return deviceProxyDAO.get_attribute_info(this, attnames);
     }
 
     // ==========================================================================
@@ -685,7 +688,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo get_attribute_info(String attname) throws DevFailed {
-        return deviceProxy.get_attribute_info(this, attname);
+        return deviceProxyDAO.get_attribute_info(this, attname);
     }
 
     // ==========================================================================
@@ -697,7 +700,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfoEx get_attribute_info_ex(String attname) throws DevFailed {
-        return deviceProxy.get_attribute_info_ex(this, attname);
+        return deviceProxyDAO.get_attribute_info_ex(this, attname);
     }
 
     // ==========================================================================
@@ -710,7 +713,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo get_attribute_config(String attname) throws DevFailed {
-        return deviceProxy.get_attribute_info(this, attname);
+        return deviceProxyDAO.get_attribute_info(this, attname);
     }
 
     // ==========================================================================
@@ -721,7 +724,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo[] get_attribute_info() throws DevFailed {
-        return deviceProxy.get_attribute_info(this);
+        return deviceProxyDAO.get_attribute_info(this);
     }
 
     // ==========================================================================
@@ -732,7 +735,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfoEx[] get_attribute_info_ex() throws DevFailed {
-        return deviceProxy.get_attribute_info_ex(this);
+        return deviceProxyDAO.get_attribute_info_ex(this);
     }
 
     // ==========================================================================
@@ -744,7 +747,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public AttributeInfo[] get_attribute_config() throws DevFailed {
-        return deviceProxy.get_attribute_info(this);
+        return deviceProxyDAO.get_attribute_info(this);
     }
 
     // ==========================================================================
@@ -755,7 +758,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_attribute_info(AttributeInfo[] attr) throws DevFailed {
-        deviceProxy.set_attribute_info(this, attr);
+        deviceProxyDAO.set_attribute_info(this, attr);
     }
 
     // ==========================================================================
@@ -766,7 +769,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_attribute_info(AttributeInfoEx[] attr) throws DevFailed {
-        deviceProxy.set_attribute_info(this, attr);
+        deviceProxyDAO.set_attribute_info(this, attr);
 
     }
 
@@ -779,7 +782,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_attribute_config(AttributeInfo[] attr) throws DevFailed {
-        deviceProxy.set_attribute_info(this, attr);
+        deviceProxyDAO.set_attribute_info(this, attr);
     }
 
     // ==========================================================================
@@ -791,7 +794,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceAttribute read_attribute(String attname) throws DevFailed {
-        return deviceProxy.read_attribute(this, attname);
+        return deviceProxyDAO.read_attribute(this, attname);
     }
 
     // ==========================================================================
@@ -802,7 +805,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ==========================================================================
     // used only by read_attribute_value() to do not re-create it every time.
     public AttributeValue read_attribute_value(String attname) throws DevFailed {
-        return deviceProxy.read_attribute_value(this, attname);
+        return deviceProxyDAO.read_attribute_value(this, attname);
     }
 
     // ==========================================================================
@@ -815,7 +818,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ==========================================================================
     public DeviceAttribute[] read_attribute(String[] attnames) throws DevFailed {
         checkDuplication(attnames, "DeviceProxy.read_attribute()");
-        return deviceProxy.read_attribute(this, attnames);
+        return deviceProxyDAO.read_attribute(this, attnames);
     }
 
     // ==========================================================================
@@ -826,7 +829,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute(DeviceAttribute deviceAttribute) throws DevFailed {
-        deviceProxy.write_attribute(this, deviceAttribute);
+        deviceProxyDAO.write_attribute(this, deviceAttribute);
     }
 
     // ==========================================================================
@@ -837,7 +840,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute(DeviceAttribute[] deviceAttributes) throws DevFailed {
-        deviceProxy.write_attribute(this, deviceAttributes);
+        deviceProxyDAO.write_attribute(this, deviceAttributes);
     }
 
     // ==========================================================================
@@ -848,7 +851,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceAttribute write_read_attribute(DeviceAttribute deviceAttribute) throws DevFailed {
-        return deviceProxy.write_read_attribute(this,
+        return deviceProxyDAO.write_read_attribute(this,
                 new DeviceAttribute[]{deviceAttribute})[0];
     }
     // ==========================================================================
@@ -861,7 +864,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(DeviceAttribute[] deviceAttributes,
                                                   String[] readNames) throws DevFailed {
-        return deviceProxy.write_read_attribute(this, deviceAttributes, readNames);
+        return deviceProxyDAO.write_read_attribute(this, deviceAttributes, readNames);
     }
 
     // ==========================================================================
@@ -872,13 +875,13 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(DeviceAttribute[] deviceAttributes) throws DevFailed {
-        return deviceProxy.write_read_attribute(this, deviceAttributes);
+        return deviceProxyDAO.write_read_attribute(this, deviceAttributes);
     }
 
     // ==========================================================================
     // ==========================================================================
     public DeviceProxy get_adm_dev() throws DevFailed {
-        return deviceProxy.get_adm_dev(this);
+        return deviceProxyDAO.get_adm_dev(this);
     }
 
     // ==========================================================================
@@ -896,7 +899,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void poll_command(String cmdname, int period) throws DevFailed {
-        deviceProxy.poll_command(this, cmdname, period);
+        deviceProxyDAO.poll_command(this, cmdname, period);
     }
 
     // ==========================================================================
@@ -909,7 +912,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void poll_attribute(String attname, int period) throws DevFailed {
-        deviceProxy.poll_attribute(this, attname, period);
+        deviceProxyDAO.poll_attribute(this, attname, period);
     }
 
     // ==========================================================================
@@ -921,7 +924,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void stop_poll_command(String cmdname) throws DevFailed {
-        deviceProxy.stop_poll_command(this, cmdname);
+        deviceProxyDAO.stop_poll_command(this, cmdname);
     }
 
     // ==========================================================================
@@ -932,7 +935,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void stop_poll_attribute(String attname) throws DevFailed {
-        deviceProxy.stop_poll_attribute(this, attname);
+        deviceProxyDAO.stop_poll_attribute(this, attname);
     }
 
     // ==========================================================================
@@ -941,7 +944,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] polling_status() throws DevFailed {
-        return deviceProxy.polling_status(this);
+        return deviceProxyDAO.polling_status(this);
     }
 
     // ==========================================================================
@@ -953,7 +956,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceDataHistory[] command_history(String cmdname, int nb) throws DevFailed {
-        return deviceProxy.command_history(this, cmdname, nb);
+        return deviceProxyDAO.command_history(this, cmdname, nb);
     }
 
     // ==========================================================================
@@ -965,7 +968,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceDataHistory[] attribute_history(String attname, int nb) throws DevFailed {
-        return deviceProxy.attribute_history(this, attname, nb);
+        return deviceProxyDAO.attribute_history(this, attname, nb);
     }
 
     // ==========================================================================
@@ -976,7 +979,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceDataHistory[] command_history(String cmdname) throws DevFailed {
-        return deviceProxy.command_history(this, cmdname);
+        return deviceProxyDAO.command_history(this, cmdname);
     }
 
     // ==========================================================================
@@ -987,7 +990,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceDataHistory[] attribute_history(String attname) throws DevFailed {
-        return deviceProxy.attribute_history(this, attname);
+        return deviceProxyDAO.attribute_history(this, attname);
     }
     // ==========================================================================
     /**
@@ -997,7 +1000,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int get_attribute_polling_period(String attname) throws DevFailed {
-        return deviceProxy.get_attribute_polling_period(this, attname);
+        return deviceProxyDAO.get_attribute_polling_period(this, attname);
     }
     //==========================================================================
     /**
@@ -1026,7 +1029,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int command_inout_asynch(String cmdname, DeviceData data_in) throws DevFailed {
-        return deviceProxy.command_inout_asynch(this, cmdname, data_in);
+        return deviceProxyDAO.command_inout_asynch(this, cmdname, data_in);
     }
 
     // ==========================================================================
@@ -1037,7 +1040,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int command_inout_asynch(String cmdname) throws DevFailed {
-        return deviceProxy.command_inout_asynch(this, cmdname);
+        return deviceProxyDAO.command_inout_asynch(this, cmdname);
     }
 
     // ==========================================================================
@@ -1049,7 +1052,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int command_inout_asynch(String cmdname, boolean forget) throws DevFailed {
-        return deviceProxy.command_inout_asynch(this, cmdname, forget);
+        return deviceProxyDAO.command_inout_asynch(this, cmdname, forget);
     }
 
     // ==========================================================================
@@ -1062,7 +1065,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int command_inout_asynch(String cmdname, DeviceData data_in, boolean forget) throws DevFailed {
-        return deviceProxy.command_inout_asynch(this, cmdname, data_in, forget);
+        return deviceProxyDAO.command_inout_asynch(this, cmdname, data_in, forget);
     }
 
     // ==========================================================================
@@ -1075,7 +1078,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void command_inout_asynch(String cmdname, DeviceData argin, CallBack cb) throws DevFailed {
-        deviceProxy.command_inout_asynch(this, cmdname, argin, cb);
+        deviceProxyDAO.command_inout_asynch(this, cmdname, argin, cb);
     }
 
     // ==========================================================================
@@ -1087,7 +1090,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void command_inout_asynch(String cmdname, CallBack cb) throws DevFailed {
-        deviceProxy.command_inout_asynch(this, cmdname, cb);
+        deviceProxyDAO.command_inout_asynch(this, cmdname, cb);
     }
 
     // ==========================================================================
@@ -1099,7 +1102,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceData command_inout_reply(int id, int timeout) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.command_inout_reply(this, id, timeout);
+        return deviceProxyDAO.command_inout_reply(this, id, timeout);
     }
 
     // ==========================================================================
@@ -1111,7 +1114,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     DeviceData command_inout_reply(AsyncCallObject aco, int timeout) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.command_inout_reply(this, aco, timeout);
+        return deviceProxyDAO.command_inout_reply(this, aco, timeout);
     }
 
     // ==========================================================================
@@ -1122,7 +1125,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceData command_inout_reply(int id) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.command_inout_reply(this, id);
+        return deviceProxyDAO.command_inout_reply(this, id);
     }
 
     // ==========================================================================
@@ -1133,7 +1136,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     DeviceData command_inout_reply(AsyncCallObject aco) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.command_inout_reply(this, aco);
+        return deviceProxyDAO.command_inout_reply(this, aco);
     }
 
     // ==========================================================================
@@ -1144,7 +1147,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int read_attribute_asynch(String attname) throws DevFailed {
-        return deviceProxy.read_attribute_asynch(this, attname);
+        return deviceProxyDAO.read_attribute_asynch(this, attname);
     }
 
     // ==========================================================================
@@ -1156,7 +1159,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ==========================================================================
     public int read_attribute_asynch(String[] attnames) throws DevFailed {
         checkDuplication(attnames, "DeviceProxy.read_attribute_asynch()");
-        return deviceProxy.read_attribute_asynch(this, attnames);
+        return deviceProxyDAO.read_attribute_asynch(this, attnames);
     }
 
     // ==========================================================================
@@ -1165,7 +1168,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     protected String get_asynch_idl_cmd(Request request, String idl_cmd) {
-        return deviceProxy.get_asynch_idl_cmd(this, request, idl_cmd);
+        return deviceProxyDAO.get_asynch_idl_cmd(this, request, idl_cmd);
     }
 
     // ==========================================================================
@@ -1176,7 +1179,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     protected void check_asynch_reply(Request request, int id, String idl_cmd) throws DevFailed, AsynReplyNotArrived {
-        deviceProxy.check_asynch_reply(this, request, id, idl_cmd);
+        deviceProxyDAO.check_asynch_reply(this, request, id, idl_cmd);
     }
 
     // ==========================================================================
@@ -1188,7 +1191,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceAttribute[] read_attribute_reply(int id, int timeout) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.read_attribute_reply(this, id, timeout);
+        return deviceProxyDAO.read_attribute_reply(this, id, timeout);
     }
 
     // ==========================================================================
@@ -1199,7 +1202,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public DeviceAttribute[] read_attribute_reply(int id) throws DevFailed, AsynReplyNotArrived {
-        return deviceProxy.read_attribute_reply(this, id);
+        return deviceProxyDAO.read_attribute_reply(this, id);
     }
 
     // ==========================================================================
@@ -1211,7 +1214,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void read_attribute_asynch(String attname, CallBack cb) throws DevFailed {
-        deviceProxy.read_attribute_asynch(this, attname, cb);
+        deviceProxyDAO.read_attribute_asynch(this, attname, cb);
     }
 
     // ==========================================================================
@@ -1223,7 +1226,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void read_attribute_asynch(String[] attnames, CallBack cb) throws DevFailed {
-        deviceProxy.read_attribute_asynch(this, attnames, cb);
+        deviceProxyDAO.read_attribute_asynch(this, attnames, cb);
     }
 
     // ==========================================================================
@@ -1234,7 +1237,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int write_attribute_asynch(DeviceAttribute attr) throws DevFailed {
-        return deviceProxy.write_attribute_asynch(this, attr);
+        return deviceProxyDAO.write_attribute_asynch(this, attr);
     }
 
     // ==========================================================================
@@ -1246,7 +1249,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int write_attribute_asynch(DeviceAttribute attr, boolean forget) throws DevFailed {
-        return deviceProxy.write_attribute_asynch(this, attr, forget);
+        return deviceProxyDAO.write_attribute_asynch(this, attr, forget);
     }
 
     // ==========================================================================
@@ -1257,7 +1260,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int write_attribute_asynch(DeviceAttribute[] attribs) throws DevFailed {
-        return deviceProxy.write_attribute_asynch(this, attribs);
+        return deviceProxyDAO.write_attribute_asynch(this, attribs);
     }
 
     // ==========================================================================
@@ -1269,7 +1272,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int write_attribute_asynch(DeviceAttribute[] attribs, boolean forget) throws DevFailed {
-        return deviceProxy.write_attribute_asynch(this, attribs, forget);
+        return deviceProxyDAO.write_attribute_asynch(this, attribs, forget);
     }
 
     // ==========================================================================
@@ -1280,7 +1283,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute_reply(int id) throws DevFailed, AsynReplyNotArrived {
-        deviceProxy.write_attribute_reply(this, id);
+        deviceProxyDAO.write_attribute_reply(this, id);
     }
 
     // ==========================================================================
@@ -1292,7 +1295,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute_reply(int id, int timeout) throws DevFailed, AsynReplyNotArrived {
-        deviceProxy.write_attribute_reply(this, id, timeout);
+        deviceProxyDAO.write_attribute_reply(this, id, timeout);
     }
 
     // ==========================================================================
@@ -1304,7 +1307,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute_asynch(DeviceAttribute attr, CallBack cb) throws DevFailed {
-        deviceProxy.write_attribute_asynch(this, attr, cb);
+        deviceProxyDAO.write_attribute_asynch(this, attr, cb);
     }
 
     // ==========================================================================
@@ -1316,7 +1319,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void write_attribute_asynch(DeviceAttribute[] attribs, CallBack cb) throws DevFailed {
-        deviceProxy.write_attribute_asynch(this, attribs, cb);
+        deviceProxyDAO.write_attribute_asynch(this, attribs, cb);
     }
 
     // ==========================================================================
@@ -1327,7 +1330,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int pending_asynch_call(int reply_model) {
-        return deviceProxy.pending_asynch_call(this, reply_model);
+        return deviceProxyDAO.pending_asynch_call(this, reply_model);
     }
 
     // ==========================================================================
@@ -1337,7 +1340,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void get_asynch_replies() {
-        deviceProxy.get_asynch_replies(this);
+        deviceProxyDAO.get_asynch_replies(this);
     }
 
     // ==========================================================================
@@ -1347,7 +1350,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void get_asynch_replies(int timeout) {
-        deviceProxy.get_asynch_replies(this, timeout);
+        deviceProxyDAO.get_asynch_replies(this, timeout);
     }
 
     // ==========================================================================
@@ -1363,7 +1366,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void add_logging_target(String target_type, String target_name) throws DevFailed {
-        deviceProxy.add_logging_target(this, target_type + "::" + target_name);
+        deviceProxyDAO.add_logging_target(this, target_type + "::" + target_name);
     }
 
     // ==========================================================================
@@ -1374,7 +1377,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void add_logging_target(String target) throws DevFailed {
-        deviceProxy.add_logging_target(this, target);
+        deviceProxyDAO.add_logging_target(this, target);
     }
 
     // ==========================================================================
@@ -1383,7 +1386,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void remove_logging_target(String target_type, String target_name) throws DevFailed {
-        deviceProxy.remove_logging_target(this, target_type, target_name);
+        deviceProxyDAO.remove_logging_target(this, target_type, target_name);
     }
 
     // ==========================================================================
@@ -1392,7 +1395,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] get_logging_target() throws DevFailed {
-        return deviceProxy.get_logging_target(this);
+        return deviceProxyDAO.get_logging_target(this);
     }
 
     // ==========================================================================
@@ -1405,7 +1408,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int get_logging_level() throws DevFailed {
-        return deviceProxy.get_logging_level(this);
+        return deviceProxyDAO.get_logging_level(this);
     }
 
     // ==========================================================================
@@ -1418,7 +1421,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_logging_level(int level) throws DevFailed {
-        deviceProxy.set_logging_level(this, level);
+        deviceProxyDAO.set_logging_level(this, level);
     }
 
 
@@ -1442,7 +1445,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void lock(int validity) throws DevFailed {
-        deviceProxy.lock(this, validity);
+        deviceProxyDAO.lock(this, validity);
         proxy_lock_cnt++;
     }
     // ==========================================================================
@@ -1453,7 +1456,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int unlock() throws DevFailed {
-        int n = deviceProxy.unlock(this); // lock counter for the device itself (not the proxy)
+        int n = deviceProxyDAO.unlock(this); // lock counter for the device itself (not the proxy)
         proxy_lock_cnt--;
         return n;
     }
@@ -1463,7 +1466,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public boolean isLocked() throws DevFailed {
-        return deviceProxy.isLocked(this);
+        return deviceProxyDAO.isLocked(this);
     }
     // ==========================================================================
     /**
@@ -1471,7 +1474,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public boolean isLockedByMe() throws DevFailed {
-        return deviceProxy.isLockedByMe(this);
+        return deviceProxyDAO.isLockedByMe(this);
     }
 
     // ==========================================================================
@@ -1480,7 +1483,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String getLockerStatus() throws DevFailed {
-        return deviceProxy.getLockerStatus(this);
+        return deviceProxyDAO.getLockerStatus(this);
     }
     // ==========================================================================
     /**
@@ -1488,7 +1491,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public LockerInfo getLockerInfo() throws DevFailed {
-        return deviceProxy.getLockerInfo(this);
+        return deviceProxyDAO.getLockerInfo(this);
     }
 
 
@@ -1510,7 +1513,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public String[] dev_inform() throws DevFailed {
-        return deviceProxy.dev_inform(this);
+        return deviceProxyDAO.dev_inform(this);
     }
 
     // ==========================================================================
@@ -1522,7 +1525,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_rpc_protocol(int mode) throws DevFailed {
-        deviceProxy.set_rpc_protocol(this, mode);
+        deviceProxyDAO.set_rpc_protocol(this, mode);
     }
 
     // ==========================================================================
@@ -1532,10 +1535,160 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public int get_rpc_protocol() throws DevFailed {
-        return deviceProxy.get_rpc_protocol(this);
+        return deviceProxyDAO.get_rpc_protocol(this);
     }
 
+
+
+
+
+    // ===================================================================
+    /*
+     * Pipe related methods
+     */
+    // ===================================================================
+
+    // ===================================================================
+    /**
+     * Query device for pipe name list
+     * @return  pipe name list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<String> getPipeNames() throws DevFailed {
+        List<PipeInfo> infoList = deviceProxyDAO.getPipeConfig(this);
+        ArrayList<String>   pipeNames = new ArrayList<String>();
+        for (PipeInfo info : infoList)
+            pipeNames.add(info.getName());
+        return pipeNames;
+    }
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig() throws DevFailed {
+        return deviceProxyDAO.getPipeConfig(this);
+    }
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param pipeName pipe name.
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public PipeInfo getPipeConfig(String pipeName) throws DevFailed {
+        ArrayList<String> list = new ArrayList<String>(1);
+        list.add(pipeName);
+        List<PipeInfo>  infoList = getPipeConfig(list);
+        if (infoList.isEmpty())
+            return null;
+        else
+            return infoList.get(0);
+    }
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param pipeNames pipe names.
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(String[] pipeNames) throws DevFailed {
+        ArrayList<String> list = new ArrayList<String>(pipeNames.length);
+        Collections.addAll(list, pipeNames);
+        return getPipeConfig(list);
+    }
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param pipeNames pipe names.
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(List<String> pipeNames) throws DevFailed {
+        return deviceProxyDAO.getPipeConfig(this, pipeNames);
+    }
+    // ===================================================================
+    /**
+     * Set device pipe configuration
+     * @param pipeInfo info containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(PipeInfo pipeInfo) throws DevFailed {
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(1);
+        infoList.add(pipeInfo);
+        setPipeConfig(infoList);
+    }
+    // ===================================================================
+    /**
+     * Set device pipe configuration
+     * @param pipeInfoList info list containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(PipeInfo[] pipeInfoList) throws DevFailed {
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(pipeInfoList.length);
+        Collections.addAll(infoList, pipeInfoList);
+        setPipeConfig(infoList);
+    }
+    // ===================================================================
+    /**
+     * Set device pipe configuration
+     * @param pipeInfoList info list containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(List<PipeInfo> pipeInfoList) throws DevFailed {
+        deviceProxyDAO.setPipeConfig(this, pipeInfoList);
+    }
+    // ===================================================================
+    /**
+     * Read specified pipe and returns read data
+     * @param pipeName pipe name
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe readPipe(String pipeName) throws DevFailed {
+        return deviceProxyDAO.readPipe(this, pipeName);
+    }
+    // ===================================================================
+    /**
+     * Write data in specified pipe
+     * @param pipeName pipe name
+     * @param pipeBlob data to be written
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public void writePipe(String pipeName, PipeBlob pipeBlob) throws DevFailed {
+        deviceProxyDAO.writePipe(this, new DevicePipe(pipeName, pipeBlob));
+    }
+    // ===================================================================
+    /**
+     * Write data in specified pipe
+     * @param devicePipe data to be written (contains the pipe name)
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public void writePipe(DevicePipe devicePipe) throws DevFailed {
+        deviceProxyDAO.writePipe(this, devicePipe);
+    }
+    // ===================================================================
+    // ===================================================================
+
+
+
+
     // ==========================================================================
+    /*
+     * Event related methods
+     */
     // ==========================================================================
     private static boolean useEvents = true;
     private static boolean useEventsChecked = false;
@@ -1565,7 +1718,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
         if (event==TangoConst.INTERFACE_CHANGE)
             Except.throw_exception("BAD_EVENT",
                     TangoConst.eventNames[event] + " cannot be applied to an attribute");
-        return deviceProxy.subscribe_event(this, attr_name, event, callback, filters, false);
+        return deviceProxyDAO.subscribe_event(this, attr_name, event, callback, filters, false);
     }
 
     // ==========================================================================
@@ -1585,7 +1738,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
         if (event==TangoConst.INTERFACE_CHANGE)
             Except.throw_exception("BAD_EVENT",
                     TangoConst.eventNames[event] + " cannot be applied to an attribute");
-        return deviceProxy.subscribe_event(this, attr_name, event, callback, filters, stateless);
+        return deviceProxyDAO.subscribe_event(this, attr_name, event, callback, filters, stateless);
     }
     // ==========================================================================
     /**
@@ -1604,7 +1757,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
         if (event==TangoConst.INTERFACE_CHANGE)
             Except.throw_exception("BAD_EVENT",
                     TangoConst.eventNames[event] + " cannot be applied to a device");
-        return deviceProxy.subscribe_event(this, attr_name, event, max_size, filters, stateless);
+        return deviceProxyDAO.subscribe_event(this, attr_name, event, max_size, filters, stateless);
     }
     // ==========================================================================
     // ==========================================================================
@@ -1623,7 +1776,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
             Except.throw_exception("BAD_EVENT",
                     TangoConst.eventNames[event] + " cannot be applied to a device");
 
-        return deviceProxy.subscribe_event(this, event, callback, stateless);
+        return deviceProxyDAO.subscribe_event(this, event, callback, stateless);
     }
     // ==========================================================================
     /**
@@ -1634,11 +1787,10 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * @param stateless If true, do not throw exception if connection failed.
      */
     // ==========================================================================
-    public int subscribe_event(int event, int max_size, boolean stateless)
-            throws DevFailed {
+    public int subscribe_event(int event, int max_size, boolean stateless) throws DevFailed {
         if (!useEvents())
             Except.throw_exception("NO_EVENT", "Event system not available");
-        return deviceProxy.subscribe_event(this, event, max_size, stateless);
+        return deviceProxyDAO.subscribe_event(this, event, max_size, stateless);
     }
 
     // ==========================================================================
@@ -1723,16 +1875,16 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void unsubscribe_event(int event_id) throws DevFailed {
-        deviceProxy.unsubscribe_event(this, event_id);
+        deviceProxyDAO.unsubscribe_event(this, event_id);
     }
 
     public IDeviceProxyDAO getDeviceProxy() {
-        return deviceProxy;
+        return deviceProxyDAO;
     }
 
 
     public void setDeviceProxy(IDeviceProxyDAO deviceProxy) {
-        this.deviceProxy = deviceProxy;
+        this.deviceProxyDAO = deviceProxy;
     }
 
     /*
@@ -1794,13 +1946,14 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Check if an item is duplicated in specified array.
      * Then if duplication found, it throws an exception.
+     * Used to do not have several same attribute names in a list
      *
      * @param list specified list to be checked.
-     * @param orig mothod calling this method (used for DevFailed)
+     * @param orig method calling this method (used for DevFailed)
      * @throws DevFailed in case of duplication.
      */
     //===============================================================
-    public static void checkDuplication(String[] list, String orig) throws DevFailed {
+    private static void checkDuplication(String[] list, String orig) throws DevFailed {
         Vector<String> dupli = new Vector<String>();
         //	For each string
         for (int i = 0 ; i<list.length ; i++) {
@@ -1838,14 +1991,11 @@ public class DeviceProxy extends Connection implements ApiDefs {
         if (proxy_lock_cnt>0) {
             try {
                 unlock();
-            } catch (DevFailed e) {
-            }
-            System.out.println("======== DeviceProxy " + get_name() + " object deleted.=======");
+            } catch (DevFailed e) { /* */  }
         }
         try {
             super.finalize();
-        } catch (Throwable e) {
-        }
+        } catch (Throwable e) { /* */  }
     }
 
 

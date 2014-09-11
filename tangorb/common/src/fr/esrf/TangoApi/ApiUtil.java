@@ -44,10 +44,7 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
 
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Class Description: This class manage a static vector of Database object. <Br>
@@ -65,7 +62,7 @@ import java.util.Vector;
 
 public class ApiUtil {
     public static String revNumber =
-            "8.7.1_tg9  -  Wed Jun 04 15:14:29 CEST 2014";
+            "9.0.0_beta1  -  Thu Sep 11 16:05:16 CEST 2014";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -397,7 +394,10 @@ public class ApiUtil {
      */
     // ==========================================================================
     public static String[] toStringArray(final String objname, final String[] argin) {
-	    return apiutilDAO.toStringArray(objname, argin);
+        final String[] array = new String[1 + argin.length];
+        array[0] = objname;
+        System.arraycopy(argin, 0, array, 1, argin.length);
+        return array;
     }
 
     // ==========================================================================
@@ -406,7 +406,10 @@ public class ApiUtil {
      */
     // ==========================================================================
     public static String[] toStringArray(final String objname, final String argin) {
-	    return apiutilDAO.toStringArray(objname, argin);
+        final String[] array = new String[2];
+        array[0] = objname;
+        array[1] = argin;
+        return array;
     }
 
     // ==========================================================================
@@ -415,23 +418,91 @@ public class ApiUtil {
      */
     // ==========================================================================
     public static String[] toStringArray(final String argin) {
-	    return apiutilDAO.toStringArray(argin);
+        final String[] array = new String[1];
+        array[0] = argin;
+        return array;
     }
 
     // ==========================================================================
     /**
      * Convert a DbAttribute class array to a StringArray.
-     * 
-     * @param objname object name (used in first index of output array)..
-     * @param attr DbAttribute array to be converted
+     *
+     * @param objname  object name (used in first index of output array)..
+     * @param attributes DbAttribute array to be converted
      * @return the String array created from input argument.
      */
     // ==========================================================================
-    public static String[] toStringArray(final String objname,
-                                         final DbAttribute[] attr, final int mode) {
-	    return apiutilDAO.toStringArray(objname, attr, mode);
-    }
+    public static String[] toStringArray(final String objname, final DbAttribute[] attributes, final int mode) {
+        final int nb_attr = attributes.length;
 
+        // Copy object name and nb attrib to String array
+        final ArrayList<String> list = new ArrayList<String>();
+        list.add(objname);
+        list.add(Integer.toString(nb_attr));
+        for (DbAttribute attribute : attributes) {
+            // Copy Attrib name and nb prop to String array
+            list.add(attribute.name);
+            list.add("" + attribute.size());
+            for (int j=0 ; j<attribute.size() ; j++) {
+                // Copy data to String array
+                list.add(attribute.get_property_name(j));
+                final String[] values = attribute.get_value(j);
+                if (mode != 1) {
+                    list.add("" + values.length);
+                }
+                list.addAll(Arrays.asList(values));
+            }
+        }
+        // alloacte a String array
+        final String[] array = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+    // ==========================================================================
+    /**
+     * Convert a DbPipe class array to a StringArray for DB command.
+     *
+     * @param deviceNme  device name
+     * @param dbPipe DbPipe object to be converted
+     * @return the String array created from input argument.
+     */
+    // ==========================================================================
+    public static String[] toStringArray(String deviceNme, DbPipe dbPipe) {
+        ArrayList<String>   list = new ArrayList<String>();
+        list.add(deviceNme);
+        list.add(Integer.toString(1));  //  one pipe
+        list.add(dbPipe.getName());
+        list.add(Integer.toString(dbPipe.size()));  //  property number
+        //  fOR EACH PROPERTY
+        for (DbDatum datum : dbPipe) {
+            if (!datum.is_empty()) {
+                String[] values = datum.extractStringArray();
+                list.add(datum.name);
+                list.add(Integer.toString(values.length));  // Property value number (array case)
+                Collections.addAll(list, values);
+            }
+        }
+        String[] array = new String[list.size()];
+        for (int i=0 ; i<list.size() ; i++) {
+            System.out.println(list.get(i));
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+    /*
+    Argin description:
+Str[0] = Device name
+Str[1] = Pipe number
+Str[2] = Pipe name
+Str[3] = Property number
+Str[4] = Property name
+Str[5] = Property value number (array case)
+Str[6] = Property value 1
+Str[n] = Property value n (array case)
+     */
+    // ==========================================================================
     // ==========================================================================
     /**
      * Convert a StringArray to a DbAttribute class array
@@ -441,9 +512,78 @@ public class ApiUtil {
      * @return the DbAtribute class array created from input argument.
      */
     // ==========================================================================
-    public static DbAttribute[] toDbAttributeArray(
-            final String[] array, final int mode) throws DevFailed {
-	    return apiutilDAO.toDbAttributeArray(array, mode);
+    public static DbAttribute[] toDbAttributeArray(final String[] array, final int mode) throws DevFailed {
+        if (mode < 1 && mode > 2) {
+            Except.throw_non_supported_exception("API_NotSupportedMode", "Mode " + mode
+                    + " to decode attribute properties is not supported",
+                    "ApiUtil.toDbAttributeArray()");
+        }
+
+        int idx = 1;
+        final int nb_attr = Integer.parseInt(array[idx++]);
+        final DbAttribute[] attr = new DbAttribute[nb_attr];
+        for (int i = 0; i < nb_attr; i++) {
+            // Create DbAttribute with name and nb properties
+            // ------------------------------------------------------
+            attr[i] = new DbAttribute(array[idx++]);
+
+            // Get nb properties
+            // ------------------------------------------------------
+            final int nb_prop = Integer.parseInt(array[idx++]);
+
+            for (int j = 0; j < nb_prop; j++) {
+                // And copy property name and value in
+                // DbAttribute's DbDatum array
+                // ------------------------------------------
+                final String p_name = array[idx++];
+                switch (mode) {
+                    case 1:
+                        // Value is just one element
+                        attr[i].add(p_name, array[idx++]);
+                        break;
+                    case 2:
+                        // value is an array
+                        final int p_length = Integer.parseInt(array[idx++]);
+                        final String[] val = new String[p_length];
+                        for (int p = 0; p < p_length; p++) {
+                            val[p] = array[idx++];
+                        }
+                        attr[i].add(p_name, val);
+                        break;
+                }
+            }
+        }
+        return attr;
+    }
+    // ==========================================================================
+    /**
+     * Convert a StringArray to a DbPipe
+     *
+     * @param pipeName pip name
+     * @param array String array to be converted
+     * @return the DbPipe created from input argument.
+     * @throws DevFailed if array is not coherent.
+     */
+    // ==========================================================================
+    public static DbPipe toDbPipe(String pipeName, final String[] array) throws DevFailed {
+        DbPipe dbPipe = new DbPipe(pipeName);
+        try {
+            int index = 3;
+            final int nbProperties = Integer.parseInt(array[index++]);
+            for (int i=0 ; i<nbProperties ; i++) {
+                String  propertyName = array[index++];
+                final int nbValues = Integer.parseInt(array[index++]);
+                String[]    arrayValues = new String[nbValues];
+                for (int v=0 ; v<nbValues ; v++) {
+                    arrayValues[v] = array[index++];
+                }
+                dbPipe.add(new DbDatum(propertyName, arrayValues));
+            }
+        }
+        catch (Exception e) {
+            Except.throw_exception("TangoApi_SyntaxError",  "Cannot convert data to DbPipe: "+e);
+        }
+        return dbPipe;
     }
 
     // ==========================================================================
