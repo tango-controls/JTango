@@ -230,8 +230,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	connection.url = new TangoUrl();
 	    	connection.url.protocol = TANGO;
 		} else {
-	    	Except.throw_wrong_syntax_exception("TangoApi_INVALID_ARGS", "Invalid argument",
-		    	"Connection.Connemction()");
+	    	Except.throw_wrong_syntax_exception(
+                    "TangoApi_INVALID_ARGS", "Invalid argument", "Connection.Connection()");
 		}
     }
 
@@ -323,7 +323,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
     // ===================================================================
     /**
-     * Ckeck the IDL revision and create the associated device.
+     * Check the IDL revision and create the associated device.
      * 
      * @param corba_str  IOR or corbaloc string.
      * @param connection the connection object
@@ -606,28 +606,22 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void connect_to_dbase(final Connection connection) throws DevFailed {
 		if (connection.device == null) {
 	    	try {
-                // Prepeare the connection string
-                // ----------------------------------
+                // Prepare the connection string
                 final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
                     + connection.url.strPort + "/database";
                 // And connect to database.
-                // ----------------------------
                 createDevice(connection, db_corbaloc);
                 connection.classname = "Database";
-                // System.out.println("Connected to " + db_corbaloc +
-                // "\ndevice: " +
-                // connection.device.name());
-	    	} catch (final SystemException ex) {
+ 	    	} catch (final SystemException ex) {
 				if (connection.transparent_reconnection) {
 		    		try {
                         final DbRedundancy dbr = DbRedundancy.get_instance();
                         final String th2 = dbr.get(connection.url.host + ":" + connection.url.port);
 
-                        // Prepeare the connection string
-                        // ----------------------------------
+                        // Prepare the connection string
                         final String db_corbaloc = "corbaloc:iiop:" + th2 + "/database";
+
                         // And connect to database.
-                        // ----------------------------
                         createDevice(connection, db_corbaloc);
                         // System.out.println("Connected to " + db_corbaloc);
                     } catch (final SystemException e) {
@@ -661,23 +655,22 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void dev_import_without_dbase(final Connection connection) throws DevFailed {
 		 if (connection.device == null) {
 	    	 try {
-			 // Prepeare the connection string
-			 // ----------------------------------
-			 final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
-				 + connection.url.strPort + "/" + connection.devname.toLowerCase();
-			 // System.out.println("db_corbaloc=" + db_corbaloc);
-			 // And connect to device.
-			 // ----------------------------
-			 createDevice(connection, db_corbaloc);
-			 connection.access = TangoConst.ACCESS_WRITE;
+                 // Prepare the connection string
+                 final String db_corbaloc = "corbaloc:iiop:" + connection.url.host + ":"
+                     + connection.url.strPort + "/" + connection.devname.toLowerCase();
+                 // System.out.println("db_corbaloc=" + db_corbaloc);
+
+                 // And connect to device.
+                 createDevice(connection, db_corbaloc);
+                 connection.access = TangoConst.ACCESS_WRITE;
 	    	 } catch (final SystemException e) {
-			 connection.device = null;
-			 connection.ior = null;
-			 // e.printStackTrace();
-			 Except.throw_connection_failed("TangoApi_DEVICE_CONNECTION_FAILED",
-				 "Connection to device without database failed  !\n" + e,
-				 "Connection.dev_import_without_dbase(" + connection.url.host + ","
-					 + connection.url.strPort + ")");
+                 connection.device = null;
+                 connection.ior = null;
+                 // e.printStackTrace();
+                 Except.throw_connection_failed("TangoApi_DEVICE_CONNECTION_FAILED",
+                     "Connection to device without database failed  !\n" + e,
+                     "Connection.dev_import_without_dbase(" + connection.url.host + ","
+                         + connection.url.strPort + ")");
 	    	 }
 		 }
     }
@@ -785,8 +778,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		}
 
 		String desc;
-		final String origin = from_inout_cmd ? connection.devname + ".command_inout(" + command
-			+ ")" : connection.devname + "." + command + ")";
+		final String origin = from_inout_cmd ? connection.devname + ".command_inout(" + command + ")"
+                : connection.devname + "." + command + ")";
 		// e.printStackTrace();
 		if (e.toString().contains("org.omg.CORBA.NO_RESPONSE")
 			|| e.toString().contains("org.omg.CORBA.TIMEOUT")
