@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device_3".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public abstract class Device_3POA
@@ -49,22 +49,12 @@ public abstract class Device_3POA
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device_3 __r = fr.esrf.Tango.Device_3Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device_3 _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device_3 __r = fr.esrf.Tango.Device_3Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public org.omg.CORBA.portable.OutputStream _invoke(String method, org.omg.CORBA.portable.InputStream _input, org.omg.CORBA.portable.ResponseHandler handler)
@@ -115,8 +105,8 @@ public abstract class Device_3POA
 			case 2: // _get_status
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult111 = status();
-_out.write_string( tmpResult111 );
+			java.lang.String tmpResult118 = status();
+_out.write_string( tmpResult118 );
 				break;
 			}
 			case 3: // set_attribute_config_3
@@ -137,8 +127,8 @@ _out.write_string( tmpResult111 );
 			case 4: // _get_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult112 = name();
-_out.write_string( tmpResult112 );
+			java.lang.String tmpResult119 = name();
+_out.write_string( tmpResult119 );
 				break;
 			}
 			case 5: // read_attributes
@@ -191,8 +181,8 @@ _out.write_string( tmpResult112 );
 			case 8: // _get_adm_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult113 = adm_name();
-_out.write_string( tmpResult113 );
+			java.lang.String tmpResult120 = adm_name();
+_out.write_string( tmpResult120 );
 				break;
 			}
 			case 9: // info_3
@@ -415,8 +405,8 @@ _out.write_string( tmpResult113 );
 			case 24: // _get_description
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult114 = description();
-_out.write_string( tmpResult114 );
+			java.lang.String tmpResult121 = description();
+_out.write_string( tmpResult121 );
 				break;
 			}
 			case 25: // read_attributes_3

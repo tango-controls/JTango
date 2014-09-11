@@ -3,11 +3,11 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL alias "DevAttrHistoryList_3".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
-public final class DevAttrHistoryList_3Helper
+public abstract class DevAttrHistoryList_3Helper
 {
 	private volatile static org.omg.CORBA.TypeCode _type;
 
@@ -48,19 +48,19 @@ public final class DevAttrHistoryList_3Helper
 	public static fr.esrf.Tango.DevAttrHistory_3[] read (final org.omg.CORBA.portable.InputStream _in)
 	{
 		fr.esrf.Tango.DevAttrHistory_3[] _result;
-		int _l_result32 = _in.read_long();
+		int _l_result34 = _in.read_long();
 		try
 		{
 			 int x = _in.available();
-			 if ( x > 0 && _l_result32 > x )
+			 if ( x > 0 && _l_result34 > x )
 				{
-					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result32);
+					throw new org.omg.CORBA.MARSHAL("Sequence length too large. Only " + x + " available and trying to assign " + _l_result34);
 				}
 		}
 		catch (java.io.IOException e)
 		{
 		}
-		_result = new fr.esrf.Tango.DevAttrHistory_3[_l_result32];
+		_result = new fr.esrf.Tango.DevAttrHistory_3[_l_result34];
 		for (int i=0;i<_result.length;i++)
 		{
 			_result[i]=fr.esrf.Tango.DevAttrHistory_3Helper.read(_in);

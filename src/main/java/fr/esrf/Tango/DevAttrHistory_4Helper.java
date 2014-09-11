@@ -4,11 +4,11 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL struct "DevAttrHistory_4".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
-public final class DevAttrHistory_4Helper
+public abstract class DevAttrHistory_4Helper
 {
 	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
@@ -74,8 +74,8 @@ public final class DevAttrHistory_4Helper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.DevAttrHistory_4 s)
 	{
-		java.lang.String tmpResult85 = s.name;
-out.write_string( tmpResult85 );
+		java.lang.String tmpResult92 = s.name;
+out.write_string( tmpResult92 );
 		fr.esrf.Tango.TimeValListHelper.write(out,s.dates);
 		out.write_any(s.value);
 		fr.esrf.Tango.AttrQualityListHelper.write(out,s.quals);

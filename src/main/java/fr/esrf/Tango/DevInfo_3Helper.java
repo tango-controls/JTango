@@ -4,11 +4,11 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL struct "DevInfo_3".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
-public final class DevInfo_3Helper
+public abstract class DevInfo_3Helper
 {
 	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
@@ -69,16 +69,16 @@ public final class DevInfo_3Helper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.DevInfo_3 s)
 	{
-		java.lang.String tmpResult80 = s.dev_class;
-out.write_string( tmpResult80 );
-		java.lang.String tmpResult81 = s.server_id;
-out.write_string( tmpResult81 );
-		java.lang.String tmpResult82 = s.server_host;
-out.write_string( tmpResult82 );
+		java.lang.String tmpResult87 = s.dev_class;
+out.write_string( tmpResult87 );
+		java.lang.String tmpResult88 = s.server_id;
+out.write_string( tmpResult88 );
+		java.lang.String tmpResult89 = s.server_host;
+out.write_string( tmpResult89 );
 		out.write_long(s.server_version);
-		java.lang.String tmpResult83 = s.doc_url;
-out.write_string( tmpResult83 );
-		java.lang.String tmpResult84 = s.dev_type;
-out.write_string( tmpResult84 );
+		java.lang.String tmpResult90 = s.doc_url;
+out.write_string( tmpResult90 );
+		java.lang.String tmpResult91 = s.dev_type;
+out.write_string( tmpResult91 );
 	}
 }

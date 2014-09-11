@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public class _DeviceStub
@@ -797,8 +797,8 @@ public class _DeviceStub
 				try
 				{
 					_os = _request( "command_inout", true);
-					java.lang.String tmpResult88 = command;
-_os.write_string( tmpResult88 );
+					java.lang.String tmpResult95 = command;
+_os.write_string( tmpResult95 );
 					_os.write_any(argin);
 					_is = _invoke(_os);
 					org.omg.CORBA.Any _result = _is.read_any();
@@ -1381,8 +1381,8 @@ _os.write_string( tmpResult88 );
 				try
 				{
 					_os = _request( "command_query", true);
-					java.lang.String tmpResult89 = command;
-_os.write_string( tmpResult89 );
+					java.lang.String tmpResult96 = command;
+_os.write_string( tmpResult96 );
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdInfo _result = fr.esrf.Tango.DevCmdInfoHelper.read(_is);
 					return _result;

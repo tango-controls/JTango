@@ -5,8 +5,8 @@ import org.omg.PortableServer.POA;
 /**
  * Generated from IDL interface "Device_5".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public class Device_5POATie
@@ -28,22 +28,12 @@ public class Device_5POATie
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device_5 __r = fr.esrf.Tango.Device_5Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device_5 _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device_5 __r = fr.esrf.Tango.Device_5Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public Device_5Operations _delegate()
@@ -102,6 +92,11 @@ public class Device_5POATie
 		return _delegate.read_attributes_2(names,source);
 	}
 
+	public fr.esrf.Tango.DevPipeData write_read_pipe_5(fr.esrf.Tango.DevPipeData value, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		return _delegate.write_read_pipe_5(value,cl_ident);
+	}
+
 	public org.omg.CORBA.Any command_inout_4(java.lang.String command, org.omg.CORBA.Any argin, fr.esrf.Tango.DevSource source, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
 	{
 		return _delegate.command_inout_4(command,argin,source,cl_ident);
@@ -120,6 +115,11 @@ public class Device_5POATie
 	public void set_attribute_config_4(fr.esrf.Tango.AttributeConfig_3[] new_conf, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
 	{
 _delegate.set_attribute_config_4(new_conf,cl_ident);
+	}
+
+	public void write_pipe_5(fr.esrf.Tango.DevPipeData value, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+_delegate.write_pipe_5(value,cl_ident);
 	}
 
 	public fr.esrf.Tango.AttributeValue_5[] read_attributes_5(java.lang.String[] names, fr.esrf.Tango.DevSource source, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
@@ -155,6 +155,11 @@ _delegate.write_attributes_3(values);
 	public java.lang.String[] black_box(int n) throws fr.esrf.Tango.DevFailed
 	{
 		return _delegate.black_box(n);
+	}
+
+	public fr.esrf.Tango.PipeConfig[] get_pipe_config_5(java.lang.String[] names) throws fr.esrf.Tango.DevFailed
+	{
+		return _delegate.get_pipe_config_5(names);
 	}
 
 	public fr.esrf.Tango.DevCmdInfo_2[] command_list_query_2() throws fr.esrf.Tango.DevFailed
@@ -197,6 +202,11 @@ _delegate.set_attribute_config(new_conf);
 		return _delegate.command_inout(command,argin);
 	}
 
+	public void set_pipe_config_5(fr.esrf.Tango.PipeConfig[] new_conf, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+_delegate.set_pipe_config_5(new_conf,cl_ident);
+	}
+
 	public org.omg.CORBA.Any command_inout_2(java.lang.String command, org.omg.CORBA.Any argin, fr.esrf.Tango.DevSource source) throws fr.esrf.Tango.DevFailed
 	{
 		return _delegate.command_inout_2(command,argin,source);
@@ -220,6 +230,11 @@ _delegate.set_attribute_config_3(new_conf);
 	public fr.esrf.Tango.AttributeValue_5[] write_read_attributes_5(fr.esrf.Tango.AttributeValue_4[] values, java.lang.String[] r_names, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.MultiDevFailed,fr.esrf.Tango.DevFailed
 	{
 		return _delegate.write_read_attributes_5(values,r_names,cl_ident);
+	}
+
+	public fr.esrf.Tango.DevPipeData read_pipe_5(java.lang.String name, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		return _delegate.read_pipe_5(name,cl_ident);
 	}
 
 	public java.lang.String name()

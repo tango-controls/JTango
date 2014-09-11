@@ -4,11 +4,11 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL struct "DevInfo".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
-public final class DevInfoHelper
+public abstract class DevInfoHelper
 {
 	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
@@ -68,14 +68,14 @@ public final class DevInfoHelper
 	}
 	public static void write (final org.omg.CORBA.portable.OutputStream out, final fr.esrf.Tango.DevInfo s)
 	{
-		java.lang.String tmpResult76 = s.dev_class;
-out.write_string( tmpResult76 );
-		java.lang.String tmpResult77 = s.server_id;
-out.write_string( tmpResult77 );
-		java.lang.String tmpResult78 = s.server_host;
-out.write_string( tmpResult78 );
+		java.lang.String tmpResult83 = s.dev_class;
+out.write_string( tmpResult83 );
+		java.lang.String tmpResult84 = s.server_id;
+out.write_string( tmpResult84 );
+		java.lang.String tmpResult85 = s.server_host;
+out.write_string( tmpResult85 );
 		out.write_long(s.server_version);
-		java.lang.String tmpResult79 = s.doc_url;
-out.write_string( tmpResult79 );
+		java.lang.String tmpResult86 = s.doc_url;
+out.write_string( tmpResult86 );
 	}
 }
