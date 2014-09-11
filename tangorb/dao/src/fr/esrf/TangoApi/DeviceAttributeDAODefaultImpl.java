@@ -1384,12 +1384,12 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		manageExceptions("extractDevStateArray()");
 		try {
 	    	if (use_union) {
-			// Check if saclar (State attribute itself !)
-			if (attributeValue_5.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
-		    	return new DevState[] { attributeValue_5.value.dev_state_att() };
-			} else {
-		    	return attributeValue_5.value.state_att_value();
-			}
+                // Check if scalar (State attribute itself !)
+                if (attributeValue_5.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
+                    return new DevState[] { attributeValue_5.value.dev_state_att() };
+                } else {
+                    return attributeValue_5.value.state_att_value();
+                }
 	    	} else {
 				return deviceAttribute_3.extractDevStateArray();
 	    	}
@@ -1420,9 +1420,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		if (use_union) {
 	    	// Check if saclar (State attribute itself !)
 	    	if (attributeValue_5.value.discriminator().value() == AttributeDataType._DEVICE_STATE) {
-			return attributeValue_5.value.dev_state_att();
+			    return attributeValue_5.value.dev_state_att();
 	    	} else {
-			return attributeValue_5.value.state_att_value()[0];
+			    return attributeValue_5.value.state_att_value()[0];
 	    	}
 		} else {
 	    	return deviceAttribute_3.extractDevState();
@@ -1877,8 +1877,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public DevEncoded extractDevEncoded() throws DevFailed {
 		manageExceptions("extractDevEncoded");
 		if (attributeValue_5.value.encoded_att_value() == null) {
-	    	Except.throw_exception("BAD_PARAM", "DevEcoded object is null",
-		    	"DeviceAttribute.extractDevEncoded()");
+	    	Except.throw_exception("BAD_PARAM", "DevEncoded object is null");
 		}
 		return attributeValue_5.value.encoded_att_value()[0];
     }
@@ -1894,8 +1893,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     public DevEncoded[] extractDevEncodedArray() throws DevFailed {
 		manageExceptions("extractDevEncoded");
 		if (attributeValue_5.value.encoded_att_value() == null) {
-	    	Except.throw_exception("BAD_PARAM", "DevEcoded object is null",
-		    	"DeviceAttribute.extractDevEncoded()");
+	    	Except.throw_exception("BAD_PARAM", "DevEncoded object is null");
 		}
 		return attributeValue_5.value.encoded_att_value();
     }
@@ -2135,9 +2133,8 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 
 		// Else check for union data type
 		if (attributeValue_5.value == null || attributeValue_5.value.discriminator() == null) {
-	    	Except.throw_exception("AttributeTypeNotSet", "Attribute "
-		    	+ attributeValue_5.name + " Value Has Not Been Set",
-		    	"DeviceAttribute.getType()");
+	    	Except.throw_exception("AttributeTypeNotSet",
+                    "Attribute " + attributeValue_5.name + " Value Has Not Been Set");
 		}
 
 		int type = -1;
@@ -2177,7 +2174,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 					type = TangoConst.Tango_DEV_STRING;
 					break;
     			case AttributeDataType._DEVICE_STATE:
-	    			case AttributeDataType._ATT_STATE:
+	    		case AttributeDataType._ATT_STATE:
 					type = TangoConst.Tango_DEV_STATE;
 					break;
     			case AttributeDataType._ATT_ENCODED:
@@ -2189,14 +2186,11 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 
     			default:
 					Except.throw_exception("AttributeTypeNotSupported",
-							"Attribute Type ("
-								+ attributeValue_5.value.discriminator().value()
-								+ ") Not Supported",
-							"DeviceAttribute.getType()");
+							"Attribute Type (" +
+						    attributeValue_5.value.discriminator().value() + ") Not Supported");
 	    	}
 		} catch (final org.omg.CORBA.BAD_PARAM e) {
-	    	Except.throw_exception("Api_TypeCodePackage.BadKind",
-		    	"Bad or unknown type ", "DeviceAttribute.getType()");
+	    	Except.throw_exception("Api_TypeCodePackage.BadKind", "Bad or unknown type ");
 		}
 		return type;
     }
