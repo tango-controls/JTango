@@ -61,7 +61,7 @@ public class NamedDevFailedList extends DevFailed {
     public NamedDevFailedList(MultiDevFailed corba_ex, String dev_name, String op_name, String reason) {
         int nb_obj_failed = corba_ex.errors.length;
 
-        for (int i = 0; i < nb_obj_failed; i++) {
+        for (int i=0 ; i<nb_obj_failed ; i++) {
             NamedDevFailed tmp_err =
                     new NamedDevFailed(corba_ex.errors[i].err_list,
                             corba_ex.errors[i].name,
@@ -70,10 +70,8 @@ public class NamedDevFailedList extends DevFailed {
         }
         //	Build an exception summary (as string) in the DevFailed part
         //	of this exception.
-        String desc =
-                "Failed to execute " + op_name + " on device " + dev_name +
-                        ", object(s) ";
-        for (int i = 0; i < nb_obj_failed; i++) {
+        String desc = "Failed to execute " + op_name + " on device " + dev_name + ", object(s) ";
+        for (int i=0 ; i<nb_obj_failed ; i++) {
             desc += corba_ex.errors[i].name;
             if (i != nb_obj_failed - 1)
                 desc += ", ";
