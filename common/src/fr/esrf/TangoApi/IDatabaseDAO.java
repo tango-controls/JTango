@@ -37,6 +37,8 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
 
+import java.util.List;
+
 public interface IDatabaseDAO extends IConnectionDAO{
 
 	
@@ -1161,10 +1163,12 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//===================================================================	
 	public int checkAccessControl(Database database, String devname, TangoUrl devUrl);
-	
+
+    //===================================================================
 	/**
 	 *	Check for specified device, the specified command is allowed.
 	 *
+     *	@param database Database object.
 	 *	@param	classname Specified class name.
 	 *	@param	cmd Specified command name.
 	 */	
@@ -1175,4 +1179,164 @@ public interface IDatabaseDAO extends IConnectionDAO{
      */
     //===================================================================
 	public String[] getPossibleTangoHosts(Database database);
+
+
+
+
+    //===================================================================
+    /**
+     * Pipe related methods
+     */
+    //===================================================================
+    // ===================================================================
+    /**
+     * Query the database for a list of class pipe properties
+     * for the specified pipe.
+     * @param className specified class.
+     * @param pipeName specified pipe.
+     * @return a list of class pipe properties.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public DbPipe getClassPipeProperties(Database database, String className, String pipeName) throws DevFailed;
+    // ===================================================================
+    /**
+     * Query the database for a list of device pipe properties
+     * for the specified pipe.
+     * @param database Database object.
+     * @param deviceName specified device.
+     * @return a list of device pipe properties.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public DbPipe getDevicePipeProperties(Database database, String deviceName, String pipeName) throws DevFailed;
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified device.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     *	@param database Database object.
+     * @param deviceName device name.
+     * @param dbPipe pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putDevicePipeProperty(Database database, String deviceName, DbPipe dbPipe) throws DevFailed;
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified class.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     *	@param database Database object.
+     * @param className class name.
+     * @param dbPipe pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putClassPipeProperty(Database database, String className, DbPipe dbPipe) throws DevFailed;
+    // ===================================================================
+    /**
+     * Query database for a list of pipes for specified device and specified wildcard.
+     *	@param database Database object.
+     * @param deviceName specified device name.
+     * @param wildcard specified wildcard.
+     * @return a list of pipes defined in database for specified device and specified wildcard.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public List<String> getDevicePipeList(Database database, String deviceName, String wildcard) throws DevFailed;
+   // ===================================================================
+    /**
+     * Query database for a list of pipes for specified class and specified wildcard.
+     *	@param database Database object.
+     * @param className specified class name.
+     * @param wildcard specified wildcard.
+     * @return a list of pipes defined in database for specified class and specified wildcard.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public List<String> getClassPipeList(Database database, String className, String wildcard) throws DevFailed;
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified device.
+     *
+     *	@param database Database object.
+     * @param deviceName Device name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteDevicePipeProperties(Database database, String deviceName,
+                                         String pipeName, List<String> propertyNames) throws DevFailed;
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified class.
+     *
+     * @param database Database object.
+     * @param className class name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteClassPipeProperties(Database database, String className,
+                                         String pipeName, List<String> propertyNames) throws DevFailed;
+    // ===================================================================
+    /**
+     * Delete specified pipe for specified device.
+     * @param database Database object.
+     * @param deviceName    device name
+     * @param pipeName      pipe name
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public void deleteDevicePipe(Database database, String deviceName, String pipeName) throws DevFailed;
+    // ===================================================================
+    /**
+     * Delete specified pipe for specified class.
+     * @param database Database object.
+     * @param className    class name
+     * @param pipeName      pipe name
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public void deleteClassPipe(Database database, String className, String pipeName) throws DevFailed;
+    // ===================================================================
+    /**
+     * Delete all properties for specified pipes
+     * @param database Database object.
+     * @param deviceName    device name
+     * @param pipeNames     pipe names
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public void deleteAllDevicePipeProperty(Database database, String deviceName,
+                                            List<String> pipeNames) throws DevFailed;
+    // ===================================================================
+    /**
+     * Returns the property history for specified pipe.
+     * @param database Database object.
+     * @param deviceName    device name
+     * @param pipeName      pipe name
+     * @param propertyName  property Name
+     * @return the property history for specified pipe.
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public List<DbHistory> getDevicePipePropertyHistory(Database database, String deviceName,
+                                                        String pipeName, String propertyName) throws DevFailed;
+    // ===================================================================
+    /**
+     * Returns the property history for specified pipe.
+     * @param database Database object.
+     * @param className    class name
+     * @param pipeName      pipe name
+     * @param propertyName  property Name
+     * @return the property history for specified pipe.
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public List<DbHistory> getClassPipePropertyHistory(Database database, String className,
+                                                       String pipeName, String propertyName) throws DevFailed;
 }

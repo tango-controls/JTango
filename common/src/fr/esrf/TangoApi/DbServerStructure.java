@@ -38,6 +38,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /** 
  *	This class is able to define a Tango server structure,
@@ -228,9 +229,11 @@ public class DbServerStructure {
         for (TangoClass clazz : classes) {
             clazz.putProperties(database);
             clazz.putAttributeProperties(database);
+            clazz.putPipeProperties(database);
             for (TangoDevice device : clazz) {
                 device.putProperties(database);
                 device.putAttributeProperties(database);
+                device.putPipeProperties(database);
             }
         }
     }
@@ -303,6 +306,7 @@ public class DbServerStructure {
         String  name;
         ArrayList<TangoProperty>   properties = new ArrayList<TangoProperty>();
         ArrayList<TangoAttribute>   attributes = new ArrayList<TangoAttribute>();
+        ArrayList<TangoPipe>   pipes = new ArrayList<TangoPipe>();
         //===========================================================
         private TangoClass(String name) throws DevFailed {
             this.name = name;
@@ -325,12 +329,25 @@ public class DbServerStructure {
             for (String attributeName : attributeNames) {
                 //  Read attribute properties
                 DbAttribute dbAttribute = database.get_class_attribute_property(name, attributeName);
-                for (Object object : dbAttribute) {
-                    DbDatum datum = (DbDatum) object;
+                for (DbDatum datum : dbAttribute) {
                     if (!datum.is_empty()) {
                         TangoAttribute attribute = new TangoAttribute(attributeName);
                         attribute.add(new TangoProperty(datum.name, datum.extractStringArray()));
                         attributes.add(attribute);
+                    }
+                }
+            }
+
+            //  Get pipe list
+            List<String> pipeNames = database.getClassPipeList(name);
+            for (String pipeName : pipeNames) {
+                //  Read pipe properties
+                DbPipe dbPipe = database.getClassPipeProperties(name, pipeName);
+                for (DbDatum datum : dbPipe) {
+                    if (!datum.is_empty()) {
+                        TangoPipe pipe = new TangoPipe(pipeName);
+                        pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
+                        pipes.add(pipe);
                     }
                 }
             }
@@ -355,6 +372,11 @@ public class DbServerStructure {
         @SuppressWarnings("UnusedDeclaration")
         public ArrayList<TangoAttribute> getAttributes() {
             return attributes;
+        }
+        //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
+        public ArrayList<TangoPipe> getPipes() {
+            return pipes;
         }
         //===========================================================
         private void putProperties(Database database) throws DevFailed {
@@ -385,9 +407,26 @@ public class DbServerStructure {
                 //  Copy in array before put in database
                 DbAttribute[]   dbAttributes = new DbAttribute[dbAttributeList.size()];
                 for (int i=0 ; i<dbAttributeList.size() ; i++) {
-                    dbAttributes[i] =dbAttributeList.get(i);
+                    dbAttributes[i] = dbAttributeList.get(i);
                 }
                 database.put_class_attribute_property(name, dbAttributes);
+            }
+        }
+        //===========================================================
+        private void putPipeProperties(Database database) throws DevFailed {
+            ArrayList<DbPipe>  dbPipeList = new ArrayList<DbPipe>();
+            if (dbPipeList.size()>0) {
+                //  Build the DbDAttribute list for the class
+                for (TangoPipe pipe : pipes) {
+                    if (pipe.size()>0) {
+                        DbPipe    dbPipe = new DbPipe(name);
+                        for (TangoProperty property : pipe) {
+                            dbPipe.add(new DbDatum(property.name, property.values));
+                        }
+                        dbPipeList.add(dbPipe);
+                    }
+                }
+                database.putClassPipeProperty(name, dbPipeList);
             }
         }
         //===========================================================
@@ -414,6 +453,18 @@ public class DbServerStructure {
                     }
                 }
             }
+            // delete class pipe properties if any
+            if (pipes.size()>0) {
+                for (TangoPipe pipe : pipes) {
+                    if (pipe.size()>0) {
+                        String[]    propertyNames = new String[pipe.size()];
+                        for (int i=0 ; i<pipe.size() ; i++) {
+                            propertyNames[i] = pipe.get(i).name;
+                        }
+                        database.deleteClassPipeProperties(name, pipe.name, propertyNames);
+                    }
+                }
+            }
         }
         //===========================================================
         public String toString() {
@@ -437,6 +488,7 @@ public class DbServerStructure {
         DeviceProxy deviceProxy;
         ArrayList<TangoProperty>   properties = new ArrayList<TangoProperty>();
         ArrayList<TangoAttribute>  attributes = new ArrayList<TangoAttribute>();
+        ArrayList<TangoPipe>       pipes = new ArrayList<TangoPipe>();
         //===========================================================
         TangoDevice(String name) throws DevFailed{
             this.name = name;
@@ -469,6 +521,19 @@ public class DbServerStructure {
                     }
                 }
             }
+           //  get pipe list from Db
+            List<String> pipeNames  = database.getDevicePipeList(name);
+            for (String pipeName : pipeNames) {
+                //  Read attribute properties
+                DbPipe dbPipe = database.getDevicePipeProperties(name, pipeName);
+                for (DbDatum datum : dbPipe) {
+                    if (!datum.is_empty()) {
+                        TangoPipe pipe = new TangoPipe(pipeName);
+                        pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
+                        pipes.add(pipe);
+                    }
+                }
+            }
         }
         //===========================================================
         public String getName() {
@@ -485,6 +550,11 @@ public class DbServerStructure {
             return attributes;
         }
         //===========================================================
+        @SuppressWarnings("UnusedDeclaration")
+        public ArrayList<TangoPipe> getPipes() {
+            return pipes;
+        }
+        //===========================================================
         private void putProperties(Database database) throws DevFailed {
             if (properties.size()>0) {
                 DbDatum[]   data = new DbDatum[properties.size()];
@@ -499,7 +569,7 @@ public class DbServerStructure {
         private void putAttributeProperties(Database database) throws DevFailed {
             ArrayList<DbAttribute>  dbAttributeList = new ArrayList<DbAttribute>();
             if (attributes.size()>0) {
-                //  Build the DbDAttribute list for the class
+                //  Build the DbAttribute list for the class
                 for (TangoAttribute attribute : attributes) {
                     if (attribute.size()>0) {
                         DbAttribute    dbAttribute = new DbAttribute(attribute.name);
@@ -516,6 +586,23 @@ public class DbServerStructure {
                     dbAttributes[i]  =dbAttributeList.get(i);
                 }
                 database.put_device_attribute_property(name, dbAttributes);
+            }
+        }
+        //===========================================================
+        private void putPipeProperties(Database database) throws DevFailed {
+            ArrayList<DbPipe> dbPipeList = new ArrayList<DbPipe>();
+            if (pipes.size()>0) {
+                //  Build the DbPipe list for the class
+                for (TangoPipe pipe : pipes) {
+                    if (pipe.size()>0) {
+                        DbPipe dbPipe = new DbPipe(pipe.name);
+                        for (TangoProperty property : pipe) {
+                            dbPipe.add(new DbDatum(property.name, property.values));
+                        }
+                        dbPipeList.add(dbPipe);
+                    }
+                }
+                database.putDevicePipeProperty(name, dbPipeList);
             }
         }
         //===========================================================
@@ -539,6 +626,26 @@ public class DbServerStructure {
         String   name;
         //===========================================================
         TangoAttribute(String name) {
+            this.name = name;
+        }
+        //===========================================================
+        public String toString() {
+            return name;
+        }
+        //===========================================================
+    }
+    //===============================================================
+    //===============================================================
+
+    //===============================================================
+    /**
+     * A class defining a Tango Pipe
+     */
+    //===============================================================
+    public class TangoPipe extends ArrayList<TangoProperty> {
+        String   name;
+        //===========================================================
+        TangoPipe(String name) {
             this.name = name;
         }
         //===========================================================

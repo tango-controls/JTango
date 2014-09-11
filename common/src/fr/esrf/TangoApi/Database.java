@@ -37,6 +37,11 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
+import fr.esrf.TangoDs.Except;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -925,7 +930,7 @@ public class Database extends Connection {
 	// ==========================================================================
 	/**
 	 * Query the database for a list of device attributes properties for the
-	 * pecified object.
+	 * specified object.
 	 * 
 	 * @param devname device name.
 	 * @param attnames attribute names.
@@ -1636,7 +1641,364 @@ public class Database extends Connection {
         return possibleTangoHosts;
     }
 	// ===================================================================
+
+
+
+
+
+
 	// ===================================================================
+    /*
+     * Pipe related methods
+     */
+	// ===================================================================
+
+    // ===================================================================
+    /**
+     * Query the database for a list of device pipe properties
+     * for the specified pipe.
+     * @param deviceName specified device.
+     * @param pipeName specified pipe.
+     * @return a list of device pipe properties.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public DbPipe getDevicePipeProperties(String deviceName, String pipeName) throws DevFailed {
+        return databaseDAO.getDevicePipeProperties(this, deviceName, pipeName);
+    }
+    // ===================================================================
+    /**
+     * Query the database for a device pipe property
+     * for the specified pipe.
+     * @param deviceName specified device.
+     * @param pipeName specified pipe.
+     * @param propertyName specified property.
+     * @return device pipe property.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public DbDatum getDevicePipeProperty(String deviceName, String pipeName, String propertyName) throws DevFailed {
+        DbPipe dbPipe = databaseDAO.getDevicePipeProperties(this, deviceName, pipeName);
+        DbDatum datum = dbPipe.getDatum(propertyName);
+        if (datum==null)
+            Except.throw_exception("TangoApi_PropertyNotFound",
+                    "Property " + propertyName + " not found for pipe " + pipeName);
+        return datum;
+    }
+	// ===================================================================
+    /**
+     * Query the database for a list of class pipe properties
+     * for the specified pipe.
+     * @param className specified class.
+     * @param pipeName specified pipe.
+     * @return a list of class pipe properties.
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public DbPipe getClassPipeProperties(String className, String pipeName) throws DevFailed {
+        return databaseDAO.getClassPipeProperties(this, className, pipeName);
+    }
+    // ===================================================================
+    /**
+     * Query the database for a class pipe property
+     * for the specified pipe.
+     * @param className specified class.
+     * @param pipeName specified pipe.
+     * @param propertyName specified property.
+     * @return class pipe property.
+     * @throws DevFailed in case of database access failed
+     */
+    // ===================================================================
+    public DbDatum getClassPipeProperty(String className, String pipeName, String propertyName) throws DevFailed {
+        DbPipe dbPipe = databaseDAO.getClassPipeProperties(this, className, pipeName);
+        DbDatum datum = dbPipe.getDatum(propertyName);
+        if (datum==null)
+            Except.throw_exception("TangoApi_PropertyNotFound",
+                    "Property " + propertyName + " not found for pipe " + pipeName);
+        return datum;
+    }
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified device.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     * @param deviceName device name.
+     * @param dbPipe pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putDevicePipeProperty(String deviceName, DbPipe dbPipe) throws DevFailed {
+        databaseDAO.putDevicePipeProperty(this, deviceName, dbPipe);
+    }
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified device.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     * @param deviceName device name.
+     * @param dbPipes    list of pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putDevicePipeProperty(String deviceName, ArrayList<DbPipe> dbPipes) throws DevFailed {
+        for (DbPipe dbPipe : dbPipes)
+            databaseDAO.putDevicePipeProperty(this, deviceName, dbPipe);
+    }
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified class.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     * @param className class name.
+     * @param dbPipe pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putClassPipeProperty(String className, DbPipe dbPipe) throws DevFailed {
+        databaseDAO.putClassPipeProperty(this, className, dbPipe);
+    }
+    // ==========================================================================
+    /**
+     * Insert or update a list of pipe properties for the specified class.
+     * The property names and their values are specified by the DbAPipe.
+     *
+     * @param className class name.
+     * @param dbPipes list of pipe name, and properties (names and values).
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void putClassPipeProperty(String className, ArrayList<DbPipe> dbPipes) throws DevFailed {
+        for (DbPipe dbPipe : dbPipes)
+            databaseDAO.putClassPipeProperty(this, className, dbPipe);
+    }
+	// ===================================================================
+    /**
+     * Query database for a list of pipes for specified device.
+     * @param deviceName specified device name.
+     * @return a list of pipes defined in database for specified device.
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public List<String> getDevicePipeList(String deviceName) throws DevFailed {
+        return getDevicePipeList(deviceName, "*");
+    }
+	// ===================================================================
+    /**
+     * Query database for a list of pipes for specified device and specified wildcard.
+     * @param deviceName specified device name.
+     * @param wildcard specified wildcard.
+     * @return a list of pipes defined in database for specified device and specified wildcard.
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public List<String> getDevicePipeList(String deviceName, String wildcard) throws DevFailed {
+        return databaseDAO.getDevicePipeList(this, deviceName, wildcard);
+    }
+	// ===================================================================
+    /**
+     * Query database for a list of pipes for specified class.
+     * @param className specified class name.
+     * @return a list of pipes defined in database for specified class.
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public List<String> getClassPipeList(String className) throws DevFailed {
+        return getClassPipeList(className, "*");
+    }
+	// ===================================================================
+    /**
+     * Query database for a list of pipes for specified class and specified wildcard.
+     * @param className specified class name.
+     * @param wildcard specified wildcard.
+     * @return a list of pipes defined in database for specified class and specified wildcard.
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public List<String> getClassPipeList(String className, String wildcard) throws DevFailed {
+        return databaseDAO.getClassPipeList(this, className, wildcard);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified device.
+     *
+     * @param deviceName device name.
+     * @param pipeName pipe name
+     * @param propertyName property name
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteDevicePipeProperty(String deviceName,
+                                         String pipeName, String propertyName) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(1);
+        list.add(propertyName);
+        databaseDAO.deleteDevicePipeProperties(this, deviceName, pipeName, list);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified device.
+     *
+     * @param deviceName Device name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteDevicePipeProperties(String deviceName,
+                                         String pipeName, String[] propertyNames) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(propertyNames.length);
+        Collections.addAll(list, propertyNames);
+        databaseDAO.deleteDevicePipeProperties(this, deviceName, pipeName, list);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified device.
+     *
+     * @param deviceName Device name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteDevicePipeProperties(String deviceName,
+                                         String pipeName, List<String> propertyNames) throws DevFailed {
+        databaseDAO.deleteDevicePipeProperties(this, deviceName, pipeName, propertyNames);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified class.
+     *
+     * @param className class name.
+     * @param pipeName pipe name
+     * @param propertyName property name
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteClassPipeProperty(String className,
+                                         String pipeName, String propertyName) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(1);
+        list.add(propertyName);
+        databaseDAO.deleteClassPipeProperties(this, className, pipeName, list);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified class.
+     *
+     * @param className class name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteClassPipeProperties(String className,
+                                         String pipeName, String[] propertyNames) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(propertyNames.length);
+        Collections.addAll(list, propertyNames);
+        databaseDAO.deleteClassPipeProperties(this, className, pipeName, list);
+    }
+    // ==========================================================================
+    /**
+     * Delete a pipe property for the specified class.
+     *
+     * @param className class name.
+     * @param pipeName pipe name
+     * @param propertyNames property names
+     * @throws DevFailed in case of database access failed
+     */
+    // ==========================================================================
+    public void deleteClassPipeProperties(String className,
+                                         String pipeName, List<String> propertyNames) throws DevFailed {
+        databaseDAO.deleteClassPipeProperties(this, className, pipeName, propertyNames);
+    }
+	// ===================================================================
+    /**
+     * Delete specified pipe for specified device.
+     * @param deviceName    device name
+     * @param pipeName      pipe name
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public void deleteDevicePipe(String deviceName, String pipeName) throws DevFailed {
+        databaseDAO.deleteDevicePipe(this, deviceName, pipeName);
+    }
+	// ===================================================================
+    /**
+     * Delete specified pipe for specified class.
+     * @param className    class name
+     * @param pipeName      pipe name
+     * @throws DevFailed in case of database access failed
+     */
+	// ===================================================================
+    public void deleteClassPipe(String className, String pipeName) throws DevFailed {
+        databaseDAO.deleteClassPipe(this, className, pipeName);
+    }
+    // ===================================================================
+    /**
+     * Delete all properties for specified pipe
+     * @param deviceName    device name
+     * @param pipeName      pipe name
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public void deleteAllDevicePipeProperty(String deviceName, String pipeName) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(1);
+        list.add(pipeName);
+        deleteAllDevicePipeProperty(deviceName, list);
+    }
+    // ===================================================================
+    /**
+     * Delete all properties for specified pipes
+     * @param deviceName    device name
+     * @param pipeNames     pipe names
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public void deleteAllDevicePipeProperty(String deviceName, String[] pipeNames) throws DevFailed {
+        ArrayList<String>   list = new ArrayList<String>(pipeNames.length);
+        Collections.addAll(list, pipeNames);
+        deleteAllDevicePipeProperty(deviceName, list);
+    }
+    // ===================================================================
+    /**
+     * Delete all properties for specified pipes
+     * @param deviceName    device name
+     * @param pipeNames     pipe names
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public void deleteAllDevicePipeProperty(String deviceName, List<String> pipeNames) throws DevFailed {
+        databaseDAO.deleteAllDevicePipeProperty(this, deviceName, pipeNames);
+    }
+    // ===================================================================
+    /**
+     * Returns the property history for specified pipe.
+     * @param deviceName    device name
+     * @param pipeName      pipe name
+     * @param propertyName  property Name
+     * @return the property history for specified pipe.
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public List<DbHistory> getDevicePipePropertyHistory(String deviceName,String pipeName,
+                                                             String propertyName) throws DevFailed {
+        return databaseDAO.getDevicePipePropertyHistory(this, deviceName, pipeName, propertyName);
+    }
+    // ===================================================================
+    /**
+     * Returns the property history for specified pipe.
+     * @param className    class name
+     * @param pipeName      pipe name
+     * @param propertyName  property Name
+     * @return the property history for specified pipe.
+     * @throws DevFailed  in case of database access failed
+     */
+    // ===================================================================
+    public List<DbHistory> getClassPipePropertyHistory(String className,String pipeName,
+                                                             String propertyName) throws DevFailed {
+        return databaseDAO.getClassPipePropertyHistory(this, className, pipeName, propertyName);
+    }
+    // ===================================================================
+    // ===================================================================
+
 
 	/*
 	 * Getter and setter 
