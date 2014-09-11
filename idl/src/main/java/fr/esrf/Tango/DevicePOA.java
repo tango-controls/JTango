@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public abstract class DevicePOA
@@ -36,22 +36,12 @@ public abstract class DevicePOA
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device __r = fr.esrf.Tango.DeviceHelper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device __r = fr.esrf.Tango.DeviceHelper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public org.omg.CORBA.portable.OutputStream _invoke(String method, org.omg.CORBA.portable.InputStream _input, org.omg.CORBA.portable.ResponseHandler handler)
@@ -83,8 +73,8 @@ public abstract class DevicePOA
 			case 1: // _get_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult90 = name();
-_out.write_string( tmpResult90 );
+			java.lang.String tmpResult97 = name();
+_out.write_string( tmpResult97 );
 				break;
 			}
 			case 2: // ping
@@ -104,8 +94,8 @@ _out.write_string( tmpResult90 );
 			case 3: // _get_description
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult91 = description();
-_out.write_string( tmpResult91 );
+			java.lang.String tmpResult98 = description();
+_out.write_string( tmpResult98 );
 				break;
 			}
 			case 4: // read_attributes
@@ -126,8 +116,8 @@ _out.write_string( tmpResult91 );
 			case 5: // _get_adm_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult92 = adm_name();
-_out.write_string( tmpResult92 );
+			java.lang.String tmpResult99 = adm_name();
+_out.write_string( tmpResult99 );
 				break;
 			}
 			case 6: // command_list_query
@@ -183,8 +173,8 @@ _out.write_string( tmpResult92 );
 			case 10: // _get_status
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult93 = status();
-_out.write_string( tmpResult93 );
+			java.lang.String tmpResult100 = status();
+_out.write_string( tmpResult100 );
 				break;
 			}
 			case 11: // set_attribute_config
