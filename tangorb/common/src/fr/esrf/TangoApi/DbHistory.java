@@ -36,15 +36,15 @@ package fr.esrf.TangoApi;
 
 /**
  *	Class Description:
- *	This class manage data object for Tango databse history access.
+ *	This class manage data object for Tango database history access.
  */
 public class DbHistory implements java.io.Serializable {
 
-  private String propName; // Property name
-  private String attName;  // Attribute name (Not used for device properties)
-  private String value;    // Property value
-  private String date;     // Update date
-  private boolean deleted; // Deleted flag
+  private String propName;  // Property name
+  private String objectName;// Attribute or pipe name (Not used for device property)
+  private String value;     // Property value
+  private String date;      // Update date
+  private boolean deleted;  // Deleted flag
 
   /**
    * Constructs a property.
@@ -58,21 +58,19 @@ public class DbHistory implements java.io.Serializable {
     this.date = formatMySQLDate(date);
     this.value = formatValue(value);
     deleted = (value.length==0);
-
   }
 
   /**
    * Constructs an attribute property.
-   * @param attName Attribute name
+   * @param objectName Attribute or Pipe name
    * @param propName Property name
    * @param date Update date (in MySQL format)
    * @param value Property value
    */
-  DbHistory(String attName,String propName,String date,String[] value) {
+  DbHistory(String objectName,String propName,String date,String[] value) {
 
     this(propName,date,value);
-    this.attName = attName;
-
+    this.objectName = objectName;
   }
 
   /**
@@ -86,7 +84,13 @@ public class DbHistory implements java.io.Serializable {
    * Return attribute name. Used when retrieving attribute property.
    */
   public String getAttributeName() {
-    return attName;
+    return objectName;
+  }
+  /**
+   * Return attribute name. Used when retrieving pipe property.
+   */
+  public String getPipeName() {
+    return objectName;
   }
 
   /**
@@ -131,8 +135,8 @@ public class DbHistory implements java.io.Serializable {
    */
   private String formatMySQLDate(String date) {
 
-    // Handle MySQL date formating
-    if( date.indexOf("-")!=-1 )
+    // Handle MySQL date format
+    if(date.contains("-"))
       return date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4) + " " +
              date.substring(11,13) + ":" + date.substring(14,16) + ":" + date.substring(17,19);
     else

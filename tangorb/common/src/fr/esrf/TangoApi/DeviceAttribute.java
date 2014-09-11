@@ -38,8 +38,7 @@ import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
 
 /**
- * Class Description: This class manage data object for Tango device attribute
- * access. <br>
+ * Class Description: This class manage data object for Tango device attribute access. <br>
  * <br>
  * <br>
  * <b> Usage example: </b> <br>
@@ -105,10 +104,10 @@ import fr.esrf.Tango.factory.TangoFactory;
  */
 
 public class DeviceAttribute {
-    private IDeviceAttributeDAO deviceattributeDAO = null;
+    private IDeviceAttributeDAO deviceAttributeDAO = null;
 
     public DeviceAttribute() {
-	deviceattributeDAO = TangoFactory.getSingleton()
+	deviceAttributeDAO = TangoFactory.getSingleton()
 		.getDeviceAttributeDAO();
     }
 
@@ -120,8 +119,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final AttributeValue_5 attributeValue_5) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(attributeValue_5);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(attributeValue_5);
     }
 
     // ===========================================
@@ -132,8 +131,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final AttributeValue_4 attributeValue_4) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(attributeValue_4);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(attributeValue_4);
     }
 
     // ===========================================
@@ -144,8 +143,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final AttributeValue_3 attributeValue_3) {
-    	deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(attributeValue_3);
+    	deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(attributeValue_3);
     }
 
     // ===========================================
@@ -156,8 +155,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final AttributeValue attributeValue) {
-	    deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-    	deviceattributeDAO.init(attributeValue);
+	    deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+    	deviceAttributeDAO.init(attributeValue);
     }
 
     // ===========================================
@@ -168,8 +167,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name) {
-	    deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-    	deviceattributeDAO.init(name);
+	    deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+    	deviceAttributeDAO.init(name);
     }
 
     // ===========================================
@@ -182,8 +181,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, dim_x, dim_y);
     }
 
     // ===========================================
@@ -195,8 +194,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final boolean value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -208,8 +207,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final DevState value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -222,8 +221,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final boolean[] value, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value, dim_x, dim_y);
     }
 
     // ===========================================
@@ -235,8 +234,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final byte value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -249,8 +248,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final byte[] value, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value, dim_x, dim_y);
     }
 
     // ===========================================
@@ -262,8 +261,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final short value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -278,8 +277,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final short[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
@@ -291,8 +290,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final int value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -307,8 +306,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final int[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
@@ -320,8 +319,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final long value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -335,8 +334,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final long[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton() .getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton() .getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
@@ -348,8 +347,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final float value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -364,8 +363,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final float[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
@@ -377,8 +376,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final double value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -393,8 +392,8 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final double[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
@@ -406,8 +405,8 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DeviceAttribute(final String name, final String value) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, value);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, value);
     }
 
     // ===========================================
@@ -422,14 +421,14 @@ public class DeviceAttribute {
     // ===========================================
     public DeviceAttribute(final String name,
                            final String[] values, final int dim_x, final int dim_y) {
-        deviceattributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
-        deviceattributeDAO.init(name, values, dim_x, dim_y);
+        deviceAttributeDAO = TangoFactory.getSingleton().getDeviceAttributeDAO();
+        deviceAttributeDAO.init(name, values, dim_x, dim_y);
     }
 
     // ===========================================
     // ===========================================
     public boolean hasFailed() {
-        return deviceattributeDAO.hasFailed();
+        return deviceAttributeDAO.hasFailed();
     }
 
     // ===========================================
@@ -438,7 +437,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevError[] getErrStack() {
-        return deviceattributeDAO.getErrStack();
+        return deviceAttributeDAO.getErrStack();
     }
 
     // ===========================================
@@ -449,7 +448,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void setAttributeValue(final AttributeValue_3 attributeValue3) {
-        deviceattributeDAO.setAttributeValue(attributeValue3);
+        deviceAttributeDAO.setAttributeValue(attributeValue3);
     }
 
     // ===========================================
@@ -460,7 +459,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void setAttributeValue(final AttributeValue attributeValue) {
-        deviceattributeDAO.setAttributeValue(attributeValue);
+        deviceAttributeDAO.setAttributeValue(attributeValue);
     }
 
     // ===========================================
@@ -475,7 +474,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final DevState argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -486,7 +485,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final DevState[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -499,7 +498,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final DevState[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -510,7 +509,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final boolean argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -521,7 +520,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final boolean[] argIn) {
-	deviceattributeDAO.insert(argIn);
+	deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -534,7 +533,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final boolean[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -545,7 +544,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final byte argIn) {
-        deviceattributeDAO.insert_uc(argIn);
+        deviceAttributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
@@ -556,7 +555,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final byte[] argIn) {
-        deviceattributeDAO.insert_uc(argIn);
+        deviceAttributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
@@ -567,7 +566,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final short argIn) {
-        deviceattributeDAO.insert_uc(argIn);
+        deviceAttributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
@@ -578,7 +577,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final short[] argIn) {
-        deviceattributeDAO.insert_uc(argIn);
+        deviceAttributeDAO.insert_uc(argIn);
     }
 
     // ===========================================
@@ -591,7 +590,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final short[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_uc(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_uc(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -602,7 +601,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_uc(final byte[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_uc(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_uc(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -613,7 +612,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final short argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -624,7 +623,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final short[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -637,7 +636,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final short[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -648,7 +647,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final short argIn) {
-        deviceattributeDAO.insert_us(argIn);
+        deviceAttributeDAO.insert_us(argIn);
     }
 
     // ===========================================
@@ -659,7 +658,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final int argIn) {
-        deviceattributeDAO.insert_us(argIn);
+        deviceAttributeDAO.insert_us(argIn);
     }
 
     // ===========================================
@@ -670,7 +669,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final short[] argIn) {
-        deviceattributeDAO.insert_us(argIn);
+        deviceAttributeDAO.insert_us(argIn);
     }
 
     // ===========================================
@@ -681,7 +680,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final int[] argIn) {
-        deviceattributeDAO.insert_us(argIn);
+        deviceAttributeDAO.insert_us(argIn);
     }
 
     // ===========================================
@@ -692,7 +691,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final short[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_us(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_us(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -703,7 +702,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_us(final int[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_us(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_us(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -714,7 +713,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final int argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -725,7 +724,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final int[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -738,7 +737,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final int[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -749,7 +748,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final long argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -760,7 +759,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final long[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -773,7 +772,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final long[] argIn, final int dim_x, final int dim_y) {
-	deviceattributeDAO.insert(argIn, dim_x, dim_y);
+	deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -784,7 +783,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final int argIn) {
-        deviceattributeDAO.insert_ul(argIn);
+        deviceAttributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
@@ -795,7 +794,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final long argIn) {
-        deviceattributeDAO.insert_ul(argIn);
+        deviceAttributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
@@ -806,7 +805,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final int[] argIn) {
-        deviceattributeDAO.insert_ul(argIn);
+        deviceAttributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
@@ -817,7 +816,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final long[] argIn) {
-        deviceattributeDAO.insert_ul(argIn);
+        deviceAttributeDAO.insert_ul(argIn);
     }
 
     // ===========================================
@@ -828,7 +827,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final int[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_ul(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_ul(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -839,7 +838,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_ul(final long[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_ul(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_ul(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -850,7 +849,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_u64(final long argIn) {
-        deviceattributeDAO.insert_u64(argIn);
+        deviceAttributeDAO.insert_u64(argIn);
     }
 
     // ===========================================
@@ -861,7 +860,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_u64(final long[] argIn) {
-        deviceattributeDAO.insert_u64(argIn);
+        deviceAttributeDAO.insert_u64(argIn);
     }
 
     // ===========================================
@@ -874,7 +873,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert_u64(final long[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert_u64(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert_u64(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -885,7 +884,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final float argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -896,7 +895,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final float[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -909,7 +908,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final float[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -920,7 +919,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final double argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -931,7 +930,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final double[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -944,7 +943,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final double[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -955,7 +954,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final String argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -966,7 +965,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final String[] argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -979,7 +978,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final String[] argIn, final int dim_x, final int dim_y) {
-        deviceattributeDAO.insert(argIn, dim_x, dim_y);
+        deviceAttributeDAO.insert(argIn, dim_x, dim_y);
     }
 
     // ===========================================
@@ -990,7 +989,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public void insert(final DevEncoded argIn) {
-        deviceattributeDAO.insert(argIn);
+        deviceAttributeDAO.insert(argIn);
     }
 
     // ===========================================
@@ -1004,7 +1003,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState[] extractDevStateArray() throws DevFailed {
-        return deviceattributeDAO.extractDevStateArray();
+        return deviceAttributeDAO.extractDevStateArray();
     }
 
     // ===========================================
@@ -1018,7 +1017,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState extractDevState() throws DevFailed {
-        return deviceattributeDAO.extractDevState();
+        return deviceAttributeDAO.extractDevState();
     }
 
     // ===========================================
@@ -1032,7 +1031,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public boolean extractBoolean() throws DevFailed {
-        return deviceattributeDAO.extractBoolean();
+        return deviceAttributeDAO.extractBoolean();
     }
 
     // ===========================================
@@ -1046,7 +1045,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public boolean[] extractBooleanArray() throws DevFailed {
-        return deviceattributeDAO.extractBooleanArray();
+        return deviceAttributeDAO.extractBooleanArray();
     }
 
     // ===========================================
@@ -1060,7 +1059,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short extractUChar() throws DevFailed {
-        return deviceattributeDAO.extractUChar();
+        return deviceAttributeDAO.extractUChar();
     }
 
     // ===========================================
@@ -1074,7 +1073,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short[] extractUCharArray() throws DevFailed {
-        return deviceattributeDAO.extractUCharArray();
+        return deviceAttributeDAO.extractUCharArray();
     }
 
     // ===========================================
@@ -1088,7 +1087,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public byte[] extractCharArray() throws DevFailed {
-        return deviceattributeDAO.extractCharArray();
+        return deviceAttributeDAO.extractCharArray();
     }
 
     // ===========================================
@@ -1102,7 +1101,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short extractShort() throws DevFailed {
-        return deviceattributeDAO.extractShort();
+        return deviceAttributeDAO.extractShort();
     }
 
     // ===========================================
@@ -1116,7 +1115,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public short[] extractShortArray() throws DevFailed {
-        return deviceattributeDAO.extractShortArray();
+        return deviceAttributeDAO.extractShortArray();
     }
 
     // ===========================================
@@ -1130,7 +1129,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int extractUShort() throws DevFailed {
-        return deviceattributeDAO.extractUShort();
+        return deviceAttributeDAO.extractUShort();
     }
 
     // ===========================================
@@ -1144,7 +1143,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int[] extractUShortArray() throws DevFailed {
-        return deviceattributeDAO.extractUShortArray();
+        return deviceAttributeDAO.extractUShortArray();
     }
 
     // ===========================================
@@ -1158,7 +1157,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int extractLong() throws DevFailed {
-        return deviceattributeDAO.extractLong();
+        return deviceAttributeDAO.extractLong();
     }
 
     // ===========================================
@@ -1172,7 +1171,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int[] extractLongArray() throws DevFailed {
-        return deviceattributeDAO.extractLongArray();
+        return deviceAttributeDAO.extractLongArray();
     }
 
     // ===========================================
@@ -1186,7 +1185,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractULong() throws DevFailed {
-        return deviceattributeDAO.extractULong();
+        return deviceAttributeDAO.extractULong();
     }
 
     // ===========================================
@@ -1200,7 +1199,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractULongArray() throws DevFailed {
-        return deviceattributeDAO.extractULongArray();
+        return deviceAttributeDAO.extractULongArray();
     }
 
     // ===========================================
@@ -1214,7 +1213,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractLong64() throws DevFailed {
-        return deviceattributeDAO.extractLong64();
+        return deviceAttributeDAO.extractLong64();
     }
 
     // ===========================================
@@ -1228,7 +1227,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractLong64Array() throws DevFailed {
-        return deviceattributeDAO.extractLong64Array();
+        return deviceAttributeDAO.extractLong64Array();
     }
 
     // ===========================================
@@ -1242,7 +1241,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long extractULong64() throws DevFailed {
-        return deviceattributeDAO.extractULong64();
+        return deviceAttributeDAO.extractULong64();
     }
 
     // ===========================================
@@ -1256,7 +1255,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long[] extractULong64Array() throws DevFailed {
-        return deviceattributeDAO.extractULong64Array();
+        return deviceAttributeDAO.extractULong64Array();
     }
 
     // ===========================================
@@ -1270,7 +1269,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public float extractFloat() throws DevFailed {
-	return deviceattributeDAO.extractFloat();
+	return deviceAttributeDAO.extractFloat();
     }
 
     // ===========================================
@@ -1284,7 +1283,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public float[] extractFloatArray() throws DevFailed {
-        return deviceattributeDAO.extractFloatArray();
+        return deviceAttributeDAO.extractFloatArray();
     }
 
     // ===========================================
@@ -1298,7 +1297,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public double extractDouble() throws DevFailed {
-        return deviceattributeDAO.extractDouble();
+        return deviceAttributeDAO.extractDouble();
     }
 
     // ===========================================
@@ -1312,7 +1311,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public double[] extractDoubleArray() throws DevFailed {
-        return deviceattributeDAO.extractDoubleArray();
+        return deviceAttributeDAO.extractDoubleArray();
     }
 
     // ===========================================
@@ -1326,7 +1325,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevState extractState() throws DevFailed {
-        return deviceattributeDAO.extractState();
+        return deviceAttributeDAO.extractState();
     }
 
     // ===========================================
@@ -1340,7 +1339,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public String extractString() throws DevFailed {
-        return deviceattributeDAO.extractString();
+        return deviceAttributeDAO.extractString();
     }
 
     // ===========================================
@@ -1354,7 +1353,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public String[] extractStringArray() throws DevFailed {
-        return deviceattributeDAO.extractStringArray();
+        return deviceAttributeDAO.extractStringArray();
     }
 
     // ===========================================
@@ -1366,7 +1365,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttrQuality getQuality() throws DevFailed {
-        return deviceattributeDAO.getQuality();
+        return deviceAttributeDAO.getQuality();
     }
 
     // ===========================================
@@ -1378,7 +1377,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevEncoded extractDevEncoded() throws DevFailed {
-        return deviceattributeDAO.extractDevEncoded();
+        return deviceAttributeDAO.extractDevEncoded();
     }
 
     // ===========================================
@@ -1390,7 +1389,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public DevEncoded[] extractDevEncodedArray() throws DevFailed {
-        return deviceattributeDAO.extractDevEncodedArray();
+        return deviceAttributeDAO.extractDevEncodedArray();
     }
 
     // ===========================================
@@ -1402,7 +1401,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttrDataFormat getDataFormat() throws DevFailed {
-        return deviceattributeDAO.getDataFormat();
+        return deviceAttributeDAO.getDataFormat();
     }
 
     // ===========================================
@@ -1413,7 +1412,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public TimeVal getTimeVal() throws DevFailed {
-        return deviceattributeDAO.getTimeVal();
+        return deviceAttributeDAO.getTimeVal();
     }
 
     // ===========================================
@@ -1424,18 +1423,18 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long getTimeValSec() throws DevFailed {
-        return deviceattributeDAO.getTimeValSec();
+        return deviceAttributeDAO.getTimeValSec();
     }
 
     // ===========================================
     /**
-     * Return attribute time value in seconds since EPOCH.
+     * Return attribute time value in milli seconds since EPOCH.
      * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
-        return deviceattributeDAO.getTimeValMillisSec();
+        return deviceAttributeDAO.getTimeValMillisSec();
     }
 
     // ===========================================
@@ -1446,7 +1445,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public String getName() throws DevFailed {
-        return deviceattributeDAO.getName();
+        return deviceAttributeDAO.getName();
     }
 
     // ===========================================
@@ -1457,7 +1456,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getNbRead() throws DevFailed {
-        return deviceattributeDAO.getNbRead();
+        return deviceAttributeDAO.getNbRead();
     }
 
     // ===========================================
@@ -1467,7 +1466,7 @@ public class DeviceAttribute {
      * @throws DevFailed in case of read_attribute failed
      */
     public AttributeDim getReadAttributeDim() throws DevFailed {
-        return deviceattributeDAO.getReadAttributeDim();
+        return deviceAttributeDAO.getReadAttributeDim();
     }
 
     // ===========================================
@@ -1477,7 +1476,7 @@ public class DeviceAttribute {
      * @throws DevFailed  in case of read_attribute failed
      */
     public AttributeDim getWriteAttributeDim() throws DevFailed {
-        return deviceattributeDAO.getWriteAttributeDim();
+        return deviceAttributeDAO.getWriteAttributeDim();
     }
 
     // ===========================================
@@ -1488,7 +1487,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getNbWritten() throws DevFailed {
-        return deviceattributeDAO.getNbWritten();
+        return deviceAttributeDAO.getNbWritten();
     }
 
     // ===========================================
@@ -1499,7 +1498,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getDimX() throws DevFailed {
-        return deviceattributeDAO.getDimX();
+        return deviceAttributeDAO.getDimX();
     }
 
     // ===========================================
@@ -1510,7 +1509,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getDimY() throws DevFailed {
-        return deviceattributeDAO.getDimY();
+        return deviceAttributeDAO.getDimY();
     }
 
     // ===========================================
@@ -1521,7 +1520,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getWrittenDimX() throws DevFailed {
-        return deviceattributeDAO.getWrittenDimX();
+        return deviceAttributeDAO.getWrittenDimX();
     }
 
     // ===========================================
@@ -1532,7 +1531,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public int getWrittenDimY() throws DevFailed {
-        return deviceattributeDAO.getWrittenDimY();
+        return deviceAttributeDAO.getWrittenDimY();
     }
 
     // ===========================================
@@ -1543,7 +1542,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue getAttributeValueObject_2() throws DevFailed {
-        return deviceattributeDAO.getAttributeValueObject_2();
+        return deviceAttributeDAO.getAttributeValueObject_2();
     }
 
     // ===========================================
@@ -1554,7 +1553,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue_3 getAttributeValueObject_3() throws DevFailed {
-        return deviceattributeDAO.getAttributeValueObject_3();
+        return deviceAttributeDAO.getAttributeValueObject_3();
     }
 
     // ===========================================
@@ -1563,7 +1562,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue_4 getAttributeValueObject_4() {
-        return deviceattributeDAO.getAttributeValueObject_4();
+        return deviceAttributeDAO.getAttributeValueObject_4();
     }
 
     // ===========================================
@@ -1572,7 +1571,7 @@ public class DeviceAttribute {
      */
     // ===========================================
     public AttributeValue_5 getAttributeValueObject_5() {
-        return deviceattributeDAO.getAttributeValueObject_5();
+        return deviceAttributeDAO.getAttributeValueObject_5();
     }
 
     // ===========================================
@@ -1584,18 +1583,18 @@ public class DeviceAttribute {
      */
     // ===========================================
     public long getTime() throws DevFailed {
-        return deviceattributeDAO.getTime();
+        return deviceAttributeDAO.getTime();
     }
 
     // ===========================================
     // ===========================================
     public int getType() throws DevFailed {
-        return deviceattributeDAO.getType();
+        return deviceAttributeDAO.getType();
     }
 
     // ===========================================
     // ===========================================
     public IDeviceAttributeDAO getDeviceAttributeDAO() {
-        return deviceattributeDAO;
+        return deviceAttributeDAO;
     }
 }

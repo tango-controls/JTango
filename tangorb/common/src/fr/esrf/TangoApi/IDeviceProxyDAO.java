@@ -40,6 +40,8 @@ import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 
+import java.util.List;
+
 public interface IDeviceProxyDAO extends IConnectionDAO{
 
 	//===================================================================
@@ -1120,9 +1122,67 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	public abstract int get_rpc_protocol(DeviceProxy deviceProxy) throws DevFailed;
 
 
+    // ===================================================================
+    /*
+     * Pipe related methods
+     */
+    // ===================================================================
+
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param deviceProxy device proxy object
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy) throws DevFailed;
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param deviceProxy device proxy object
+     * @param pipeNames pipe names.
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy, List<String> pipeNames) throws DevFailed;
+    // ===================================================================
+    /**
+     * Set device pipe configuration
+     * @param deviceProxy device proxy object
+     * @param pipeInfoList info list containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(DeviceProxy deviceProxy, List<PipeInfo> pipeInfoList) throws DevFailed;
+    // ===================================================================
+    /**
+     * Read specified pipe and returns read data
+     * @param deviceProxy device proxy object
+     * @param pipeName pipe name
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe readPipe(DeviceProxy deviceProxy, String pipeName) throws DevFailed;
+    // ===================================================================
+    /**
+     * Write data in specified pipe
+     * @param deviceProxy device proxy object
+     * @param devicePipe data to be written
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
+
+
+
 	//===============================================================
+    /*
+     *  Event related methods
+     */
 	//===============================================================
-	//TODO remove javadoc
 	//==========================================================================
 	/**
 	 *	Subscribe to an event.
