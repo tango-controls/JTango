@@ -51,7 +51,7 @@ public class EventUtil {
     //===================================================================
     /**
      * Check if graphical environment is available
-     * This test is use to know if method SwingUtilities.invokeLater() can be used.
+     * This test is used to know if method SwingUtilities.invokeLater() can be used.
      *
      * @return true if graphical environment is available
      */
