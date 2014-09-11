@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device_5".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public class _Device_5Stub
@@ -136,8 +136,8 @@ public class _Device_5Stub
 				try
 				{
 					_os = _request( "read_attribute_history_2", true);
-					java.lang.String tmpResult129 = name;
-_os.write_string( tmpResult129 );
+					java.lang.String tmpResult136 = name;
+_os.write_string( tmpResult136 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory[] _result = fr.esrf.Tango.DevAttrHistoryListHelper.read(_is);
@@ -242,8 +242,8 @@ _os.write_string( tmpResult129 );
 				try
 				{
 					_os = _request( "read_attribute_history_4", true);
-					java.lang.String tmpResult130 = name;
-_os.write_string( tmpResult130 );
+					java.lang.String tmpResult137 = name;
+_os.write_string( tmpResult137 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory_4 _result = fr.esrf.Tango.DevAttrHistory_4Helper.read(_is);
@@ -432,8 +432,8 @@ _os.write_string( tmpResult130 );
 				try
 				{
 					_os = _request( "read_attribute_history_3", true);
-					java.lang.String tmpResult131 = name;
-_os.write_string( tmpResult131 );
+					java.lang.String tmpResult138 = name;
+_os.write_string( tmpResult138 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory_3[] _result = fr.esrf.Tango.DevAttrHistoryList_3Helper.read(_is);
@@ -538,8 +538,8 @@ _os.write_string( tmpResult131 );
 				try
 				{
 					_os = _request( "read_attribute_history_5", true);
-					java.lang.String tmpResult132 = name;
-_os.write_string( tmpResult132 );
+					java.lang.String tmpResult139 = name;
+_os.write_string( tmpResult139 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevAttrHistory_5 _result = fr.esrf.Tango.DevAttrHistory_5Helper.read(_is);
@@ -842,6 +842,111 @@ _os.write_string( tmpResult132 );
 
 	}
 
+	public fr.esrf.Tango.DevPipeData write_read_pipe_5(fr.esrf.Tango.DevPipeData value, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		while(true)
+		{
+			if(! this._is_local())
+			{
+				org.omg.CORBA.portable.InputStream _is = null;
+				org.omg.CORBA.portable.OutputStream _os = null;
+				try
+				{
+					_os = _request( "write_read_pipe_5", true);
+					fr.esrf.Tango.DevPipeDataHelper.write(_os,value);
+					fr.esrf.Tango.ClntIdentHelper.write(_os,cl_ident);
+					_is = _invoke(_os);
+					fr.esrf.Tango.DevPipeData _result = fr.esrf.Tango.DevPipeDataHelper.read(_is);
+					return _result;
+				}
+				catch( org.omg.CORBA.portable.RemarshalException _rx )
+					{
+						continue;
+					}
+				catch( org.omg.CORBA.portable.ApplicationException _ax )
+				{
+					String _id = _ax.getId();
+					try
+					{
+						if( _id.equals("IDL:Tango/DevFailed:1.0"))
+						{
+							throw fr.esrf.Tango.DevFailedHelper.read(_ax.getInputStream());
+						}
+						else 
+						{
+							throw new RuntimeException("Unexpected exception " + _id );
+						}
+					}
+					finally
+					{
+						try
+						{
+							_ax.getInputStream().close();
+						}
+						catch (java.io.IOException e)
+						{
+							throw new RuntimeException("Unexpected exception " + e.toString() );
+						}
+					}
+			}
+			finally
+			{
+				if (_os != null)
+				{
+					try
+					{
+						_os.close();
+					}
+					catch (java.io.IOException e)
+					{
+						throw new RuntimeException("Unexpected exception " + e.toString() );
+					}
+				}
+				this._releaseReply(_is);
+			}
+		}
+		else
+		{
+			org.omg.CORBA.portable.ServantObject _so = _servant_preinvoke( "write_read_pipe_5", _opsClass );
+			if( _so == null )
+				continue;
+			Device_5Operations _localServant = (Device_5Operations)_so.servant;
+			fr.esrf.Tango.DevPipeData _result;
+			try
+			{
+				_result = _localServant.write_read_pipe_5(value,cl_ident);
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
+				return _result;
+			}
+			catch (fr.esrf.Tango.DevFailed ex) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
+				throw ex;
+			}
+			catch (RuntimeException re) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(re);
+				throw re;
+			}
+			catch (java.lang.Error err) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(err);
+				throw err;
+			}
+			finally
+			{
+				_servant_postinvoke(_so);
+			}
+		}
+
+		}
+
+	}
+
 	public org.omg.CORBA.Any command_inout_4(java.lang.String command, org.omg.CORBA.Any argin, fr.esrf.Tango.DevSource source, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
 	{
 		while(true)
@@ -853,8 +958,8 @@ _os.write_string( tmpResult132 );
 				try
 				{
 					_os = _request( "command_inout_4", true);
-					java.lang.String tmpResult133 = command;
-_os.write_string( tmpResult133 );
+					java.lang.String tmpResult140 = command;
+_os.write_string( tmpResult140 );
 					_os.write_any(argin);
 					fr.esrf.Tango.DevSourceHelper.write(_os,source);
 					fr.esrf.Tango.ClntIdentHelper.write(_os,cl_ident);
@@ -961,8 +1066,8 @@ _os.write_string( tmpResult133 );
 				try
 				{
 					_os = _request( "command_inout_history_2", true);
-					java.lang.String tmpResult134 = command;
-_os.write_string( tmpResult134 );
+					java.lang.String tmpResult141 = command;
+_os.write_string( tmpResult141 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdHistory[] _result = fr.esrf.Tango.DevCmdHistoryListHelper.read(_is);
@@ -1067,8 +1172,8 @@ _os.write_string( tmpResult134 );
 				try
 				{
 					_os = _request( "command_inout_history_4", true);
-					java.lang.String tmpResult135 = command;
-_os.write_string( tmpResult135 );
+					java.lang.String tmpResult142 = command;
+_os.write_string( tmpResult142 );
 					_os.write_long(n);
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdHistory_4 _result = fr.esrf.Tango.DevCmdHistory_4Helper.read(_is);
@@ -1233,6 +1338,109 @@ _os.write_string( tmpResult135 );
 			try
 			{
 				_localServant.set_attribute_config_4(new_conf,cl_ident);
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
+				return;
+			}
+			catch (fr.esrf.Tango.DevFailed ex) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
+				throw ex;
+			}
+			catch (RuntimeException re) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(re);
+				throw re;
+			}
+			catch (java.lang.Error err) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(err);
+				throw err;
+			}
+			finally
+			{
+				_servant_postinvoke(_so);
+			}
+		}
+
+		}
+
+	}
+
+	public void write_pipe_5(fr.esrf.Tango.DevPipeData value, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		while(true)
+		{
+			if(! this._is_local())
+			{
+				org.omg.CORBA.portable.InputStream _is = null;
+				org.omg.CORBA.portable.OutputStream _os = null;
+				try
+				{
+					_os = _request( "write_pipe_5", true);
+					fr.esrf.Tango.DevPipeDataHelper.write(_os,value);
+					fr.esrf.Tango.ClntIdentHelper.write(_os,cl_ident);
+					_is = _invoke(_os);
+					return;
+				}
+				catch( org.omg.CORBA.portable.RemarshalException _rx )
+					{
+						continue;
+					}
+				catch( org.omg.CORBA.portable.ApplicationException _ax )
+				{
+					String _id = _ax.getId();
+					try
+					{
+						if( _id.equals("IDL:Tango/DevFailed:1.0"))
+						{
+							throw fr.esrf.Tango.DevFailedHelper.read(_ax.getInputStream());
+						}
+						else 
+						{
+							throw new RuntimeException("Unexpected exception " + _id );
+						}
+					}
+					finally
+					{
+						try
+						{
+							_ax.getInputStream().close();
+						}
+						catch (java.io.IOException e)
+						{
+							throw new RuntimeException("Unexpected exception " + e.toString() );
+						}
+					}
+			}
+			finally
+			{
+				if (_os != null)
+				{
+					try
+					{
+						_os.close();
+					}
+					catch (java.io.IOException e)
+					{
+						throw new RuntimeException("Unexpected exception " + e.toString() );
+					}
+				}
+				this._releaseReply(_is);
+			}
+		}
+		else
+		{
+			org.omg.CORBA.portable.ServantObject _so = _servant_preinvoke( "write_pipe_5", _opsClass );
+			if( _so == null )
+				continue;
+			Device_5Operations _localServant = (Device_5Operations)_so.servant;
+			try
+			{
+				_localServant.write_pipe_5(value,cl_ident);
 				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
 					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
 				return;
@@ -2005,6 +2213,110 @@ _os.write_string( tmpResult135 );
 
 	}
 
+	public fr.esrf.Tango.PipeConfig[] get_pipe_config_5(java.lang.String[] names) throws fr.esrf.Tango.DevFailed
+	{
+		while(true)
+		{
+			if(! this._is_local())
+			{
+				org.omg.CORBA.portable.InputStream _is = null;
+				org.omg.CORBA.portable.OutputStream _os = null;
+				try
+				{
+					_os = _request( "get_pipe_config_5", true);
+					fr.esrf.Tango.DevVarStringArrayHelper.write(_os,names);
+					_is = _invoke(_os);
+					fr.esrf.Tango.PipeConfig[] _result = fr.esrf.Tango.PipeConfigListHelper.read(_is);
+					return _result;
+				}
+				catch( org.omg.CORBA.portable.RemarshalException _rx )
+					{
+						continue;
+					}
+				catch( org.omg.CORBA.portable.ApplicationException _ax )
+				{
+					String _id = _ax.getId();
+					try
+					{
+						if( _id.equals("IDL:Tango/DevFailed:1.0"))
+						{
+							throw fr.esrf.Tango.DevFailedHelper.read(_ax.getInputStream());
+						}
+						else 
+						{
+							throw new RuntimeException("Unexpected exception " + _id );
+						}
+					}
+					finally
+					{
+						try
+						{
+							_ax.getInputStream().close();
+						}
+						catch (java.io.IOException e)
+						{
+							throw new RuntimeException("Unexpected exception " + e.toString() );
+						}
+					}
+			}
+			finally
+			{
+				if (_os != null)
+				{
+					try
+					{
+						_os.close();
+					}
+					catch (java.io.IOException e)
+					{
+						throw new RuntimeException("Unexpected exception " + e.toString() );
+					}
+				}
+				this._releaseReply(_is);
+			}
+		}
+		else
+		{
+			org.omg.CORBA.portable.ServantObject _so = _servant_preinvoke( "get_pipe_config_5", _opsClass );
+			if( _so == null )
+				continue;
+			Device_5Operations _localServant = (Device_5Operations)_so.servant;
+			fr.esrf.Tango.PipeConfig[] _result;
+			try
+			{
+				_result = _localServant.get_pipe_config_5(names);
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
+				return _result;
+			}
+			catch (fr.esrf.Tango.DevFailed ex) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
+				throw ex;
+			}
+			catch (RuntimeException re) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(re);
+				throw re;
+			}
+			catch (java.lang.Error err) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(err);
+				throw err;
+			}
+			finally
+			{
+				_servant_postinvoke(_so);
+			}
+		}
+
+		}
+
+	}
+
 	public fr.esrf.Tango.DevCmdInfo_2[] command_list_query_2() throws fr.esrf.Tango.DevFailed
 	{
 		while(true)
@@ -2223,8 +2535,8 @@ _os.write_string( tmpResult135 );
 				try
 				{
 					_os = _request( "command_query_2", true);
-					java.lang.String tmpResult136 = command;
-_os.write_string( tmpResult136 );
+					java.lang.String tmpResult143 = command;
+_os.write_string( tmpResult143 );
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdInfo_2 _result = fr.esrf.Tango.DevCmdInfo_2Helper.read(_is);
 					return _result;
@@ -2743,8 +3055,8 @@ _os.write_string( tmpResult136 );
 				try
 				{
 					_os = _request( "command_inout", true);
-					java.lang.String tmpResult137 = command;
-_os.write_string( tmpResult137 );
+					java.lang.String tmpResult144 = command;
+_os.write_string( tmpResult144 );
 					_os.write_any(argin);
 					_is = _invoke(_os);
 					org.omg.CORBA.Any _result = _is.read_any();
@@ -2838,6 +3150,109 @@ _os.write_string( tmpResult137 );
 
 	}
 
+	public void set_pipe_config_5(fr.esrf.Tango.PipeConfig[] new_conf, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		while(true)
+		{
+			if(! this._is_local())
+			{
+				org.omg.CORBA.portable.InputStream _is = null;
+				org.omg.CORBA.portable.OutputStream _os = null;
+				try
+				{
+					_os = _request( "set_pipe_config_5", true);
+					fr.esrf.Tango.PipeConfigListHelper.write(_os,new_conf);
+					fr.esrf.Tango.ClntIdentHelper.write(_os,cl_ident);
+					_is = _invoke(_os);
+					return;
+				}
+				catch( org.omg.CORBA.portable.RemarshalException _rx )
+					{
+						continue;
+					}
+				catch( org.omg.CORBA.portable.ApplicationException _ax )
+				{
+					String _id = _ax.getId();
+					try
+					{
+						if( _id.equals("IDL:Tango/DevFailed:1.0"))
+						{
+							throw fr.esrf.Tango.DevFailedHelper.read(_ax.getInputStream());
+						}
+						else 
+						{
+							throw new RuntimeException("Unexpected exception " + _id );
+						}
+					}
+					finally
+					{
+						try
+						{
+							_ax.getInputStream().close();
+						}
+						catch (java.io.IOException e)
+						{
+							throw new RuntimeException("Unexpected exception " + e.toString() );
+						}
+					}
+			}
+			finally
+			{
+				if (_os != null)
+				{
+					try
+					{
+						_os.close();
+					}
+					catch (java.io.IOException e)
+					{
+						throw new RuntimeException("Unexpected exception " + e.toString() );
+					}
+				}
+				this._releaseReply(_is);
+			}
+		}
+		else
+		{
+			org.omg.CORBA.portable.ServantObject _so = _servant_preinvoke( "set_pipe_config_5", _opsClass );
+			if( _so == null )
+				continue;
+			Device_5Operations _localServant = (Device_5Operations)_so.servant;
+			try
+			{
+				_localServant.set_pipe_config_5(new_conf,cl_ident);
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
+				return;
+			}
+			catch (fr.esrf.Tango.DevFailed ex) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
+				throw ex;
+			}
+			catch (RuntimeException re) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(re);
+				throw re;
+			}
+			catch (java.lang.Error err) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(err);
+				throw err;
+			}
+			finally
+			{
+				_servant_postinvoke(_so);
+			}
+		}
+
+		}
+
+	}
+
 	public org.omg.CORBA.Any command_inout_2(java.lang.String command, org.omg.CORBA.Any argin, fr.esrf.Tango.DevSource source) throws fr.esrf.Tango.DevFailed
 	{
 		while(true)
@@ -2849,8 +3264,8 @@ _os.write_string( tmpResult137 );
 				try
 				{
 					_os = _request( "command_inout_2", true);
-					java.lang.String tmpResult138 = command;
-_os.write_string( tmpResult138 );
+					java.lang.String tmpResult145 = command;
+_os.write_string( tmpResult145 );
 					_os.write_any(argin);
 					fr.esrf.Tango.DevSourceHelper.write(_os,source);
 					_is = _invoke(_os);
@@ -3341,6 +3756,112 @@ _os.write_string( tmpResult138 );
 				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
 					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
 				throw ex;
+			}
+			catch (fr.esrf.Tango.DevFailed ex) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(ex);
+				throw ex;
+			}
+			catch (RuntimeException re) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(re);
+				throw re;
+			}
+			catch (java.lang.Error err) 
+			{
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).exceptionalCompletion(err);
+				throw err;
+			}
+			finally
+			{
+				_servant_postinvoke(_so);
+			}
+		}
+
+		}
+
+	}
+
+	public fr.esrf.Tango.DevPipeData read_pipe_5(java.lang.String name, fr.esrf.Tango.ClntIdent cl_ident) throws fr.esrf.Tango.DevFailed
+	{
+		while(true)
+		{
+			if(! this._is_local())
+			{
+				org.omg.CORBA.portable.InputStream _is = null;
+				org.omg.CORBA.portable.OutputStream _os = null;
+				try
+				{
+					_os = _request( "read_pipe_5", true);
+					java.lang.String tmpResult146 = name;
+_os.write_string( tmpResult146 );
+					fr.esrf.Tango.ClntIdentHelper.write(_os,cl_ident);
+					_is = _invoke(_os);
+					fr.esrf.Tango.DevPipeData _result = fr.esrf.Tango.DevPipeDataHelper.read(_is);
+					return _result;
+				}
+				catch( org.omg.CORBA.portable.RemarshalException _rx )
+					{
+						continue;
+					}
+				catch( org.omg.CORBA.portable.ApplicationException _ax )
+				{
+					String _id = _ax.getId();
+					try
+					{
+						if( _id.equals("IDL:Tango/DevFailed:1.0"))
+						{
+							throw fr.esrf.Tango.DevFailedHelper.read(_ax.getInputStream());
+						}
+						else 
+						{
+							throw new RuntimeException("Unexpected exception " + _id );
+						}
+					}
+					finally
+					{
+						try
+						{
+							_ax.getInputStream().close();
+						}
+						catch (java.io.IOException e)
+						{
+							throw new RuntimeException("Unexpected exception " + e.toString() );
+						}
+					}
+			}
+			finally
+			{
+				if (_os != null)
+				{
+					try
+					{
+						_os.close();
+					}
+					catch (java.io.IOException e)
+					{
+						throw new RuntimeException("Unexpected exception " + e.toString() );
+					}
+				}
+				this._releaseReply(_is);
+			}
+		}
+		else
+		{
+			org.omg.CORBA.portable.ServantObject _so = _servant_preinvoke( "read_pipe_5", _opsClass );
+			if( _so == null )
+				continue;
+			Device_5Operations _localServant = (Device_5Operations)_so.servant;
+			fr.esrf.Tango.DevPipeData _result;
+			try
+			{
+				_result = _localServant.read_pipe_5(name,cl_ident);
+				if ( _so instanceof org.omg.CORBA.portable.ServantObjectExt) 
+					((org.omg.CORBA.portable.ServantObjectExt)_so).normalCompletion();
+				return _result;
 			}
 			catch (fr.esrf.Tango.DevFailed ex) 
 			{
@@ -3939,8 +4460,8 @@ _os.write_string( tmpResult138 );
 				try
 				{
 					_os = _request( "command_query", true);
-					java.lang.String tmpResult139 = command;
-_os.write_string( tmpResult139 );
+					java.lang.String tmpResult147 = command;
+_os.write_string( tmpResult147 );
 					_is = _invoke(_os);
 					fr.esrf.Tango.DevCmdInfo _result = fr.esrf.Tango.DevCmdInfoHelper.read(_is);
 					return _result;

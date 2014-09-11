@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device_2".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public abstract class Device_2POA
@@ -43,22 +43,12 @@ public abstract class Device_2POA
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device_2 __r = fr.esrf.Tango.Device_2Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device_2 _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device_2 __r = fr.esrf.Tango.Device_2Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public org.omg.CORBA.portable.OutputStream _invoke(String method, org.omg.CORBA.portable.InputStream _input, org.omg.CORBA.portable.ResponseHandler handler)
@@ -89,15 +79,15 @@ public abstract class Device_2POA
 			case 1: // _get_status
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult100 = status();
-_out.write_string( tmpResult100 );
+			java.lang.String tmpResult107 = status();
+_out.write_string( tmpResult107 );
 				break;
 			}
 			case 2: // _get_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult101 = name();
-_out.write_string( tmpResult101 );
+			java.lang.String tmpResult108 = name();
+_out.write_string( tmpResult108 );
 				break;
 			}
 			case 3: // read_attributes
@@ -134,8 +124,8 @@ _out.write_string( tmpResult101 );
 			case 5: // _get_adm_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult102 = adm_name();
-_out.write_string( tmpResult102 );
+			java.lang.String tmpResult109 = adm_name();
+_out.write_string( tmpResult109 );
 				break;
 			}
 			case 6: // get_attribute_config
@@ -329,8 +319,8 @@ _out.write_string( tmpResult102 );
 			case 19: // _get_description
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult103 = description();
-_out.write_string( tmpResult103 );
+			java.lang.String tmpResult110 = description();
+_out.write_string( tmpResult110 );
 				break;
 			}
 			case 20: // black_box

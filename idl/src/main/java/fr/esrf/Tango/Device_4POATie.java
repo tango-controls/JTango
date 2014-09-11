@@ -5,8 +5,8 @@ import org.omg.PortableServer.POA;
 /**
  * Generated from IDL interface "Device_4".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public class Device_4POATie
@@ -28,22 +28,12 @@ public class Device_4POATie
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device_4 __r = fr.esrf.Tango.Device_4Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device_4 _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device_4 __r = fr.esrf.Tango.Device_4Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public Device_4Operations _delegate()

@@ -4,8 +4,8 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL interface "Device_5".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
 public abstract class Device_5POA
@@ -23,60 +23,55 @@ public abstract class Device_5POA
 		m_opsHash.put ( "read_attribute_history_5", Integer.valueOf(5));
 		m_opsHash.put ( "get_attribute_config_5", Integer.valueOf(6));
 		m_opsHash.put ( "read_attributes_2", Integer.valueOf(7));
-		m_opsHash.put ( "command_inout_4", Integer.valueOf(8));
-		m_opsHash.put ( "command_inout_history_2", Integer.valueOf(9));
-		m_opsHash.put ( "command_inout_history_4", Integer.valueOf(10));
-		m_opsHash.put ( "set_attribute_config_4", Integer.valueOf(11));
-		m_opsHash.put ( "read_attributes_5", Integer.valueOf(12));
-		m_opsHash.put ( "write_attributes_4", Integer.valueOf(13));
-		m_opsHash.put ( "write_read_attributes_4", Integer.valueOf(14));
-		m_opsHash.put ( "_get_adm_name", Integer.valueOf(15));
-		m_opsHash.put ( "write_attributes_3", Integer.valueOf(16));
-		m_opsHash.put ( "info_3", Integer.valueOf(17));
-		m_opsHash.put ( "black_box", Integer.valueOf(18));
-		m_opsHash.put ( "command_list_query_2", Integer.valueOf(19));
-		m_opsHash.put ( "read_attributes", Integer.valueOf(20));
-		m_opsHash.put ( "command_query_2", Integer.valueOf(21));
-		m_opsHash.put ( "get_attribute_config_2", Integer.valueOf(22));
-		m_opsHash.put ( "get_attribute_config", Integer.valueOf(23));
-		m_opsHash.put ( "set_attribute_config", Integer.valueOf(24));
-		m_opsHash.put ( "read_attributes_3", Integer.valueOf(25));
-		m_opsHash.put ( "command_inout", Integer.valueOf(26));
-		m_opsHash.put ( "command_inout_2", Integer.valueOf(27));
-		m_opsHash.put ( "info", Integer.valueOf(28));
-		m_opsHash.put ( "set_attribute_config_5", Integer.valueOf(29));
-		m_opsHash.put ( "set_attribute_config_3", Integer.valueOf(30));
-		m_opsHash.put ( "write_read_attributes_5", Integer.valueOf(31));
-		m_opsHash.put ( "_get_name", Integer.valueOf(32));
-		m_opsHash.put ( "ping", Integer.valueOf(33));
-		m_opsHash.put ( "_get_status", Integer.valueOf(34));
-		m_opsHash.put ( "_get_description", Integer.valueOf(35));
-		m_opsHash.put ( "command_list_query", Integer.valueOf(36));
-		m_opsHash.put ( "write_attributes", Integer.valueOf(37));
-		m_opsHash.put ( "command_query", Integer.valueOf(38));
-		m_opsHash.put ( "read_attributes_4", Integer.valueOf(39));
+		m_opsHash.put ( "write_read_pipe_5", Integer.valueOf(8));
+		m_opsHash.put ( "command_inout_4", Integer.valueOf(9));
+		m_opsHash.put ( "command_inout_history_2", Integer.valueOf(10));
+		m_opsHash.put ( "command_inout_history_4", Integer.valueOf(11));
+		m_opsHash.put ( "set_attribute_config_4", Integer.valueOf(12));
+		m_opsHash.put ( "write_pipe_5", Integer.valueOf(13));
+		m_opsHash.put ( "read_attributes_5", Integer.valueOf(14));
+		m_opsHash.put ( "write_attributes_4", Integer.valueOf(15));
+		m_opsHash.put ( "write_read_attributes_4", Integer.valueOf(16));
+		m_opsHash.put ( "_get_adm_name", Integer.valueOf(17));
+		m_opsHash.put ( "write_attributes_3", Integer.valueOf(18));
+		m_opsHash.put ( "info_3", Integer.valueOf(19));
+		m_opsHash.put ( "black_box", Integer.valueOf(20));
+		m_opsHash.put ( "get_pipe_config_5", Integer.valueOf(21));
+		m_opsHash.put ( "command_list_query_2", Integer.valueOf(22));
+		m_opsHash.put ( "read_attributes", Integer.valueOf(23));
+		m_opsHash.put ( "command_query_2", Integer.valueOf(24));
+		m_opsHash.put ( "get_attribute_config_2", Integer.valueOf(25));
+		m_opsHash.put ( "get_attribute_config", Integer.valueOf(26));
+		m_opsHash.put ( "set_attribute_config", Integer.valueOf(27));
+		m_opsHash.put ( "read_attributes_3", Integer.valueOf(28));
+		m_opsHash.put ( "command_inout", Integer.valueOf(29));
+		m_opsHash.put ( "set_pipe_config_5", Integer.valueOf(30));
+		m_opsHash.put ( "command_inout_2", Integer.valueOf(31));
+		m_opsHash.put ( "info", Integer.valueOf(32));
+		m_opsHash.put ( "set_attribute_config_5", Integer.valueOf(33));
+		m_opsHash.put ( "set_attribute_config_3", Integer.valueOf(34));
+		m_opsHash.put ( "write_read_attributes_5", Integer.valueOf(35));
+		m_opsHash.put ( "read_pipe_5", Integer.valueOf(36));
+		m_opsHash.put ( "_get_name", Integer.valueOf(37));
+		m_opsHash.put ( "ping", Integer.valueOf(38));
+		m_opsHash.put ( "_get_status", Integer.valueOf(39));
+		m_opsHash.put ( "_get_description", Integer.valueOf(40));
+		m_opsHash.put ( "command_list_query", Integer.valueOf(41));
+		m_opsHash.put ( "write_attributes", Integer.valueOf(42));
+		m_opsHash.put ( "command_query", Integer.valueOf(43));
+		m_opsHash.put ( "read_attributes_4", Integer.valueOf(44));
 	}
 	private String[] ids = {"IDL:Tango/Device_5:1.0","IDL:Tango/Device_2:1.0","IDL:Tango/Device_3:1.0","IDL:Tango/Device_4:1.0","IDL:Tango/Device:1.0"};
 	public fr.esrf.Tango.Device_5 _this()
 	{
 		org.omg.CORBA.Object __o = _this_object() ;
 		fr.esrf.Tango.Device_5 __r = fr.esrf.Tango.Device_5Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public fr.esrf.Tango.Device_5 _this(org.omg.CORBA.ORB orb)
 	{
 		org.omg.CORBA.Object __o = _this_object(orb) ;
 		fr.esrf.Tango.Device_5 __r = fr.esrf.Tango.Device_5Helper.narrow(__o);
-		if (__o != null && __o != __r)
-		{
-			((org.omg.CORBA.portable.ObjectImpl)__o)._set_delegate(null);
-
-		}
 		return __r;
 	}
 	public org.omg.CORBA.portable.OutputStream _invoke(String method, org.omg.CORBA.portable.InputStream _input, org.omg.CORBA.portable.ResponseHandler handler)
@@ -206,7 +201,23 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 8: // command_inout_4
+			case 8: // write_read_pipe_5
+			{
+			try
+			{
+				fr.esrf.Tango.DevPipeData _arg0=fr.esrf.Tango.DevPipeDataHelper.read(_input);
+				fr.esrf.Tango.ClntIdent _arg1=fr.esrf.Tango.ClntIdentHelper.read(_input);
+				_out = handler.createReply();
+				fr.esrf.Tango.DevPipeDataHelper.write(_out,write_read_pipe_5(_arg0,_arg1));
+			}
+			catch(fr.esrf.Tango.DevFailed _ex0)
+			{
+				_out = handler.createExceptionReply();
+				fr.esrf.Tango.DevFailedHelper.write(_out, _ex0);
+			}
+				break;
+			}
+			case 9: // command_inout_4
 			{
 			try
 			{
@@ -224,7 +235,7 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 9: // command_inout_history_2
+			case 10: // command_inout_history_2
 			{
 			try
 			{
@@ -240,7 +251,7 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 10: // command_inout_history_4
+			case 11: // command_inout_history_4
 			{
 			try
 			{
@@ -256,7 +267,7 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 11: // set_attribute_config_4
+			case 12: // set_attribute_config_4
 			{
 			try
 			{
@@ -272,7 +283,23 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 12: // read_attributes_5
+			case 13: // write_pipe_5
+			{
+			try
+			{
+				fr.esrf.Tango.DevPipeData _arg0=fr.esrf.Tango.DevPipeDataHelper.read(_input);
+				fr.esrf.Tango.ClntIdent _arg1=fr.esrf.Tango.ClntIdentHelper.read(_input);
+				_out = handler.createReply();
+				write_pipe_5(_arg0,_arg1);
+			}
+			catch(fr.esrf.Tango.DevFailed _ex0)
+			{
+				_out = handler.createExceptionReply();
+				fr.esrf.Tango.DevFailedHelper.write(_out, _ex0);
+			}
+				break;
+			}
+			case 14: // read_attributes_5
 			{
 			try
 			{
@@ -289,7 +316,7 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 13: // write_attributes_4
+			case 15: // write_attributes_4
 			{
 			try
 			{
@@ -310,7 +337,7 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 14: // write_read_attributes_4
+			case 16: // write_read_attributes_4
 			{
 			try
 			{
@@ -331,14 +358,14 @@ public abstract class Device_5POA
 			}
 				break;
 			}
-			case 15: // _get_adm_name
+			case 17: // _get_adm_name
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult140 = adm_name();
-_out.write_string( tmpResult140 );
+			java.lang.String tmpResult148 = adm_name();
+_out.write_string( tmpResult148 );
 				break;
 			}
-			case 16: // write_attributes_3
+			case 18: // write_attributes_3
 			{
 			try
 			{
@@ -358,7 +385,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 17: // info_3
+			case 19: // info_3
 			{
 			try
 			{
@@ -372,7 +399,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 18: // black_box
+			case 20: // black_box
 			{
 			try
 			{
@@ -387,7 +414,22 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 19: // command_list_query_2
+			case 21: // get_pipe_config_5
+			{
+			try
+			{
+				java.lang.String[] _arg0=fr.esrf.Tango.DevVarStringArrayHelper.read(_input);
+				_out = handler.createReply();
+				fr.esrf.Tango.PipeConfigListHelper.write(_out,get_pipe_config_5(_arg0));
+			}
+			catch(fr.esrf.Tango.DevFailed _ex0)
+			{
+				_out = handler.createExceptionReply();
+				fr.esrf.Tango.DevFailedHelper.write(_out, _ex0);
+			}
+				break;
+			}
+			case 22: // command_list_query_2
 			{
 			try
 			{
@@ -401,7 +443,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 20: // read_attributes
+			case 23: // read_attributes
 			{
 			try
 			{
@@ -416,7 +458,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 21: // command_query_2
+			case 24: // command_query_2
 			{
 			try
 			{
@@ -431,7 +473,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 22: // get_attribute_config_2
+			case 25: // get_attribute_config_2
 			{
 			try
 			{
@@ -446,7 +488,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 23: // get_attribute_config
+			case 26: // get_attribute_config
 			{
 			try
 			{
@@ -461,7 +503,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 24: // set_attribute_config
+			case 27: // set_attribute_config
 			{
 			try
 			{
@@ -476,7 +518,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 25: // read_attributes_3
+			case 28: // read_attributes_3
 			{
 			try
 			{
@@ -492,7 +534,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 26: // command_inout
+			case 29: // command_inout
 			{
 			try
 			{
@@ -508,7 +550,23 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 27: // command_inout_2
+			case 30: // set_pipe_config_5
+			{
+			try
+			{
+				fr.esrf.Tango.PipeConfig[] _arg0=fr.esrf.Tango.PipeConfigListHelper.read(_input);
+				fr.esrf.Tango.ClntIdent _arg1=fr.esrf.Tango.ClntIdentHelper.read(_input);
+				_out = handler.createReply();
+				set_pipe_config_5(_arg0,_arg1);
+			}
+			catch(fr.esrf.Tango.DevFailed _ex0)
+			{
+				_out = handler.createExceptionReply();
+				fr.esrf.Tango.DevFailedHelper.write(_out, _ex0);
+			}
+				break;
+			}
+			case 31: // command_inout_2
 			{
 			try
 			{
@@ -525,7 +583,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 28: // info
+			case 32: // info
 			{
 			try
 			{
@@ -539,7 +597,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 29: // set_attribute_config_5
+			case 33: // set_attribute_config_5
 			{
 			try
 			{
@@ -555,7 +613,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 30: // set_attribute_config_3
+			case 34: // set_attribute_config_3
 			{
 			try
 			{
@@ -570,7 +628,7 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 31: // write_read_attributes_5
+			case 35: // write_read_attributes_5
 			{
 			try
 			{
@@ -592,14 +650,30 @@ _out.write_string( tmpResult140 );
 			}
 				break;
 			}
-			case 32: // _get_name
+			case 36: // read_pipe_5
 			{
-			_out = handler.createReply();
-			java.lang.String tmpResult141 = name();
-_out.write_string( tmpResult141 );
+			try
+			{
+				java.lang.String _arg0=_input.read_string();
+				fr.esrf.Tango.ClntIdent _arg1=fr.esrf.Tango.ClntIdentHelper.read(_input);
+				_out = handler.createReply();
+				fr.esrf.Tango.DevPipeDataHelper.write(_out,read_pipe_5(_arg0,_arg1));
+			}
+			catch(fr.esrf.Tango.DevFailed _ex0)
+			{
+				_out = handler.createExceptionReply();
+				fr.esrf.Tango.DevFailedHelper.write(_out, _ex0);
+			}
 				break;
 			}
-			case 33: // ping
+			case 37: // _get_name
+			{
+			_out = handler.createReply();
+			java.lang.String tmpResult149 = name();
+_out.write_string( tmpResult149 );
+				break;
+			}
+			case 38: // ping
 			{
 			try
 			{
@@ -613,21 +687,21 @@ _out.write_string( tmpResult141 );
 			}
 				break;
 			}
-			case 34: // _get_status
+			case 39: // _get_status
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult142 = status();
-_out.write_string( tmpResult142 );
+			java.lang.String tmpResult150 = status();
+_out.write_string( tmpResult150 );
 				break;
 			}
-			case 35: // _get_description
+			case 40: // _get_description
 			{
 			_out = handler.createReply();
-			java.lang.String tmpResult143 = description();
-_out.write_string( tmpResult143 );
+			java.lang.String tmpResult151 = description();
+_out.write_string( tmpResult151 );
 				break;
 			}
-			case 36: // command_list_query
+			case 41: // command_list_query
 			{
 			try
 			{
@@ -641,7 +715,7 @@ _out.write_string( tmpResult143 );
 			}
 				break;
 			}
-			case 37: // write_attributes
+			case 42: // write_attributes
 			{
 			try
 			{
@@ -656,7 +730,7 @@ _out.write_string( tmpResult143 );
 			}
 				break;
 			}
-			case 38: // command_query
+			case 43: // command_query
 			{
 			try
 			{
@@ -671,7 +745,7 @@ _out.write_string( tmpResult143 );
 			}
 				break;
 			}
-			case 39: // read_attributes_4
+			case 44: // read_attributes_4
 			{
 			try
 			{

@@ -2,11 +2,11 @@ package fr.esrf.Tango;
 /**
  * Generated from IDL enum "AttributeDataType".
  *
- * @author JacORB IDL compiler V 3.1, 19-Aug-2012
- * @version generated at May 14, 2014 1:27:02 PM
+ * @author JacORB IDL compiler V 3.5
+ * @version generated at Sep 5, 2014 10:37:19 AM
  */
 
-public final class AttributeDataTypeHelper
+public abstract class AttributeDataTypeHelper
 {
 	private volatile static org.omg.CORBA.TypeCode _type;
 	public static org.omg.CORBA.TypeCode type ()
