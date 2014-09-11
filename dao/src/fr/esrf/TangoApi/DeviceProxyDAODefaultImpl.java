@@ -43,6 +43,9 @@ import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
 import fr.esrf.TangoDs.TangoConst;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class Description: This class manage device connection for Tango objects. It
  * is an api between user and IDL Device object.
@@ -1833,26 +1836,26 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     .getFull_class_name()
                     + ".command_history()");
 	    }
-//  ToDo DeviceDataHistory
-        DeviceDataHistory[] histo = new DeviceDataHistory[0];
+
+        DeviceDataHistory[] histories = new DeviceDataHistory[0];
         try {
             // Check IDL revision to know kind of history.
             if (deviceProxy.device_5 != null) {
                 final DevCmdHistory_4 cmdHistory =
                         deviceProxy.device_5.command_inout_history_4(cmdname, nb);
-                histo = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
+                histories = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
             }
             else if (deviceProxy.device_4 != null) {
                 final DevCmdHistory_4 cmdHistory =
                         deviceProxy.device_4.command_inout_history_4(cmdname, nb);
-                histo = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
+                histories = ConversionUtil.commandHistoryToDeviceDataHistoryArray(cmdname, cmdHistory);
             }
             else {
                 final DevCmdHistory[] cmdHistory =
                         deviceProxy.device_2.command_inout_history_2(cmdname, nb);
-                histo = new DeviceDataHistory[cmdHistory.length];
+                histories = new DeviceDataHistory[cmdHistory.length];
                 for (int i = 0; i < cmdHistory.length; i++) {
-                    histo[i] = new DeviceDataHistory(cmdname, cmdHistory[i]);
+                    histories[i] = new DeviceDataHistory(cmdname, cmdHistory[i]);
                 }
             }
         } catch (final DevFailed e) {
@@ -1860,7 +1863,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         } catch (final Exception e) {
             throw_dev_failed(deviceProxy, e, "command_inout_history()", false);
         }
-        return histo;
+        return histories;
     }
 
     // ==========================================================================
@@ -2599,7 +2602,6 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 }
             }
         }
-//        catch (ConnectionFailed e) {
         catch (Exception e) {
             if (e instanceof AsynReplyNotArrived)
                 throw (AsynReplyNotArrived) e;
@@ -3193,6 +3195,168 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
         return deviceProxy.taco_device.get_rpc_protocol();
     }
+
+
+    // ===================================================================
+    /*
+     * ToDo Pipe related methods
+     */
+    // ===================================================================
+
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy) throws DevFailed {
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        try {
+            PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(new String[]{"All pipes"});
+            ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
+            for (PipeConfig configuration : configurations) {
+                infoList.add(new PipeInfo(configuration));
+            }
+            return infoList;
+        }
+        catch (Exception except) {
+            if (except instanceof DevFailed)
+                throw (DevFailed) except;
+            else
+                throw_dev_failed(deviceProxy, except, "getPipeConfig()", false);
+            return null; // cannot occur
+        }
+    }
+    // ===================================================================
+    /**
+     * Query device for pipe configuration list
+     * @param deviceProxy device proxy object
+     * @param pipeNames pipe names.
+     * @return  pipe configuration list
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy, List<String> pipeNames) throws DevFailed {
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        try {
+            String[]    array = new String[pipeNames.size()];
+            for (int i=0 ; i<pipeNames.size() ; i++)
+                array[i] = pipeNames.get(i);
+            PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(array);
+            ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
+            for (PipeConfig configuration : configurations) {
+                infoList.add(new PipeInfo(configuration));
+            }
+            return infoList;
+        }
+        catch (Exception except) {
+            if (except instanceof DevFailed)
+                throw (DevFailed) except;
+            else
+                throw_dev_failed(deviceProxy, except, "getPipeConfig()", false);
+            return null; // cannot occur
+        }
+    }
+    // ===================================================================
+    /**
+     * Set device pipe configuration
+     * @param deviceProxy device proxy object
+     * @param pipeInfoList info list containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(DeviceProxy deviceProxy, List<PipeInfo> pipeInfoList) throws DevFailed {
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        try {
+            PipeConfig[]  configList = new PipeConfig[pipeInfoList.size()];
+            for (int i=0 ; i<pipeInfoList.size() ; i++) {
+                configList[i] = pipeInfoList.get(i).getPipeConfig();
+            }
+            deviceProxy.device_5.set_pipe_config_5(
+                    configList, DevLockManager.getInstance().getClntIdent());
+        }
+        catch (Exception except) {
+            if (except instanceof DevFailed)
+                throw (DevFailed) except;
+            else
+                throw_dev_failed(deviceProxy, except, "setPipeConfig()", false);
+        }
+}
+    // ===================================================================
+    /**
+     * Read specified pipe and returns read data
+     * Read specified pipe and returns read data
+     * @param deviceProxy device proxy object
+     * @param pipeName pipe name
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe readPipe(DeviceProxy deviceProxy, String pipeName) throws DevFailed {
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        try {
+            DevPipeData pipeData = deviceProxy.device_5.read_pipe_5(
+                    pipeName, DevLockManager.getInstance().getClntIdent());
+            return new DevicePipe(pipeData);
+        }
+        catch (Exception except) {
+            if (except instanceof DevFailed)
+                throw (DevFailed) except;
+            else
+                throw_dev_failed(deviceProxy, except, "readPipe(" + pipeName + ")", false);
+            return null; // cannot occur
+        }
+    }
+    // ===================================================================
+    /**
+     * Write data in specified pipe
+     * @param deviceProxy device proxy object
+     * @param devicePipe data to be written
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed {
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        try {
+            DevPipeData devPipeData = devicePipe.getDevPipeDataObject();
+            deviceProxy.device_5.write_pipe_5(
+                    devPipeData, DevLockManager.getInstance().getClntIdent());
+        }
+        catch (Exception except) {
+            if (except instanceof DevFailed)
+                throw (DevFailed) except;
+            else
+                throw_dev_failed(deviceProxy, except,
+                     "writePipe(" + devicePipe.getPipeName() + ")", false);
+        }
+    }
+    // ===================================================================
+    // ===================================================================
+
+
+
+
+    // ===================================================================
+    /*
+     * Event related methods
+     */
+    // ===================================================================
 
     // ==========================================================================
     /**
