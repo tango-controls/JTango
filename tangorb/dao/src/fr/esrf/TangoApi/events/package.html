@@ -21,13 +21,13 @@ Classes for client events management.
 public class  TestEvents <Br>
 {
 <ul>
-	public TestEvents(String devname) throws DevFailed<Br>
+	public TestEvents(String deviceName) throws DevFailed<Br>
 	{
 <ul>
 <FONT COLOR="#3b648b">   <!--- DeepSkyBlue4 --->
 		//	Subscribe to a change event<Br>
 </Font>
-		TangoEventsAdapter	event_supplier = new TangoEventsAdapter(devname);<Br>
+		TangoEventsAdapter	event_supplier = new TangoEventsAdapter(deviceName);<Br>
 		PositionEventListener	listener = new PositionEventListener();<Br>
 		event_supplier.addTangoChangeListener(listener, "Position", new String[0]);
 </ul>
@@ -35,13 +35,13 @@ public class  TestEvents <Br>
 	public static void main (String[] args)<Br>
 	{
 <ul>
-		String		devname = "stepper/motor/1";<Br>
+		String		deviceName = "stepper/motor/1";<Br>
 		TestEvents	client;<Br>
 <Br>
 		try<Br>
 		{
 <ul>
-			client = new TestEvents(devname);
+			client = new TestEvents(deviceName);
 </ul>
 		}<Br>
 		catch(DevFailed e)<Br>
@@ -67,7 +67,7 @@ public class  TestEvents <Br>
 			//	Get attribute device name <Br>
 </Font>
 			TangoChange	tc = (TangoChange)event.getSource();<Br>
-			String		devname = tc.getEventSupplier().name();<Br>
+			String		deviceName = tc.getEventSupplier().name();<Br>
 <Br>
 			try
 			{
@@ -77,7 +77,7 @@ public class  TestEvents <Br>
 </Font>
 			 	DeviceAttribute	attr = event.getValue();<Br>
 				short			value = attr.extractShort();<Br>
-				System.out.println("Position changed on " + devname + ": " + value);
+				System.out.println("Position changed on " + deviceName + ": " + value);
 </ul>
 	    	}<Br>
 			catch (DevFailed e)<Br>
@@ -87,7 +87,7 @@ public class  TestEvents <Br>
 				//	Check if heart beat<Br>
 </Font>
 				if (e.errors[0].reason.equals("API_EventTimeout"))<Br>
-<ul>				System.out.println(devname + " : API_EventTimeout");</ul>
+<ul>				System.out.println(deviceName + " : API_EventTimeout");</ul>
 				else<Br>
 					fr.esrf.TangoDs.Except.print_exception(e);
 </ul>
