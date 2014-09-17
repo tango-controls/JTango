@@ -3215,21 +3215,25 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         if (deviceProxy.idl_version<5)
             Except.throw_exception("TangoApi_NOT_SUPPORTED",
                     "Pipe not supported in IDL " + deviceProxy.idl_version);
-        try {
-            PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(new String[]{"All pipes"});
-            ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
-            for (PipeConfig configuration : configurations) {
-                infoList.add(new PipeInfo(configuration));
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr=0; tr<retries && !done ; tr++) {
+            try {
+                PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(new String[]{"All pipes"});
+                for (PipeConfig configuration : configurations) {
+                    infoList.add(new PipeInfo(configuration));
+                }
+                done = true;
+            } catch (final DevFailed e) {
+                // Except.print_exception(e);
+                throw e;
+            } catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.getPipeConfig");
             }
-            return infoList;
         }
-        catch (Exception except) {
-            if (except instanceof DevFailed)
-                throw (DevFailed) except;
-            else
-                throw_dev_failed(deviceProxy, except, "getPipeConfig()", false);
-            return null; // cannot occur
-        }
+        return infoList;
     }
     // ===================================================================
     /**
@@ -3245,24 +3249,29 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         if (deviceProxy.idl_version<5)
             Except.throw_exception("TangoApi_NOT_SUPPORTED",
                     "Pipe not supported in IDL " + deviceProxy.idl_version);
-        try {
-            String[]    array = new String[pipeNames.size()];
-            for (int i=0 ; i<pipeNames.size() ; i++)
-                array[i] = pipeNames.get(i);
-            PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(array);
-            ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
-            for (PipeConfig configuration : configurations) {
-                infoList.add(new PipeInfo(configuration));
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>();
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr=0 ; tr<retries && !done ; tr++) {
+            try {
+                String[]    array = new String[pipeNames.size()];
+                for (int i=0 ; i<pipeNames.size() ; i++)
+                    array[i] = pipeNames.get(i);
+                PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(array);
+                for (PipeConfig configuration : configurations) {
+                    infoList.add(new PipeInfo(configuration));
+                }
+                done = true;
             }
-            return infoList;
+            catch (final DevFailed e) {
+                throw e;
+            }
+            catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.getPipeConfig");
+            }
         }
-        catch (Exception except) {
-            if (except instanceof DevFailed)
-                throw (DevFailed) except;
-            else
-                throw_dev_failed(deviceProxy, except, "getPipeConfig()", false);
-            return null; // cannot occur
-        }
+        return infoList;
     }
     // ===================================================================
     /**
@@ -3277,19 +3286,25 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         if (deviceProxy.idl_version<5)
             Except.throw_exception("TangoApi_NOT_SUPPORTED",
                     "Pipe not supported in IDL " + deviceProxy.idl_version);
-        try {
-            PipeConfig[]  configList = new PipeConfig[pipeInfoList.size()];
-            for (int i=0 ; i<pipeInfoList.size() ; i++) {
-                configList[i] = pipeInfoList.get(i).getPipeConfig();
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr=0 ; tr<retries && !done ; tr++) {
+            try {
+                PipeConfig[]  configList = new PipeConfig[pipeInfoList.size()];
+                for (int i=0 ; i<pipeInfoList.size() ; i++) {
+                    configList[i] = pipeInfoList.get(i).getPipeConfig();
+                }
+                deviceProxy.device_5.set_pipe_config_5(
+                        configList, DevLockManager.getInstance().getClntIdent());
+                done = true;
             }
-            deviceProxy.device_5.set_pipe_config_5(
-                    configList, DevLockManager.getInstance().getClntIdent());
-        }
-        catch (Exception except) {
-            if (except instanceof DevFailed)
-                throw (DevFailed) except;
-            else
-                throw_dev_failed(deviceProxy, except, "setPipeConfig()", false);
+            catch (final DevFailed e) {
+                throw e;
+            }
+            catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.setPipeConfig");
+            }
         }
 }
     // ===================================================================
@@ -3307,18 +3322,24 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         if (deviceProxy.idl_version<5)
             Except.throw_exception("TangoApi_NOT_SUPPORTED",
                     "Pipe not supported in IDL " + deviceProxy.idl_version);
-        try {
-            DevPipeData pipeData = deviceProxy.device_5.read_pipe_5(
-                    pipeName, DevLockManager.getInstance().getClntIdent());
-            return new DevicePipe(pipeData);
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr=0 ; tr<retries && !done ; tr++) {
+            try {
+                DevPipeData pipeData = deviceProxy.device_5.read_pipe_5(
+                        pipeName, DevLockManager.getInstance().getClntIdent());
+                done = true;
+                return new DevicePipe(pipeData);
+            }
+            catch (final DevFailed e) {
+                throw e;
+            }
+            catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.readPipe");
+            }
         }
-        catch (Exception except) {
-            if (except instanceof DevFailed)
-                throw (DevFailed) except;
-            else
-                throw_dev_failed(deviceProxy, except, "readPipe(" + pipeName + ")", false);
-            return null; // cannot occur
-        }
+        return null;    //  cannot occur
     }
     // ===================================================================
     /**
@@ -3333,17 +3354,22 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         if (deviceProxy.idl_version<5)
             Except.throw_exception("TangoApi_NOT_SUPPORTED",
                     "Pipe not supported in IDL " + deviceProxy.idl_version);
-        try {
-            DevPipeData devPipeData = devicePipe.getDevPipeDataObject();
-            deviceProxy.device_5.write_pipe_5(
-                    devPipeData, DevLockManager.getInstance().getClntIdent());
-        }
-        catch (Exception except) {
-            if (except instanceof DevFailed)
-                throw (DevFailed) except;
-            else
-                throw_dev_failed(deviceProxy, except,
-                     "writePipe(" + devicePipe.getPipeName() + ")", false);
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr=0 ; tr<retries && !done ; tr++) {
+            try {
+                DevPipeData devPipeData = devicePipe.getDevPipeDataObject();
+                deviceProxy.device_5.write_pipe_5(
+                        devPipeData, DevLockManager.getInstance().getClntIdent());
+                done = true;
+            }
+            catch (final DevFailed e) {
+                throw e;
+            }
+            catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.writePipe");
+            }
         }
     }
     // ===================================================================
