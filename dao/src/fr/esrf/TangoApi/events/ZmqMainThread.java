@@ -43,10 +43,7 @@ package fr.esrf.TangoApi.events;
  */
 
 import fr.esrf.Tango.*;
-import fr.esrf.TangoApi.ApiUtil;
-import fr.esrf.TangoApi.AttributeInfoEx;
-import fr.esrf.TangoApi.DeviceAttribute;
-import fr.esrf.TangoApi.DeviceInterface;
+import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.zeromq.ZMQ;
@@ -364,6 +361,14 @@ public class ZmqMainThread extends Thread {
                 }
             }
         }
+
+        //  Not found
+        /*  Display table content
+        Enumeration<String> keys = callbackMap.keys();
+        while (keys.hasMoreElements()) {
+            System.err.println(keys.nextElement());
+        }
+        */
         return null;
     }
     //===============================================================
@@ -377,6 +382,7 @@ public class ZmqMainThread extends Thread {
         EventCallBackStruct callBackStruct = getEventCallBackStruct(eventName);
         if (callBackStruct!=null) {
             DeviceAttribute attributeValue  = null;
+            DevicePipe      devicePipe      = null;
             AttributeInfoEx attributeConfig = null;
             AttDataReady    dataReady       = null;
             DeviceInterface deviceInterface = null;
@@ -404,6 +410,9 @@ public class ZmqMainThread extends Thread {
                             attributeConfig =
                                     ZMQutils.deMarshallAttributeConfig(recData, littleEndian, idl);
                             break;
+                        case TangoConst.PIPE_EVENT:
+                            devicePipe = ZMQutils.deMarshallPipe(recData, littleEndian, idl);
+                            break;
                         case TangoConst.DATA_READY_EVENT:
                             dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
                             break;
@@ -422,7 +431,9 @@ public class ZmqMainThread extends Thread {
                         new EventData(callBackStruct.device,
                                 deviceName, eventName,
                                 callBackStruct.event_type, EventData.ZMQ_EVENT,
-                                attributeValue, attributeConfig, dataReady, deviceInterface, devErrorList));
+                                attributeValue, devicePipe,
+                                attributeConfig, dataReady,
+                                deviceInterface, devErrorList));
             }
         }
         else
@@ -503,7 +514,7 @@ public class ZmqMainThread extends Thread {
                 new EventData(callBackStruct.device,
                         deviceName, eventName,
                         callBackStruct.event_type, EventData.ZMQ_EVENT,
-                        null, null, null, null, devErrorList));
+                        null, null, null, null, null, devErrorList));
         callBackStruct.setZmqCounter(eventCounter);
         return true;
     }
@@ -658,7 +669,8 @@ public class ZmqMainThread extends Thread {
             }
 
             //  Do the connection
-            //System.out.println("Connect for " + controlStructure.endPoint);
+            //System.out.println("Connect on " + controlStructure.endPoint);
+            //System.out.println("        for " + controlStructure.eventName);
             socket.setHWM(controlStructure.hwm);
             socket.connect(controlStructure.endPoint);
             if (!alreadyConnected(controlStructure.endPoint)) {

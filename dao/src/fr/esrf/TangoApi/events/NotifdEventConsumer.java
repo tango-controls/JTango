@@ -253,7 +253,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
                         new EventData(callBackStruct.device,
                                 domainName, eventType,
                                 callBackStruct.event_type, EventData.NOTIFD_EVENT,
-                                attr_value, attr_config, data_ready, null, dev_err_list);
+                                attr_value, null, attr_config, data_ready, null, dev_err_list);
 
 
                 if (callBackStruct.use_ev_queue) {
@@ -712,7 +712,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
             EventData event_data =
                     new EventData(eventChannelStruct.adm_device_proxy,
                             domain_name, callbackStruct.event_name, EventData.NOTIFD_EVENT,
-                            callbackStruct.event_type, null, null, null, null, errors);
+                            callbackStruct.event_type, null, null, null, null, null, errors);
 
             event_data.device = callbackStruct.device;
             event_data.name = callbackStruct.device.name();

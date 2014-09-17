@@ -324,9 +324,13 @@ public class  ZMQutils {
         }
 
         if (idl>=5) {
-            //  Special case (for interface change do not add idl)
+            //  Special case (for interface change and pipe do not add idl)
             if (eventName.equals(TangoConst.eventNames[TangoConst.INTERFACE_CHANGE]))
                 return ("tango://" + tangoHost + "/" + deviceName + "."+ eventName).toLowerCase();
+            else
+            if (eventName.equals(TangoConst.eventNames[TangoConst.PIPE_EVENT]))
+                return ("tango://" + tangoHost + "/" + deviceName +
+                        "/" + attributeName + "."+ eventName).toLowerCase();
             else
                 return ("tango://" + tangoHost + "/" + deviceName +
                     "/" + attributeName + ".idl"+ idl + "_" + eventName).toLowerCase();
@@ -711,8 +715,6 @@ public class  ZMQutils {
             byte[]  buffer = new byte[recData.length-4];
             //for (byte b : recData)
             //    System.out.println(b&0xff);
-            System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
-            CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
 
             //  Check device IDL
             if (idl<4) {
@@ -720,12 +722,61 @@ public class  ZMQutils {
                         "ZMQ events are not supported for IDL " + idl);
             }
             else if (idl<5) {
+                System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
+                CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
+
                 AttributeValue_4    attributeValue_4 = AttributeValue_4Helper.read(is);
                 return new DeviceAttribute(attributeValue_4);
             }
             else {
+                System.arraycopy(recData, 4, buffer, 0, recData.length - 4);
+                CDRInputStream is = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
+
                 AttributeValue_5    attributeValue_5 = AttributeValue_5Helper.read(is);
                 return new DeviceAttribute(attributeValue_5);
+            }
+        }
+        catch (DevFailed e) {
+            throw e;
+        }
+        catch (Exception e) {
+            Except.throw_exception("Api_ConversionFailed",
+                    "An exception " + e + " has been catch");
+        }
+        return null;    //  Cannot occur
+    }
+	//===============================================================
+    /**
+     * De Marshall data from a receive byte buffer
+     * @param recData   receive data
+     * @param littleIndian endianness to de marshall
+     * @param idl   idl revision to convert to attribute value
+     * @return the data after de marshaling
+     * @throws DevFailed in case of de marshaling failed
+     */
+	//===============================================================
+    static DevicePipe deMarshallPipe(byte[] recData, boolean littleIndian, int idl) throws DevFailed {
+        try {
+            //  Remove the 8 first bytes (added for c++ alignment)
+            byte[]  buffer = new byte[recData.length-8];
+            /*
+            int cnt = 0;
+            for (byte b : recData) {
+                System.out.print(String.format("ox%x", (b&0xff)) + "  ");
+                if ((++cnt%0x10)==0)   System.out.println();
+            }
+            System.out.println();
+            */
+            //  Check device IDL
+            if (idl<5) {
+                Except.throw_exception("SeverTooOld",
+                        "Pipe events are not supported for IDL " + idl);
+            }
+            else {
+                System.arraycopy(recData, 8, buffer, 0, recData.length - 8);
+                CDRInputStream inputStream = new CDRInputStream(ApiUtil.getOrb(), buffer, littleIndian);
+                DevPipeData devPipeData = DevPipeDataHelper.read(inputStream);
+                return new DevicePipe(devPipeData);
             }
         }
         catch (DevFailed e) {
