@@ -63,6 +63,14 @@ public abstract class EventDispatcher extends CallBack
 
     //=======================================================================
     //=======================================================================
+    protected int subscribe_pipe_event(String attr_name, String[] filters, boolean stateless)
+            throws DevFailed {
+        return event_supplier.subscribe_event(attr_name,
+                PIPE_EVENT, this, filters, stateless);
+    }
+
+    //=======================================================================
+    //=======================================================================
     protected int subscribe_periodic_event(String attr_name, String[] filters, boolean stateless)
             throws DevFailed {
         return event_supplier.subscribe_event(attr_name,
