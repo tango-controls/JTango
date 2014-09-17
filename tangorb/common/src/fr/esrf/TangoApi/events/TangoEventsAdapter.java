@@ -49,6 +49,8 @@ public class TangoEventsAdapter implements java.io.Serializable {
     private DeviceProxy device_proxy = null;
     private Hashtable<String, TangoPeriodic>
             tango_periodic_source = new Hashtable<String, TangoPeriodic>();
+    private Hashtable<String, TangoPipe>
+            tango_pipe_source = new Hashtable<String, TangoPipe>();
     private Hashtable<String, TangoChange>
             tango_change_source = new Hashtable<String, TangoChange>();
     private Hashtable<String, TangoQualityChange>
@@ -152,6 +154,73 @@ public class TangoEventsAdapter implements java.io.Serializable {
             TangoPeriodic tango_periodic;
             if ((tango_periodic = tango_periodic_source.get(attr_name)) != null)
                 tango_periodic.removeTangoPeriodicListener(listener);
+        }
+    }
+
+    //=======================================================================
+    /**
+     * Add listener for pipe event
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @param filters filter array
+     * @throws DevFailed in case of connection failed
+     */
+    //=======================================================================
+    public void addTangoPipeListener(ITangoPipeListener listener,
+                                     String attr_name, String[] filters) throws DevFailed {
+        addTangoPipeListener(listener, attr_name, filters, false);
+    }
+
+    //=======================================================================
+    /**
+     * Add listener for pipe event
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @param stateless if true: will re-try if failed
+     * @throws DevFailed in case of connection failed and stateless is false
+     */
+    //=======================================================================
+    public void addTangoPipeListener(ITangoPipeListener listener,
+                                     String attr_name, boolean stateless) throws DevFailed {
+        addTangoPipeListener(listener, attr_name, new String[0], stateless);
+    }
+    //=======================================================================
+    /**
+     * Add listener for Pipe event
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @param filters filter array
+     * @param stateless if true: will re-try if failed
+     * @throws DevFailed in case of connection failed and stateless is false
+     */
+    //=======================================================================
+    public void addTangoPipeListener(ITangoPipeListener listener,
+                                     String attr_name, String[] filters, boolean stateless) throws DevFailed {
+        TangoPipe tangoPipe;
+        if ((tangoPipe = tango_pipe_source.get(attr_name)) == null) {
+            tangoPipe = new TangoPipe(device_proxy, attr_name, filters);
+            tango_pipe_source.put(attr_name, tangoPipe);
+        }
+
+        synchronized (moni) {
+            tangoPipe.addTangoPipeListener(listener, stateless);
+        }
+    }
+
+    //=======================================================================
+    /**
+     * remove listener for pipe event
+     * @param  listener the specified listener
+     * @param attr_name the attribute name
+     * @throws DevFailed if specified listener not found
+     */
+    //=======================================================================
+    public void removeTangoPipeListener(ITangoPipeListener listener, String attr_name)
+            throws DevFailed {
+        synchronized (moni) {
+            TangoPipe tangoPipe;
+            if ((tangoPipe = tango_pipe_source.get(attr_name)) != null)
+                tangoPipe.removeTangoPipeListener(listener);
         }
     }
 
