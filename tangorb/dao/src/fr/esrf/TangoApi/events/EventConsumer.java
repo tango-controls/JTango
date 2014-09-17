@@ -251,8 +251,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         String deviceName = device.fullName();
         String callback_key = deviceName.toLowerCase();
         if (device.get_idl_version()>=5) {
-            if (event_name.equals("intr_change"))
+            if (event_name.equals("intr_change"))   //  No IDL for insterface change
                 callback_key += "." + event_name;
+            else
+            if (event_name.equals("pipe")) //    No IDL for pipe
+                callback_key += "/" + attribute + "." + event_name;
             else
                 callback_key += "/" + attribute + ".idl" + device.get_idl_version()+ "_" + event_name;
         }
@@ -337,7 +340,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //	read attribute or callback execution a little bit long.
         if ((event == CHANGE_EVENT) ||
                 (event == PERIODIC_EVENT) ||
-                (event == QUALITY_EVENT) ||
+                (event == PIPE_EVENT) ||
                 (event == ARCHIVE_EVENT) ||
                 (event == USER_EVENT) ||
                 (event == INTERFACE_CHANGE) ||
@@ -425,7 +428,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         EventData eventData =
                 new EventData(cs.device, callbackKey,
                         cs.event_name, source,
-                        cs.event_type, null, null, null, null, e.errors);
+                        cs.event_type, null, null, null, null, null, e.errors);
 
         if (cs.use_ev_queue) {
             EventQueue ev_queue = cs.device.getEventQueue();
@@ -536,7 +539,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             EventData event_data =
                     new EventData(event_channel_struct.adm_device_proxy,
                             domain_name, callback_struct.event_name, callback_struct.event_type,
-                            eventSource, null, null, null, null, errors);
+                            eventSource, null, null, null, null, null, errors);
 
             CallBack callback = callback_struct.callback;
             event_data.device = callback_struct.device;
@@ -565,7 +568,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             return;
 
         //	Else do the synchronous call
-        DeviceAttribute da = null;
+        DeviceAttribute deviceAttribute = null;
+        DevicePipe      devicePipe = null;
         AttributeInfoEx info = null;
         DeviceInterface deviceInterface = null;
         DevError[] err = null;
@@ -578,11 +582,15 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 info = callbackStruct.device.get_attribute_info_ex(callbackStruct.attr_name);
             }
             else
+            if (callbackStruct.event_name.equals(eventNames[PIPE_EVENT])) {
+                devicePipe = callbackStruct.device.readPipe(callbackStruct.attr_name);
+            }
+            else
             if (callbackStruct.event_name.equals(eventNames[INTERFACE_CHANGE])) {
                 deviceInterface = new DeviceInterface(callbackStruct.device);
             }
             else {
-                da = callbackStruct.device.read_attribute(callbackStruct.attr_name);
+                deviceAttribute = callbackStruct.device.read_attribute(callbackStruct.attr_name);
             }
             callbackStruct.setSynchronousDone(true);
 
@@ -603,7 +611,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         callbackStruct.event_name,
                         callbackStruct.event_type,
                         getSource(eventChannelStruct.consumer),
-                        da, info, null, deviceInterface, err);
+                        deviceAttribute, devicePipe,
+                        info, null, deviceInterface, err);
 
         if (callbackStruct.use_ev_queue) {
             EventQueue ev_queue = callbackStruct.device.getEventQueue();
@@ -642,6 +651,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         public void run() {
              //	Then read attribute
             DeviceAttribute deviceAttribute = null;
+            DevicePipe      devicePipe = null;
             AttributeInfoEx attributeInfo = null;
             DeviceInterface deviceInterface = null;
             DevError[] err = null;
@@ -653,6 +663,10 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             try {
                 if (cb_struct.event_type==INTERFACE_CHANGE) {
                     deviceInterface = new DeviceInterface(cb_struct.device);
+                }
+                else
+                if (cb_struct.event_type==PIPE_EVENT) {
+                    devicePipe = cb_struct.device.readPipe(cb_struct.attr_name);
                 }
                 else
                 if (cb_struct.event_type==ATT_CONF_EVENT) {
@@ -674,7 +688,9 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                             cb_struct.event_name,
                             cb_struct.event_type,
                             eventSource,
-                            deviceAttribute, attributeInfo, null, deviceInterface, err);
+                            deviceAttribute,
+                            devicePipe,
+                            attributeInfo, null, deviceInterface, err);
             if (cb_struct.use_ev_queue) {
                 EventQueue ev_queue = cb_struct.device.getEventQueue();
                 ev_queue.insert_event(event_data);
