@@ -220,7 +220,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         //	read attribute or callback execution a little bit long.
         if ((event == CHANGE_EVENT) ||
                 (event == PERIODIC_EVENT) ||
-                (event == QUALITY_EVENT) ||
+                (event == PIPE_EVENT) ||
                 (event == ARCHIVE_EVENT) ||
                 (event == USER_EVENT) ||
                 (event == INTERFACE_CHANGE) ||
