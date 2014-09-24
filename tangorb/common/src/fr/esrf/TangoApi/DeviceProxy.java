@@ -2037,7 +2037,9 @@ public class DeviceProxy extends Connection implements ApiDefs {
                         return 800;
                 }
                 return 700;
-        }
+             case 5:
+			 	return 900;
+       }
 
         //  Not found
         return 0;
