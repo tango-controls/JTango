@@ -32,10 +32,10 @@
 //-======================================================================
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevPipeBlob;
-import fr.esrf.Tango.DevPipeData;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
+import fr.esrf.TangoDs.TangoConst;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -43,8 +43,8 @@ import fr.esrf.Tango.TimeVal;
  * It contains an object name, a read time and a PipeBlob containing data.
  */
 
-
-public class DevicePipe {
+//@NotThreadSafe
+public class DevicePipe implements PipeScanner {
     private String pipeName = "";
     private TimeVal  timeVal;
     private PipeBlob pipeBlob;
@@ -62,6 +62,7 @@ public class DevicePipe {
         int usec = (int)(t-(1000*sec))*1000;
         this.timeVal  = new TimeVal(sec, usec, 0);
         this.pipeBlob = pipeBlob;
+        size = pipeBlob.size();
     }
     // ===================================================================
     /**
@@ -73,6 +74,7 @@ public class DevicePipe {
         this.pipeName = pipeData.name;
         this.timeVal  = pipeData.time;
         this.pipeBlob = new PipeBlob(pipeData.data_blob);
+        size = this.pipeBlob.size();
     }
     // ===================================================================
     // ===================================================================
@@ -162,6 +164,157 @@ public class DevicePipe {
     public long getTimeValMillisSec() throws DevFailed {
         return (long)timeVal.tv_sec*1000 + timeVal.tv_usec/1000;
     }
+
+    private final int size;
+    private final AtomicInteger blobNdx = new AtomicInteger(0);
+    private final AtomicInteger ndx = new AtomicInteger(0);
+
+    @Override
+    public boolean hasNext() {
+        return ndx.get() < size;
+    }
+
+    @Override
+    public boolean nextBoolean() throws DevFailed {
+        boolean[] data = new boolean[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public byte nextByte() throws DevFailed {
+        byte[] data = new byte[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public char nextChar() throws DevFailed {
+        char[] data = new char[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public short nextShort() throws DevFailed {
+        short[] data = new short[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public int nextInt() throws DevFailed {
+        int[] data = new int[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public long nextLong() throws DevFailed {
+        long[] data = new long[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public float nextFloat() throws DevFailed {
+        float[] data = new float[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public double nextDouble() throws DevFailed {
+        double[] data = new double[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public String nextString() throws DevFailed {
+        String[] data = new String[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public DevState nextState() throws DevFailed {
+        DevState[] data = new DevState[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    @Override
+    public DevEncoded nextEncoded() throws DevFailed {
+        DevEncoded[] data = new DevEncoded[1];
+        nextArray(data,1);
+        return data[0];
+    }
+
+    private PipeBlob nextBlob() throws DevFailed{
+        PipeBlob blob = getPipeBlob();
+        if(blob.get(ndx.get()).getType() != TangoConst.Tango_DEV_PIPE_BLOB) return blob;
+        //TODO
+        return null;
+    }
+
+    @Override
+    public <T> void nextArray(T[] target, int size) throws DevFailed {
+        nextArray((Object) target, size);
+    }
+
+    private void nextArray(Object target, int size) throws DevFailed {
+        if(!hasNext()) throw new IllegalStateException("EOF pipe has reached!");
+        PipeDataElement el = nextBlob().get(ndx.getAndIncrement() - blobNdx.get());
+        //TODO check type
+        Object array = null;
+        switch(el.getType()) {
+            case TangoConst.Tango_DEV_PIPE_BLOB:
+                throw new IllegalStateException("Unexpected state! Blobs are not welcome here...");
+            case TangoConst.Tango_DEV_BOOLEAN:
+                array = el.extractBooleanArray();
+                break;
+            case TangoConst.Tango_DEV_CHAR:
+                array = el.extractCharArray();
+                break;
+            case TangoConst.Tango_DEV_UCHAR:
+                array = el.extractUCharArray();
+                break;
+            case TangoConst.Tango_DEV_SHORT:
+                array = el.extractShortArray();
+                break;
+            case TangoConst.Tango_DEV_USHORT:
+                array = el.extractUShortArray();
+                break;
+            case TangoConst.Tango_DEV_LONG:
+                array = el.extractLongArray();
+                break;
+            case TangoConst.Tango_DEV_ULONG:
+                array = el.extractULongArray();
+                break;
+            case TangoConst.Tango_DEV_LONG64:
+                array = el.extractLong64Array();
+                break;
+            case TangoConst.Tango_DEV_DOUBLE:
+                array = el.extractDoubleArray();
+                break;
+            case TangoConst.Tango_DEV_FLOAT:
+                array = el.extractFloatArray();
+                break;
+            case TangoConst.Tango_DEV_STRING:
+                array = el.extractStringArray();
+                break;
+            case TangoConst.Tango_DEV_STATE:
+                array = el.extractDevStateArray();
+                break;
+            case TangoConst.Tango_DEV_ENCODED:
+                array = el.extractDevEncodedArray();
+                break;
+        }
+        //TODO avoid copying?
+        System.arraycopy(array,0,target,0,size);
+    }
+
     // ===================================================================
     // ===================================================================
 
