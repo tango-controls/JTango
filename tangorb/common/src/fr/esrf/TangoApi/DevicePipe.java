@@ -35,6 +35,7 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.TangoConst;
 
+import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -45,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 //@NotThreadSafe
 public class DevicePipe implements PipeScanner {
+    private static final DevError[] DEV_ERRORS = new DevError[0];
     private String pipeName = "";
     private TimeVal  timeVal;
     private PipeBlob pipeBlob;
@@ -166,7 +168,6 @@ public class DevicePipe implements PipeScanner {
     }
 
     private final int size;
-    private final AtomicInteger blobNdx = new AtomicInteger(0);
     private final AtomicInteger ndx = new AtomicInteger(0);
 
     @Override
@@ -175,144 +176,155 @@ public class DevicePipe implements PipeScanner {
     }
 
     @Override
+    public void move() {
+        ndx.incrementAndGet();
+    }
+
+    @Override
+    public void advance(int steps) {
+        if(ndx.addAndGet(steps) >= size) throw new IllegalArgumentException("Can not advance by " + steps + ": exceeds size of " + size);
+    }
+
+    @Override
+    public void reset() {
+        ndx.set(0);
+    }
+
+    @Override
     public boolean nextBoolean() throws DevFailed {
-        boolean[] data = new boolean[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != boolean.class) throw new DevFailed("Wrong type! Expected boolean, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getBoolean(array, 0);
     }
 
     @Override
     public byte nextByte() throws DevFailed {
-        byte[] data = new byte[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != byte.class) throw new DevFailed("Wrong type! Expected byte, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getByte(array, 0);
     }
 
     @Override
     public char nextChar() throws DevFailed {
-        char[] data = new char[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != char.class) throw new DevFailed("Wrong type! Expected char, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getChar(array, 0);
     }
 
     @Override
     public short nextShort() throws DevFailed {
-        short[] data = new short[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != short.class) throw new DevFailed("Wrong type! Expected short, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getShort(array, 0);
     }
 
     @Override
     public int nextInt() throws DevFailed {
-        int[] data = new int[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != int.class) throw new DevFailed("Wrong type! Expected int, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getInt(array, 0);
     }
 
     @Override
     public long nextLong() throws DevFailed {
-        long[] data = new long[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != long.class) throw new DevFailed("Wrong type! Expected long, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getLong(array,0);
     }
 
     @Override
     public float nextFloat() throws DevFailed {
-        float[] data = new float[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != float.class) throw new DevFailed("Wrong type! Expected float, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getFloat(array,0);
     }
 
     @Override
     public double nextDouble() throws DevFailed {
-        double[] data = new double[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != double.class) throw new DevFailed("Wrong type! Expected double, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return Array.getDouble(array,0);
     }
 
     @Override
     public String nextString() throws DevFailed {
-        String[] data = new String[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != String.class) throw new DevFailed("Wrong type! Expected String, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return String.class.cast(Array.get(array, 0));
     }
 
     @Override
     public DevState nextState() throws DevFailed {
-        DevState[] data = new DevState[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != DevState.class) throw new DevFailed("Wrong type! Expected DevState, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return DevState.class.cast(Array.get(array, 0));
     }
 
     @Override
     public DevEncoded nextEncoded() throws DevFailed {
-        DevEncoded[] data = new DevEncoded[1];
-        nextArray(data,1);
-        return data[0];
+        Object array = nextArray();
+        if(array.getClass().getComponentType() != DevEncoded.class) throw new DevFailed("Wrong type! Expected DevEncoded, but was " +  array.getClass().getComponentType().getSimpleName(),DEV_ERRORS);
+        return DevEncoded.class.cast(Array.get(array, 0));
     }
 
-    private PipeBlob nextBlob() throws DevFailed{
+    @Override
+    public PipeScanner nextScanner() throws DevFailed{
         PipeBlob blob = getPipeBlob();
-        if(blob.get(ndx.get()).getType() != TangoConst.Tango_DEV_PIPE_BLOB) return blob;
-        //TODO
-        return null;
+        PipeDataElement el = blob.get(ndx.getAndIncrement());
+        if(el.getType() != TangoConst.Tango_DEV_PIPE_BLOB) throw new DevFailed("Wrong type! Expected PipeBlob, but was " +  TangoConst.Tango_CmdArgTypeName[el.getType()], DEV_ERRORS);
+        return new DevicePipe(pipeName,el.extractPipeBlob());
     }
 
     @Override
     public <T> void nextArray(T[] target, int size) throws DevFailed {
-        nextArray((Object) target, size);
+        Object array = nextArray();
+        if(Array.getLength(array) != size) throw new DevFailed("size is not equal to array's length: " + size + "!=" +Array.getLength(array),DEV_ERRORS);
+        if(target.getClass().getComponentType() != array.getClass().getComponentType()) throw new DevFailed("target array type " + target.getClass().getComponentType() + " does not match underlying array type " + array.getClass().getComponentType(), new DevError[0]);
+        System.arraycopy(array,0,target,0,size);
     }
 
-    private void nextArray(Object target, int size) throws DevFailed {
-        if(!hasNext()) throw new IllegalStateException("EOF pipe has reached!");
-        PipeDataElement el = nextBlob().get(ndx.getAndIncrement() - blobNdx.get());
-        //TODO check type
-        Object array = null;
+    @Override
+    public void nextArray(Object target, int size) throws DevFailed {
+        Object array = nextArray();
+        if(Array.getLength(array) != size) throw new DevFailed("size is not equal to array's length: " + size + "!=" +Array.getLength(array),DEV_ERRORS);
+        if(target.getClass().getComponentType() != array.getClass().getComponentType()) throw new DevFailed("target array type " + target.getClass().getComponentType() + " does not match underlying array type " + array.getClass().getComponentType(),DEV_ERRORS);
+        System.arraycopy(array,0,target,0,size);
+    }
+
+    private Object nextArray() throws DevFailed {
+        if(!hasNext()) throw new DevFailed("EOF pipe has reached!",DEV_ERRORS);
+        PipeDataElement el = getPipeBlob().get(ndx.getAndIncrement());
         switch(el.getType()) {
             case TangoConst.Tango_DEV_PIPE_BLOB:
-                throw new IllegalStateException("Unexpected state! Blobs are not welcome here...");
+                throw new DevFailed("Unexpected state! Blobs are not welcome here...",DEV_ERRORS);
             case TangoConst.Tango_DEV_BOOLEAN:
-                array = el.extractBooleanArray();
-                break;
+                return el.extractBooleanArray();
             case TangoConst.Tango_DEV_CHAR:
-                array = el.extractCharArray();
-                break;
+                return el.extractCharArray();
             case TangoConst.Tango_DEV_UCHAR:
-                array = el.extractUCharArray();
-                break;
+                return el.extractUCharArray();
             case TangoConst.Tango_DEV_SHORT:
-                array = el.extractShortArray();
-                break;
+                return el.extractShortArray();
             case TangoConst.Tango_DEV_USHORT:
-                array = el.extractUShortArray();
-                break;
+                return el.extractUShortArray();
             case TangoConst.Tango_DEV_LONG:
-                array = el.extractLongArray();
-                break;
+                return el.extractLongArray();
             case TangoConst.Tango_DEV_ULONG:
-                array = el.extractULongArray();
-                break;
+                return el.extractULongArray();
             case TangoConst.Tango_DEV_LONG64:
-                array = el.extractLong64Array();
-                break;
+                return el.extractLong64Array();
             case TangoConst.Tango_DEV_DOUBLE:
-                array = el.extractDoubleArray();
-                break;
+                return el.extractDoubleArray();
             case TangoConst.Tango_DEV_FLOAT:
-                array = el.extractFloatArray();
-                break;
+                return el.extractFloatArray();
             case TangoConst.Tango_DEV_STRING:
-                array = el.extractStringArray();
-                break;
+                return el.extractStringArray();
             case TangoConst.Tango_DEV_STATE:
-                array = el.extractDevStateArray();
-                break;
+                return el.extractDevStateArray();
             case TangoConst.Tango_DEV_ENCODED:
-                array = el.extractDevEncodedArray();
-                break;
+                return el.extractDevEncodedArray();
         }
-        //TODO avoid copying?
-        System.arraycopy(array,0,target,0,size);
+        throw new AssertionError("Unreachable statement");
     }
 
     // ===================================================================

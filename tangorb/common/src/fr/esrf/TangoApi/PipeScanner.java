@@ -38,30 +38,15 @@ import fr.esrf.Tango.DevState;
 
 /**
  * This interface provides a way for users to read from {@link DevicePipe} objects in a convenient way.
- *
- * Note that inner blobs are considered as top level blobs, i.e.
- *
- * <pre>
- *     Blob = {123, 3.14, Blob {"Hello"," world"}, "!!!"}
- * </pre>
- *
- * must be read as:
- *
- * <pre>
- *     pipe.nextInt();pipe.nextDouble();pipe.nextString();pipe.nextString();pipe.nextString()
- * </pre>
- *
- * the result of the code above is obviously: 123,3.14,Hello, World,!!!
  * <p>
- * Also note that this interface narrows down possible output types to the java types, i.e. if one needs to read
+ * Note that this interface narrows down possible output types to the java types, i.e. if one needs to read
  * DevUShort one should invoke nextInt()[or nextLong()]
  * </p>
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
  * @since 01.10.14
  */
 public interface PipeScanner {
-    boolean hasNext();
-    //TODO can we avoid throws?
+    //data extraction methods
     boolean nextBoolean() throws DevFailed;
     byte nextByte() throws DevFailed;
     char nextChar() throws DevFailed;
@@ -73,6 +58,32 @@ public interface PipeScanner {
     String nextString() throws DevFailed;
     DevState nextState() throws DevFailed;
     DevEncoded nextEncoded() throws DevFailed;
+    PipeScanner nextScanner() throws DevFailed;
 
     <T> void nextArray(T[] target, int size) throws DevFailed;
+
+    //TODO replace this with explicit methods, i.e. nextArray(float[])?
+    void nextArray(Object target, int size) throws DevFailed;
+    //convenience methods
+    /**
+     * Checks whether there are still elements in the underlying {@link PipeBlob}
+     *
+     * @return true if yes, otherwise - false
+     */
+    boolean hasNext();
+    /**
+     * Increments inner counter
+     */
+    void move();
+
+    /**
+     * Increments inner counter by value
+     *
+     * @param steps
+     */
+    void advance(int steps);
+    /**
+     * Resets inner counter so nextXXX method should be called as this Scanner is just created
+     */
+    void reset();
 }
