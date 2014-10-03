@@ -34,6 +34,7 @@ import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.utils.DevFailedUtils;
 
+import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.TangoConst;
@@ -72,6 +73,17 @@ public final class ProxyAttribute implements IAttributeBehavior {
         this.isReadyOnly = isReadyOnly;
         proxy = new TangoAttribute(attributeProxyName);
         ac = TangoConverter.toAttributeConfiguration(proxy.getAttributeProxy().get_info());
+        final int type = ac.getTangoType();
+        final AttrDataFormat format = ac.getFormat();
+        // Fix: client api returns a different type that the server must provide
+        if (type == TangoConst.Tango_DEV_UCHAR) {
+            ac.setTangoType(TangoConst.Tango_DEV_SHORT, format);
+        } else if (type == TangoConst.Tango_DEV_USHORT) {
+            ac.setTangoType(TangoConst.Tango_DEV_LONG, format);
+        } else if (type == TangoConst.Tango_DEV_ULONG) {
+            ac.setTangoType(TangoConst.Tango_DEV_LONG64, format);
+        }
+        ac.getAttributeProperties().setDescription("proxied from " + attributeProxyName);
         ac.setName(attributeName);
         if (isReadyOnly) {
             ac.setWritable(AttrWriteType.READ);
@@ -95,14 +107,9 @@ public final class ProxyAttribute implements IAttributeBehavior {
     @Override
     public AttributeValue getValue() throws DevFailed {
         if (autoUpdate) {
-            // Read value on proxy
-            if (proxy.getDeviceAttribute().getType() == TangoConst.Tango_DEV_USHORT) {
-                // Fix: client api returns a int while server must provide a short
-                readValue.setValue(proxy.read(short.class));
-            } else {
-                readValue.setValue(proxy.read());
-            }
+            readValue.setValue(proxy.read());
             readValue.setQuality(proxy.getDeviceAttribute().getQuality());
+            readValue.setTime(proxy.getTimestamp());
         }
         return readValue;
     }

@@ -33,6 +33,7 @@ import org.tango.server.command.CommandConfiguration;
 import org.tango.server.command.ICommandBehavior;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.TangoConst;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -59,23 +60,39 @@ public final class ProxyCommand implements ICommandBehavior {
      * @throws DevFailed
      */
     public ProxyCommand(final String commandName, final String commandProxyName) throws DevFailed {
-	proxy = new TangoCommand(commandProxyName);
-	cc = new CommandConfiguration();
-	cc.setName(commandName);
-	cc.setInTangoType(proxy.getArginType());
-	cc.setOutTangoType(proxy.getArgoutType());
-	cc.setInTypeDesc("proxied from " + proxy.getCommandName());
-	cc.setOutTypeDesc("proxied from " + proxy.getCommandName());
+        proxy = new TangoCommand(commandProxyName);
+        cc = new CommandConfiguration();
+        cc.setName(commandName);
+        final int arginType = proxy.getArginType();
+
+        cc.setInTangoType(arginType);
+        // Fix: client api returns a different type that the server must provide
+        final int argoutType = proxy.getArgoutType();
+        if (argoutType == TangoConst.Tango_DEV_UCHAR) {
+            cc.setOutTangoType(TangoConst.Tango_DEV_SHORT);
+        } else if (argoutType == TangoConst.Tango_DEV_USHORT) {
+            cc.setOutTangoType(TangoConst.Tango_DEV_LONG);
+        } else if (argoutType == TangoConst.Tango_DEVVAR_USHORTARRAY) {
+            cc.setOutTangoType(TangoConst.Tango_DEVVAR_LONGARRAY);
+        } else if (argoutType == TangoConst.Tango_DEV_ULONG) {
+            cc.setOutTangoType(TangoConst.Tango_DEV_LONG64);
+        } else if (argoutType == TangoConst.Tango_DEVVAR_ULONGARRAY) {
+            cc.setOutTangoType(TangoConst.Tango_DEVVAR_ULONG64ARRAY);
+        } else {
+            cc.setOutTangoType(argoutType);
+        }
+        cc.setInTypeDesc("proxied from " + proxy.getCommandName());
+        cc.setOutTypeDesc("proxied from " + proxy.getCommandName());
     }
 
     @Override
     public StateMachineBehavior getStateMachine() {
-	return null;
+        return null;
     }
 
     @Override
     public CommandConfiguration getConfiguration() {
-	return cc;
+        return cc;
     }
 
     /**
@@ -87,6 +104,6 @@ public final class ProxyCommand implements ICommandBehavior {
      */
     @Override
     public Object execute(final Object arg) throws DevFailed {
-	return proxy.executeExtract(arg);
+        return proxy.executeExtract(arg);
     }
 }
