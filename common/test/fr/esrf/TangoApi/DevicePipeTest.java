@@ -17,19 +17,20 @@ public class DevicePipeTest {
 
     @Before
     public void before() throws Exception{
-        PipeBlob child = new PipeBlob("Name / Age");
-        child.add(new PipeDataElement("Chloe", 30));
-        child.add(new PipeDataElement("Nicolas", 28));
-        child.add(new PipeDataElement("Auxane", 21));
+        PipeBlobBuilder childBuilder = new PipeBlobBuilder("Name / Age");
+
+        childBuilder.add("Chloe", 30);
+        childBuilder.add("Nicolas", 28);
+        childBuilder.add("Auxane", 21);
 
         //  Build the main blob and insert inner one
-        PipeBlob  pipeBlob = new PipeBlob("Pascal");
-        pipeBlob.add(new PipeDataElement("City",     "Grenoble"));
-        pipeBlob.add(new PipeDataElement("Values",   new float[]{1.23f, 4.56f, 7.89f}));
-        pipeBlob.add(new PipeDataElement("Children", child));
-        pipeBlob.add(new PipeDataElement("Status",   DevState.RUNNING));
+        PipeBlobBuilder blobBuilder =  new PipeBlobBuilder("Pascal");
+        blobBuilder.add("City",     "Grenoble");
+        blobBuilder.add("Values",   new float[]{1.23f, 4.56f, 7.89f});
+        blobBuilder.add("Children", childBuilder.build());
+        blobBuilder.add("Status",   DevState.RUNNING);
 
-        blob = pipeBlob;
+        blob = blobBuilder.build();
     }
 
     @Test
