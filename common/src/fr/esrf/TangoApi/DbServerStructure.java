@@ -339,17 +339,26 @@ public class DbServerStructure {
             }
 
             //  Get pipe list
-            List<String> pipeNames = database.getClassPipeList(name);
-            for (String pipeName : pipeNames) {
-                //  Read pipe properties
-                DbPipe dbPipe = database.getClassPipeProperties(name, pipeName);
-                for (DbDatum datum : dbPipe) {
-                    if (!datum.is_empty()) {
-                        TangoPipe pipe = new TangoPipe(pipeName);
-                        pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
-                        pipes.add(pipe);
+            try {
+                List<String> pipeNames = database.getClassPipeList(name);
+                for (String pipeName : pipeNames) {
+                    //  Read pipe properties
+                    DbPipe dbPipe = database.getClassPipeProperties(name, pipeName);
+                    for (DbDatum datum : dbPipe) {
+                        if (!datum.is_empty()) {
+                            TangoPipe pipe = new TangoPipe(pipeName);
+                            pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
+                            pipes.add(pipe);
+                        }
                     }
                 }
+            }
+            catch (DevFailed e) {
+                //  Database server manage pipes ?
+                if (e.errors[0].reason.equals("API_CommandNotFound"))
+                    System.err.println(e.errors[0].desc);
+                else
+                    throw e;
             }
 
             //  Build devices
@@ -414,19 +423,28 @@ public class DbServerStructure {
         }
         //===========================================================
         private void putPipeProperties(Database database) throws DevFailed {
-            ArrayList<DbPipe>  dbPipeList = new ArrayList<DbPipe>();
-            if (dbPipeList.size()>0) {
-                //  Build the DbDAttribute list for the class
-                for (TangoPipe pipe : pipes) {
-                    if (pipe.size()>0) {
-                        DbPipe    dbPipe = new DbPipe(name);
-                        for (TangoProperty property : pipe) {
-                            dbPipe.add(new DbDatum(property.name, property.values));
+            try {
+                ArrayList<DbPipe>  dbPipeList = new ArrayList<DbPipe>();
+                if (dbPipeList.size()>0) {
+                    //  Build the DbDAttribute list for the class
+                    for (TangoPipe pipe : pipes) {
+                        if (pipe.size()>0) {
+                            DbPipe    dbPipe = new DbPipe(name);
+                            for (TangoProperty property : pipe) {
+                                dbPipe.add(new DbDatum(property.name, property.values));
+                            }
+                            dbPipeList.add(dbPipe);
                         }
-                        dbPipeList.add(dbPipe);
                     }
+                    database.putClassPipeProperty(name, dbPipeList);
                 }
-                database.putClassPipeProperty(name, dbPipeList);
+            }
+            catch (DevFailed e) {
+                //  Database server manage pipes ?
+                if (e.errors[0].reason.equals("API_CommandNotFound"))
+                    System.err.println(e.errors[0].desc);
+                else
+                    throw e;
             }
         }
         //===========================================================
@@ -521,18 +539,27 @@ public class DbServerStructure {
                     }
                 }
             }
-           //  get pipe list from Db
-            List<String> pipeNames  = database.getDevicePipeList(name);
-            for (String pipeName : pipeNames) {
-                //  Read attribute properties
-                DbPipe dbPipe = database.getDevicePipeProperties(name, pipeName);
-                for (DbDatum datum : dbPipe) {
-                    if (!datum.is_empty()) {
-                        TangoPipe pipe = new TangoPipe(pipeName);
-                        pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
-                        pipes.add(pipe);
+            try {
+                //  get pipe list from Db
+                List<String> pipeNames  = database.getDevicePipeList(name);
+                for (String pipeName : pipeNames) {
+                    //  Read attribute properties
+                    DbPipe dbPipe = database.getDevicePipeProperties(name, pipeName);
+                    for (DbDatum datum : dbPipe) {
+                        if (!datum.is_empty()) {
+                            TangoPipe pipe = new TangoPipe(pipeName);
+                            pipe.add(new TangoProperty(datum.name, datum.extractStringArray()));
+                            pipes.add(pipe);
+                        }
                     }
                 }
+            }
+            catch (DevFailed e) {
+                //  Database server manage pipes ?
+                if (e.errors[0].reason.equals("API_CommandNotFound"))
+                    System.err.println(e.errors[0].desc);
+                else
+                    throw e;
             }
         }
         //===========================================================
@@ -590,19 +617,28 @@ public class DbServerStructure {
         }
         //===========================================================
         private void putPipeProperties(Database database) throws DevFailed {
-            ArrayList<DbPipe> dbPipeList = new ArrayList<DbPipe>();
-            if (pipes.size()>0) {
-                //  Build the DbPipe list for the class
-                for (TangoPipe pipe : pipes) {
-                    if (pipe.size()>0) {
-                        DbPipe dbPipe = new DbPipe(pipe.name);
-                        for (TangoProperty property : pipe) {
-                            dbPipe.add(new DbDatum(property.name, property.values));
+            try {
+                ArrayList<DbPipe> dbPipeList = new ArrayList<DbPipe>();
+                if (pipes.size()>0) {
+                    //  Build the DbPipe list for the class
+                    for (TangoPipe pipe : pipes) {
+                        if (pipe.size()>0) {
+                            DbPipe dbPipe = new DbPipe(pipe.name);
+                            for (TangoProperty property : pipe) {
+                                dbPipe.add(new DbDatum(property.name, property.values));
+                            }
+                            dbPipeList.add(dbPipe);
                         }
-                        dbPipeList.add(dbPipe);
                     }
+                    database.putDevicePipeProperty(name, dbPipeList);
                 }
-                database.putDevicePipeProperty(name, dbPipeList);
+            }
+            catch (DevFailed e) {
+                //  Database server manage pipes ?
+                if (e.errors[0].reason.equals("API_CommandNotFound"))
+                    System.err.println(e.errors[0].desc);
+                else
+                    throw e;
             }
         }
         //===========================================================
