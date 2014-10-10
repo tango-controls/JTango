@@ -1,3 +1,7 @@
+1.1.6
+-----
+- dynamic attribute: fix timestamp. Dynamic attr and cmd: fix bug for unsigned types.
+
 1.1.5
 -----
 - fix timestamp management. In some cases timestamp set in the device was not send to client. 
