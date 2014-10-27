@@ -106,9 +106,7 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @throws DevFailed
      */
     public void setValue(final Object value) throws DevFailed {
-        if (time == 0) {
-            time = System.currentTimeMillis();
-        }
+        time = System.currentTimeMillis();
         if (value != null) {
             if (!value.getClass().isArray()) { // SCALAR
                 // check if this value can be an attribute value
@@ -157,9 +155,6 @@ public final class AttributeValue implements Cloneable, Serializable {
     }
 
     void setValueWithoutDim(final Object value) throws DevFailed {
-        if (time == 0) {
-            time = System.currentTimeMillis();
-        }
         this.value = value;
     }
 
