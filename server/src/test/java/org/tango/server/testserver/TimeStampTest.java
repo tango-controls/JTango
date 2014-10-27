@@ -25,9 +25,11 @@
 package org.tango.server.testserver;
 
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.tango.clientapi.TangoAttribute;
@@ -42,4 +44,19 @@ public class TimeStampTest extends NoDBDeviceManager {
         assertThat(att.getTimestamp(), equalTo(123456L));
     }
 
+    @Test
+    public void testReadTimestampDouble() throws DevFailed {
+        try {
+            final TangoAttribute att = new TangoAttribute(deviceName + "/doubleScalar");
+
+            att.read();
+            final long time1 = att.getTimestamp();
+            att.read();
+            final long time2 = att.getTimestamp();
+            assertThat(time1, not(time2));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
+    }
 }
