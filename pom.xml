@@ -25,9 +25,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://svn.code.sf.net/p/tango-ds/code/api/java/common/JTangoCommons/trunk</connection>
+    <connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</connection>
     <developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</developerConnection>
-    <url>https://svn.code.sf.net/p/tango-ds/code/api/java/common/JTangoCommons/trunk</url>
+    <url>https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</url>
   </scm>
   <dependencies>
     <dependency>
