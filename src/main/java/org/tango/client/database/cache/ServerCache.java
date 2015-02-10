@@ -268,6 +268,7 @@ public final class ServerCache {
             // admin device not defined in db (second one
             // being "Not found"))
             // reset default timeout
+            // TODO pipes
             this.database.set_timeout_millis(3000);
         }
     }

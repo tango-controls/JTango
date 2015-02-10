@@ -153,17 +153,7 @@ public final class NoCacheDatabase implements ICachableDatabase {
      */
     @Override
     public void setDeviceProperties(final String deviceName, final Map<String, String[]> properties) throws DevFailed {
-        final List<String> args = new ArrayList<String>();
-        args.add(deviceName);
-        args.add(Integer.toString(properties.size()));
-        for (final Map.Entry<String, String[]> entry : properties.entrySet()) {
-            args.add(entry.getKey());
-            final String[] propValues = entry.getValue();
-            args.add(Integer.toString(propValues.length));
-            for (final String propValue : propValues) {
-                args.add(propValue);
-            }
-        }
+        final List<String> args = getArray(properties, deviceName);
         final DeviceData argin = new DeviceData();
         argin.insert(args.toArray(new String[args.size()]));
         database.command_inout("DbPutDeviceProperty", argin);
@@ -201,17 +191,7 @@ public final class NoCacheDatabase implements ICachableDatabase {
      */
     @Override
     public void setClassProperties(final String name, final Map<String, String[]> properties) throws DevFailed {
-        final List<String> args = new ArrayList<String>();
-        args.add(name);
-        args.add(Integer.toString(properties.size()));
-        for (final Map.Entry<String, String[]> entry : properties.entrySet()) {
-            args.add(entry.getKey());
-            final String[] propValues = entry.getValue();
-            args.add(Integer.toString(propValues.length));
-            for (final String propValue : propValues) {
-                args.add(propValue);
-            }
-        }
+        final List<String> args = getArray(properties, name);
         final DeviceData argin = new DeviceData();
         argin.insert(args.toArray(new String[args.size()]));
         database.command_inout("DbPutClassProperty", argin);
@@ -391,6 +371,18 @@ public final class NoCacheDatabase implements ICachableDatabase {
     }
 
     @Override
+    public void deleteDevicePipeProperties(final String deviceName, final String... pipeNames) throws DevFailed {
+        final DeviceData argin = new DeviceData();
+        if (pipeNames == null || pipeNames.length == 0) {
+            // delete all properties of the device
+            argin.insert(new String[] { deviceName, "*" });
+        } else {
+            argin.insert((String[]) ArrayUtils.add(pipeNames, 0, deviceName));
+        }
+        database.command_inout("DbDeleteAllDevicePipeProperty", argin);
+    }
+
+    @Override
     public void loadCache(final String serverName, final String hostName) throws DevFailed {
     }
 
@@ -456,5 +448,63 @@ public final class NoCacheDatabase implements ICachableDatabase {
             result = deviceData.extractStringArray()[4];
         }
         return result;
+    }
+
+    @Override
+    public Map<String, String[]> getDevicePipeProperties(final String deviceName, final String pipeName)
+            throws DevFailed {
+        final DeviceData argin = new DeviceData();
+        argin.insert(new String[] { deviceName, pipeName });
+        final DeviceData argout = database.command_inout("DbGetDevicePipeProperty", argin);
+        final String[] result = argout.extractStringArray();
+        return extractArgout(result, 4);
+    }
+
+    @Override
+    public void setDevicePipeProperties(final String deviceName, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        // argin desc: Str[0] = Device name,Str[1] = Pipe number,Str[2] = Pipe name
+        final List<String> args = getArray(properties, deviceName, "1", pipeName);
+        final DeviceData argin = new DeviceData();
+        final String[] array = args.toArray(new String[args.size()]);
+        argin.insert(array);
+        database.command_inout("DbPutDevicePipeProperty", argin);
+    }
+
+    @Override
+    public Map<String, String[]> getClassPipeProperties(final String className, final String pipeName) throws DevFailed {
+        final DeviceData argin = new DeviceData();
+        argin.insert(new String[] { className, pipeName });
+        final DeviceData argout = database.command_inout("DbGetClassPipeProperty", argin);
+        final String[] result = argout.extractStringArray();
+        return extractArgout(result, 2);
+    }
+
+    @Override
+    public void setClassPipeProperties(final String className, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        final List<String> args = getArray(properties, className);
+        final DeviceData argin = new DeviceData();
+        argin.insert(args.toArray(new String[args.size()]));
+        database.command_inout("DbPutClassPipeProperty", argin);
+
+    }
+
+    private List<String> getArray(final Map<String, String[]> properties, final String... start) {
+        final List<String> args = new ArrayList<String>();
+        for (int i = 0; i < start.length; i++) {
+            args.add(start[i]);
+        }
+
+        args.add(Integer.toString(properties.size()));
+        for (final Map.Entry<String, String[]> entry : properties.entrySet()) {
+            args.add(entry.getKey());
+            final String[] propValues = entry.getValue();
+            args.add(Integer.toString(propValues.length));
+            for (final String propValue : propValues) {
+                args.add(propValue);
+            }
+        }
+        return args;
     }
 }

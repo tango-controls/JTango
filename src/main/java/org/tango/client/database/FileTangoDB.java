@@ -321,11 +321,45 @@ public final class FileTangoDB implements ITangoDB {
      */
     @Override
     public String[] getPossibleTangoHosts() {
-        return new String[] { "" };
+        return new String[] { "nodb" };
     }
 
     @Override
     public String getFreeProperty(final String name, final String propertyName) {
         return "";
     }
+
+    @Override
+    public Map<String, String[]> getDevicePipeProperties(final String deviceName, final String pipeName)
+            throws DevFailed {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setDevicePipeProperties(final String deviceName, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Map<String, String[]> getClassPipeProperties(final String className, final String pipeName) throws DevFailed {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setClassPipeProperties(final String className, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void deleteDevicePipeProperties(final String deviceName, final String... pipeNames) throws DevFailed {
+        // TODO Auto-generated method stub
+
+    }
+
 }

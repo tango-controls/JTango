@@ -245,4 +245,33 @@ public final class Database implements ITangoDB {
         return cache.getFreeProperty(name, propertyName);
     }
 
+    @Override
+    public Map<String, String[]> getDevicePipeProperties(final String deviceName, final String pipeName)
+            throws DevFailed {
+        return cache.getDevicePipeProperties(deviceName, pipeName);
+    }
+
+    @Override
+    public void setDevicePipeProperties(final String deviceName, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        cache.setDevicePipeProperties(deviceName, pipeName, properties);
+    }
+
+    @Override
+    public Map<String, String[]> getClassPipeProperties(final String className, final String pipeName) throws DevFailed {
+        return cache.getClassPipeProperties(className, pipeName);
+    }
+
+    @Override
+    public void setClassPipeProperties(final String className, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        cache.setClassPipeProperties(className, pipeName, properties);
+    }
+
+    @Override
+    public void deleteDevicePipeProperties(final String deviceName, final String... pipeNames) throws DevFailed {
+        cache.deleteDevicePipeProperties(deviceName, pipeNames);
+
+    }
+
 }

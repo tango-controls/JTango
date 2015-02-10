@@ -32,7 +32,7 @@ public final class TangoGroupAttribute {
     }
 
     /**
-     * AttributesValuesRefreshingThread
+     * 
      * 
      * @param throwExceptions
      * @param attributeNames
