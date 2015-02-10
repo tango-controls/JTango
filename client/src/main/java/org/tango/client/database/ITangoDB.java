@@ -173,4 +173,24 @@ public interface ITangoDB {
 
     String getFreeProperty(String name, String propertyName) throws DevFailed;
 
+    /**
+     * 
+     */
+    Map<String, String[]> getDevicePipeProperties(String deviceName, String pipeName) throws DevFailed;
+
+    void setDevicePipeProperties(String deviceName, String pipeName, Map<String, String[]> properties) throws DevFailed;
+
+    Map<String, String[]> getClassPipeProperties(String className, String pipeName) throws DevFailed;
+
+    void setClassPipeProperties(String className, String pipeName, Map<String, String[]> properties) throws DevFailed;
+
+    void deleteDevicePipeProperties(String deviceName, String... pipeNames) throws DevFailed;
+
+    // List<String> getDevicePipeList(String deviceName, String wildcard) throws DevFailed;
+
+    // List<String> getClassPipeList(String className, String wildcard) throws DevFailed;
+    // void deleteDevicePipeProperties( String deviceName, String pipeName, List<String> propertyNames) throws DevFailed
+    // void deleteClassPipeProperties(String className, String pipeName, List<String> propertyNames) throws DevFailed
+    // void deleteDevicePipe( String deviceName, String pipeName) throws DevFailed
+    // void deleteClassPipe( String className, String pipeName)
 }
