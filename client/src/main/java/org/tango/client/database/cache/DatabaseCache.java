@@ -2,6 +2,7 @@ package org.tango.client.database.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,7 @@ import fr.esrf.TangoApi.Connection;
  * 
  */
 public final class DatabaseCache implements ICachableDatabase {
-    private static final String RELEASE_1_7 = "release 1.7";
-    private static final String RELEASE_1_8 = "release 1.8";
+    private static final String RELEASE_1_X = "release 1\\.[7-9]";
     private final Logger logger = LoggerFactory.getLogger(ServerCache.class);
     private ServerCache serverCache;
 
@@ -35,7 +35,7 @@ public final class DatabaseCache implements ICachableDatabase {
         final AttributeProxy attr = new AttributeProxy(database.get_device().name() + "/StoredProcedureRelease");
         version = attr.read().extractString();
         logger.debug("current database cache version {}", version);
-        if (version.equalsIgnoreCase(RELEASE_1_7) || version.equalsIgnoreCase(RELEASE_1_8)) {
+        if (Pattern.matches(RELEASE_1_X, version)) {
             isCacheAvailable = true;
         } else {
             isCacheAvailable = false;
@@ -246,6 +246,39 @@ public final class DatabaseCache implements ICachableDatabase {
     public String getFreeProperty(final String name, final String propertyName) throws DevFailed {
         // TODO get from cache
         return dbDevice.getFreeProperty(name, propertyName);
+    }
+
+    @Override
+    public Map<String, String[]> getDevicePipeProperties(final String deviceName, final String pipeName)
+            throws DevFailed {
+        // TODO cache
+        return dbDevice.getDevicePipeProperties(deviceName, pipeName);
+    }
+
+    @Override
+    public void setDevicePipeProperties(final String deviceName, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        // TODO cache
+        dbDevice.setDevicePipeProperties(deviceName, pipeName, properties);
+    }
+
+    @Override
+    public Map<String, String[]> getClassPipeProperties(final String className, final String pipeName) throws DevFailed {
+        // TODO cache
+        return dbDevice.getClassPipeProperties(className, pipeName);
+    }
+
+    @Override
+    public void setClassPipeProperties(final String className, final String pipeName,
+            final Map<String, String[]> properties) throws DevFailed {
+        // TODO cache
+        dbDevice.setClassPipeProperties(className, pipeName, properties);
+    }
+
+    @Override
+    public void deleteDevicePipeProperties(final String deviceName, final String... pipeNames) throws DevFailed {
+        // TODO cache
+        dbDevice.deleteDevicePipeProperties(deviceName, pipeNames);
     }
 
 }

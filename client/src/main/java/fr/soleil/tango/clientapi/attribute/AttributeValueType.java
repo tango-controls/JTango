@@ -67,7 +67,9 @@ public enum AttributeValueType {
     /**
  * 
  */
-    DEVENCODED(TangoConst.Tango_DEV_ENCODED, new Inserters.DevEncodedInserter(), new Extractors.DevEncodedExtractor());
+    DEVENCODED(TangoConst.Tango_DEV_ENCODED, new Inserters.DevEncodedInserter(), new Extractors.DevEncodedExtractor()),
+
+    DEVENUM(TangoConst.Tango_DEV_ENUM, new Inserters.ShortInserter(), new Extractors.ShortExtractor());
 
     private static final Map<Integer, IExtractor> EXTRACTORS_MAP = new HashMap<Integer, IExtractor>();
     private static final Map<Integer, IInserter> INSERTERS_MAP = new HashMap<Integer, IInserter>();
