@@ -19,67 +19,67 @@ public final class DevFailedUtils {
     }
 
     public static DevFailed newDevFailed(final String reason, final String desc) {
-	LOGGER.error("new DevFailed: {}, {}", reason, desc);
-	final DevFailed ex = new DevFailed(buildDevError(reason, desc, 3));
-	LOGGER.error("", ex);
-	return ex;
+        LOGGER.error("{}, {}", reason, desc);
+        final DevFailed ex = new DevFailed(buildDevError(reason, desc, 3));
+        LOGGER.error("", ex);
+        return ex;
     }
 
     public static DevFailed newDevFailed(final String msg) {
-	LOGGER.error("new DevFailed: {}", msg);
-	final DevFailed ex = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
-	LOGGER.error("", ex);
-	return ex;
+        LOGGER.error("{}", msg);
+        final DevFailed ex = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
+        LOGGER.error("", ex);
+        return ex;
     }
 
     public static void throwDevFailed(final String msg) throws DevFailed {
-	final DevFailed e = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
-	LOGGER.error("throwing DevFailed: {}", msg);
-	LOGGER.error("", e);
-	throw e;
+        final DevFailed e = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
+        LOGGER.error("{}", msg);
+        LOGGER.error("", e);
+        throw e;
     }
 
     public static void throwDevFailed(final String reason, final String desc) throws DevFailed {
-	final DevFailed e = new DevFailed(buildDevError(reason, desc, 3));
-	LOGGER.error("throwing DevFailed: {}, {}", reason, desc);
-	LOGGER.error("", e);
-	throw e;
+        final DevFailed e = new DevFailed(buildDevError(reason, desc, 3));
+        LOGGER.error("{}, {}", reason, desc);
+        LOGGER.error("", e);
+        throw e;
     }
 
     public static DevError[] buildDevError(final String reason, final String desc, final int stackLevel) {
-	final DevError[] err = new DevError[1];
-	err[0] = new DevError();
-	err[0].desc = desc;
-	err[0].severity = ErrSeverity.ERR;
-	err[0].reason = reason;
-	final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-	// for (final StackTraceElement element : stackTrace) {
-	// System.err.println(element.toString());
-	// }
-	err[0].origin = stackTrace[stackLevel].toString();
-	return err;
+        final DevError[] err = new DevError[1];
+        err[0] = new DevError();
+        err[0].desc = desc;
+        err[0].severity = ErrSeverity.ERR;
+        err[0].reason = reason;
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // for (final StackTraceElement element : stackTrace) {
+        // System.err.println(element.toString());
+        // }
+        err[0].origin = stackTrace[stackLevel].toString();
+        return err;
     }
 
     public static DevFailed newDevFailed(final Throwable origin) throws DevFailed {
-	final DevError[] err = new DevError[1];
-	err[0] = new DevError();
-	err[0].desc = origin.getClass().getCanonicalName();
-	err[0].severity = ErrSeverity.PANIC;
-	err[0].reason = "NA";
-	final StringWriter sw = new StringWriter();
-	origin.printStackTrace(new PrintWriter(sw));
-	err[0].origin = sw.toString();
-	final DevFailed e = new DevFailed(err);
-	// DevFailedUtils.printDevFailed(e);
+        final DevError[] err = new DevError[1];
+        err[0] = new DevError();
+        err[0].desc = origin.getClass().getCanonicalName();
+        err[0].severity = ErrSeverity.PANIC;
+        err[0].reason = "NA";
+        final StringWriter sw = new StringWriter();
+        origin.printStackTrace(new PrintWriter(sw));
+        err[0].origin = sw.toString();
+        final DevFailed e = new DevFailed(err);
+        // DevFailedUtils.printDevFailed(e);
 
-	return e;
+        return e;
     }
 
     public static void throwDevFailed(final Throwable origin) throws DevFailed {
-	final DevFailed e = newDevFailed(origin);
-	// LOGGER.error("exception origin {}, at {}", origin.getClass());
-	LOGGER.error("throwing DevFailed from ", origin);
-	throw e;
+        final DevFailed e = newDevFailed(origin);
+        // LOGGER.error("exception origin {}, at {}", origin.getClass());
+        LOGGER.error("throwing DevFailed from ", origin);
+        throw e;
     }
 
     /**
@@ -89,27 +89,27 @@ public final class DevFailedUtils {
      * @return
      */
     public static String toString(final DevFailed e) {
-	final StringBuilder buffer = new StringBuilder();
-	if (e.errors != null) {
-	    for (int i = 0; i < e.errors.length; i++) {
-		buffer.append("Error Level ").append(i).append(":\n");
-		buffer.append("\t - desc: ").append(e.errors[i].desc).append("\n");
-		buffer.append("\t - origin: ").append(e.errors[i].origin).append("\n");
-		buffer.append("\t - reason: ").append(e.errors[i].reason).append("\n");
-		String sev = "";
-		if (e.errors[i].severity.value() == ErrSeverity.ERR.value()) {
-		    sev = "ERROR";
-		} else if (e.errors[i].severity.value() == ErrSeverity.PANIC.value()) {
-		    sev = "PANIC";
-		} else if (e.errors[i].severity.value() == ErrSeverity.WARN.value()) {
-		    sev = "WARN";
-		}
-		buffer.append("\t - severity: ").append(sev).append("\n");
-	    }
-	} else {
-	    buffer.append("EMPTY DevFailed");
-	}
-	return buffer.toString();
+        final StringBuilder buffer = new StringBuilder();
+        if (e.errors != null) {
+            for (int i = 0; i < e.errors.length; i++) {
+                buffer.append("Error Level ").append(i).append(":\n");
+                buffer.append("\t - desc: ").append(e.errors[i].desc).append("\n");
+                buffer.append("\t - origin: ").append(e.errors[i].origin).append("\n");
+                buffer.append("\t - reason: ").append(e.errors[i].reason).append("\n");
+                String sev = "";
+                if (e.errors[i].severity.value() == ErrSeverity.ERR.value()) {
+                    sev = "ERROR";
+                } else if (e.errors[i].severity.value() == ErrSeverity.PANIC.value()) {
+                    sev = "PANIC";
+                } else if (e.errors[i].severity.value() == ErrSeverity.WARN.value()) {
+                    sev = "WARN";
+                }
+                buffer.append("\t - severity: ").append(sev).append("\n");
+            }
+        } else {
+            buffer.append("EMPTY DevFailed");
+        }
+        return buffer.toString();
     }
 
     /**
@@ -119,29 +119,29 @@ public final class DevFailedUtils {
      * @return
      */
     public static void logDevFailed(final DevFailed e, final Logger logger) {
-	if (e.errors != null) {
-	    for (int i = 0; i < e.errors.length; i++) {
-		logger.error("Error Level {} :", i);
-		logger.error("\t - desc: {}", e.errors[i].desc);
-		logger.error("\t - origin: {}", e.errors[i].origin);
-		logger.error("\t - reason: {}", e.errors[i].reason);
-		String sev = "";
-		if (e.errors[i].severity.value() == ErrSeverity.ERR.value()) {
-		    sev = "ERROR";
-		} else if (e.errors[i].severity.value() == ErrSeverity.PANIC.value()) {
-		    sev = "PANIC";
-		} else if (e.errors[i].severity.value() == ErrSeverity.WARN.value()) {
-		    sev = "WARN";
-		}
-		logger.error("\t - severity: {}", sev);
-	    }
-	} else {
-	    logger.error("EMPTY DevFailed");
-	}
+        if (e.errors != null) {
+            for (int i = 0; i < e.errors.length; i++) {
+                logger.error("Error Level {} :", i);
+                logger.error("\t - desc: {}", e.errors[i].desc);
+                logger.error("\t - origin: {}", e.errors[i].origin);
+                logger.error("\t - reason: {}", e.errors[i].reason);
+                String sev = "";
+                if (e.errors[i].severity.value() == ErrSeverity.ERR.value()) {
+                    sev = "ERROR";
+                } else if (e.errors[i].severity.value() == ErrSeverity.PANIC.value()) {
+                    sev = "PANIC";
+                } else if (e.errors[i].severity.value() == ErrSeverity.WARN.value()) {
+                    sev = "WARN";
+                }
+                logger.error("\t - severity: {}", sev);
+            }
+        } else {
+            logger.error("EMPTY DevFailed");
+        }
     }
 
     public static void printDevFailed(final DevFailed e) {
-	System.err.println(toString(e));
+        System.err.println(toString(e));
     }
 
     public static final String TANGO_BUILD_FAILED = "TANGO_BUILD_FAILED";
