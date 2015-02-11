@@ -45,8 +45,14 @@ import fr.esrf.Tango.DevFailed;
 final class DeviceManagerBuilder {
     private final Logger logger = LoggerFactory.getLogger(DeviceManagerBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceManagerBuilder.class);
-
+    /**
+     * keep record of DeviceManagers for device inheritance
+     */
     private static final Map<String, DeviceManager> DEV_MNGERS = new HashMap<String, DeviceManager>();
+
+    public static void clear() {
+        DEV_MNGERS.clear();
+    }
 
     /**
      * create a {@link DeviceManager} {@link DeviceManagement}

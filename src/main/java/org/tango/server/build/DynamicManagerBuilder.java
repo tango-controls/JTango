@@ -53,7 +53,14 @@ final class DynamicManagerBuilder {
     private final Logger logger = LoggerFactory.getLogger(DynamicManagerBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DynamicManagerBuilder.class);
 
+    /**
+     * keep record of DynamicManager for device inheritance
+     */
     private static final Map<String, DynamicManager> DYN_MNGRS = new HashMap<String, DynamicManager>();
+
+    public static void clear() {
+        DYN_MNGRS.clear();
+    }
 
     /**
      * create a {@link DynamicManager} {@link DynamicManagement}
