@@ -77,6 +77,14 @@ public final class InvocationContext {
          * After execute command
          */
         POST_COMMAND,
+        /**
+         * Before a write_read request
+         */
+        PRE_WRITE_READ_ATTRIBUTES,
+        /**
+         * Before a write_read request
+         */
+        POST_WRITE_READ_ATTRIBUTES
     }
 
     /**

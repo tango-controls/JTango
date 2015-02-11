@@ -35,6 +35,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.annotation.Attribute;
 import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ReflectAttributeBehavior;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
@@ -52,79 +53,79 @@ final class AttributeFieldBuilder {
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeFieldBuilder.class);
 
     public void build(final DeviceImpl device, final Object businessObject, final Field field,
-	    final boolean isOnDeviceImpl) throws DevFailed {
-	final String fieldName = field.getName();
-	xlogger.entry(fieldName);
+            final boolean isOnDeviceImpl) throws DevFailed {
+        final String fieldName = field.getName();
+        xlogger.entry(fieldName);
 
-	Object target;
-	if (isOnDeviceImpl) {
-	    target = device;
-	} else {
-	    target = businessObject;
-	}
-	// final String fieldName = field.getName();
-	final Class<?> type = field.getType();
+        Object target;
+        if (isOnDeviceImpl) {
+            target = device;
+        } else {
+            target = businessObject;
+        }
+        // final String fieldName = field.getName();
+        final Class<?> type = field.getType();
+        String getterName = BuilderUtils.GET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + fieldName.substring(1);
+        Method getter = null;
+        try {
+            getter = target.getClass().getMethod(getterName);
+        } catch (final NoSuchMethodException e) {
+            // try is for boolean getter
+            if (fieldName.startsWith(BuilderUtils.IS)) {
+                getterName = fieldName;
+            } else {
+                getterName = BuilderUtils.IS + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                        + fieldName.substring(1);
+            }
+            try {
+                getter = target.getClass().getMethod(getterName);
+            } catch (final NoSuchMethodException e1) {
+                // attribute is write only
+            }
+        }
 
-	String getterName = BuilderUtils.GET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ fieldName.substring(1);
-	Method getter = null;
-	try {
-	    getter = target.getClass().getMethod(getterName);
-	} catch (final NoSuchMethodException e) {
-	    // try is for boolean getter
-	    if (fieldName.startsWith(BuilderUtils.IS)) {
-		getterName = fieldName;
-	    } else {
-		getterName = BuilderUtils.IS + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-			+ fieldName.substring(1);
-	    }
-	    try {
-		getter = target.getClass().getMethod(getterName);
-	    } catch (final NoSuchMethodException e1) {
-		// attribute is write only
-	    }
-	}
+        String setterName = BuilderUtils.SET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + fieldName.substring(1);
 
-	String setterName = BuilderUtils.SET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ fieldName.substring(1);
+        Method setter = null;
+        try {
+            setter = target.getClass().getMethod(setterName, type);
+        } catch (final NoSuchMethodException e) {
+            if (fieldName.startsWith(BuilderUtils.IS)) {
+                // may be a boolean attribute
+                setterName = BuilderUtils.SET + fieldName.substring(2);
+                try {
+                    setter = businessObject.getClass().getMethod(setterName, type);
+                } catch (final NoSuchMethodException e1) {
+                    DevFailedUtils.throwDevFailed(e);
+                }
+            }
+            // attribute is read only
+        }
 
-	Method setter = null;
-	try {
-	    setter = target.getClass().getMethod(setterName, type);
-	} catch (final NoSuchMethodException e) {
-	    if (fieldName.startsWith(BuilderUtils.IS)) {
-		// may be a boolean attribute
-		setterName = BuilderUtils.SET + fieldName.substring(2);
-		try {
-		    setter = businessObject.getClass().getMethod(setterName, type);
-		} catch (final NoSuchMethodException e1) {
-		    DevFailedUtils.throwDevFailed(e);
-		}
-	    }
-	    // attribute is read only
-	}
+        if (setter == null && getter == null) {
+            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
+                    + BuilderUtils.METHOD_NOT_FOUND);
+        }
 
-	if (setter == null && getter == null) {
-	    DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
-		    + BuilderUtils.METHOD_NOT_FOUND);
-	}
+        final Attribute annot = field.getAnnotation(Attribute.class);
+        final String attributeName = BuilderUtils.getAttributeName(fieldName, annot);
+        final AttributeConfiguration config = BuilderUtils.getAttributeConfiguration(type, getter, setter, annot,
+                attributeName);
 
-	final Attribute annot = field.getAnnotation(Attribute.class);
-	final String attributeName = BuilderUtils.getAttributeName(fieldName, annot);
-	final AttributeConfiguration config = BuilderUtils.getAttributeConfiguration(type, getter, setter, annot,
-		attributeName);
+        // add default attr properties
+        AttributePropertiesImpl props = BuilderUtils.getAttributeProperties(field, attributeName);
+        props = BuilderUtils.setEnumLabelProperty(type, props);
+        config.setAttributeProperties(props);
 
-	// add default attr properties
-	config.setAttributeProperties(BuilderUtils.getAttributeProperties(field, attributeName));
+        final AttributeImpl attr = new AttributeImpl(new ReflectAttributeBehavior(config, target, getter, setter),
+                device.getName());
 
-	final AttributeImpl attr = new AttributeImpl(new ReflectAttributeBehavior(config, target, getter, setter),
-		device.getAttributeProperties());
-
-	logger.debug("Has an attribute: {} {}", attr.getName(), attr.getFormat().value());
-	BuilderUtils.setStateMachine(field, attr);
-	device.addAttribute(attr);
-	xlogger.exit(field.getName());
+        logger.debug("Has an attribute: {} {}", attr.getName(), attr.getFormat().value());
+        BuilderUtils.setStateMachine(field, attr);
+        device.addAttribute(attr);
+        xlogger.exit(field.getName());
 
     }
-
 }

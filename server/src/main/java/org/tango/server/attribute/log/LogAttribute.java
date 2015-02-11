@@ -38,42 +38,60 @@ import fr.esrf.TangoDs.TangoConst;
 public class LogAttribute implements IAttributeBehavior {
 
     private final AttributeAppender attributeAppender;
+    private String attributeName = "";
 
+    /**
+     * Build an attribute "log" which is an image of string.
+     * 
+     * @param depth max logging size
+     * @param loggers the loggers to log
+     */
     public LogAttribute(final int depth, final Logger... loggers) {
-	attributeAppender = new AttributeAppender(depth);
-	for (final Logger logger : loggers) {
-	    if (logger instanceof ch.qos.logback.classic.Logger) {
-		final ch.qos.logback.classic.Logger loggerBack = (ch.qos.logback.classic.Logger) logger;
-		loggerBack.addAppender(attributeAppender);
-		attributeAppender.start();
-	    }
-	}
+        attributeName = "log";
+        attributeAppender = new AttributeAppender(depth);
+        for (final Logger logger : loggers) {
+            if (logger instanceof ch.qos.logback.classic.Logger) {
+                final ch.qos.logback.classic.Logger loggerBack = (ch.qos.logback.classic.Logger) logger;
+                loggerBack.addAppender(attributeAppender);
+                attributeAppender.start();
+            }
+        }
 
+    }
+
+    /**
+     * Build an attribute which is an image of string.
+     * 
+     * @param attributeName The attribute name
+     * @param depth max logging size
+     * @param loggers the loggers to log
+     */
+    public LogAttribute(final String attributeName, final int depth, final Logger... loggers) {
+        this(depth, loggers);
+        this.attributeName = attributeName;
     }
 
     @Override
     public AttributeConfiguration getConfiguration() throws DevFailed {
-	final AttributeConfiguration config = new AttributeConfiguration();
-	config.setName("log");
-	config.setTangoType(TangoConst.Tango_DEV_STRING, AttrDataFormat.IMAGE);
-	config.setWritable(AttrWriteType.READ);
-	return config;
+        final AttributeConfiguration config = new AttributeConfiguration();
+        config.setName(attributeName);
+        config.setTangoType(TangoConst.Tango_DEV_STRING, AttrDataFormat.IMAGE);
+        config.setWritable(AttrWriteType.READ);
+        return config;
     }
 
     @Override
     public AttributeValue getValue() throws DevFailed {
-	return new AttributeValue(attributeAppender.getLog());
+        return new AttributeValue(attributeAppender.getLog());
     }
 
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
-
     }
 
     @Override
     public StateMachineBehavior getStateMachine() throws DevFailed {
-	// TODO Auto-generated method stub
-	return null;
+        return null;
     }
 
 }

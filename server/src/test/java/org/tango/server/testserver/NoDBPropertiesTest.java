@@ -39,7 +39,6 @@ import org.tango.client.database.ITangoDB;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeInfo;
 import fr.esrf.TangoApi.AttributeInfoEx;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
@@ -54,159 +53,164 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
     @Test
     public void testFileProperty() throws DevFailed, IOException {
-	stopDevice();
-	ServerSocket ss1 = null;
-	try {
-	    ss1 = new ServerSocket(0);
-	    ss1.setReuseAddress(true);
-	    ss1.close();
-	    JTangoTest.startNoDbFile(ss1.getLocalPort());
-	} finally {
-	    if (ss1 != null)
-		ss1.close();
-	}
-	deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final DeviceData devda = dev.command_inout("getMyProperty");
+        stopDevice();
+        ServerSocket ss1 = null;
+        try {
+            ss1 = new ServerSocket(0);
+            ss1.setReuseAddress(true);
+            ss1.close();
+            JTangoTest.startNoDbFile(ss1.getLocalPort());
+        } finally {
+            if (ss1 != null) {
+                ss1.close();
+            }
+        }
+        deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceData devda = dev.command_inout("getMyProperty");
 
-	final String value = devda.extractString();
-	Assert.assertEquals(value, "titi");
+        final String value = devda.extractString();
+        Assert.assertEquals(value, "titi");
     }
 
     @Test
     public void testProperty() throws DevFailed {
-	final ITangoDB db = DatabaseFactory.getDatabase();
+        final ITangoDB db = DatabaseFactory.getDatabase();
 
-	final Double d = new Double(Math.random());
-	final String propValue = d.toString();
+        final Double d = new Double(Math.random());
+        final String propValue = d.toString();
 
-	final String propName = "myProp";
+        final String propName = "myProp";
 
-	Map<String, String[]> map = new HashMap<String, String[]>();
-	map.put(propName, new String[] { propValue });
-	db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { propValue });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
 
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	dev.command_inout("Init");
-	DeviceData devda = dev.command_inout("getMyProperty");
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        dev.command_inout("Init");
+        DeviceData devda = dev.command_inout("getMyProperty");
 
-	String value = devda.extractString();
+        String value = devda.extractString();
 
-	Assert.assertEquals(propValue, value);
+        Assert.assertEquals(propValue, value);
 
-	map = new HashMap<String, String[]>();
-	map.put(propName, new String[] { "" });
-	db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { "" });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
 
-	dev.command_inout("Init");
-	devda = dev.command_inout("getMyProperty");
-	value = devda.extractString();
-	Assert.assertEquals("default", value);
+        dev.command_inout("Init");
+        devda = dev.command_inout("getMyProperty");
+        value = devda.extractString();
+        Assert.assertEquals("default", value);
     }
 
     @Test
     public void testbooleanProperty() throws DevFailed {
-	final ITangoDB db = DatabaseFactory.getDatabase();
+        final ITangoDB db = DatabaseFactory.getDatabase();
 
-	final String propValue = "true";
+        final String propValue = "true";
 
-	final String propName = "booleanProp";
+        final String propName = "booleanProp";
 
-	final Map<String, String[]> map = new HashMap<String, String[]>();
-	map.put(propName, new String[] { propValue });
-	db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        final Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { propValue });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
 
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	dev.command_inout("Init");
-	final DeviceData devda = dev.command_inout("isBooleanProp");
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        dev.command_inout("Init");
+        final DeviceData devda = dev.command_inout("isBooleanProp");
 
-	final boolean value = devda.extractBoolean();
+        final boolean value = devda.extractBoolean();
 
-	Assert.assertEquals(true, value);
+        Assert.assertEquals(true, value);
     }
 
     @Test
     public void testbooleanNumProperty() throws DevFailed {
-	final ITangoDB db = DatabaseFactory.getDatabase();
+        final ITangoDB db = DatabaseFactory.getDatabase();
 
-	final String propValue = "1";
+        final String propValue = "1";
 
-	final String propName = "booleanProp";
+        final String propName = "booleanProp";
 
-	final Map<String, String[]> map = new HashMap<String, String[]>();
-	map.put(propName, new String[] { propValue });
-	db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        final Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { propValue });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
 
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	dev.command_inout("Init");
-	final DeviceData devda = dev.command_inout("isBooleanProp");
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        dev.command_inout("Init");
+        final DeviceData devda = dev.command_inout("isBooleanProp");
 
-	final boolean value = devda.extractBoolean();
+        final boolean value = devda.extractBoolean();
 
-	Assert.assertEquals(true, value);
+        Assert.assertEquals(true, value);
     }
 
     @Test
     public void testClassProperty() throws DevFailed {
-	final ITangoDB db = DatabaseFactory.getDatabase();
+        final ITangoDB db = DatabaseFactory.getDatabase();
 
-	final Double dd = new Double(Math.random());
-	final String propClassValue = dd.toString();
-	final String propClassName = "myClassProp";
+        final Double dd = new Double(Math.random());
+        final String propClassValue = dd.toString();
+        final String propClassName = "myClassProp";
 
-	Map<String, String[]> map = new HashMap<String, String[]>();
-	map.put(propClassName, new String[] { propClassValue });
-	db.setClassProperties(JTangoTest.class.getCanonicalName(), map);
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propClassName, new String[] { propClassValue });
+        db.setClassProperties(JTangoTest.class.getCanonicalName(), map);
 
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	dev.command_inout("Init");
-	DeviceData devdaClass = dev.command_inout("getMyClassProperty");
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        dev.command_inout("Init");
+        DeviceData devdaClass = dev.command_inout("getMyClassProperty");
 
-	String[] valueClass = devdaClass.extractStringArray();
+        String[] valueClass = devdaClass.extractStringArray();
 
-	Assert.assertArrayEquals(new String[] { propClassValue }, valueClass);
+        Assert.assertArrayEquals(new String[] { propClassValue }, valueClass);
 
-	map = new HashMap<String, String[]>();
-	map.put(propClassName, new String[] { "" });
-	db.setClassProperties(JTangoTest.class.getCanonicalName(), map);
+        map = new HashMap<String, String[]>();
+        map.put(propClassName, new String[] { "" });
+        db.setClassProperties(JTangoTest.class.getCanonicalName(), map);
 
-	dev.command_inout("Init");
-	devdaClass = dev.command_inout("getMyClassProperty");
-	valueClass = devdaClass.extractStringArray();
-	Assert.assertArrayEquals(new String[] { "classDefault" }, valueClass);
+        dev.command_inout("Init");
+        devdaClass = dev.command_inout("getMyClassProperty");
+        valueClass = devdaClass.extractStringArray();
+        Assert.assertArrayEquals(new String[] { "classDefault" }, valueClass);
     }
 
     @Test
     public void testAttributeProperty() throws DevFailed {
-	try {
-	    final Double dd = new Double(Math.random());
-	    final String value = dd.toString();
-	    final String attrName = "shortScalar";
-	    final DeviceProxy dev = new DeviceProxy(deviceName);
-	    final AttributeInfo info = dev.get_attribute_info(attrName);
-	    info.description = value;
-	    dev.set_attribute_info(new AttributeInfo[] { info });
-	    final String actualValue = dev.get_attribute_info(attrName).description;
-	    Assert.assertEquals(value, actualValue);
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final Double dd = new Double(Math.random());
+            final String value = dd.toString();
+            final String attrName = "shortScalar";
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final AttributeInfoEx info = dev.get_attribute_info_ex(attrName);
+            info.description = value;
+            dev.set_attribute_info(new AttributeInfoEx[] { info });
+            final String actualValue = dev.get_attribute_info_ex(attrName).description;
+            Assert.assertEquals(value, actualValue);
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testDefaultAttributeProperty() throws DevFailed {
-	final String attrName = "longSpectrum";
-	final DeviceProxy dev = new DeviceProxy(deviceName);
-	final AttributeInfoEx info = dev.get_attribute_info_ex(attrName);
-	assertThat(info.alarms.min_alarm, equalTo("0"));
-	assertThat(info.alarms.max_alarm, equalTo("10"));
-	assertThat(info.min_value, equalTo("-100"));
-	assertThat(info.max_value, equalTo("1015054014654325L"));
-	assertThat(info.alarms.min_warning, equalTo("3"));
-	assertThat(info.alarms.max_warning, equalTo("4"));
-	assertThat(info.alarms.delta_t, equalTo("10"));
-	assertThat(info.alarms.delta_val, equalTo("20"));
-	assertThat(info.description, equalTo("test"));
+        final String attrName = "longSpectrum";
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final AttributeInfoEx info = dev.get_attribute_info_ex(attrName);
+        assertThat(info.alarms.min_alarm, equalTo("0"));
+        assertThat(info.alarms.max_alarm, equalTo("10"));
+        assertThat(info.min_value, equalTo("-100"));
+        assertThat(info.max_value, equalTo("1015054014654325L"));
+        assertThat(info.alarms.min_warning, equalTo("3"));
+        assertThat(info.alarms.max_warning, equalTo("4"));
+        assertThat(info.alarms.delta_t, equalTo("10"));
+        assertThat(info.alarms.delta_val, equalTo("20"));
+        assertThat(info.description, equalTo("test"));
+        Assert.assertArrayEquals(info.enum_label, new String[] { "Not specified" });
+        // test IDL5 properties
+        final AttributeInfoEx info2 = dev.get_attribute_info_ex("enumAttribute");
+        Assert.assertArrayEquals(info2.enum_label, new String[] { "VALUE1", "VALUE2" });
     }
 }

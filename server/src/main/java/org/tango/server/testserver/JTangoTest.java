@@ -72,6 +72,10 @@ import fr.esrf.Tango.DevVarLongStringArray;
 public final class JTangoTest {
     private final Logger logger = LoggerFactory.getLogger(JTangoTest.class);
 
+    public static final String NO_DB_DEVICE_NAME = "1/1/1";
+    // public static final String NO_DB_GIOP_PORT = "12354";
+    public static final String INSTANCE_NAME = "1";
+    public static final String SERVER_NAME = JTangoTest.class.getSimpleName();
     /*
      * Array size constant
      */
@@ -167,6 +171,13 @@ public final class JTangoTest {
 
     @Attribute
     private DevEncoded devEncodedScalar = new DevEncoded("yfui", new byte[] { 1, 2, 3 });
+
+    public enum TestType {
+        VALUE1, VALUE2
+    }
+
+    @Attribute
+    private TestType enumAttribute = TestType.VALUE1;
 
     // @Attribute
     // private DevEncoded[] devEncodedSpectrum = new DevEncoded[] { new
@@ -314,6 +325,8 @@ public final class JTangoTest {
         dynamicManager.addAttribute(new DynamicAttributeTest(boolean.class));
         dynamicManager.addAttribute(new DynamicAttributeTest(boolean[].class));
         dynamicManager.addAttribute(new DynamicAttributeTest(boolean[][].class));
+        dynamicManager.addAttribute(new DynamicEnumAttribute());
+        dynamicManager.addAttribute(new DynamicAttributeTest(double.class, "testfowarded"));
     }
 
     /**
@@ -420,14 +433,6 @@ public final class JTangoTest {
 
     public long[] getLongSpectrum() {
         return Arrays.copyOf(longSpectrum, longSpectrum.length);
-    }
-
-    @Attribute
-    @AttributeProperties(minAlarm = "2")
-    private final double invalidQuality = 0;
-
-    public AttributeValue getInvalidQuality() throws DevFailed {
-        return new AttributeValue(invalidQuality, AttrQuality.ATTR_INVALID);
     }
 
     public void setLongSpectrum(final long[] longSpectrum) {
@@ -593,6 +598,14 @@ public final class JTangoTest {
         this.byteImage = ArrayUtils.copyOf(byteImage);
     }
 
+    @Attribute
+    @AttributeProperties(minAlarm = "2")
+    private final double invalidQuality = 0;
+
+    public AttributeValue getInvalidQuality() throws DevFailed {
+        return new AttributeValue(invalidQuality, AttrQuality.ATTR_INVALID);
+    }
+
     /*
      * 
      * COMMAND
@@ -732,11 +745,6 @@ public final class JTangoTest {
     public void testState() {
     }
 
-    public static final String NO_DB_DEVICE_NAME = "1/1/1";
-    // public static final String NO_DB_GIOP_PORT = "12354";
-    public static final String INSTANCE_NAME = "1";
-    public static final String SERVER_NAME = JTangoTest.class.getSimpleName();
-
     /**
      * Start a device with tango database. The server must be declared in tango
      * db.
@@ -764,8 +772,19 @@ public final class JTangoTest {
     }
 
     public static void main(final String[] args) {
-        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-        ServerManager.getInstance().start(args, SERVER_NAME);
+        if (args.length > 1 && args[1].equals("NODB")) {
+            try {
+                startNoDb(Integer.valueOf(args[2]));
+            } catch (final NumberFormatException e) {
+                e.printStackTrace();
+            } catch (final DevFailed e) {
+                e.printStackTrace();
+            }
+        } else {
+          //  System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+            ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+            ServerManager.getInstance().start(new String[] { "1" }, SERVER_NAME);
+        }
     }
 
     /*
@@ -889,6 +908,14 @@ public final class JTangoTest {
 
     public void setDeviceManager(final DeviceManager deviceManager) {
         this.deviceManager = deviceManager;
+    }
+
+    public TestType getEnumAttribute() {
+        return enumAttribute;
+    }
+
+    public void setEnumAttribute(final TestType enumAttribute) {
+        this.enumAttribute = enumAttribute;
     }
 
 }

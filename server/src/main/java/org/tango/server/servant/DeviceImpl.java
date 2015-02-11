@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.servant;
 
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -64,6 +65,7 @@ import org.tango.server.annotation.Status;
 import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
@@ -71,12 +73,13 @@ import org.tango.server.device.DeviceLock;
 import org.tango.server.device.InitImpl;
 import org.tango.server.device.StateImpl;
 import org.tango.server.device.StatusImpl;
-import org.tango.server.events.EventManager;
+import org.tango.server.events.DeviceInterfaceChangedSender;
 import org.tango.server.history.DeviceBlackBox;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
+import org.tango.server.idl.TangoIDLUtil;
 import org.tango.server.lock.ClientLocking;
-import org.tango.server.properties.AttributePropertiesManager;
+import org.tango.server.pipe.PipeImpl;
 import org.tango.server.properties.ClassPropertyImpl;
 import org.tango.server.properties.DevicePropertiesImpl;
 import org.tango.server.properties.DevicePropertyImpl;
@@ -87,13 +90,16 @@ import org.tango.utils.DevFailedUtils;
 import fr.esrf.Tango.AttributeConfig;
 import fr.esrf.Tango.AttributeConfig_2;
 import fr.esrf.Tango.AttributeConfig_3;
+import fr.esrf.Tango.AttributeConfig_5;
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.AttributeValue_3;
 import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_5;
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevAttrHistory;
 import fr.esrf.Tango.DevAttrHistory_3;
 import fr.esrf.Tango.DevAttrHistory_4;
+import fr.esrf.Tango.DevAttrHistory_5;
 import fr.esrf.Tango.DevCmdHistory;
 import fr.esrf.Tango.DevCmdHistory_4;
 import fr.esrf.Tango.DevCmdInfo;
@@ -101,18 +107,21 @@ import fr.esrf.Tango.DevCmdInfo_2;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevInfo;
 import fr.esrf.Tango.DevInfo_3;
+import fr.esrf.Tango.DevIntrChange;
+import fr.esrf.Tango.DevPipeData;
 import fr.esrf.Tango.DevSource;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.Device_4POA;
+import fr.esrf.Tango.Device_5POA;
 import fr.esrf.Tango.MultiDevFailed;
+import fr.esrf.Tango.PipeConfig;
 
 /**
- * The CORBA servant for a tango device server in IDL 4.
+ * The CORBA servant for a tango device server in IDL 5.
  * 
  * @author ABEILLE
  */
-public final class DeviceImpl extends Device_4POA {
+public final class DeviceImpl extends Device_5POA {
 
     public static final String INIT_CMD = "Init";
 //    private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
@@ -127,7 +136,7 @@ public final class DeviceImpl extends Device_4POA {
     /**
      * TANGO system version
      */
-    public static final int SERVER_VERSION = 4;
+    public static final int SERVER_VERSION = 5;
     /**
      * for logging
      */
@@ -137,6 +146,8 @@ public final class DeviceImpl extends Device_4POA {
      * Special attribute name meaning all attributes
      */
     public static final String ALL_ATTR = "All attributes";
+
+    public static final String ALL_PIPES = "All pipes";
 
     public static final String STATE_NAME = "State";
     public static final String STATUS_NAME = "Status";
@@ -196,6 +207,11 @@ public final class DeviceImpl extends Device_4POA {
     /**
      * the device's attributes
      */
+    private final List<PipeImpl> pipeList = new ArrayList<PipeImpl>();
+
+    /**
+     * the device's attributes
+     */
     private final List<AttributeImpl> attributeList = new ArrayList<AttributeImpl>();
     /**
      * the device's commands
@@ -213,10 +229,6 @@ public final class DeviceImpl extends Device_4POA {
      * all the device's properties. To allow dynamic properties
      */
     private DevicePropertiesImpl deviceProperties;
-    /**
-     * Manage attribute properties
-     */
-    private final AttributePropertiesManager attributeProperties;
     /**
      * Black box. History of all client requests
      */
@@ -261,6 +273,8 @@ public final class DeviceImpl extends Device_4POA {
 
     private PollingManager pollingManager;
 
+    private DeviceInterfaceChangedSender interfaceChangeSender;
+
     /**
      * Ctr
      * 
@@ -282,7 +296,6 @@ public final class DeviceImpl extends Device_4POA {
         deviceLock = new DeviceLock(txType, businessObject.getClass());
 
         this.businessObject = businessObject;
-        attributeProperties = new AttributePropertiesManager(deviceName);
         stateCheckAttrAlarm = false;
         if (CLIENT_LOCKING_MAP.containsKey(deviceName)) {
             clientLocking = CLIENT_LOCKING_MAP.get(deviceName);
@@ -433,6 +446,7 @@ public final class DeviceImpl extends Device_4POA {
             isCorrectlyInit.set(false);
             deleteDevice();
             doInit();
+            pushInterfaceChangeEvent(false);
         }
         xlogger.exit();
     }
@@ -443,7 +457,7 @@ public final class DeviceImpl extends Device_4POA {
      * @param attribute
      * @throws DevFailed
      */
-    public void addAttribute(final AttributeImpl attribute) throws DevFailed {
+    public synchronized void addAttribute(final AttributeImpl attribute) throws DevFailed {
         // add attribute only if it doesn't exists
         AttributeImpl result = null;
         for (final AttributeImpl attr : attributeList) {
@@ -457,7 +471,47 @@ public final class DeviceImpl extends Device_4POA {
             if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
                 attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
             }
+//            if (!isCorrectlyInit.get()) {
+//                pushInterfaceChangeEvent(false);
+//            }
         }
+    }
+
+    /**
+     * 
+     * @param pipe
+     * @throws DevFailed
+     */
+    public void addPipe(final PipeImpl pipe) throws DevFailed {
+        PipeImpl result = null;
+        for (final PipeImpl pipeElt : pipeList) {
+            if (pipeElt.getName().equalsIgnoreCase(pipe.getName())) {
+                result = pipe;
+                break;
+            }
+        }
+        if (result == null) {
+            pipeList.add(pipe);
+        }
+    }
+
+    /**
+     * remove pipe of the device. Not possible to remove State or Status
+     * 
+     * @param attribute
+     * @throws DevFailed
+     */
+    public synchronized void removePipe(final PipeImpl pipe) throws DevFailed {
+        pipeList.remove(pipe);
+    }
+
+    /**
+     * Get a copy of the commands
+     * 
+     * @return the commands
+     */
+    public List<PipeImpl> getPipeList() {
+        return new ArrayList<PipeImpl>(pipeList);
     }
 
     /**
@@ -486,7 +540,7 @@ public final class DeviceImpl extends Device_4POA {
      * @param attribute
      * @throws DevFailed
      */
-    public void removeAttribute(final AttributeImpl attribute) throws DevFailed {
+    public synchronized void removeAttribute(final AttributeImpl attribute) throws DevFailed {
         if (attribute.getName().equalsIgnoreCase(STATUS_NAME) || attribute.getName().equalsIgnoreCase(STATE_NAME)) {
             return;
         }
@@ -494,6 +548,9 @@ public final class DeviceImpl extends Device_4POA {
         statusImpl.removeAttributeAlarm(attribute.getName());
         stateImpl.removeAttributeAlarm(attribute.getName());
         attributeList.remove(attribute);
+//        if (!isCorrectlyInit.get()) {
+//            pushInterfaceChangeEvent(false);
+//        }
 
     }
 
@@ -549,6 +606,9 @@ public final class DeviceImpl extends Device_4POA {
             for (final ClassPropertyImpl prop : classPropertyList) {
                 prop.update();
             }
+            for (final PipeImpl pipe : pipeList) {
+                pipe.loadConfiguration();
+            }
             init.execute(stateImpl, statusImpl);
             isCorrectlyInit.set(true);
         } catch (final DevFailed e) {
@@ -563,7 +623,7 @@ public final class DeviceImpl extends Device_4POA {
             }
         }
 
-        logger.debug("init OK " + isCorrectlyInit);
+        logger.debug("end with isCorrectlyInit={}", isCorrectlyInit);
     }
 
     /**
@@ -591,8 +651,24 @@ public final class DeviceImpl extends Device_4POA {
             buildInit(null, false);
         }
         doInit();
+        try {
+            pushInterfaceChangeEvent(true);
+        } catch (final DevFailed e) {
+            // TODO don't know what to do with it
+            logger.error("error pushing event", e);
+            e.printStackTrace();
+        }
         logger.debug("device init done");
         xlogger.exit();
+    }
+
+    public synchronized void pushInterfaceChangeEvent(final boolean isStarted) throws DevFailed {
+        final DevIntrChange devInterface = new DevIntrChange(isStarted, command_list_query_2(),
+                get_attribute_config_5(new String[] { ALL_ATTR }));
+        if (interfaceChangeSender == null) {
+            interfaceChangeSender = new DeviceInterfaceChangedSender(name);
+        }
+        interfaceChangeSender.pushEvent(devInterface);
     }
 
     /**
@@ -604,12 +680,16 @@ public final class DeviceImpl extends Device_4POA {
     public void deleteDevice() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
+        PropertiesUtils.clearCache();
         PropertiesUtils.clearDeviceCache(name);
         PropertiesUtils.clearClassCache(className);
         stopPolling();
         pollingManager.removeAll();
         if (deviceScheduler != null) {
             deviceScheduler.stop();
+        }
+        if (interfaceChangeSender != null) {
+            interfaceChangeSender.stop();
         }
         if (deleteMethod != null) {
             try {
@@ -1019,6 +1099,56 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
+     * Read some attributes. IDL 5 version.
+     * 
+     * @param names
+     *            The attributes names
+     * @param source
+     *            the device source (CACHE, DEV or CACHE_DEV)
+     * @param clIdent
+     *            the client ID
+     * @return The read results.
+     * @throws DevFailed
+     */
+    @Override
+    public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
+            throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry(Arrays.toString(names));
+        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            checkInitialization();
+        }
+
+        blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
+        clientIdentity = clIdent;
+        if (names.length == 0) {
+            throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
+        }
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
+            clientLocking.checkClientLocking(clIdent, names);
+        }
+        deviceLock.lockAttribute();
+        AttributeValue_5[] result = null;
+        try {
+            result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
+                    aroundInvokeImpl, source);
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        } finally {
+            deviceLock.unlockAttribute();
+        }
+        xlogger.exit();
+        return result;
+    }
+
+    /**
      * Write some attributes. IDL 1 version
      * 
      * @param values
@@ -1181,11 +1311,68 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
+     * Write and read attributes in a single request
+     * 
+     * @param writeValues
+     *            the values to write
+     * @param readNames
+     *            the attributes to read
+     * @param clIdent
+     *            the client ID
+     * @return the read results
+     */
+    @Override
+    public AttributeValue_5[] write_read_attributes_5(final AttributeValue_4[] writeValues, final String[] readNames,
+            final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
+        blackBox.insertInblackBox("write_read_attributes_5 ", clIdent);
+        clientIdentity = clIdent;
+        final String[] names = new String[writeValues.length];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = writeValues[i].name;
+        }
+
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
+            clientLocking.checkClientLocking(clIdent, names);
+        }
+        deviceLock.lockAttribute();
+        AttributeValue_5[] resultValues = null;
+        try {
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES,
+                    CallType.CACHE_DEV, name));
+            // write attributes
+            try {
+                AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl);
+            } catch (final MultiDevFailed e) {
+                throw new DevFailed(e.errors[0].err_list);
+            }
+            // read attributes
+
+            resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager, attributeList,
+                    aroundInvokeImpl, DevSource.DEV);
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
+                    CallType.CACHE_DEV, name));
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        } finally {
+            deviceLock.unlockAttribute();
+        }
+        return resultValues;
+    }
+
+    /**
      * @param values
      * @return The read values
      * @throws DevFailed
      */
     private AttributeValue_4[] writeRead(final AttributeValue_4[] values) throws DevFailed {
+        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
+                name));
         try {
             AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl);
         } catch (final MultiDevFailed e) {
@@ -1195,8 +1382,11 @@ public final class DeviceImpl extends Device_4POA {
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
         }
-        return AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList, aroundInvokeImpl,
-                DevSource.DEV);
+        final AttributeValue_4[] resultValues = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager,
+                attributeList, aroundInvokeImpl, DevSource.DEV);
+        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
+                name));
+        return resultValues;
     }
 
     /**
@@ -1554,6 +1744,57 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
+     * Get attributes config. IDL5 version
+     * 
+     * @param attributeNames
+     *            the attribute names or "All attributes"
+     * @return the attribute configs
+     * @throws DevFailed
+     */
+    @Override
+    public AttributeConfig_5[] get_attribute_config_5(final String[] attributeNames) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry(Arrays.toString(attributeNames));
+        // checkInitialization();
+        blackBox.insertInblackBox("get_attribute_config_5 " + Arrays.toString(attributeNames));
+        // check if we must retrieve all attributes config
+        final int length = attributeNames.length;
+        boolean getAllConfig = false;
+
+        if (length == 1 && attributeNames[0].contains(ALL_ATTR)) {
+            getAllConfig = true;
+        }
+
+        AttributeConfig_5[] result;
+        if (getAllConfig) {
+            logger.debug("get All");
+            final List<AttributeImpl> attrList = getAttributeList();
+            // Collections.sort(attrList);
+            result = new AttributeConfig_5[attributeList.size()];
+            int i = 0;
+            for (final AttributeImpl attribute : attrList) {
+                if (!attribute.getName().equals(STATE_NAME) && !attribute.getName().equals(STATUS_NAME)) {
+                    result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
+                }
+            }
+            result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(AttributeGetterSetter.getAttribute(STATE_NAME,
+                    attrList));
+            result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(AttributeGetterSetter.getAttribute(STATUS_NAME,
+                    attrList));
+        } else {
+            result = new AttributeConfig_5[attributeNames.length];
+            int i = 0;
+            for (final String attributeName : attributeNames) {
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+                logger.debug("{}:{}", attributeName, attribute.getProperties());
+                result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
+            }
+        }
+        xlogger.exit();
+        return result;
+    }
+
+    /**
      * Get attributes config. IDL3 version
      * 
      * @param attributeNames
@@ -1699,6 +1940,56 @@ public final class DeviceImpl extends Device_4POA {
     }
 
     /**
+     * Set some attribute configs. IDL5 version
+     * 
+     * @param newConf
+     *            the new configurations
+     * @param clIdent
+     *            client id
+     * @throws DevFailed
+     */
+
+    @Override
+    public void set_attribute_config_5(final AttributeConfig_5[] newConf, final ClntIdent clIdent) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry();
+        checkInitialization();
+        clientIdentity = clIdent;
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
+            clientLocking.checkClientLocking(clIdent);
+        }
+
+        // TODO The root attribute informs the forwarded attribute of eventual
+        // configuration change by events
+        blackBox.insertInblackBox("set_attribute_config_5", clIdent);
+        for (final AttributeConfig_5 attributeConfig : newConf) {
+            final String attributeName = attributeConfig.name;
+
+            final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+            if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
+                DevFailedUtils.throwDevFailed("set attribute is not possible for " + attribute.getName());
+            }
+            if (!attribute.getFormat().equals(attributeConfig.data_format)
+                    || !attribute.getWritable().equals(attributeConfig.writable)
+                    || !attribute.getDispLevel().equals(attributeConfig.level)
+                    || attribute.getTangoType() != attributeConfig.data_type) {
+                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+            }
+
+            final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
+            logger.debug("set_attribute_config_5: {}", props);
+            if (!attribute.getProperties().isEnumMutable()
+                    && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
+                throw DevFailedUtils
+                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                                "It's not supported to change enumeration labels number from outside the Tango device class code");
+            }
+            attribute.setProperties(props);
+        }
+        xlogger.exit();
+    }
+
+    /**
      * Set some attribute configs. IDL4 version
      * 
      * @param newConf
@@ -1751,7 +2042,6 @@ public final class DeviceImpl extends Device_4POA {
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
             logger.debug("set_attribute_config_3: {}", props);
             attribute.setProperties(props);
-
         }
         xlogger.exit();
     }
@@ -1783,7 +2073,6 @@ public final class DeviceImpl extends Device_4POA {
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
             logger.debug("set_attribute_config: {}", props);
             attribute.setProperties(props);
-            EventManager.getInstance().pushConfigEvent(name, attributeName);
         }
         xlogger.exit();
     }
@@ -1804,7 +2093,7 @@ public final class DeviceImpl extends Device_4POA {
      *            the new command
      * @throws DevFailed
      */
-    public void addCommand(final CommandImpl command) throws DevFailed {
+    public synchronized void addCommand(final CommandImpl command) throws DevFailed {
         CommandImpl result = null;
         for (final CommandImpl cmd : commandList) {
             if (command.getName().equalsIgnoreCase(cmd.getName())) {
@@ -1817,7 +2106,11 @@ public final class DeviceImpl extends Device_4POA {
             if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
                 command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
             }
+            if (!isCorrectlyInit.get()) {
+                pushInterfaceChangeEvent(false);
+            }
         }
+
     }
 
     /**
@@ -1826,11 +2119,15 @@ public final class DeviceImpl extends Device_4POA {
      * @param command
      * @throws DevFailed
      */
-    public void removeCommand(final CommandImpl command) throws DevFailed {
+    public synchronized void removeCommand(final CommandImpl command) throws DevFailed {
         if (!command.getName().equals(INIT_CMD)) {
             pollingManager.removeCommandPolling(command.getName());
             commandList.remove(command);
+            if (!isCorrectlyInit.get()) {
+                pushInterfaceChangeEvent(false);
+            }
         }
+
     }
 
     /**
@@ -2178,15 +2475,6 @@ public final class DeviceImpl extends Device_4POA {
         return new ArrayList<ClassPropertyImpl>(classPropertyList);
     }
 
-    /**
-     * Get attribute properties manager
-     * 
-     * @return attribute properties manager
-     */
-    public AttributePropertiesManager getAttributeProperties() {
-        return attributeProperties;
-    }
-
     public int getAttributeHistorySize(final AttributeImpl attribute) {
         return attribute.getHistory().size();
     }
@@ -2199,7 +2487,178 @@ public final class DeviceImpl extends Device_4POA {
         return clientIdentity;
     }
 
-    public void setDeviceScheduler(final List<Method> methodList) {
+    public void setDeviceScheduler(final Set<Method> methodList) {
         deviceScheduler = new DeviceScheduler(businessObject, methodList, name, className);
+    }
+
+    /**
+     * read an attribute history. IDL 5 version. The history is filled only be
+     * attribute polling
+     * 
+     * @param attributeName
+     *            The attribute to retrieve
+     * @param maxSize
+     *            The history maximum size returned
+     * @throws DevFailed
+     */
+    @Override
+    public DevAttrHistory_5 read_attribute_history_5(final String attributeName, final int maxSize) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry();
+        checkInitialization();
+        blackBox.insertInblackBox("read_attribute_history_5");
+        DevAttrHistory_5 result = null;
+        try {
+            final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+            if (attr.getBehavior() instanceof ForwardedAttribute) {
+                final ForwardedAttribute fwdAttr = (ForwardedAttribute) attr.getBehavior();
+                result = fwdAttr.getAttributeHistory(maxSize);
+            } else {
+                result = attr.getHistory().getAttrHistory5(maxSize);
+            }
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        }
+        return result;
+
+    }
+
+    @Override
+    public PipeConfig[] get_pipe_config_5(final String[] names) throws DevFailed {
+        xlogger.entry(Arrays.toString(names));
+        // checkInitialization();
+        blackBox.insertInblackBox("get_pipe_config_5 " + Arrays.toString(names));
+        // check if we must retrieve all attributes config
+        final int length = names.length;
+        boolean getAllConfig = false;
+        if (length == 1 && names[0].contains(ALL_PIPES)) {
+            getAllConfig = true;
+        }
+
+        PipeConfig[] result;
+        if (getAllConfig) {
+            logger.debug("get All");
+            result = new PipeConfig[pipeList.size()];
+            int i = 0;
+            for (final PipeImpl pipe : pipeList) {
+                result[i++] = TangoIDLUtil.toPipeConfig(pipe);
+            }
+        } else {
+            result = new PipeConfig[names.length];
+            int i = 0;
+            for (final String pipeName : names) {
+                final PipeImpl pipe = getPipe(pipeName, pipeList);
+                logger.debug("{}:{}", pipeName, pipe.getConfiguration());
+                result[i++] = TangoIDLUtil.toPipeConfig(pipe);
+            }
+        }
+        xlogger.exit();
+        return result;
+    }
+
+    @Override
+    public void set_pipe_config_5(final PipeConfig[] newConf, final ClntIdent clIdent) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry();
+        checkInitialization();
+        clientIdentity = clIdent;
+
+        blackBox.insertInblackBox("set_pipe_config_5", clIdent);
+        for (final PipeConfig config : newConf) {
+            final String name = config.name;
+            final PipeImpl pipe = getPipe(name, pipeList);
+            pipe.setConfiguration(config.label, config.description);
+        }
+        xlogger.exit();
+    }
+
+    public static PipeImpl getPipe(final String name, final List<PipeImpl> pipeList) throws DevFailed {
+        PipeImpl result = null;
+        for (final PipeImpl pipe : pipeList) {
+            if (pipe.getName().equalsIgnoreCase(name)) {
+                result = pipe;
+                break;
+            }
+        }
+        if (result == null) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + " does not exists");
+        }
+        return result;
+    }
+
+    @Override
+    public DevPipeData read_pipe_5(final String name, final ClntIdent clIdent) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry(name);
+        final PipeImpl pipe = getPipe(name, pipeList);
+        blackBox.insertInblackBox("read_pipe_5 " + name, clIdent);
+        clientIdentity = clIdent;
+        DevPipeData result = null;
+        try {
+            pipe.updateValue();
+            result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        }
+        xlogger.exit();
+        return result;
+    }
+
+    @Override
+    public void write_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry(value.name);
+        final PipeImpl pipe = getPipe(value.name, pipeList);
+        blackBox.insertInblackBox("write_pipe_5 " + value.name, clIdent);
+        clientIdentity = clIdent;
+        try {
+            pipe.setValue(TangoIDLUtil.toPipeValue(value));
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        }
+        xlogger.exit();
+    }
+
+    @Override
+    public DevPipeData write_read_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
+        MDC.put(MDC_KEY, name);
+        xlogger.entry(name);
+        final PipeImpl pipe = getPipe(name, pipeList);
+        blackBox.insertInblackBox("write_read_pipe_5 " + name, clIdent);
+        clientIdentity = clIdent;
+        DevPipeData result = null;
+        try {
+            pipe.setValue(TangoIDLUtil.toPipeValue(value));
+            pipe.updateValue();
+            result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
+        } catch (final Exception e) {
+            if (e instanceof DevFailed) {
+                throw (DevFailed) e;
+            } else {
+                // with CORBA, the stack trace is not visible by the client if
+                // not inserted in DevFailed.
+                DevFailedUtils.throwDevFailed(e);
+            }
+        }
+        xlogger.exit();
+        return result;
     }
 }

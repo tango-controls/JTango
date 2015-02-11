@@ -25,8 +25,6 @@
 package org.tango.server.attribute;
 
 import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.entropysoft.transmorph.ConverterException;
 import net.entropysoft.transmorph.DefaultConverters;
@@ -43,7 +41,9 @@ import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
+import org.tango.server.IReadableWritable;
 import org.tango.server.PollingUtils;
+import org.tango.server.events.EventManager;
 import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.utils.ArrayUtils;
@@ -57,21 +57,20 @@ import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DispLevel;
-import fr.esrf.Tango.EventProperties;
 
 /**
  * Tango attribute
  * 
  * @author ABEILLE
  */
-public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable {
+public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
+        IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
 
     private final String name;
     private final AttributeConfiguration config;
-    // private AttributeValue_4 corbaValue;
     private AttributeValue readValue;
     private AttributeValue writeValue = null;
     private final AttributeHistory history;
@@ -88,17 +87,38 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private volatile double executionDuration;
     private volatile double lastUpdateTime;
     private volatile double deltaTime;
+    private final boolean isFwdAttribute;
+    private final String deviceName;
 
-    public AttributeImpl(final IAttributeBehavior behavior, final AttributePropertiesManager attributePropertiesManager)
-            throws DevFailed {
+    public AttributeImpl(final IAttributeBehavior behavior, final String deviceName) throws DevFailed {
         super();
+        name = behavior.getConfiguration().getName();
+        this.deviceName = deviceName;
+        this.attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        isFwdAttribute = behavior instanceof ForwardedAttribute;
+        if (isFwdAttribute) {
+            // init attribute with either the attribute property value, or the value defined in its constructor
+            final ForwardedAttribute att = (ForwardedAttribute) behavior;
+            final String rootAttributeName = behavior.getConfiguration().getAttributeProperties()
+                    .loadAttributeRootName(deviceName, name);
+            if (rootAttributeName.isEmpty()
+                    || rootAttributeName.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
+                att.init();
+                // persist root attribute name in tango db
+                behavior.getConfiguration().getAttributeProperties().persistAttributeRootName(deviceName, name);
+            } else {
+                // use attribute property
+                att.init(rootAttributeName);
+            }
+        }
+        // get config only when fwd attribute is initialized
         config = behavior.getConfiguration();
-        name = config.getName();
         this.behavior = behavior;
-        this.attributePropertiesManager = attributePropertiesManager;
+
         history = new AttributeHistory(config.getName(), config.getWritable().equals(AttrWriteType.READ_WRITE),
-                getTangoType());
+                config.getTangoType(), config.getFormat());
         isAlarmToHigh = false;
+
     }
 
     private Object getMemorizedValue() throws DevFailed {
@@ -176,6 +196,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      * 
      * @throws DevFailed
      */
+    @Override
     public void updateValue() throws DevFailed {
         xlogger.entry(getName());
         // invoke on device
@@ -185,7 +206,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         } catch (final CloneNotSupportedException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-
         xlogger.exit(getName());
     }
 
@@ -194,8 +214,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      * 
      * @throws DevFailed
      */
+    @Override
     public void updateValue(final AttributeValue inValue) throws DevFailed {
-
         xlogger.entry(getName());
         if (inValue == null) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
@@ -212,9 +232,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 checkUpdateErrors(inValue);
                 // get as array if necessary (for image)
                 readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
-
                 // force conversion to check types
-                TangoIDLAttributeUtil.toAttributeValue4(this, readValue, null);
+                TangoIDLAttributeUtil.toAttributeValue5(this, readValue, null);
                 if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
                     // write value is managed by the user
                     try {
@@ -414,6 +433,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
      * @param value
      * @throws DevFailed
      */
+    @Override
     public void setValue(final AttributeValue value) throws DevFailed {
         if (!config.getWritable().equals(AttrWriteType.READ)) {
             checkSetErrors(value);
@@ -507,7 +527,14 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             }
         }
         config.setAttributeProperties(properties);
-        setAttributePropertiesInDb(properties);
+        if (isFwdAttribute) {
+            // set config on forwarded attribute
+            final ForwardedAttribute fwdAttr = (ForwardedAttribute) behavior;
+            properties.setRootAttribute(fwdAttr.getRootName());
+            fwdAttr.setAttributeConfiguration(config);
+        }
+        config.persist(deviceName);
+        EventManager.getInstance().pushAttributeConfigEvent(deviceName, name);
     }
 
     @Override
@@ -527,7 +554,16 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         return config.isMemorized();
     }
 
-    public AttributePropertiesImpl getProperties() {
+    public boolean isMemorizedAtInit() {
+        return config.isMemorizedAtInit();
+    }
+
+    public AttributePropertiesImpl getProperties() throws DevFailed {
+        if (isFwdAttribute) {
+            // retrieve remote attribute properties
+            final ForwardedAttribute fwdAttr = (ForwardedAttribute) behavior;
+            config.setAttributeProperties(fwdAttr.getProperties());
+        }
         return config.getAttributeProperties();
     }
 
@@ -551,10 +587,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         return reflectionToStringBuilder.toString();
     }
 
+    @Override
     public AttributeValue getWriteValue() {
         return writeValue;
     }
 
+    @Override
     public AttributeValue getReadValue() {
         return readValue;
     }
@@ -621,118 +659,17 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     public void resetPolling() throws DevFailed {
         config.setPolled(false);
         config.setPollingPeriod(0);
-        // PollingUtils.resetPolling(config, attributePropertiesManager);
     }
-
-    // public void updatePollingConfigFromDB() throws DevFailed {
-    // PollingUtils.updatePollingConfigFromDB(config, attributePropertiesManager);
-    // }
 
     public void configureAttributePropFromDb() throws DevFailed {
-        final AttributePropertiesImpl props = config.getAttributeProperties();
-        final Map<String, String> propValues = attributePropertiesManager.getAttributePropertiesFromDB(getName());
-        if (propValues.containsKey(AttributePropertiesImpl.LABEL)) {
-            props.setLabel(propValues.get(AttributePropertiesImpl.LABEL));
+        config.load(deviceName);
+        if (isFwdAttribute) {
+            ((ForwardedAttribute) behavior).setLabel(config.getAttributeProperties().getLabel());
         }
-        if (propValues.containsKey(AttributePropertiesImpl.FORMAT)) {
-            props.setFormat(propValues.get(AttributePropertiesImpl.FORMAT));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.UNIT)) {
-            props.setUnit(propValues.get(AttributePropertiesImpl.UNIT));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.DISPLAY_UNIT)) {
-            props.setDisplayUnit(propValues.get(AttributePropertiesImpl.DISPLAY_UNIT));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.STANDARD_UNIT)) {
-            props.setStandardUnit(propValues.get(AttributePropertiesImpl.STANDARD_UNIT));
-        }
-        setMinMax(props, propValues);
-        if (propValues.containsKey(AttributePropertiesImpl.DESC)) {
-            props.setDescription(propValues.get(AttributePropertiesImpl.DESC));
-        }
-        setEventProperties(props, propValues);
-    }
-
-    private void setMinMax(final AttributePropertiesImpl props, final Map<String, String> propValues) {
-        if (propValues.containsKey(AttributePropertiesImpl.MIN_VAL)) {
-            props.setMinValue(propValues.get(AttributePropertiesImpl.MIN_VAL));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.MAX_VAL)) {
-            props.setMaxValue(propValues.get(AttributePropertiesImpl.MAX_VAL));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.MIN_ALARM)) {
-            props.setMinAlarm(propValues.get(AttributePropertiesImpl.MIN_ALARM));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.MAX_ALARM)) {
-            props.setMaxAlarm(propValues.get(AttributePropertiesImpl.MAX_ALARM));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.MIN_WARNING)) {
-            props.setMinWarning(propValues.get(AttributePropertiesImpl.MIN_WARNING));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.MAX_WARNING)) {
-            props.setMaxWarning(propValues.get(AttributePropertiesImpl.MAX_WARNING));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.DELTA_T)) {
-            props.setDeltaT(propValues.get(AttributePropertiesImpl.DELTA_T));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.DELTA_VAL)) {
-            props.setDeltaVal(propValues.get(AttributePropertiesImpl.DELTA_VAL));
-        }
-    }
-
-    private void setEventProperties(final AttributePropertiesImpl props, final Map<String, String> propValues) {
-
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_ARCHIVE_ABS)) {
-            props.setArchivingEventAbsChange(propValues.get(AttributePropertiesImpl.EVENT_ARCHIVE_ABS));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_ARCHIVE_PERIOD)) {
-            props.setArchivingEventPeriod(propValues.get(AttributePropertiesImpl.EVENT_ARCHIVE_PERIOD));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_ARCHIVE_REL)) {
-            props.setArchivingEventRelChange(propValues.get(AttributePropertiesImpl.EVENT_ARCHIVE_REL));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_CHANGE_ABS)) {
-            props.setEventAbsChange(propValues.get(AttributePropertiesImpl.EVENT_CHANGE_ABS));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_PERIOD)) {
-            props.setEventPeriod(propValues.get(AttributePropertiesImpl.EVENT_PERIOD));
-        }
-        if (propValues.containsKey(AttributePropertiesImpl.EVENT_CHANGE_REL)) {
-            props.setEventRelChange(propValues.get(AttributePropertiesImpl.EVENT_CHANGE_REL));
-        }
-    }
-
-    private void setAttributePropertiesInDb(final AttributePropertiesImpl props) throws DevFailed {
-        final Map<String, String> properties = new HashMap<String, String>();
-        properties.put(AttributePropertiesImpl.LABEL, props.getLabel());
-        properties.put(AttributePropertiesImpl.FORMAT, props.getFormat());
-        properties.put(AttributePropertiesImpl.UNIT, props.getUnit());
-        properties.put(AttributePropertiesImpl.DISPLAY_UNIT, props.getDisplayUnit());
-        properties.put(AttributePropertiesImpl.STANDARD_UNIT, props.getStandardUnit());
-        properties.put(AttributePropertiesImpl.MIN_VAL, props.getMinValue());
-        properties.put(AttributePropertiesImpl.MAX_VAL, props.getMaxValue());
-        properties.put(AttributePropertiesImpl.MIN_ALARM, props.getMinAlarm());
-        properties.put(AttributePropertiesImpl.MAX_ALARM, props.getMaxAlarm());
-        properties.put(AttributePropertiesImpl.MIN_WARNING, props.getMinWarning());
-        properties.put(AttributePropertiesImpl.MAX_WARNING, props.getMaxWarning());
-        properties.put(AttributePropertiesImpl.DELTA_T, props.getDeltaT());
-        properties.put(AttributePropertiesImpl.DELTA_VAL, props.getDeltaVal());
-        properties.put(AttributePropertiesImpl.DESC, props.getDescription());
-        final EventProperties eventProp = props.getEventProp();
-
-        properties.put(AttributePropertiesImpl.EVENT_ARCHIVE_ABS, eventProp.arch_event.abs_change);
-        properties.put(AttributePropertiesImpl.EVENT_ARCHIVE_PERIOD, eventProp.arch_event.period);
-        properties.put(AttributePropertiesImpl.EVENT_ARCHIVE_REL, eventProp.arch_event.rel_change);
-        properties.put(AttributePropertiesImpl.EVENT_CHANGE_ABS, eventProp.ch_event.abs_change);
-        properties.put(AttributePropertiesImpl.EVENT_PERIOD, eventProp.per_event.period);
-        properties.put(AttributePropertiesImpl.EVENT_CHANGE_REL, eventProp.ch_event.rel_change);
-
-        attributePropertiesManager.setAttributePropertiesInDB(getName(), properties);
-
     }
 
     public void removeProperties() throws DevFailed {
-        attributePropertiesManager.removeAttributeProperties(getName());
+        config.clear(deviceName);
     }
 
     public boolean isNumber() {

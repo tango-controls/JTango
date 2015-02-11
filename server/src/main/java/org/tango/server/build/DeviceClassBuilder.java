@@ -66,55 +66,52 @@ public final class DeviceClassBuilder {
      *            The Tango device class name
      */
     public DeviceClassBuilder(final Class<?> clazz, final String className) {
-	this.clazz = clazz;
-	this.className = className;
+        this.clazz = clazz;
+        this.className = className;
     }
 
     public DeviceImpl buildDevice(final String name) throws DevFailed {
-	final String lowerName = name.toLowerCase(Locale.ENGLISH);
-	logger.debug("create device " + lowerName + " of class " + clazz.getName() + " - in");
-	// final DeviceImpl4 devToClean = deviceImplMap.get(lowerName);
-	//
-	// if (devToClean != null) {
-	// LOGGER.debug("cleaning device " + devToClean.getName());
-	// // deviceImplMap.remove(lowerName);
-	// }
-	// deviceNameList.add(lowerName);
+        final String lowerName = name.toLowerCase(Locale.ENGLISH);
+        logger.debug("create device {} of class {}", lowerName, clazz.getName());
+        final DeviceImpl dev = new DeviceBuilder(clazz, className, name).createDevice();
+        deviceImplMap.put(lowerName, dev);
 
-	final DeviceImpl dev = DeviceBuilder.getInstance().createDevice(clazz, className, name);
-	deviceImplMap.put(lowerName, dev);
+        return dev;
 
-	logger.debug("create device " + lowerName + " of class " + clazz.getName() + " - out");
-	return dev;
+    }
 
+    public void removeDevice(final String name) {
+        final String lowerName = name.toLowerCase(Locale.ENGLISH);
+        logger.debug("remove device {}", lowerName);
+        deviceImplMap.remove(lowerName);
     }
 
     public List<DeviceImpl> getDeviceImplList() {
-	return new LinkedList<DeviceImpl>(deviceImplMap.values());
+        return new LinkedList<DeviceImpl>(deviceImplMap.values());
     }
 
     public DeviceImpl getDeviceImpl(final String deviceName) {
-	return deviceImplMap.get(deviceName.toLowerCase(Locale.ENGLISH));
+        return deviceImplMap.get(deviceName.toLowerCase(Locale.ENGLISH));
     }
 
     public boolean containsDevice(final String deviceName) {
-	return deviceImplMap.containsKey(deviceName.toLowerCase(Locale.ENGLISH));
+        return deviceImplMap.containsKey(deviceName.toLowerCase(Locale.ENGLISH));
     }
 
     public void clearDevices() {
-	deviceImplMap.clear();
+        deviceImplMap.clear();
     }
 
     public List<String> getDeviceNameList() {
-	return new ArrayList<String>(deviceImplMap.keySet());
+        return new ArrayList<String>(deviceImplMap.keySet());
     }
 
     public Class<?> getDeviceClass() {
-	return clazz;
+        return clazz;
     }
 
     public String getClassName() {
-	return className;
+        return className;
     }
 
 }

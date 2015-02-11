@@ -29,6 +29,7 @@ import java.lang.reflect.Array;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.orb.ORBManager;
+import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
@@ -42,9 +43,11 @@ import fr.esrf.Tango.AttributeAlarm;
 import fr.esrf.Tango.AttributeConfig;
 import fr.esrf.Tango.AttributeConfig_2;
 import fr.esrf.Tango.AttributeConfig_3;
+import fr.esrf.Tango.AttributeConfig_5;
 import fr.esrf.Tango.AttributeDim;
 import fr.esrf.Tango.AttributeValue_3;
 import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_5;
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 
@@ -133,6 +136,41 @@ public final class TangoIDLAttributeUtil {
         return value3;
     }
 
+    public static AttributeValue_5 toAttributeValue5(final AttributeImpl attributeImpl, final AttributeValue read,
+            final AttributeValue write) throws DevFailed {
+        XLOGGER.entry();
+        final AttributeValue_5 value = new AttributeValue_5();
+        try {
+            final Object readValue = read.getValue();
+            value.name = attributeImpl.getName();
+            value.data_format = attributeImpl.getFormat();
+            value.data_type = attributeImpl.getTangoType();
+            value.w_dim = new AttributeDim();
+            // if attribute has a write value, return it with read value
+            if (attributeImpl.getWritable().equals(AttrWriteType.READ_WRITE) && write != null
+                    && write.getValue() != null) {
+                final Object writeValue = write.getValue();
+                final Object insert = readWriteInArray(readValue, writeValue);
+                value.value = CleverAttrValUnion.set(attributeImpl.getTangoType(), insert);
+                value.w_dim.dim_x = write.getXDim();
+                value.w_dim.dim_y = write.getYDim();
+            } else {
+                value.value = CleverAttrValUnion.set(attributeImpl.getTangoType(), readValue);
+            }
+            value.quality = read.getQuality();
+            value.time = TangoIDLUtil.getTime(read.getTime());
+            value.r_dim = new AttributeDim();
+            value.r_dim.dim_x = read.getXDim();
+            value.r_dim.dim_y = read.getYDim();
+            // LOGGER.debug("get attr dim {} {}", value4.r_dim.dim_x, value4.r_dim.dim_y);
+            value.err_list = new DevError[0];
+        } catch (final IllegalArgumentException e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
+        XLOGGER.exit();
+        return value;
+    }
+
     public static AttributeValue_4 toAttributeValue4(final AttributeImpl attributeImpl, final AttributeValue read,
             final AttributeValue write) throws DevFailed {
         XLOGGER.entry();
@@ -189,7 +227,6 @@ public final class TangoIDLAttributeUtil {
     public static AttributeValue_4 toAttributeValue4Error(final String name, final AttrDataFormat format,
             final DevFailed e) {
         final AttributeValue_4 value4 = new AttributeValue_4();
-
         value4.name = name;
         value4.data_format = format;
         value4.value = new AttrValUnion();
@@ -202,7 +239,23 @@ public final class TangoIDLAttributeUtil {
         return value4;
     }
 
-    public static AttributeConfig toAttributeConfig(final AttributeImpl attribute) {
+    public static AttributeValue_5 toAttributeValue5Error(final String name, final AttrDataFormat format,
+            final int dataType, final DevFailed e) {
+        final AttributeValue_5 value = new AttributeValue_5();
+        value.name = name;
+        value.data_format = format;
+        value.data_type = dataType;
+        value.value = new AttrValUnion();
+        value.value.union_no_data(true);
+        value.quality = AttrQuality.ATTR_INVALID;
+        value.time = TangoIDLUtil.getTime(System.currentTimeMillis());
+        value.r_dim = new AttributeDim();
+        value.w_dim = new AttributeDim();
+        value.err_list = e.errors;
+        return value;
+    }
+
+    public static AttributeConfig toAttributeConfig(final AttributeImpl attribute) throws DevFailed {
         final AttributePropertiesImpl props = attribute.getProperties();
         return new AttributeConfig(attribute.getName(), attribute.getWritable(), attribute.getFormat(),
                 attribute.getTangoType(), attribute.getMaxX(), attribute.getMaxY(), props.getDescription(), attribute
@@ -213,7 +266,7 @@ public final class TangoIDLAttributeUtil {
 
     }
 
-    public static AttributeConfig_2 toAttributeConfig2(final AttributeImpl attribute) {
+    public static AttributeConfig_2 toAttributeConfig2(final AttributeImpl attribute) throws DevFailed {
         final AttributePropertiesImpl props = attribute.getProperties();
         return new AttributeConfig_2(attribute.getName(), attribute.getWritable(), attribute.getFormat(),
                 attribute.getTangoType(), attribute.getMaxX(), attribute.getMaxY(), props.getDescription(), attribute
@@ -223,7 +276,47 @@ public final class TangoIDLAttributeUtil {
                 props.getWritableAttrName(), attribute.getDispLevel(), props.getExtensions());
     }
 
-    public static AttributeConfig_3 toAttributeConfig3(final AttributeImpl attribute) {
+    public static AttributeConfig_5 toAttributeConfig5(final AttributeImpl attribute) throws DevFailed {
+
+        final AttributePropertiesImpl props = attribute.getProperties();
+        final AttributeAlarm alarm = new AttributeAlarm();
+        alarm.delta_t = props.getDeltaT();
+        alarm.delta_val = props.getDeltaVal();
+        alarm.max_alarm = props.getMaxAlarm();
+        alarm.max_warning = props.getMaxWarning();
+        alarm.min_alarm = props.getMinAlarm();
+        alarm.min_warning = props.getMinWarning();
+        alarm.extensions = props.getAlarmExtensions();
+        return new AttributeConfig_5(attribute.getName(), attribute.getWritable(), attribute.getFormat(),
+                attribute.getTangoType(), attribute.isMemorized(), attribute.isMemorizedAtInit(), attribute.getMaxX(),
+                attribute.getMaxY(), props.getDescription(), attribute.getProperties().getLabel(), props.getUnit(),
+                props.getStandardUnit(), attribute.getProperties().getDisplayUnit(), props.getFormat(),
+                props.getMinValue(), attribute.getProperties().getMaxValue(), props.getWritableAttrName(),
+                attribute.getDispLevel(), props.getRootAttribute(), props.getEnumLabels(), alarm, props.getEventProp(),
+                props.getExtensions(), props.getSysExtensions());
+    }
+
+    public static AttributeConfig_5 toAttributeConfig5(final AttributeConfiguration config) throws DevFailed {
+
+        final AttributePropertiesImpl props = config.getAttributeProperties();
+        final AttributeAlarm alarm = new AttributeAlarm();
+        alarm.delta_t = props.getDeltaT();
+        alarm.delta_val = props.getDeltaVal();
+        alarm.max_alarm = props.getMaxAlarm();
+        alarm.max_warning = props.getMaxWarning();
+        alarm.min_alarm = props.getMinAlarm();
+        alarm.min_warning = props.getMinWarning();
+        alarm.extensions = props.getAlarmExtensions();
+        return new AttributeConfig_5(config.getName(), config.getWritable(), config.getFormat(), config.getTangoType(),
+                config.isMemorized(), config.isMemorizedAtInit(), config.getMaxX(), config.getMaxY(),
+                props.getDescription(), config.getAttributeProperties().getLabel(), props.getUnit(),
+                props.getStandardUnit(), config.getAttributeProperties().getDisplayUnit(), props.getFormat(),
+                props.getMinValue(), config.getAttributeProperties().getMaxValue(), props.getWritableAttrName(),
+                config.getDispLevel(), props.getRootAttribute(), props.getEnumLabels(), alarm, props.getEventProp(),
+                props.getExtensions(), props.getSysExtensions());
+    }
+
+    public static AttributeConfig_3 toAttributeConfig3(final AttributeImpl attribute) throws DevFailed {
 
         final AttributePropertiesImpl props = attribute.getProperties();
         final AttributeAlarm alarm = new AttributeAlarm();
@@ -296,6 +389,33 @@ public final class TangoIDLAttributeUtil {
         props.setSysExtensions(config.sys_extensions);
         props.setUnit(config.unit);
         props.setWritableAttrName(config.writable_attr_name);
+        return props;
+    }
+
+    public static AttributePropertiesImpl toAttributeProperties(final AttributeConfig_5 config) throws DevFailed {
+        final AttributePropertiesImpl props = new AttributePropertiesImpl();
+        props.setAlarmExtensions(config.att_alarm.extensions);
+        props.setDeltaT(config.att_alarm.delta_t);
+        props.setDeltaVal(config.att_alarm.delta_val);
+        props.setDescription(config.description);
+        props.setDisplayUnit(config.display_unit);
+        props.setEventProp(config.event_prop);
+        props.setExtensions(config.extensions);
+        props.setFormat(config.format);
+        props.setLabel(config.label);
+        props.setMaxAlarm(config.att_alarm.max_alarm);
+        props.setMaxValue(config.max_value);
+        props.setMaxWarning(config.att_alarm.max_warning);
+        props.setMinAlarm(config.att_alarm.min_alarm);
+        props.setMinValue(config.min_value);
+        props.setMinWarning(config.att_alarm.min_warning);
+        props.setStandardUnit(config.standard_unit);
+        props.setSysExtensions(config.sys_extensions);
+        props.setUnit(config.unit);
+        props.setWritableAttrName(config.writable_attr_name);
+        props.setEnumLabels(config.enum_labels);
+        // TODO memorized
+        // props.setRootAttribute(config.root_attr_name);
         return props;
     }
 }

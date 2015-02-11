@@ -72,13 +72,7 @@ public final class AttributeCache {
     public void stopRefresh() {
         if (result != null) {
             logger.debug("stop refresh cache of {}", attribute.getName());
-            final boolean isCancelled = result.cancel(true);
-            if (!isCancelled) {
-                logger.warn("stop refresh NOT CANCELLED");
-                // n.throwDevFailed("STOP_REFRESH",
-                // "error stopping refresh of "
-                // + attribute.getName());
-            }
+            result.cancel(true);
         }
     }
 

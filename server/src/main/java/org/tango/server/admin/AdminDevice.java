@@ -51,12 +51,14 @@ import org.tango.server.annotation.StateMachine;
 import org.tango.server.annotation.Status;
 import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.build.DeviceClassBuilder;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
 import org.tango.server.export.IExporter;
+import org.tango.server.pipe.PipeImpl;
 import org.tango.server.properties.ClassPropertyImpl;
 import org.tango.server.properties.DevicePropertyImpl;
 import org.tango.server.servant.DeviceImpl;
@@ -705,77 +707,101 @@ public final class AdminDevice {
         }
         final String deviceName = argin[0].toLowerCase(Locale.ENGLISH);
         final String attributeName = argin[1].toLowerCase(Locale.ENGLISH);
+
         // argin[2] - "subscribe" not used.
         final EventType eventType = EventType.getEvent(argin[3].toLowerCase(Locale.ENGLISH));
         // Search the specified device and attribute objects
         DeviceImpl device = null;
         AttributeImpl attribute = null;
+        PipeImpl pipe = null;
         for (final DeviceClassBuilder deviceClass : classList) {
             for (final DeviceImpl deviceImpl : deviceClass.getDeviceImplList()) {
                 if (deviceImpl.getName().toLowerCase(Locale.ENGLISH).equals(deviceName)) {
-                    for (final AttributeImpl attributeImpl : deviceImpl.getAttributeList()) {
-
-                        if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
-
-                            if (attributeImpl.isPolled()) {
-                                // Check if event criteria are set. Otherwise a DevFailed is thrown
-                                EventManager.checkEventCriteria(attributeImpl, eventType);
+                    if (eventType.equals(EventType.INTERFACE_CHANGE_EVENT)) {
+                        // event for INTERFACE_CHANGE_EVENT does not have an attribute
+                        device = deviceImpl;
+                    } else if (eventType.equals(EventType.PIPE_EVENT)) {
+                        for (final PipeImpl pipeImpl : deviceImpl.getPipeList()) {
+                            if (pipeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
                                 // Found. Store objects
                                 device = deviceImpl;
-                                attribute = attributeImpl;
-
-                            } else {
-                                // check if event is pushed from device
-                                boolean throwError = false;
-                                switch (eventType) {
-                                    case ARCHIVE_EVENT:
-                                        if (!attributeImpl.isPushArchiveEvent()) {
-                                            throwError = true;
-                                        }
-                                        break;
-                                    case CHANGE_EVENT:
-                                        if (!attributeImpl.isPushChangeEvent()) {
-                                            throwError = true;
-                                        }
-                                        break;
-                                    case DATA_READY_EVENT:
-                                        if (!attributeImpl.isPushDataReady()) {
-                                            throwError = true;
-                                        }
-                                        break;
-                                    case USER_EVENT:
-                                        break;
-                                    case PERIODIC_EVENT:
-                                    default:
-                                        throwError = true;
-                                        break;
-
-                                }
-                                if (throwError) {
-                                    DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
-                                            "The polling (necessary to send events) for the attribute " + attributeName
-                                                    + " is not started");
-                                } else {
-                                    device = deviceImpl;
-                                    attribute = attributeImpl;
-                                }
+                                pipe = pipeImpl;
                             }
                         }
+                    } else {
+                        for (final AttributeImpl attributeImpl : deviceImpl.getAttributeList()) {
+                            if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
+                                if (attributeImpl.getBehavior() instanceof ForwardedAttribute) {
+                                    // Found. Store objects
+                                    device = deviceImpl;
+                                    attribute = attributeImpl;
+                                } else if (attributeImpl.isPolled()) {
+                                    // Check if event criteria are set. Otherwise a DevFailed is thrown
+                                    EventManager.checkEventCriteria(attributeImpl, eventType);
+                                    // Found. Store objects
+                                    device = deviceImpl;
+                                    attribute = attributeImpl;
+
+                                } else {
+                                    // check if event is pushed from device
+                                    boolean throwError = false;
+                                    switch (eventType) {
+                                        case ARCHIVE_EVENT:
+                                            if (!attributeImpl.isPushArchiveEvent()) {
+                                                throwError = true;
+                                            }
+                                            break;
+                                        case CHANGE_EVENT:
+                                            if (!attributeImpl.isPushChangeEvent()) {
+                                                throwError = true;
+                                            }
+                                            break;
+                                        case DATA_READY_EVENT:
+                                            if (!attributeImpl.isPushDataReady()) {
+                                                throwError = true;
+                                            }
+                                            break;
+                                        case USER_EVENT:
+                                        case ATT_CONF_EVENT:
+                                        case INTERFACE_CHANGE_EVENT:
+                                            break;
+                                        case PERIODIC_EVENT:
+                                        default:
+                                            throwError = true;
+                                            break;
+
+                                    }
+                                    if (throwError) {
+                                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
+                                                "The polling (necessary to send events) for the attribute "
+                                                        + attributeName + " is not started");
+                                    } else {
+                                        device = deviceImpl;
+                                        attribute = attributeImpl;
+                                    }
+                                }
+                            }
+                        } // end for
                     }
 
-                    if (attribute == null) { // Not found
+                    if (eventType.equals(EventType.PIPE_EVENT)) {
+                        if (pipe == null) {
+                            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Pipe " + attributeName
+                                    + " not found");
+                        }
+                    } else if (!eventType.equals(EventType.INTERFACE_CHANGE_EVENT) && attribute == null) { // Not found
                         DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + attributeName
                                 + " not found");
                     }
                 }
             }
         }
-
         logger.debug("Subscribe event for {}/{} with type {}", new Object[] { deviceName, attributeName, eventType });
 
         if (device == null) { // Not found
             DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, "Device " + deviceName + " not found");
         }
+
         xlogger.exit();
 
         // Subscribe and returns connection parameters for client
@@ -787,9 +813,19 @@ public final class AdminDevice {
         // - Lg[3] = Multicast info
         // - Lg[4] = Multicast info
         // - Lg[5] = ZMQ release
-        return EventManager.getInstance().getConnectionParameters(deviceName, attribute, eventType);
-
+        DevVarLongStringArray result;
+        if (eventType.equals(EventType.INTERFACE_CHANGE_EVENT)) {
+            // event for INTERFACE_CHANGE_EVENT does not have an attribute
+            result = EventManager.getInstance().getConnectionParameters(deviceName);
+        } else if (eventType.equals(EventType.PIPE_EVENT)) {
+            result = EventManager.getInstance().getConnectionParameters(deviceName, pipe);
+        } else {
+            result = EventManager.getInstance().getConnectionParameters(deviceName, attribute, eventType);
+        }
+        return result;
     }
+
+    // TODO command EventConfirmSubscription
 
     /**
      * 

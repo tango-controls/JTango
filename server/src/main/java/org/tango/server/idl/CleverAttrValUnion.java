@@ -103,7 +103,7 @@ public final class CleverAttrValUnion {
         Object result = null;
         if (union != null) {
             final AttributeDataType discriminator = union.discriminator();
-            if (discriminator.value() == AttributeDataType._NO_DATA) {
+            if (discriminator.value() == AttributeDataType._ATT_NO_DATA) {
                 throw DevFailedUtils.newDevFailed("there is not data");
             }
             try {

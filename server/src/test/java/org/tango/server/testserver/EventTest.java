@@ -32,9 +32,11 @@ import java.io.IOException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.tango.server.ServerManager;
+import org.tango.server.events.EventType;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrQuality;
@@ -45,9 +47,10 @@ import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
 
-@Ignore("TODO: tests not fully stable (work 99% of time)")
+//@Ignore("TODO: tests not fully stable (work 99% of time)")
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EventTest {
-
+// XXX dependency to tangodb
     private static String deviceName = "tmp/test/event";
 
     // private static String adminName;
@@ -79,8 +82,41 @@ public class EventTest {
         System.out.println("stop device out");
     }
 
-    @Test(timeout = 1000)
+    // @Ignore
+    @Test(timeout = 3000)
+    public void aInterfaceChange() throws DevFailed {
+        System.out.println("\t####interfaceChange");
+        try {
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            // dev.subscribe_event("booleanAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
+            // TangoConst.NOT_STATELESS);
+            // dev.subscribe_event("doubleAtt", TangoConst.PERIODIC_EVENT, 100, new String[] {},
+            // TangoConst.NOT_STATELESS);
+            final int id = dev.subscribe_event(TangoConst.INTERFACE_CHANGE, 100, TangoConst.NOT_STATELESS);
+            int eventsNb = 0;
+            dev.command_inout("Init");
+            while (eventsNb < 3) {
+                final EventData[] events = dev.get_events();
+                for (final EventData eventData : events) {
+                    if (eventData.event_type == EventType.INTERFACE_CHANGE_EVENT.getValue()) {
+                        eventsNb++;
+                        System.out.println("received INTERFACE_CHANGE for: "
+                                + eventData.deviceInterface.getAttributeNumber());
+                        dev.command_inout("Init");
+                    }
+                }
+            }
+            dev.unsubscribe_event(id);
+        } catch (final DevFailed e) {
+            e.printStackTrace();
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
+    }
+
+    @Test(timeout = 3000)
     public void changeNumberScalar() throws DevFailed {
+        System.out.println("\t####changeNumberScalar");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -101,8 +137,9 @@ public class EventTest {
         dev.unsubscribe_event(id);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeNumberScalarRelative() throws DevFailed {
+        System.out.println("\t####changeNumberScalarRelative");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("changeRelative", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -129,8 +166,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void archiveScalar() throws DevFailed {
+        System.out.println("\t####archiveScalar");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("archive", TangoConst.ARCHIVE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -154,8 +192,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeBooleanScalar() throws DevFailed {
+        System.out.println("\t####changeBooleanScalar");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("booleanAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -170,6 +209,8 @@ public class EventTest {
                         eventsNb++;
                         previousValue = value;
                         value = eventData.attr_value.extractBoolean();
+                        System.out.println("read value " + value);
+                        System.out.println("read value time " + eventData.attr_value.getTime());
                         assertThat(eventData.attr_value.getTime(), equalTo(34567L));
                     }
                 }
@@ -180,8 +221,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void periodic() throws DevFailed {
+        System.out.println("\t####periodic");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleAtt", TangoConst.PERIODIC_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -205,8 +247,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeNumberArray() throws DevFailed {
+        System.out.println("\t####changeNumberArray");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleArrayAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -232,6 +275,7 @@ public class EventTest {
 
     @Test(timeout = 10000)
     public void changeStringScalar() throws DevFailed {
+        System.out.println("\t####changeStringScalar");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("stringAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -256,8 +300,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeBooleanArray() throws DevFailed {
+        System.out.println("\t####changeBooleanArray");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("booleanArrayAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -282,8 +327,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeStringArray() throws DevFailed {
+        System.out.println("\t####changeStringArray");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("stringArrayAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -308,8 +354,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeStateScalar() throws DevFailed {
+        System.out.println("\t####changeStateScalar");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("state", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -337,8 +384,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeDevEncoded() throws DevFailed {
+        System.out.println("\t####changeDevEncoded");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("devEncodedAttr", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -363,8 +411,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeStateArray() throws DevFailed {
+        System.out.println("\t####changeStateArray");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("stateArray", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -389,8 +438,9 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeQuality() throws DevFailed {
+        System.out.println("\t####changeQuality");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("qualityAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -415,8 +465,9 @@ public class EventTest {
         }
     }
 
-    @Test(expected = DevFailed.class, timeout = 1000)
+    @Test(expected = DevFailed.class, timeout = 3000)
     public void error() throws DevFailed {
+        System.out.println("\t####error");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("errorAtt", TangoConst.USER_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -440,8 +491,9 @@ public class EventTest {
      * 
      * @throws DevFailed
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeErrorAppears() throws DevFailed {
+        System.out.println("\t####changeErrorAppears");
         final DeviceProxy dev = new DeviceProxy(deviceName);
 
         final int id = dev.subscribe_event("error", TangoConst.CHANGE_EVENT, 100, new String[] {},
@@ -505,8 +557,9 @@ public class EventTest {
      * 
      * @throws DevFailed
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeErrorChange() throws DevFailed {
+        System.out.println("\t####changeErrorChange");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("error", TangoConst.CHANGE_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -528,7 +581,9 @@ public class EventTest {
                 for (final EventData eventData : events) {
                     if (eventData.name.endsWith("error")) {
                         if (eventData.err) {
+
                             final DevFailed e = new DevFailed(eventData.errors);
+                            System.out.println("received error " + DevFailedUtils.toString(e));
                             if (DevFailedUtils.toString(e).contains("error0")) {
                             } else if (DevFailedUtils.toString(e).contains("error1")) {
                                 error1 = true;
@@ -555,8 +610,9 @@ public class EventTest {
      * 
      * @throws DevFailed
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void changeErrorDisappear() throws DevFailed {
+        System.out.println("\t####changeErrorDisappear");
         final DeviceProxy dev = new DeviceProxy(deviceName);
 
         final int id = dev.subscribe_event("error", TangoConst.CHANGE_EVENT, 100, new String[] {},
@@ -592,8 +648,9 @@ public class EventTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void user() throws DevFailed {
+        System.out.println("\t####user");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("userEvent", TangoConst.USER_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -620,9 +677,10 @@ public class EventTest {
         }
     }
 
-    @Test(timeout = 10000)
-    @Ignore
+    @Test(timeout = 30000)
+    // @Ignore
     public void dataReady() throws DevFailed {
+        System.out.println("\t####dataReady");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleArrayAtt", TangoConst.DATA_READY_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -658,6 +716,7 @@ public class EventTest {
 
     @Test(timeout = 3000)
     public void changeAttrConfig() throws DevFailed {
+        System.out.println("\t####changeAttrConfig");
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("doubleAtt", TangoConst.ATT_CONF_EVENT, 100, new String[] {},
                 TangoConst.NOT_STATELESS);
@@ -673,6 +732,7 @@ public class EventTest {
                     if (eventData.name.contains("doubleatt")) {
                         previousValue = value;
                         value = eventData.attr_config.events.arch_event.abs_change;
+                        // System.out.println("read value " + eventData.attr_config.name);
                         eventCount++;
                     }
                 }

@@ -305,7 +305,7 @@ public class ChangeEventTrigger implements IEventTrigger {
     }
 
     @Override
-    public void updateProperties() {
+    public void updateProperties() throws DevFailed {
         final EventProperties props = attribute.getProperties().getEventProp();
         setCriteria(props.ch_event.abs_change, props.ch_event.rel_change);
     }
