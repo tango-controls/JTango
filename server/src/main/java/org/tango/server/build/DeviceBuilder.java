@@ -100,27 +100,27 @@ public final class DeviceBuilder {
             device = new DeviceImpl(name, className, txType, businessObject, deviceType);
             addSuperDevices();
 
-            final Reflections reflectionsMethods = new Reflections(clazz.getCanonicalName(),
-                    new MethodAnnotationsScanner());
-            final Reflections reflectionsFields = new Reflections(clazz.getCanonicalName(),
-                    new FieldAnnotationsScanner());
-            createBusinessObjectAttrCmd(reflectionsMethods, false);
-            createBusinessObjectAttrField(reflectionsFields, false);
-            createBusinessObjectInitDelete(reflectionsMethods);
-            createBusinessObjectAroundInvoke(reflectionsMethods);
-            createBusinessObjectFields(reflectionsFields);
-            createBusinessObjectDeviceProperties(reflectionsFields);
-            createBusinessObjectProps(reflectionsFields);
-            createBusinessObjectState(reflectionsFields);
-            createBusinessObjectPipes(reflectionsFields);
-
             // create default attributes and commands
             final Reflections reflectionsMethodsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
                     new MethodAnnotationsScanner());
             final Reflections reflectionsFieldsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
                     new FieldAnnotationsScanner());
-            createBusinessObjectAttrCmd(reflectionsMethodsDeviceImpl, true);
             createBusinessObjectAttrField(reflectionsFieldsDeviceImpl, true);
+            createBusinessObjectAttrCmd(reflectionsMethodsDeviceImpl, true);
+
+            final Reflections reflectionsMethods = new Reflections(clazz.getCanonicalName(),
+                    new MethodAnnotationsScanner());
+            final Reflections reflectionsFields = new Reflections(clazz.getCanonicalName(),
+                    new FieldAnnotationsScanner());
+            createBusinessObjectState(reflectionsFields);
+            createBusinessObjectAttrField(reflectionsFields, false);
+            createBusinessObjectAttrCmd(reflectionsMethods, false);
+            createBusinessObjectInitDelete(reflectionsMethods);
+            createBusinessObjectAroundInvoke(reflectionsMethods);
+            createBusinessObjectFields(reflectionsFields);
+            createBusinessObjectDeviceProperties(reflectionsFields);
+            createBusinessObjectProps(reflectionsFields);
+            createBusinessObjectPipes(reflectionsFields);
 
         } catch (final InstantiationException e) {
             DevFailedUtils.throwDevFailed(e);
