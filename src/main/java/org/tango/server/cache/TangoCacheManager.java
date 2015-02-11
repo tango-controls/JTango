@@ -377,6 +377,8 @@ public final class TangoCacheManager {
         if (statusCache != null) {
             statusCache.stopRefresh();
         }
+        pollingPool.shutdownNow();
+        pollingPool = new ScheduledThreadPoolExecutor(poolSize, new TangoCacheThreadFactory());
     }
 
     /**

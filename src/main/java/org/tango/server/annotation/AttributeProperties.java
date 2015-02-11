@@ -61,7 +61,7 @@ public @interface AttributeProperties {
 
     String displayUnit() default AttributePropertiesImpl.NO_DIPLAY_UNIT;
 
-    String format() default AttributePropertiesImpl.FORMAT;
+    String format() default AttributePropertiesImpl.FORMAT_6_2F;
 
     String minValue() default AttributePropertiesImpl.NOT_SPECIFIED;
 
@@ -90,4 +90,6 @@ public @interface AttributeProperties {
     String archiveEventRelative() default AttributePropertiesImpl.NOT_SPECIFIED;
 
     String archiveEventPeriod() default AttributePropertiesImpl.NOT_SPECIFIED;
+
+    String rootAttribute() default AttributePropertiesImpl.NOT_SPECIFIED;
 }

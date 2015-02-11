@@ -63,6 +63,8 @@ import fr.esrf.Tango.Device_3;
 import fr.esrf.Tango.Device_3Helper;
 import fr.esrf.Tango.Device_4;
 import fr.esrf.Tango.Device_4Helper;
+import fr.esrf.Tango.Device_5;
+import fr.esrf.Tango.Device_5Helper;
 
 /**
  * Initialize, shutdown the ORB
@@ -140,7 +142,10 @@ public final class ORBManager {
         } catch (final InvalidName e) {
             DevFailedUtils.throwDevFailed(e);
         } catch (final INITIALIZE e) {
-            // ignore occurs when starting several times a server that failed
+            // ignore, occurs when starting several times a server that failed
+            if (!useDb) {
+                DevFailedUtils.throwDevFailed(e);
+            }
         }
 
         try {
@@ -198,40 +203,46 @@ public final class ORBManager {
     private static void checkServerRunning(final DeviceImportInfo importInfo, final String toBeImported)
             throws DevFailed {
         XLOGGER.entry();
+        Device_5 devIDL5 = null;
         Device_4 devIDL4 = null;
         Device_3 devIDL3 = null;
         Device_2 devIDL2 = null;
         Device devIDL1 = null;
         try {
-            // try IDL4
+            // try IDL5
             try {
-                devIDL4 = narrowIDL4(importInfo);
+                devIDL5 = narrowIDL5(importInfo);
             } catch (final BAD_PARAM e) {
-                // maybe another IDL is currently running
-                // try IDL3
+                // try IDL4
                 try {
-                    devIDL3 = narrowIDL3(importInfo);
-                } catch (final BAD_PARAM e1) {
+                    devIDL4 = narrowIDL4(importInfo);
+                } catch (final BAD_PARAM e4) {
                     // maybe another IDL is currently running
-                    // try IDL2
+                    // try IDL3
                     try {
-                        devIDL2 = narrowIDL2(importInfo);
-                    } catch (final BAD_PARAM e2) {
+                        devIDL3 = narrowIDL3(importInfo);
+                    } catch (final BAD_PARAM e1) {
                         // maybe another IDL is currently running
-                        // try IDL1
+                        // try IDL2
                         try {
-                            devIDL1 = narrowIDL1(importInfo);
-                        } catch (final BAD_PARAM e3) {
-                            // may not occur, unknown CORBA server
-                            DevFailedUtils.throwDevFailed(e);
+                            devIDL2 = narrowIDL2(importInfo);
+                        } catch (final BAD_PARAM e2) {
+                            // maybe another IDL is currently running
+                            // try IDL1
+                            try {
+                                devIDL1 = narrowIDL1(importInfo);
+                            } catch (final BAD_PARAM e3) {
+                                // may not occur, unknown CORBA server
+                                DevFailedUtils.throwDevFailed(e);
+                            }
                         }
                     }
                 }
             }
-            if (devIDL4 == null && devIDL3 == null && devIDL2 == null && devIDL1 == null) {
+            if (devIDL5 == null && devIDL4 == null && devIDL3 == null && devIDL2 == null && devIDL1 == null) {
                 LOGGER.debug("out, device is not running");
             } else {
-                checkDeviceName(toBeImported, devIDL4, devIDL3, devIDL2, devIDL1);
+                checkDeviceName(toBeImported, devIDL5, devIDL4, devIDL3, devIDL2, devIDL1);
             }
         } catch (final org.omg.CORBA.TIMEOUT e) {
             // Receive a Timeout exception ---> It is not running !!!!
@@ -252,11 +263,13 @@ public final class ORBManager {
         XLOGGER.exit();
     }
 
-    private static void checkDeviceName(final String toBeImported, final Device_4 devIDL4, final Device_3 devIDL3,
-            final Device_2 devIDL2, final Device devIDL1) throws DevFailed {
+    private static void checkDeviceName(final String toBeImported, final Device_5 devIDL5, final Device_4 devIDL4,
+            final Device_3 devIDL3, final Device_2 devIDL2, final Device devIDL1) throws DevFailed {
         // get the device name from the server
         try {
-            if (devIDL4 != null) {
+            if (devIDL5 != null) {
+                checkDev(toBeImported, devIDL5.name(), "5");
+            } else if (devIDL4 != null) {
                 checkDev(toBeImported, devIDL4.name(), "4");
             } else if (devIDL3 != null) {
                 checkDev(toBeImported, devIDL3.name(), "3");
@@ -284,6 +297,16 @@ public final class ORBManager {
         if (deviceName.equals(toBeImported)) {
             DevFailedUtils.throwDevFailed(INIT_ERROR, "This server is already running in IDL" + version + ", exiting!");
         }
+    }
+
+    private static Device_5 narrowIDL5(final DeviceImportInfo importInfo) throws DevFailed {
+        Device_5 dev = null;
+        final org.omg.CORBA.Object obj = orb.string_to_object(importInfo.getIor());
+        LOGGER.debug("try narrow {} as IDL5 with PID {} because it is exported ", importInfo.getName(),
+                importInfo.getPid());
+        dev = Device_5Helper.narrow(obj);
+        LOGGER.debug("narrow IDL5 done");
+        return dev;
     }
 
     private static Device_4 narrowIDL4(final DeviceImportInfo importInfo) throws DevFailed {

@@ -8,7 +8,8 @@
     <version>1.0.2</version>
   </parent>
   <artifactId>JTangoServer</artifactId>
-  <version>1.1.8-SNAPSHOT</version>
+	<version>9.0.0-SNAPSHOT</version>
+
   <name>JTango Server</name>
   <description>Library for Tango Server (ie. Tango Device) in Java</description>
   <inceptionYear>2012</inceptionYear>
@@ -105,6 +106,7 @@
             </executions>
           </plugin>
           <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <executions>
               <execution>
@@ -113,6 +115,7 @@
                   <goal>attached</goal>
                 </goals>
                 <configuration>
+									<finalName>JTango-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/assembly/assembly.xml</descriptor>
                   </descriptors>
@@ -130,8 +133,9 @@
                   <goal>shade</goal>
                 </goals>
                 <configuration>
+									<finalName>JTango-${project.version}</finalName>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
-                  <shadedClassifierName>all</shadedClassifierName>
+									<!-- <shadedClassifierName>all</shadedClassifierName> -->
                 </configuration>
               </execution>
             </executions>
@@ -144,7 +148,7 @@
     <dependency>
       <groupId>org.tango</groupId>
       <artifactId>JTangoClientLang</artifactId>
-      <version>1.0.14</version>
+			<version>9.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -182,6 +186,11 @@
       <version>3.2</version>
     </dependency>
     <dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.9-RC1</version>
+		</dependency>
+		<dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>

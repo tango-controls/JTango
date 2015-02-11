@@ -72,14 +72,7 @@ public final class CommandCache {
     public void stopRefresh() {
         if (result != null) {
             logger.debug("stop refresh cache of {}", command.getName());
-            final boolean isCancelled = result.cancel(true);
-            if (!isCancelled) {
-                logger.warn("stop refresh NOT CANCELLED");
-                // DevFailedUtils.throwDevFailed("STOP_REFRESH",
-                // "error stopping refresh of "
-                // + attribute.getName());
-            }
-
+            result.cancel(true);
         }
     }
 

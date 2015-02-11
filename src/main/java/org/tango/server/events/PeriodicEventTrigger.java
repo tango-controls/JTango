@@ -93,7 +93,7 @@ public class PeriodicEventTrigger implements IEventTrigger {
     }
 
     @Override
-    public void updateProperties() {
+    public void updateProperties() throws DevFailed {
         final EventProperties props = attribute.getProperties().getEventProp();
         try {
             period = Long.parseLong(props.per_event.period);

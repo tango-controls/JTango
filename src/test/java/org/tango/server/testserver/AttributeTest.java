@@ -160,6 +160,8 @@ public class AttributeTest extends NoDBDeviceManager {
                         // Fin Array.asList
                         // STATE
                         { DevState.ALARM, "stateScalar" },
+                         { (short) 2, "enumAttribute" },
+                         { (short) 2, "DevEnumDynamic" },
                         { new DevState[] { DevState.FAULT, DevState.OFF }, "stateSpectrum" } });
     }
 

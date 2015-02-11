@@ -44,7 +44,7 @@ import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.Device;
-import fr.esrf.Tango.Device_4;
+import fr.esrf.Tango.Device_5;
 
 public final class ORBUtils {
 
@@ -56,11 +56,11 @@ public final class ORBUtils {
     }
 
     public static void exportDevice(final DeviceImpl dev, final String hostName, final String pid) throws DevFailed {
-	if (DatabaseFactory.isUseDb()) {
-	    exportDeviceWithDatabase(dev, hostName, pid);
-	} else {
-	    exportDeviceWithoutDatabase(dev);
-	}
+        if (DatabaseFactory.isUseDb()) {
+            exportDeviceWithDatabase(dev, hostName, pid);
+        } else {
+            exportDeviceWithoutDatabase(dev);
+        }
     }
 
     /**
@@ -71,79 +71,79 @@ public final class ORBUtils {
      * @throws DevFailed
      */
     private static void exportDeviceWithDatabase(final DeviceImpl dev, final String hostName, final String pid)
-	    throws DevFailed {
-	XLOGGER.entry(dev.getName());
+            throws DevFailed {
+        XLOGGER.entry(dev.getName());
 
-	final ORB orb = ORBManager.getOrb();
-	// Activate the CORBA object incarnated by the Java object
-	final Device_4 d = dev._this(orb);
+        final ORB orb = ORBManager.getOrb();
+        // Activate the CORBA object incarnated by the Java object
+        final Device_5 d = dev._this(orb);
 
-	// Get the object id and store it
+        // Get the object id and store it
 
-	final POA poa = ORBManager.getPoa();
+        final POA poa = ORBManager.getPoa();
 
-	try {
-	    dev.setObjId(poa.reference_to_id(d));
-	} catch (final WrongAdapter e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final WrongPolicy e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
+        try {
+            dev.setObjId(poa.reference_to_id(d));
+        } catch (final WrongAdapter e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final WrongPolicy e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
 
-	final DeviceExportInfo info = new DeviceExportInfo(dev.getName(), orb.object_to_string(d), hostName,
-		Integer.toString(DeviceImpl.SERVER_VERSION), pid, dev.getClassName());
-	DatabaseFactory.getDatabase().exportDevice(info);
+        final DeviceExportInfo info = new DeviceExportInfo(dev.getName(), orb.object_to_string(d), hostName,
+                Integer.toString(DeviceImpl.SERVER_VERSION), pid, dev.getClassName());
+        DatabaseFactory.getDatabase().exportDevice(info);
 
-	XLOGGER.exit();
+        XLOGGER.exit();
     }
 
     private static void exportDeviceWithoutDatabase(final DeviceImpl dev) throws DevFailed {
-	XLOGGER.entry(dev.getName());
+        XLOGGER.entry(dev.getName());
 
-	// For server without db usage.
-	// it is necessary to create our own CORBA object id and to bind it into
-	// the OOC Boot Manager for access through a stringified object
-	// reference
-	// constructed using the corbaloc style
-	final String lowerCaseDevice = dev.getName().toLowerCase(Locale.ENGLISH);
-	final byte[] oid = lowerCaseDevice.getBytes();
-	final POA poa = ORBManager.getPoa();
-	try {
-	    poa.activate_object_with_id(oid, dev);
-	} catch (final ServantAlreadyActive e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final ObjectAlreadyActive e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final WrongPolicy e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
-	// Get the object id and store it
-	dev._this(ORBManager.getOrb());
-	dev.setObjId(oid);
+        // For server without db usage.
+        // it is necessary to create our own CORBA object id and to bind it into
+        // the OOC Boot Manager for access through a stringified object
+        // reference
+        // constructed using the corbaloc style
+        final String lowerCaseDevice = dev.getName().toLowerCase(Locale.ENGLISH);
+        final byte[] oid = lowerCaseDevice.getBytes();
+        final POA poa = ORBManager.getPoa();
+        try {
+            poa.activate_object_with_id(oid, dev);
+        } catch (final ServantAlreadyActive e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final ObjectAlreadyActive e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final WrongPolicy e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
+        // Get the object id and store it
+        dev._this(ORBManager.getOrb());
+        dev.setObjId(oid);
 
-	registerDeviceForJacorb(lowerCaseDevice);
+        registerDeviceForJacorb(lowerCaseDevice);
 
-	XLOGGER.exit();
+        XLOGGER.exit();
     }
 
     public static IORDump getIORDump(final DeviceImpl dev) throws DevFailed {
-	final ORB orb = ORBManager.getOrb();
-	final Device d = dev._this(orb);
-	return new IORDump(dev.getName(), orb.object_to_string(d));
+        final ORB orb = ORBManager.getOrb();
+        final Device d = dev._this(orb);
+        return new IORDump(dev.getName(), orb.object_to_string(d));
     }
 
     public static void unexportDevice(final DeviceImpl device) throws DevFailed {
-	XLOGGER.entry(device.getName());
-	device.deleteDevice();
-	final POA poa = ORBManager.getPoa();
-	try {
-	    poa.deactivate_object(device.getObjId());
-	} catch (final ObjectNotActive e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final WrongPolicy e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
-	XLOGGER.exit();
+        XLOGGER.entry(device.getName());
+        device.deleteDevice();
+        final POA poa = ORBManager.getPoa();
+        try {
+            poa.deactivate_object(device.getObjId());
+        } catch (final ObjectNotActive e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final WrongPolicy e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
+        XLOGGER.exit();
     }
 
     /**
@@ -155,20 +155,20 @@ public final class ORBUtils {
      * @throws DevFailed
      */
     private static void registerDeviceForJacorb(final String name) throws DevFailed {
-	// Get the 3 fields of device name
-	final StringTokenizer st = new StringTokenizer(name, "/");
-	final String[] field = new String[3];
-	for (int i = 0; i < 3 && st.countTokens() > 0; i++) {
-	    field[i] = st.nextToken();
-	}
+        // Get the 3 fields of device name
+        final StringTokenizer st = new StringTokenizer(name, "/");
+        final String[] field = new String[3];
+        for (int i = 0; i < 3 && st.countTokens() > 0; i++) {
+            field[i] = st.nextToken();
+        }
 
-	// After a header used by JacORB, in the device name
-	// the '/' char must be replaced by another separator
-	final String separator = "&%25";
-	final String targetname = ORBManager.SERVER_IMPL_NAME + "/" + ORBManager.NODB_POA + "/" + field[0] + separator
-		+ field[1] + separator + field[2];
-	// And set the JacORB objectKeyMap HashMap
-	final org.jacorb.orb.ORB jacorb = (org.jacorb.orb.ORB) ORBManager.getOrb();
-	jacorb.addObjectKey(name, targetname);
+        // After a header used by JacORB, in the device name
+        // the '/' char must be replaced by another separator
+        final String separator = "&%25";
+        final String targetname = ORBManager.SERVER_IMPL_NAME + "/" + ORBManager.NODB_POA + "/" + field[0] + separator
+                + field[1] + separator + field[2];
+        // And set the JacORB objectKeyMap HashMap
+        final org.jacorb.orb.ORB jacorb = (org.jacorb.orb.ORB) ORBManager.getOrb();
+        jacorb.addObjectKey(name, targetname);
     }
 }

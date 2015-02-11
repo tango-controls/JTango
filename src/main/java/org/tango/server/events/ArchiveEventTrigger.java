@@ -107,7 +107,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
     }
 
     @Override
-    public void updateProperties() {
+    public void updateProperties() throws DevFailed {
         final EventProperties props = attribute.getProperties().getEventProp();
         long period = -1;
         try {

@@ -49,8 +49,10 @@ public interface IEventTrigger {
 
     /**
      * Update event properties
+     * 
+     * @throws DevFailed
      */
-    void updateProperties();
+    void updateProperties() throws DevFailed;
 
     /**
      * 

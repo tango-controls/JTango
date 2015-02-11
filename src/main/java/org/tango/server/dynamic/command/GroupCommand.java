@@ -68,6 +68,10 @@ public final class GroupCommand implements ICommandBehavior {
 
     public GroupCommand(final String commandName, final String... deviceNames) throws DevFailed {
         name = commandName;
+        // test if devices exist because add will not check it
+        for (final String deviceName : deviceNames) {
+            new DeviceProxy(deviceName);
+        }
         group = new Group(name);
         group.add(deviceNames);
         checkCommand(group);

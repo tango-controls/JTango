@@ -104,7 +104,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
     }
 
     private AttributeValue buildAttributeValue(final Object value) throws DevFailed {
-        final AttributeValue result;
+        AttributeValue result = null;
         if (value == null) {
             result = new AttributeValue(null);
         } else if (value instanceof AttributeValue) {
@@ -119,6 +119,9 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
                 devStates[i] = in[i].getDevState();
             }
             result = new AttributeValue(devStates);
+        } else if (value instanceof Enum) {
+            final Enum<?> enumValue = (Enum<?>) value;
+            result = new AttributeValue((short) enumValue.ordinal());
         } else {
             result = new AttributeValue(value);
         }
@@ -133,6 +136,9 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
             try {
                 if (paramSetter.equals(DeviceState.class)) {
                     setter.invoke(businessObject, DeviceState.getDeviceState((DevState) value.getValue()));
+                } else if (Enum.class.isAssignableFrom(paramSetter)) {
+                    final short enumValue = (Short) value.getValue();
+                    setter.invoke(businessObject, paramSetter.getEnumConstants()[enumValue]);
                 } else if (paramSetter.equals(DeviceState[].class)) {
                     final DevState[] states = (DevState[]) value.getValue();
                     final DeviceState[] devStates = new DeviceState[states.length];

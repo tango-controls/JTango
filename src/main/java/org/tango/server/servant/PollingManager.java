@@ -43,6 +43,7 @@ import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
+import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.utils.DevFailedUtils;
@@ -289,9 +290,13 @@ public final class PollingManager {
      * @throws DevFailed
      */
     public void addAttributePolling(final String attributeName, final int pollingPeriod) throws DevFailed {
+
         logger.debug("add {} polling with period {}", attributeName, pollingPeriod);
         checkPollingLimits(attributeName, pollingPeriod, minAttributePolling);
         final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+        if (attribute.getBehavior() instanceof ForwardedAttribute) {
+            throw DevFailedUtils.newDevFailed(attributeName + " not pollable because it is a forwarded attribute");
+        }
         attribute.configurePolling(pollingPeriod);
         if (attribute.getName().equals(DeviceImpl.STATE_NAME) || attribute.getName().equals(DeviceImpl.STATUS_NAME)) {
             // command is also set as polled

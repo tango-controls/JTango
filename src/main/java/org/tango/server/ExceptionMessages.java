@@ -65,4 +65,23 @@ public final class ExceptionMessages {
     public static final String EVENT_NOT_AVAILABLE = "API_EventNotAvailable";
     public static final String EVENT_NO_FREE_PORT = "API_NoFreePortFound";
     public static final String TANGO_HOST_ERROR = "API_GetTangoHostFailed";
+    public static final String NOT_SUPPORTED_FEATURE = "API_NotSupportedFeature";
+    // - Root attribute not found in root device
+    public static final String FWD_WRONG_ATTR = "FWD_WRONG_ATTR";
+    // - Root device not found in control system
+    public static final String FWD_WRONG_DEV = "FWD_WRONG_DEV";
+    // - The root device is the local device
+    public static final String FWD_ROOT_DEV_LOCAL_DEV = "FWD_ROOT_DEV_LOCAL_DEV";
+    // - Missing root attribute definition
+    public static final String FWD_MISSING_ROOT = "FWD_MISSING_ROOT";
+//    - Wrong syntax in root attribute definition     
+    public static final String FWD_WRONG_SYNTAX = "FWD_WRONG_SYNTAX";
+//    - Root device not started yet               
+    public static final String FWD_ROOT_DEV_NOT_STARTED = "FWD_ROOT_DEV_NOT_STARTED";
+//    - Root attribute already use in this DS for another forwarded attribute  
+    public static final String FWD_DOUBLE_USED = "FWD_DOUBLE_USED";
+//    - Local device does not support forwarded attribute (IDL 4 or less)         
+    public static final String FWD_TOO_OLD_LOCAL_DEVICE = "FWD_TOO_OLD_LOCAL_DEVICE";
+//    - Root device does not support forwarded attribute (IDL 4 or less)     
+    public static final String FWD_TOO_OLD_ROOT_DEVICE = "FWD_TOO_OLD_ROOT_DEVICE";
 }

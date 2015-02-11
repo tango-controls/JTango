@@ -40,7 +40,7 @@ import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLock;
 
 public final class StateStatusCache {
-    private final Logger logger = LoggerFactory.getLogger(CommandCache.class);
+    private final Logger logger = LoggerFactory.getLogger(StateStatusCache.class);
 
     private ScheduledFuture<?> result;
     private final SelfPopulatingCache cache;

@@ -134,6 +134,26 @@ public final class ServerManager {
         tangoClasses.put(tangoClass, deviceClass);
     }
 
+    public void startDevice(final String deviceName, final Class<?> deviceClass) throws DevFailed {
+        if (!isStarted.get()) {
+            DevFailedUtils.throwDevFailed("the server must be started");
+        }
+        if (tangoExporter != null) {
+            if (tangoClasses.containsValue(deviceClass)) {
+                tangoExporter.buildDevice(deviceName, deviceClass);
+            }
+        }
+    }
+
+    public void stopDevice(final String deviceName) throws DevFailed {
+        if (!isStarted.get()) {
+            DevFailedUtils.throwDevFailed("the server must be started");
+        }
+        if (tangoExporter != null) {
+            tangoExporter.unexportDevice(deviceName);
+        }
+    }
+
     /**
      * Starts a Tango server. The system property TANGO_HOST is mandatory if
      * using the tango database. If the tango db is not used, the system

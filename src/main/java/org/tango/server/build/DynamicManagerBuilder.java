@@ -27,7 +27,9 @@ package org.tango.server.build;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,8 @@ final class DynamicManagerBuilder {
     private final Logger logger = LoggerFactory.getLogger(DynamicManagerBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DynamicManagerBuilder.class);
 
+    private static final Map<String, DynamicManager> DYN_MNGRS = new HashMap<String, DynamicManager>();
+
     /**
      * create a {@link DynamicManager} {@link DynamicManagement}
      * 
@@ -60,25 +64,34 @@ final class DynamicManagerBuilder {
      * @throws DevFailed
      */
     public void build(final Field field, final DeviceImpl device, final Object businessObject) throws DevFailed {
-	xlogger.entry();
-	final String name = field.getName();
-	logger.debug("Has a DynamicAttributeManagement : {}", name);
-	BuilderUtils.checkStatic(field);
+        xlogger.entry();
+        final String name = field.getName();
+        logger.debug("Has a DynamicAttributeManagement : {}", name);
+        BuilderUtils.checkStatic(field);
 
-	final String setterName = BuilderUtils.SET + name.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ name.substring(1);
-	try {
-	    final Method setter = businessObject.getClass().getMethod(setterName, DynamicManager.class);
-	    setter.invoke(businessObject, new DynamicManager(device));
-	} catch (final NoSuchMethodException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final IllegalArgumentException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final IllegalAccessException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	} catch (final InvocationTargetException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
-	xlogger.exit();
+        final String setterName = BuilderUtils.SET + name.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + name.substring(1);
+        try {
+            final String deviceName = device.getName().toLowerCase(Locale.ENGLISH);
+            final Method setter = businessObject.getClass().getMethod(setterName, DynamicManager.class);
+            if (DYN_MNGRS.containsKey(deviceName)) {
+                setter.invoke(businessObject, DYN_MNGRS.get(deviceName));
+            } else {
+                final DynamicManager mnger = new DynamicManager(device);
+                setter.invoke(businessObject, mnger);
+                DYN_MNGRS.put(deviceName, mnger);
+            }
+        } catch (final IllegalArgumentException e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final IllegalAccessException e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final InvocationTargetException e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final NoSuchMethodException e) {
+            DevFailedUtils.throwDevFailed(e);
+        } catch (final SecurityException e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
+        xlogger.exit();
     }
 }

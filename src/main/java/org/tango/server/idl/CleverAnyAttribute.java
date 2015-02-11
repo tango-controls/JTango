@@ -66,37 +66,37 @@ public final class CleverAnyAttribute {
     private static final Map<Integer, Class<?>> CLASS_MAP = new HashMap<Integer, Class<?>>();
 
     static {
-	CLASS_MAP.put(TangoConst.Tango_DEV_BOOLEAN, DevVarBooleanArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_SHORT, DevVarShortArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_USHORT, DevVarUShortArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_LONG, DevVarLongArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_ULONG, DevVarULongArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_LONG64, DevVarLong64ArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_ULONG64, DevVarULong64ArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_FLOAT, DevVarFloatArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_DOUBLE, DevVarDoubleArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_STRING, DevVarStringArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_STATE, DevVarStateArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_UCHAR, DevVarCharArrayHelper.class);
-	CLASS_MAP.put(TangoConst.Tango_DEV_ENCODED, DevVarEncodedArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_BOOLEAN, DevVarBooleanArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_SHORT, DevVarShortArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_USHORT, DevVarUShortArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_LONG, DevVarLongArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_ULONG, DevVarULongArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_LONG64, DevVarLong64ArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_ULONG64, DevVarULong64ArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_FLOAT, DevVarFloatArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_DOUBLE, DevVarDoubleArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_STRING, DevVarStringArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_STATE, DevVarStateArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_UCHAR, DevVarCharArrayHelper.class);
+        CLASS_MAP.put(TangoConst.Tango_DEV_ENCODED, DevVarEncodedArrayHelper.class);
     }
 
     private static final Map<Integer, Class<?>> PARAM_MAP = new HashMap<Integer, Class<?>>();
 
     static {
-	PARAM_MAP.put(TangoConst.Tango_DEV_BOOLEAN, boolean[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_SHORT, short[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_USHORT, short[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_LONG, int[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_ULONG, int[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_LONG64, long[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_ULONG64, long[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_FLOAT, float[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_DOUBLE, double[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_STRING, String[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_STATE, DevState[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_UCHAR, byte[].class);
-	PARAM_MAP.put(TangoConst.Tango_DEV_ENCODED, DevEncoded[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_BOOLEAN, boolean[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_SHORT, short[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_USHORT, short[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_LONG, int[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_ULONG, int[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_LONG64, long[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_ULONG64, long[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_FLOAT, float[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_DOUBLE, double[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_STRING, String[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_STATE, DevState[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_UCHAR, byte[].class);
+        PARAM_MAP.put(TangoConst.Tango_DEV_ENCODED, DevEncoded[].class);
     }
 
     private CleverAnyAttribute() {
@@ -112,29 +112,29 @@ public final class CleverAnyAttribute {
      * @throws DevFailed
      */
     public static Object get(final Any any, final int tangoType, final AttrDataFormat format) throws DevFailed {
-	Object result = null;
-	if (any != null) {
-	    try {
-		final Class<?> extractorClass = CLASS_MAP.get(tangoType);
-		final Method method = extractorClass.getMethod("extract", Any.class);
-		result = method.invoke(null, any);
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		DevFailedUtils.throwDevFailed(e.getCause());
-	    } catch (final SecurityException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final NoSuchMethodException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    }
-	    if (format.equals(AttrDataFormat.SCALAR)) {
-		// for scalar except state, get only first value
-		result = Array.get(result, 0);
-	    }
-	}
-	return result;
+        Object result = null;
+        if (any != null) {
+            try {
+                final Class<?> extractorClass = CLASS_MAP.get(tangoType);
+                final Method method = extractorClass.getMethod("extract", Any.class);
+                result = method.invoke(null, any);
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                DevFailedUtils.throwDevFailed(e.getCause());
+            } catch (final SecurityException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final NoSuchMethodException e) {
+                DevFailedUtils.throwDevFailed(e);
+            }
+            if (format.equals(AttrDataFormat.SCALAR)) {
+                // for scalar except state, get only first value
+                result = Array.get(result, 0);
+            }
+        }
+        return result;
     }
 
     /**
@@ -146,35 +146,36 @@ public final class CleverAnyAttribute {
      * @throws DevFailed
      */
     public static Any set(final int tangoType, final Object value) throws DevFailed {
-	final Any any = ORBManager.createAny();
+        final Any any = ORBManager.createAny();
 
-	if (value != null) {
-	    Object array = null;
-	    if (value.getClass().isArray()) {
-		// convert to array of primitives if necessary
-		array = org.tango.utils.ArrayUtils.toPrimitiveArray(value);
-	    } else {
-		// put in an array before inserting for scalars
-		array = Array.newInstance(AttributeTangoType.getTypeFromTango(tangoType).getType(), 1);
-		Array.set(array, 0, value);
-	    }
-	    try {
-		final Class<?> inserterClass = CLASS_MAP.get(tangoType);
-		final Method method = inserterClass.getMethod("insert", Any.class, PARAM_MAP.get(tangoType));
-		method.invoke(null, any, array);
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
-			+ " is not of the good type");
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		DevFailedUtils.throwDevFailed(e.getCause());
-	    } catch (final SecurityException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final NoSuchMethodException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    }
-	}
-	return any;
+        if (value != null) {
+            Object array = null;
+            if (value.getClass().isArray()) {
+                // convert to array of primitives if necessary
+                array = org.tango.utils.ArrayUtils.toPrimitiveArray(value);
+            } else {
+                // put in an array before inserting for scalars
+                array = Array.newInstance(AttributeTangoType.getTypeFromTango(tangoType).getType(), 1);
+                Array.set(array, 0, value);
+            }
+            Method method = null;
+            try {
+                final Class<?> inserterClass = CLASS_MAP.get(tangoType);
+                method = inserterClass.getMethod("insert", Any.class, PARAM_MAP.get(tangoType));
+                method.invoke(null, any, array);
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
+                        + " is not of the good type, should be " + method);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                DevFailedUtils.throwDevFailed(e.getCause());
+            } catch (final SecurityException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final NoSuchMethodException e) {
+                DevFailedUtils.throwDevFailed(e);
+            }
+        }
+        return any;
     }
 }

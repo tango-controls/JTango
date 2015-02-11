@@ -29,8 +29,8 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.quartz.CronTrigger;
@@ -53,7 +53,7 @@ public final class DeviceScheduler {
     private static final String SCHEDULE_PROP = "schedule";
     private final Logger logger = LoggerFactory.getLogger(DeviceScheduler.class);
 
-    private final List<Method> methodList;
+    private final Set<Method> methodList;
     // private final String defaultCronExpression;
     // private final String timeZone;
     private final Object businessObject;
@@ -63,109 +63,109 @@ public final class DeviceScheduler {
     private final String className;
     private static int poolSize = Math.min(10, Runtime.getRuntime().availableProcessors());
 
-    public DeviceScheduler(final Object businessObject, final List<Method> methodList, final String deviceName,
-	    final String className) {
-	this.businessObject = businessObject;
-	this.methodList = methodList;
-	this.deviceName = deviceName;
-	this.className = className;
-	// defaultCronExpression = annot.cronExpression();
-	// timeZone = annot.timezone();
-	// activationProperty = annot.activationProperty();
+    public DeviceScheduler(final Object businessObject, final Set<Method> methodList, final String deviceName,
+            final String className) {
+        this.businessObject = businessObject;
+        this.methodList = methodList;
+        this.deviceName = deviceName;
+        this.className = className;
+        // defaultCronExpression = annot.cronExpression();
+        // timeZone = annot.timezone();
+        // activationProperty = annot.activationProperty();
     }
 
     public void triggerJob() throws DevFailed {
 
-	for (final Method method : methodList) {
-	    final Schedule config = method.getAnnotation(Schedule.class);
-	    // get device property for activation
-	    final String[] activationProps = PropertiesUtils.getDeviceProperty(deviceName, className,
-		    config.activationProperty());
-	    boolean active = false;
-	    if (activationProps.length > 0 && activationProps[0].equalsIgnoreCase("true")
-		    || activationProps[0].equalsIgnoreCase("1")) {
-		active = true;
-	    }
-	    // the job is started only if device property activationProperty is true
-	    if (active) {
-		try {
-		    if (quartz == null) {
-			// configure and start the scheduler
-			final StdSchedulerFactory fact = new StdSchedulerFactory();
-			final Properties props = new Properties();
-			logger.debug("setting pool size to  {}", poolSize);
-			props.put("org.quartz.threadPool.threadCount", Integer.toString(poolSize));
-			fact.initialize(props);
-			quartz = fact.getScheduler();
-			quartz.start();
-		    }
-		} catch (final SchedulerException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		}
+        for (final Method method : methodList) {
+            final Schedule config = method.getAnnotation(Schedule.class);
+            // get device property for activation
+            final String[] activationProps = PropertiesUtils.getDeviceProperty(deviceName, className,
+                    config.activationProperty());
+            boolean active = false;
+            if (activationProps.length > 0 && activationProps[0].equalsIgnoreCase("true")
+                    || activationProps[0].equalsIgnoreCase("1")) {
+                active = true;
+            }
+            // the job is started only if device property activationProperty is true
+            if (active) {
+                try {
+                    if (quartz == null) {
+                        // configure and start the scheduler
+                        final StdSchedulerFactory fact = new StdSchedulerFactory();
+                        final Properties props = new Properties();
+                        logger.debug("setting pool size to  {}", poolSize);
+                        props.put("org.quartz.threadPool.threadCount", Integer.toString(poolSize));
+                        fact.initialize(props);
+                        quartz = fact.getScheduler();
+                        quartz.start();
+                    }
+                } catch (final SchedulerException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                }
 
-		// get cron parameters from device property
-		final String devicePropName = method.getName() + SCHEDULE_PROP;
-		final String[] deviceProps = PropertiesUtils.getDeviceProperty(deviceName, className, devicePropName);
-		String cronExpression = "";
-		if (deviceProps.length > 0) {
-		    cronExpression = deviceProps[0];
-		}
-		if (cronExpression.isEmpty()) {
-		    cronExpression = config.cronExpression();
-		}
-		// final configure cron job
-		CronTrigger trigger = null;
-		try {
-		    if (!config.timezone().isEmpty()) {
-			trigger = newTrigger().withSchedule(
-				cronSchedule(cronExpression).inTimeZone(TimeZone.getTimeZone(config.timezone())))
-				.build();
-		    } else {
-			trigger = newTrigger().withSchedule(cronSchedule(cronExpression)).build();
-		    }
-		} catch (final RuntimeException e) {
-		    DevFailedUtils.throwDevFailed("unable to start device scheduler for " + method + " - error is: "
-			    + e.getMessage());
-		}
+                // get cron parameters from device property
+                final String devicePropName = method.getName() + SCHEDULE_PROP;
+                final String[] deviceProps = PropertiesUtils.getDeviceProperty(deviceName, className, devicePropName);
+                String cronExpression = "";
+                if (deviceProps.length > 0) {
+                    cronExpression = deviceProps[0];
+                }
+                if (cronExpression.isEmpty()) {
+                    cronExpression = config.cronExpression();
+                }
+                // final configure cron job
+                CronTrigger trigger = null;
+                try {
+                    if (!config.timezone().isEmpty()) {
+                        trigger = newTrigger().withSchedule(
+                                cronSchedule(cronExpression).inTimeZone(TimeZone.getTimeZone(config.timezone())))
+                                .build();
+                    } else {
+                        trigger = newTrigger().withSchedule(cronSchedule(cronExpression)).build();
+                    }
+                } catch (final RuntimeException e) {
+                    DevFailedUtils.throwDevFailed("unable to start device scheduler for " + method + " - error is: "
+                            + e.getMessage());
+                }
 
-		try {
-		    if (quartz == null) {
-			// configure and start the scheduler
-			final StdSchedulerFactory fact = new StdSchedulerFactory();
-			final Properties props = new Properties();
-			logger.debug("setting pool size to  {}", poolSize);
-			props.put("org.quartz.threadPool.threadCount", Integer.toString(poolSize));
-			fact.initialize(props);
-			quartz = fact.getScheduler();
-			quartz.start();
-		    }
-		    // start the job
-		    final JobDetail job = newJob(DeviceJob.class).withIdentity(method.getName(), deviceName).build();
-		    job.getJobDataMap().put(JOB_PARAM_DEVICE, businessObject);
-		    job.getJobDataMap().put(JOB_PARAM_METHOD, method);
-		    quartz.scheduleJob(job, trigger);
-		    logger.debug("start job on {} started with {}", method, cronExpression);
-		} catch (final SchedulerException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		}
-	    }
-	}
+                try {
+                    if (quartz == null) {
+                        // configure and start the scheduler
+                        final StdSchedulerFactory fact = new StdSchedulerFactory();
+                        final Properties props = new Properties();
+                        logger.debug("setting pool size to  {}", poolSize);
+                        props.put("org.quartz.threadPool.threadCount", Integer.toString(poolSize));
+                        fact.initialize(props);
+                        quartz = fact.getScheduler();
+                        quartz.start();
+                    }
+                    // start the job
+                    final JobDetail job = newJob(DeviceJob.class).withIdentity(method.getName(), deviceName).build();
+                    job.getJobDataMap().put(JOB_PARAM_DEVICE, businessObject);
+                    job.getJobDataMap().put(JOB_PARAM_METHOD, method);
+                    quartz.scheduleJob(job, trigger);
+                    logger.debug("start job on {} started with {}", method, cronExpression);
+                } catch (final SchedulerException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                }
+            }
+        }
     }
 
     public static void setThreadPoolSize(final int poolSize) {
-	DeviceScheduler.poolSize = poolSize;
+        DeviceScheduler.poolSize = poolSize;
     }
 
     public void stop() throws DevFailed {
-	try {
-	    if (quartz != null) {
-		for (final Method method : methodList) {
-		    logger.debug("delete job for {}", method.getName());
-		    quartz.deleteJob(new JobKey(method.getName(), deviceName));
-		}
-	    }
-	} catch (final SchedulerException e) {
-	    DevFailedUtils.throwDevFailed(e);
-	}
+        try {
+            if (quartz != null) {
+                for (final Method method : methodList) {
+                    logger.debug("delete job for {}", method.getName());
+                    quartz.deleteJob(new JobKey(method.getName(), deviceName));
+                }
+            }
+        } catch (final SchedulerException e) {
+            DevFailedUtils.throwDevFailed(e);
+        }
     }
 }

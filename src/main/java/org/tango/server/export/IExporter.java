@@ -58,4 +58,8 @@ public interface IExporter {
 
     DeviceImpl getDevice(final String className, final String deviceName) throws DevFailed;
 
+    void unexportDevice(String deviceName) throws DevFailed;
+
+    DeviceImpl buildDevice(String deviceName, Class<?> clazz) throws DevFailed;
+
 }

@@ -51,7 +51,7 @@ public final class AttributePropertiesManager {
     private final String deviceName;
 
     public AttributePropertiesManager(final String deviceName) {
-	this.deviceName = deviceName;
+        this.deviceName = deviceName;
     }
 
     /**
@@ -61,26 +61,39 @@ public final class AttributePropertiesManager {
      * @return The properties
      * @throws DevFailed
      */
-    public Map<String, String> getAttributePropertiesFromDB(final String attributeName) throws DevFailed {
-	xlogger.entry(attributeName);
-	final Map<String, String> result = new HashMap<String, String>();
-	final Map<String, String[]> prop = DatabaseFactory.getDatabase().getAttributeProperties(deviceName,
-		attributeName);
-	for (final Entry<String, String[]> entry : prop.entrySet()) {
-	    final String name = entry.getKey();
-	    final String[] value = entry.getValue();
-	    if (value.length > 0) {
-		result.put(name, value[0]);
-	    } else {
-		result.put(name, "");
-	    }
-	}
-	xlogger.exit();
-	return result;
+    public Map<String, String[]> getAttributePropertiesFromDB(final String attributeName) throws DevFailed {
+        xlogger.entry(attributeName);
+        xlogger.exit();
+        return DatabaseFactory.getDatabase().getAttributeProperties(deviceName, attributeName);
+    }
+
+    /**
+     * Get an attribute's properties from tango db
+     * 
+     * @param attributeName
+     * @return The properties
+     * @throws DevFailed
+     */
+    private Map<String, String> getAttributePropertiesFromDBSingle(final String attributeName) throws DevFailed {
+        xlogger.entry(attributeName);
+        final Map<String, String> result = new HashMap<String, String>();
+        final Map<String, String[]> prop = DatabaseFactory.getDatabase().getAttributeProperties(deviceName,
+                attributeName);
+        for (final Entry<String, String[]> entry : prop.entrySet()) {
+            final String name = entry.getKey();
+            final String[] value = entry.getValue();
+            if (value.length > 0) {
+                result.put(name, value[0]);
+            } else {
+                result.put(name, "");
+            }
+        }
+        xlogger.exit();
+        return result;
     }
 
     public void removeAttributeProperties(final String... attributeNames) throws DevFailed {
-	DatabaseFactory.getDatabase().deleteAttributeProperties(deviceName, attributeNames);
+        DatabaseFactory.getDatabase().deleteAttributeProperties(deviceName, attributeNames);
     }
 
     /**
@@ -92,21 +105,21 @@ public final class AttributePropertiesManager {
      * @throws DevFailed
      */
     public String getAttributePropertyFromDB(final String attributeName, final String propertyName) throws DevFailed {
-	xlogger.entry(propertyName);
-	String[] result = new String[] {};
-	final Map<String, String[]> prop = DatabaseFactory.getDatabase().getAttributeProperties(deviceName,
-		attributeName);
-	if (prop.get(propertyName) != null) {
-	    // get value
-	    result = prop.get(propertyName);
-	    logger.debug(attributeName + " property {} is {}", propertyName, Arrays.toString(result));
-	}
-	xlogger.exit();
-	String single = "";
-	if (result.length == 1 && !result[0].isEmpty()) {
-	    single = result[0];
-	}
-	return single;
+        xlogger.entry(propertyName);
+        String[] result = new String[] {};
+        final Map<String, String[]> prop = DatabaseFactory.getDatabase().getAttributeProperties(deviceName,
+                attributeName);
+        if (prop.get(propertyName) != null) {
+            // get value
+            result = prop.get(propertyName);
+            logger.debug(attributeName + " property {} is {}", propertyName, Arrays.toString(result));
+        }
+        xlogger.exit();
+        String single = "";
+        if (result.length == 1 && !result[0].isEmpty()) {
+            single = result[0];
+        }
+        return single;
     }
 
     /**
@@ -118,31 +131,31 @@ public final class AttributePropertiesManager {
      * @throws DevFailed
      */
     public void setAttributePropertyInDB(final String attributeName, final String propertyName, final String value)
-	    throws DevFailed {
-	xlogger.entry(propertyName);
+            throws DevFailed {
+        xlogger.entry(propertyName);
 
-	// insert value in db only if input value is different and not a
-	// default value
-	// if (checkCurrentValue) {
-	// final String presentValue = getAttributePropertyFromDB(attributeName, propertyName);
-	// final boolean isADefaultValue = presentValue.isEmpty()
-	// && (value.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-	// || value.equalsIgnoreCase(AttributePropertiesImpl.NO_DIPLAY_UNIT)
-	// || value.equalsIgnoreCase(AttributePropertiesImpl.NO_UNIT) || value
-	// .equalsIgnoreCase(AttributePropertiesImpl.NO_STD_UNIT));
-	// if (!isADefaultValue && !presentValue.equals(value) && !value.isEmpty() && !value.equals("NaN")) {
-	// LOGGER.debug("update in DB {}, property {}= {}", new Object[] { attributeName, propertyName, value });
-	// final Map<String, String[]> propInsert = new HashMap<String, String[]>();
-	// propInsert.put(propertyName, new String[] { value });
-	// DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
-	// }
-	// } else {
-	logger.debug("update in DB {}, property {}= {}", new Object[] { attributeName, propertyName, value });
-	final Map<String, String[]> propInsert = new HashMap<String, String[]>();
-	propInsert.put(propertyName, new String[] { value });
-	DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
-	// }
-	xlogger.exit();
+        // insert value in db only if input value is different and not a
+        // default value
+        // if (checkCurrentValue) {
+        // final String presentValue = getAttributePropertyFromDB(attributeName, propertyName);
+        // final boolean isADefaultValue = presentValue.isEmpty()
+        // && (value.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+        // || value.equalsIgnoreCase(AttributePropertiesImpl.NO_DIPLAY_UNIT)
+        // || value.equalsIgnoreCase(AttributePropertiesImpl.NO_UNIT) || value
+        // .equalsIgnoreCase(AttributePropertiesImpl.NO_STD_UNIT));
+        // if (!isADefaultValue && !presentValue.equals(value) && !value.isEmpty() && !value.equals("NaN")) {
+        // LOGGER.debug("update in DB {}, property {}= {}", new Object[] { attributeName, propertyName, value });
+        // final Map<String, String[]> propInsert = new HashMap<String, String[]>();
+        // propInsert.put(propertyName, new String[] { value });
+        // DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
+        // }
+        // } else {
+        logger.debug("update in DB {}, property {}= {}", new Object[] { attributeName, propertyName, value });
+        final Map<String, String[]> propInsert = new HashMap<String, String[]>();
+        propInsert.put(propertyName, new String[] { value });
+        DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
+        // }
+        xlogger.exit();
     }
 
     /**
@@ -152,36 +165,46 @@ public final class AttributePropertiesManager {
      * @param properties
      * @throws DevFailed
      */
-    public void setAttributePropertiesInDB(final String attributeName, final Map<String, String> properties)
-	    throws DevFailed {
-	xlogger.entry(properties);
+    public void setAttributePropertiesInDB(final String attributeName, final Map<String, String[]> properties)
+            throws DevFailed {
+        xlogger.entry(properties);
 
-	final Map<String, String> currentValues = getAttributePropertiesFromDB(attributeName);
-	final Map<String, String[]> propInsert = new HashMap<String, String[]>();
-	for (final Entry<String, String> entry : properties.entrySet()) {
-	    final String propertyName = entry.getKey();
-	    final String value = entry.getValue();
-	    // insert value in db only if input value is different and not a
-	    // default value
-	    final String presentValue = currentValues.get(propertyName);
-	    boolean isADefaultValue = false;
-	    if (presentValue != null) {
-		isADefaultValue = presentValue.isEmpty()
-			&& (value.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-				|| value.equalsIgnoreCase(AttributePropertiesImpl.NO_DIPLAY_UNIT)
-				|| value.equalsIgnoreCase(AttributePropertiesImpl.NO_UNIT) || value
-				    .equalsIgnoreCase(AttributePropertiesImpl.NO_STD_UNIT));
-	    }
-	    if (!isADefaultValue) {
-		if (presentValue == null) {
-		    propInsert.put(propertyName, new String[] { value });
-		} else if (!presentValue.equals(value) && !value.isEmpty() && !value.equals("NaN")) {
-		    propInsert.put(propertyName, new String[] { value });
-		}
-	    }
-	}
-	logger.debug("update attribute properties in DB {}", attributeName);
-	DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
-	xlogger.exit();
+        final Map<String, String> currentValues = getAttributePropertiesFromDBSingle(attributeName);
+        final Map<String, String[]> propInsert = new HashMap<String, String[]>();
+        for (final Entry<String, String[]> entry : properties.entrySet()) {
+            final String propertyName = entry.getKey();
+            final String[] valueArray = entry.getValue();
+            // insert value in db only if input value is different and not a
+            // default value
+            if (valueArray.length == 1) {
+                final String value = valueArray[0];
+                final String presentValue = currentValues.get(propertyName);
+                boolean isADefaultValue = false;
+                if (presentValue != null) {
+                    isADefaultValue = presentValue.isEmpty()
+                            && (value.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
+                                    || value.equalsIgnoreCase(AttributePropertiesImpl.NO_DIPLAY_UNIT)
+                                    || value.equalsIgnoreCase(AttributePropertiesImpl.NO_UNIT) || value
+                                        .equalsIgnoreCase(AttributePropertiesImpl.NO_STD_UNIT));
+                }
+                if (!isADefaultValue) {
+                    if (presentValue == null) {
+                        propInsert.put(propertyName, valueArray);
+                    } else if (!presentValue.equals(value) && !value.isEmpty() && !value.equals("NaN")) {
+                        propInsert.put(propertyName, valueArray);
+                    }
+                }
+            } else {
+                // do not check if not a single value
+                propInsert.put(propertyName, valueArray);
+            }
+        }
+        logger.debug("update attribute {} properties {} in DB ", attributeName, properties.keySet());
+        DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
+        xlogger.exit();
+    }
+
+    public String getDeviceName() {
+        return deviceName;
     }
 }

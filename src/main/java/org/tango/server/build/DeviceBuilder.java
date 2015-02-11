@@ -24,14 +24,15 @@
  */
 package org.tango.server.build;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -47,6 +48,7 @@ import org.tango.server.annotation.DeviceProperties;
 import org.tango.server.annotation.DeviceProperty;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
+import org.tango.server.annotation.Pipe;
 import org.tango.server.annotation.Schedule;
 import org.tango.server.annotation.State;
 import org.tango.server.annotation.Status;
@@ -65,17 +67,25 @@ import fr.esrf.Tango.DevFailed;
 public final class DeviceBuilder {
 
     private static final String MUST_BE_UNIQUE = " must be unique";
-    // private static Logger logger = LoggerFactory.getLogger(DeviceBuilder.class);
+    private final Logger logger = LoggerFactory.getLogger(DeviceBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceBuilder.class);
-    private static final DeviceBuilder INSTANCE = new DeviceBuilder();
+    private final Class<?> clazz;
+    private final String className;
+    private final String name;
+    private DeviceImpl device;
+    private Object businessObject;
 
-    private DeviceBuilder() {
+    DeviceBuilder(final Class<?> clazz, final String className, final String name) {
+        this.clazz = clazz;
+        this.className = className;
+        this.name = name;
+
     }
 
-    public DeviceImpl createDevice(final Class<?> clazz, final String className, final String name) throws DevFailed {
+    public DeviceImpl createDevice() throws DevFailed {
         MDC.put("deviceName", name);
         xlogger.entry();
-        DeviceImpl device = null;
+
         checkIsTangoDevice(clazz, name);
 
         try {
@@ -86,23 +96,32 @@ public final class DeviceBuilder {
             }
             final String deviceType = annotation.deviceType();
             // create the device
-            final Object businessObject = clazz.newInstance();
+            businessObject = clazz.newInstance();
             device = new DeviceImpl(name, className, txType, businessObject, deviceType);
+            addSuperDevices();
 
-            // create the user device methods
-            final Map<Class<?>, List<Method>> methodsBO = getAnnotatedMethods(clazz);
-            createBusinessObjectAttrCmd(methodsBO, device, businessObject);
-            createBusinessObjectInitDelete(methodsBO, device, businessObject);
-            createBusinessObjectAroundInvoke(methodsBO, device, businessObject);
-            // create the user device fields
-            final Map<Class<?>, List<Field>> fields = getAnnotatedFields(clazz);
-            createBusinessObjectFields(fields, device, businessObject);
-            createBusinessObjectProps(fields, clazz, device, businessObject);
-            createBusinessObjectState(fields, clazz, device, businessObject);
+            final Reflections reflectionsMethods = new Reflections(clazz.getCanonicalName(),
+                    new MethodAnnotationsScanner());
+            final Reflections reflectionsFields = new Reflections(clazz.getCanonicalName(),
+                    new FieldAnnotationsScanner());
+            createBusinessObjectAttrCmd(reflectionsMethods, false);
+            createBusinessObjectAttrField(reflectionsFields, false);
+            createBusinessObjectInitDelete(reflectionsMethods);
+            createBusinessObjectAroundInvoke(reflectionsMethods);
+            createBusinessObjectFields(reflectionsFields);
+            createBusinessObjectDeviceProperties(reflectionsFields);
+            createBusinessObjectProps(reflectionsFields);
+            createBusinessObjectState(reflectionsFields);
+            createBusinessObjectPipes(reflectionsFields);
 
             // create default attributes and commands
-            createDeviceImplMethods(device, businessObject);
-            createDeviceImplFields(device, businessObject);
+            final Reflections reflectionsMethodsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
+                    new MethodAnnotationsScanner());
+            final Reflections reflectionsFieldsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
+                    new FieldAnnotationsScanner());
+            createBusinessObjectAttrCmd(reflectionsMethodsDeviceImpl, true);
+            createBusinessObjectAttrField(reflectionsFieldsDeviceImpl, true);
+
         } catch (final InstantiationException e) {
             DevFailedUtils.throwDevFailed(e);
         } catch (final IllegalAccessException e) {
@@ -113,201 +132,165 @@ public final class DeviceBuilder {
         return device;
     }
 
-    private Map<Class<?>, List<Method>> getAnnotatedMethods(final Class<?> clazz) {
-        final Map<Class<?>, List<Method>> methods = new HashMap<Class<?>, List<Method>>();
-        for (final Method method : clazz.getDeclaredMethods()) {
-            final Annotation[] annotations = method.getAnnotations();
-            for (final Annotation annotation : annotations) {
-                if (methods.containsKey(annotation.annotationType())) {
-                    methods.get(annotation.annotationType()).add(method);
-                } else {
-                    final List<Method> list = new ArrayList<Method>();
-                    list.add(method);
-                    methods.put(annotation.annotationType(), list);
-                }
-            }
-        }
-        return methods;
-    }
+    private void addSuperDevices() throws DevFailed {
+        Class<?> superDeviceClass = clazz.getSuperclass();
+        while (superDeviceClass != null && superDeviceClass.getAnnotation(Device.class) != null) {
+            logger.debug("adding super class to device {}", superDeviceClass.getCanonicalName());
+            final Reflections reflectionsMethods = new Reflections(superDeviceClass.getCanonicalName(),
+                    new MethodAnnotationsScanner());
+            final Reflections reflectionsFields = new Reflections(superDeviceClass.getCanonicalName(),
+                    new FieldAnnotationsScanner());
+            createBusinessObjectAttrCmd(reflectionsMethods, false);
+            createBusinessObjectAttrField(reflectionsFields, false);
+            createBusinessObjectProps(reflectionsFields);
+            createBusinessObjectFields(reflectionsFields);
+            createBusinessObjectState(reflectionsFields);
+            createBusinessObjectInitDelete(reflectionsMethods);
+            createBusinessObjectPipes(reflectionsFields);
 
-    private void createDeviceImplMethods(final DeviceImpl device, final Object businessObject) throws DevFailed {
-        final Map<Class<?>, List<Method>> deviceImplMethods = getAnnotatedMethods(device.getClass());
-
-        final List<Method> cmds = deviceImplMethods.get(Command.class);
-        if (cmds != null) {
-            final CommandBuilder cmd = new CommandBuilder();
-            for (final Method method : cmds) {
-                cmd.build(device, businessObject, method, true);
-            }
-        }
-        final List<Method> attrs = deviceImplMethods.get(Attribute.class);
-        if (attrs != null) {
-            final AttributeMethodBuilder attr = new AttributeMethodBuilder();
-            for (final Method method : attrs) {
-                attr.build(device, businessObject, method, true);
-            }
+            superDeviceClass = superDeviceClass.getSuperclass();
         }
     }
 
-    private void createBusinessObjectAttrCmd(final Map<Class<?>, List<Method>> methodsBO, final DeviceImpl device,
-            final Object businessObject) throws DevFailed {
+    private void createBusinessObjectAttrCmd(final Reflections reflectionsMethods, final boolean isOnDeviceImpl)
+            throws DevFailed {
+
         // Command
-        final List<Method> cmds = methodsBO.get(Command.class);
+        final Set<Method> cmds = reflectionsMethods.getMethodsAnnotatedWith(Command.class);
         if (cmds != null) {
             final CommandBuilder cmd = new CommandBuilder();
             for (final Method method : cmds) {
-                cmd.build(device, businessObject, method, false);
+                cmd.build(device, businessObject, method, isOnDeviceImpl);
             }
         }
         // Attribute
-        final List<Method> attrs = methodsBO.get(Attribute.class);
+        final Set<Method> attrs = reflectionsMethods.getMethodsAnnotatedWith(Attribute.class);
         if (attrs != null) {
             final AttributeMethodBuilder attr = new AttributeMethodBuilder();
             for (final Method method : attrs) {
-                attr.build(device, businessObject, method, false);
+                attr.build(device, businessObject, method, isOnDeviceImpl);
             }
         }
     }
 
-    private void createBusinessObjectInitDelete(final Map<Class<?>, List<Method>> methodsBO, final DeviceImpl device,
-            final Object businessObject) throws DevFailed {
+    private void createBusinessObjectInitDelete(final Reflections reflectionsMethods) throws DevFailed {
         // Init
-        final InitBuilder init = new InitBuilder();
-        final List<Method> initM = methodsBO.get(Init.class);
+        final Set<Method> initM = reflectionsMethods.getMethodsAnnotatedWith(Init.class);
         if (initM != null && initM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Init.class + MUST_BE_UNIQUE);
         }
         if (initM != null && initM.size() == 1) {
-            init.build(initM.get(0), device, businessObject);
+            new InitBuilder().build(initM.iterator().next(), device, businessObject);
         }
         // Delete
-        final DeleteBuilder delete = new DeleteBuilder();
-        final List<Method> deleteM = methodsBO.get(Delete.class);
+        final Set<Method> deleteM = reflectionsMethods.getMethodsAnnotatedWith(Delete.class);
         if (deleteM != null && deleteM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Delete.class + MUST_BE_UNIQUE);
         }
-        if (deleteM != null && deleteM.size() == 1) {
-            delete.build(deleteM.get(0), device);
-        }
 
-        final List<Method> scheduleM = methodsBO.get(Schedule.class);
+        if (deleteM != null && deleteM.size() == 1) {
+            new DeleteBuilder().build(deleteM.iterator().next(), device);
+        }
+        // Schedule
+        final Set<Method> scheduleM = reflectionsMethods.getMethodsAnnotatedWith(Schedule.class);
         if (scheduleM != null && scheduleM.size() == 1) {
             new DeviceSchedulerBuilder().build(scheduleM, device);
         }
     }
 
-    private void createBusinessObjectAroundInvoke(final Map<Class<?>, List<Method>> methodsBO, final DeviceImpl device,
-            final Object businessObject) throws DevFailed {
+    private void createBusinessObjectAroundInvoke(final Reflections reflectionsMethods) throws DevFailed {
         // AroundInvoke
-        final AroundInvokeBuilder invoke = new AroundInvokeBuilder();
-        final List<Method> invokeM = methodsBO.get(AroundInvoke.class);
+        final Set<Method> invokeM = reflectionsMethods.getMethodsAnnotatedWith(AroundInvoke.class);
         if (invokeM != null && invokeM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, AroundInvoke.class + MUST_BE_UNIQUE);
         }
         if (invokeM != null && invokeM.size() == 1) {
-            invoke.build(invokeM.get(0), device, businessObject);
+            new AroundInvokeBuilder().build(invokeM.iterator().next(), device, businessObject);
         }
     }
 
-    private Map<Class<?>, List<Field>> getAnnotatedFields(final Class<?> clazz) {
-        final Map<Class<?>, List<Field>> fields = new HashMap<Class<?>, List<Field>>();
-        for (final Field field : clazz.getDeclaredFields()) {
-            final Annotation[] annotations = field.getAnnotations();
-            for (final Annotation annotation : annotations) {
-                if (fields.containsKey(annotation.annotationType())) {
-                    fields.get(annotation.annotationType()).add(field);
-                } else {
-                    final List<Field> list = new ArrayList<Field>();
-                    list.add(field);
-                    fields.put(annotation.annotationType(), list);
-                }
-            }
-        }
-        return fields;
-    }
-
-    private void createDeviceImplFields(final DeviceImpl device, final Object businessObject) throws DevFailed {
-        final Map<Class<?>, List<Field>> fields = getAnnotatedFields(device.getClass());
-        final AttributeFieldBuilder attr = new AttributeFieldBuilder();
-        final List<Field> attributeF = fields.get(Attribute.class);
-        if (attributeF != null) {
-            // default attributes declared on DeviceImpl4
-            for (final Field field : attributeF) {
-                attr.build(device, businessObject, field, true);
-            }
-        }
-    }
-
-    private void createBusinessObjectFields(final Map<Class<?>, List<Field>> fields, final DeviceImpl device,
-            final Object businessObject) throws DevFailed {
+    private void createBusinessObjectAttrField(final Reflections reflectionsFields, final boolean isOnDeviceImpl)
+            throws DevFailed {
         // Attribute
-        final List<Field> attributeF = fields.get(Attribute.class);
+        final Set<Field> attributeF = reflectionsFields.getFieldsAnnotatedWith(Attribute.class);
         if (attributeF != null) {
             final AttributeFieldBuilder attr = new AttributeFieldBuilder();
             for (final Field field : attributeF) {
-                attr.build(device, businessObject, field, false);
+                attr.build(device, businessObject, field, isOnDeviceImpl);
             }
         }
+
+    }
+
+    private void createBusinessObjectPipes(final Reflections reflectionsFields) throws DevFailed {
+        // Pipe
+        final Set<Field> fields = reflectionsFields.getFieldsAnnotatedWith(Pipe.class);
+        if (fields != null) {
+            final PipeBuilder pipe = new PipeBuilder();
+            for (final Field field : fields) {
+                pipe.build(device, businessObject, field);
+            }
+        }
+
+    }
+
+    private void createBusinessObjectFields(final Reflections reflectionsFields) throws DevFailed {
         // DynamicManagement
-        final List<Field> dynF = fields.get(DynamicManagement.class);
+        final Set<Field> dynF = reflectionsFields.getFieldsAnnotatedWith(DynamicManagement.class);
         if (dynF != null) {
-            final DynamicManagerBuilder dynB = new DynamicManagerBuilder();
             if (dynF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
                         + MUST_BE_UNIQUE);
             }
             if (dynF.size() == 1) {
-                dynB.build(dynF.get(0), device, businessObject);
+                new DynamicManagerBuilder().build(dynF.iterator().next(), device, businessObject);
             }
         }
 
         // DeviceManagement
-        final List<Field> deviceF = fields.get(DeviceManagement.class);
+        final Set<Field> deviceF = reflectionsFields.getFieldsAnnotatedWith(DeviceManagement.class);
         if (deviceF != null) {
-            final DeviceManagerBuilder dynB = new DeviceManagerBuilder();
             if (deviceF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
                         + MUST_BE_UNIQUE);
             }
             if (deviceF.size() == 1) {
-                dynB.build(deviceF.get(0), device, businessObject);
+                new DeviceManagerBuilder().build(deviceF.iterator().next(), device, businessObject);
             }
         }
     }
 
-    private void createBusinessObjectState(final Map<Class<?>, List<Field>> fields, final Class<?> clazz,
-            final DeviceImpl device, final Object businessObject) throws DevFailed {
+    private void createBusinessObjectState(final Reflections reflectionsFields) throws DevFailed {
 
         // State
-        final List<Field> stateF = fields.get(State.class);
+        final Set<Field> stateF = reflectionsFields.getFieldsAnnotatedWith(State.class);
         if (stateF != null) {
             final StateBuilder stateB = new StateBuilder();
             if (stateF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, State.class + MUST_BE_UNIQUE);
             }
             if (stateF.size() == 1) {
-                stateB.build(clazz, stateF.get(0), device, businessObject);
+                stateB.build(clazz, stateF.iterator().next(), device, businessObject);
             }
         }
         // Status
-        final List<Field> statusF = fields.get(Status.class);
+        final Set<Field> statusF = reflectionsFields.getFieldsAnnotatedWith(Status.class);
         if (statusF != null) {
             final StatusBuilder statusB = new StatusBuilder();
             if (statusF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Status.class + MUST_BE_UNIQUE);
             }
             if (statusF.size() == 1) {
-                statusB.build(clazz, statusF.get(0), device, businessObject);
+                statusB.build(clazz, statusF.iterator().next(), device, businessObject);
             }
         }
 
     }
 
-    private void createBusinessObjectProps(final Map<Class<?>, List<Field>> fields, final Class<?> clazz,
-            final DeviceImpl device, final Object businessObject) throws DevFailed {
+    private void createBusinessObjectDeviceProperties(final Reflections reflectionsFields) throws DevFailed {
 
         // DeviceProperties
-        final List<Field> devicePropsF = fields.get(DeviceProperties.class);
+        final Set<Field> devicePropsF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperties.class);
         if (devicePropsF != null) {
             final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
             if (devicePropsF.size() > 1) {
@@ -315,11 +298,27 @@ public final class DeviceBuilder {
                         + MUST_BE_UNIQUE);
             }
             if (devicePropsF.size() == 1) {
-                devicePropsB.build(clazz, devicePropsF.get(0), device, businessObject);
+                devicePropsB.build(clazz, devicePropsF.iterator().next(), device, businessObject);
+            }
+        }
+    }
+
+    private void createBusinessObjectProps(final Reflections reflectionsFields) throws DevFailed {
+
+        // DeviceProperties
+        final Set<Field> devicePropsF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperties.class);
+        if (devicePropsF != null) {
+            final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
+            if (devicePropsF.size() > 1) {
+                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceProperties.class
+                        + MUST_BE_UNIQUE);
+            }
+            if (devicePropsF.size() == 1) {
+                devicePropsB.build(clazz, devicePropsF.iterator().next(), device, businessObject);
             }
         }
         // DeviceProperty
-        final List<Field> devicePropF = fields.get(DeviceProperty.class);
+        final Set<Field> devicePropF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperty.class);
         if (devicePropF != null) {
             final DevicePropertyBuilder devicePropB = new DevicePropertyBuilder();
             for (final Field field : devicePropF) {
@@ -327,17 +326,13 @@ public final class DeviceBuilder {
             }
         }
         // ClassProperty
-        final List<Field> classPropF = fields.get(ClassProperty.class);
+        final Set<Field> classPropF = reflectionsFields.getFieldsAnnotatedWith(ClassProperty.class);
         if (classPropF != null) {
             final ClassPropertyBuilder classPropB = new ClassPropertyBuilder();
             for (final Field field : classPropF) {
                 classPropB.build(clazz, field, device, businessObject);
             }
         }
-    }
-
-    public static DeviceBuilder getInstance() {
-        return INSTANCE;
     }
 
     private void checkIsTangoDevice(final Class<?> clazz, final String name) throws DevFailed {
