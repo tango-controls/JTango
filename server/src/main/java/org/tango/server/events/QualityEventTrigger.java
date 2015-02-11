@@ -71,9 +71,11 @@ public class QualityEventTrigger implements IEventTrigger {
             previousInitialized = true;
             hasChanged = false;
         } else {
-            final AttrQuality previousQuality = previousValue.getQuality();
-            final AttrQuality quality = value.getQuality();
-            hasChanged = !quality.equals(previousQuality);
+            if (previousValue != null) {
+                final AttrQuality previousQuality = previousValue.getQuality();
+                final AttrQuality quality = value.getQuality();
+                hasChanged = !quality.equals(previousQuality);
+            }
         }
         logger.debug("QUALITY event must send: {}", hasChanged);
         xlogger.exit();

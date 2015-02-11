@@ -54,13 +54,9 @@ public class EventTriggerFactory {
         final EventProperties props = attribute.getProperties().getEventProp();
         IEventTrigger eventTrigger;
         switch (eventType) {
-
             case PERIODIC_EVENT:
                 final long period = Long.parseLong(props.per_event.period);
                 eventTrigger = new PeriodicEventTrigger(period, attribute);
-                break;
-            case ATT_CONF_EVENT:
-                eventTrigger = new PropertiesEventTrigger(attribute);
                 break;
             case CHANGE_EVENT:
                 eventTrigger = new ChangeEventTrigger(attribute, props.ch_event.abs_change, props.ch_event.rel_change);
@@ -76,8 +72,11 @@ public class EventTriggerFactory {
                 eventTrigger = new ArchiveEventTrigger(periodA, props.arch_event.abs_change,
                         props.arch_event.rel_change, attribute);
                 break;
+            case ATT_CONF_EVENT:
             case DATA_READY_EVENT:
             case USER_EVENT:
+            case INTERFACE_CHANGE_EVENT:
+            case PIPE_EVENT:
             default:
                 eventTrigger = new DefaultEventTrigger();
                 break;
@@ -85,4 +84,5 @@ public class EventTriggerFactory {
         }
         return eventTrigger;
     }
+
 }

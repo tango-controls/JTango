@@ -63,12 +63,27 @@ public enum EventType {
     /**
      * Data ready event.
      */
-    DATA_READY_EVENT(TangoConst.DATA_READY_EVENT, TangoConst.eventNames[6]);
+    DATA_READY_EVENT(TangoConst.DATA_READY_EVENT, TangoConst.eventNames[6]),
+    /**
+     * Interface change event.
+     */
+    INTERFACE_CHANGE_EVENT(TangoConst.INTERFACE_CHANGE, TangoConst.eventNames[7]),
+    /**
+     * Interface change event.
+     */
+    PIPE_EVENT(TangoConst.PIPE_EVENT, TangoConst.eventNames[8]);
 
     private static final Map<String, EventType> EVENT_TYPE_MAP = new HashMap<String, EventType>();
     static {
         for (final EventType s : EnumSet.allOf(EventType.class)) {
             EVENT_TYPE_MAP.put(s.getString(), s);
+        }
+    }
+
+    private static final Map<Integer, EventType> EVENT_TYPE_INT_MAP = new HashMap<Integer, EventType>();
+    static {
+        for (final EventType s : EnumSet.allOf(EventType.class)) {
+            EVENT_TYPE_INT_MAP.put(s.getValue(), s);
         }
     }
 
@@ -91,6 +106,22 @@ public enum EventType {
         final EventType result = EVENT_TYPE_MAP.get(string);
         if (result == null) {
             DevFailedUtils.throwDevFailed(string + " is not an event type");
+        }
+        return result;
+
+    }
+
+    /**
+     * Get an {@link EventType} from a String
+     * 
+     * @param eventValue the event type as an int
+     * @return the EventType
+     * @throws DevFailed if event type does not exist
+     */
+    public static EventType getEvent(final int eventValue) throws DevFailed {
+        final EventType result = EVENT_TYPE_INT_MAP.get(eventValue);
+        if (result == null) {
+            DevFailedUtils.throwDevFailed(eventValue + " is not an event type");
         }
         return result;
 

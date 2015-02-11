@@ -24,7 +24,16 @@
  */
 package org.tango.server.idl;
 
+import org.tango.server.pipe.PipeConfiguration;
+import org.tango.server.pipe.PipeImpl;
+import org.tango.server.pipe.PipeValue;
+
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevPipeBlob;
+import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.PipeConfig;
 import fr.esrf.Tango.TimeVal;
+import fr.esrf.TangoApi.PipeBlob;
 
 public final class TangoIDLUtil {
 
@@ -34,14 +43,32 @@ public final class TangoIDLUtil {
     }
 
     public static TimeVal getTime(final long nbMillisec) {
-	final TimeVal timeVal = new TimeVal();
-	timeVal.tv_sec = (int) (nbMillisec / FACTOR_1000);
-	timeVal.tv_usec = (int) ((nbMillisec - nbMillisec / FACTOR_1000 * FACTOR_1000) * FACTOR_1000);
-	timeVal.tv_nsec = 0;
-	return timeVal;
+        final TimeVal timeVal = new TimeVal();
+        timeVal.tv_sec = (int) (nbMillisec / FACTOR_1000);
+        timeVal.tv_usec = (int) ((nbMillisec - nbMillisec / FACTOR_1000 * FACTOR_1000) * FACTOR_1000);
+        timeVal.tv_nsec = 0;
+        return timeVal;
     }
 
     public static long getTime(final TimeVal timeVal) {
-	return timeVal.tv_nsec * FACTOR_1000 + timeVal.tv_usec * FACTOR_1000 * FACTOR_1000;
+        return timeVal.tv_nsec * FACTOR_1000 + timeVal.tv_usec * FACTOR_1000 * FACTOR_1000;
     }
+
+    public static PipeConfig toPipeConfig(final PipeImpl pipe) throws DevFailed {
+        final PipeConfiguration props = pipe.getConfiguration();
+        return new PipeConfig(pipe.getName(), props.getDescription(), props.getLabel(), props.getDisplayLevel(),
+                props.getWriteType(), props.getExtensions());
+    }
+
+    public static DevPipeData toDevPipeData(final String pipeName, final PipeValue pipeValue) throws DevFailed {
+        final DevPipeBlob devPipeBlob = pipeValue.getValue().getDevPipeBlobObject();
+        return new DevPipeData(pipeName, TangoIDLUtil.getTime(pipeValue.getTime()), devPipeBlob);
+    }
+
+    public static PipeValue toPipeValue(final DevPipeData pipeData) throws DevFailed {
+        final PipeValue value = new PipeValue();
+        value.setValue(new PipeBlob(pipeData.data_blob), TangoIDLUtil.getTime(pipeData.time));
+        return value;
+    }
+
 }

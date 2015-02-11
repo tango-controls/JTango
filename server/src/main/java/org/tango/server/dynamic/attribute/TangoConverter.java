@@ -30,9 +30,11 @@ package org.tango.server.dynamic.attribute;
 
 import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.idl.TangoIDLAttributeUtil;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeInfo;
+import fr.esrf.TangoApi.AttributeInfoEx;
 
 /**
  * 
@@ -61,7 +63,26 @@ public final class TangoConverter {
         properties.setMaxValue(ai.max_value);
         properties.setMinAlarm(ai.min_alarm);
         properties.setMinValue(ai.min_value);
+
         result.setAttributeProperties(properties);
         return result;
+    }
+
+    public static AttributeConfiguration toAttributeConfigurationEx(final AttributeInfoEx ai) throws DevFailed {
+        final AttributeConfiguration result = toAttributeConfiguration(ai);
+        final AttributePropertiesImpl properties = result.getAttributeProperties();
+        properties.setEnumLabels(ai.enum_label);
+        properties.setRootAttribute(ai.root_attr_name);
+        properties.setEventAbsChange(ai.events.ch_event.abs_change);
+        properties.setEventRelChange(ai.events.ch_event.rel_change);
+        properties.setEventPeriod(ai.events.per_event.period);
+        properties.setArchivingEventAbsChange(ai.events.arch_event.abs_change);
+        properties.setArchivingEventRelChange(ai.events.arch_event.rel_change);
+        result.setAttributeProperties(properties);
+        return result;
+    }
+
+    public static AttributeInfoEx toAttributeConfigurationEx(final AttributeConfiguration config) throws DevFailed {
+        return new AttributeInfoEx(TangoIDLAttributeUtil.toAttributeConfig5(config));
     }
 }

@@ -30,17 +30,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.tango.DeviceState;
+import org.tango.attribute.AttributeTangoType;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Attribute;
 import org.tango.server.annotation.AttributeProperties;
+import org.tango.server.annotation.Pipe;
 import org.tango.server.annotation.StateMachine;
 import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.pipe.PipeConfiguration;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DispLevel;
+import fr.esrf.Tango.PipeWriteType;
 
 /**
  * Tools to build a tango device from a class with annotations {@link org.tango.server.annotation}
@@ -69,6 +73,23 @@ final class BuilderUtils {
      * @return
      */
     static String getAttributeName(final String fieldName, final Attribute annot) {
+        String attributeName = null;
+        if (annot.name().equals("")) {
+            attributeName = fieldName;
+        } else {
+            attributeName = annot.name();
+        }
+        return attributeName;
+    }
+
+    /**
+     * Get pipe name from annotation {@link Pipe}
+     * 
+     * @param fieldName
+     * @param annot
+     * @return
+     */
+    static String getPipeName(final String fieldName, final Pipe annot) {
         String attributeName = null;
         if (annot.name().equals("")) {
             attributeName = fieldName;
@@ -118,7 +139,55 @@ final class BuilderUtils {
         return config;
     }
 
-    static AttributePropertiesImpl getAttributeProperties(final AccessibleObject method, final String attributeName) {
+    static PipeConfiguration getPipeConfiguration(final Class<?> type, final Method getter, final Method setter,
+            final Pipe annot, final String pipeName) throws DevFailed {
+        final PipeConfiguration config = new PipeConfiguration(pipeName);
+        if (setter == null) {
+            config.setWriteType(PipeWriteType.PIPE_READ);
+        } else {
+            config.setWriteType(PipeWriteType.PIPE_READ_WRITE);
+        }
+        config.setDisplayLevel(DispLevel.from_int(annot.displayLevel()));
+        if (annot.label().equals("")) {
+            config.setLabel(pipeName);
+        } else {
+            config.setLabel(annot.label());
+        }
+        config.setDescription(annot.description());
+        // config.setPollingPeriod(annot.pollingPeriod());
+        // TODO config.setPushDataReady(annot.pushDataReady());
+        // TODO config.setPushChangeEvent(annot.pushChangeEvent());
+        // TODO config.setCheckChangeEvent(annot.checkChangeEvent());
+        // TODO config.setPushArchiveEvent(annot.pushArchiveEvent());
+        // TODO config.setCheckArchivingEvent(annot.checkArchivingEvent());
+
+        return config;
+    }
+
+    /**
+     * Set enum label for Enum types
+     * 
+     * @param type
+     * @param props
+     * @throws DevFailed
+     */
+    static AttributePropertiesImpl setEnumLabelProperty(final Class<?> type, final AttributePropertiesImpl props)
+            throws DevFailed {
+        // if is is an enum set enum values in properties
+        if (AttributeTangoType.getTypeFromClass(type).equals(AttributeTangoType.DEVENUM)) {
+            // final Class<Enum<?>> enumType = (Class<Enum<?>>) field.getType();
+            final Object[] enumValues = type.getEnumConstants();
+            final String[] enumLabels = new String[enumValues.length];
+            for (int i = 0; i < enumLabels.length; i++) {
+                enumLabels[i] = enumValues[i].toString();
+            }
+            props.setEnumLabels(enumLabels, false);
+        }
+        return props;
+    }
+
+    static AttributePropertiesImpl getAttributeProperties(final AccessibleObject method, final String attributeName)
+            throws DevFailed {
         // add default attr properties
         final AttributePropertiesImpl props = new AttributePropertiesImpl();
         if (method.isAnnotationPresent(AttributeProperties.class)) {
@@ -148,7 +217,7 @@ final class BuilderUtils {
             props.setArchivingEventRelChange(annotProp.archiveEventRelative());
             props.setArchivingEventAbsChange(annotProp.archiveEventAbsolute());
             props.setArchivingEventPeriod(annotProp.archiveEventPeriod());
-
+            props.setRootAttribute(annotProp.rootAttribute());
         } else {
             props.setLabel(attributeName);
         }

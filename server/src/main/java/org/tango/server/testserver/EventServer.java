@@ -134,8 +134,7 @@ public class EventServer {
     public AttributeValue getBooleanAtt() throws DevFailed {
         final AttributeValue val = new AttributeValue();
         booleanAtt = !booleanAtt;
-        val.setTime(34567L);
-        val.setValue(booleanAtt);
+        val.setValue(booleanAtt, 34567L);
         return val;
     }
 
@@ -256,6 +255,7 @@ public class EventServer {
     }
 
     public static void main(final String[] args) throws DevFailed {
+        //System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
         EventServer.start();
     }
 }

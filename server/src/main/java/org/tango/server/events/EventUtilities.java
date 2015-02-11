@@ -64,20 +64,25 @@ import java.util.StringTokenizer;
 import org.jacorb.orb.CDROutputStream;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.client.database.DatabaseFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.idl.TangoIDLAttributeUtil;
+import org.tango.utils.TangoUtil;
 
 import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.AttDataReadyHelper;
-import fr.esrf.Tango.AttributeConfig_3;
-import fr.esrf.Tango.AttributeConfig_3Helper;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.AttributeValue_4Helper;
+import fr.esrf.Tango.AttributeConfig_5;
+import fr.esrf.Tango.AttributeConfig_5Helper;
+import fr.esrf.Tango.AttributeValue_5;
+import fr.esrf.Tango.AttributeValue_5Helper;
 import fr.esrf.Tango.DevErrorListHelper;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevIntrChange;
+import fr.esrf.Tango.DevIntrChangeHelper;
+import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.DevPipeDataHelper;
 import fr.esrf.Tango.ZmqCallInfo;
 import fr.esrf.Tango.ZmqCallInfoHelper;
-import fr.esrf.TangoApi.ApiUtil;
 
 /**
  * This class is a set of static utilities used for event management.
@@ -87,21 +92,52 @@ import fr.esrf.TangoApi.ApiUtil;
 
 class EventUtilities {
 
+    private static final String HEARTBEAT = ".heartbeat";
+    private static final String TANGO = "tango://";
+    private static final String IDL5 = ".idl5_";
     private static double zmqVersion = -1.0;
     private static String tangoHost = null;
     private static final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
 
-    static String buildEventName(final String deviceName, final String attributeName, final String eventType)
+    static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
+        String fullName = buildEventNameBeginning(deviceName, attributeName);
+        fullName += IDL5 + eventType.getString();
+        return fullName;
+    }
+
+    static String buildPipeEventName(final String deviceName, final String pipename) throws DevFailed {
+        String fullName = buildEventNameBeginning(deviceName, null);
+        fullName += TangoUtil.DEVICE_SEPARATOR + pipename.toLowerCase(Locale.ENGLISH) + "."
+                + EventType.PIPE_EVENT.getString();
+        return fullName;
+    }
+
+    static String buildHeartBeatEventName(final String deviceName) throws DevFailed {
+        String fullName = buildEventNameBeginning(deviceName, null);
+        fullName += HEARTBEAT;
+        return fullName;
+    }
+
+    static String buildDeviceEventName(final String deviceName, final EventType eventType) throws DevFailed {
+        String fullName = buildEventNameBeginning(deviceName, null);
+        fullName += "." + eventType.getString();
+        return fullName;
+    }
+
+    private static String buildEventNameBeginning(final String deviceName, final String attributeName) throws DevFailed {
         if (tangoHost == null) {
-            tangoHost = ApiUtil.get_db_obj().getPossibleTangoHosts()[0];
+            tangoHost = DatabaseFactory.getDatabase().getPossibleTangoHosts()[0];
         }
 
-        String fullName = "tango://" + tangoHost + "/" + deviceName.toLowerCase(Locale.ENGLISH);
+//        String deviceName2 = deviceName;
+//        if (!DatabaseFactory.isUseDb()) {
+//            deviceName2 = deviceName + "#dbase=no";
+//        }
+        String fullName = TANGO + tangoHost + TangoUtil.DEVICE_SEPARATOR + deviceName.toLowerCase(Locale.ENGLISH);
         if (attributeName != null) {
-            fullName += "/" + attributeName.toLowerCase(Locale.ENGLISH);
+            fullName += TangoUtil.DEVICE_SEPARATOR + attributeName.toLowerCase(Locale.ENGLISH);
         }
-        fullName += "." + eventType;
         return fullName;
     }
 
@@ -132,11 +168,11 @@ class EventUtilities {
      */
     static byte[] marshall(final AttributeImpl attribute) throws DevFailed {
         xlogger.entry();
-        final AttributeValue_4 attributeValue4 = TangoIDLAttributeUtil.toAttributeValue4(attribute,
+        final AttributeValue_5 attributeValue = TangoIDLAttributeUtil.toAttributeValue5(attribute,
                 attribute.getReadValue(), attribute.getWriteValue());
         final CDROutputStream os = new CDROutputStream();
         try {
-            AttributeValue_4Helper.write(os, attributeValue4);
+            AttributeValue_5Helper.write(os, attributeValue);
             xlogger.exit();
             return cppAlignment(os.getBufferCopy());
         } finally {
@@ -171,10 +207,10 @@ class EventUtilities {
      */
     static byte[] marshallConfig(final AttributeImpl attribute) throws DevFailed {
         xlogger.entry();
-        final AttributeConfig_3 config = TangoIDLAttributeUtil.toAttributeConfig3(attribute);
+        final AttributeConfig_5 config = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
         final CDROutputStream os = new CDROutputStream();
         try {
-            AttributeConfig_3Helper.write(os, config);
+            AttributeConfig_5Helper.write(os, config);
             xlogger.exit();
             return cppAlignment(os.getBufferCopy());
         } finally {
@@ -222,6 +258,32 @@ class EventUtilities {
         } finally {
             os.close();
         }
+    }
+
+    static byte[] marshall(final DevIntrChange deviceInterface) {
+        xlogger.entry();
+        final CDROutputStream os = new CDROutputStream();
+        try {
+            DevIntrChangeHelper.write(os, deviceInterface);
+            xlogger.exit();
+            return cppAlignment(os.getBufferCopy());
+        } finally {
+            os.close();
+        }
+
+    }
+
+    static byte[] marshall(final DevPipeData pipeData) {
+        xlogger.entry();
+        final CDROutputStream os = new CDROutputStream();
+        try {
+            DevPipeDataHelper.write(os, pipeData);
+            xlogger.exit();
+            return cppAlignment(os.getBufferCopy());
+        } finally {
+            os.close();
+        }
+
     }
 
     static void dump(final byte[] rec) {

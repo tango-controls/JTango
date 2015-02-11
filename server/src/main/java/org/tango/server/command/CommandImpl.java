@@ -69,32 +69,31 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     private DevFailed lastError;
 
-    public CommandImpl(final ICommandBehavior behavior, final AttributePropertiesManager attributePropertiesManager)
-	    throws DevFailed {
-	super();
-	config = behavior.getConfiguration();
-	name = config.getName();
-	this.behavior = behavior;
-	this.attributePropertiesManager = attributePropertiesManager;
-	inType = CommandTangoType.getTypeFromTango(config.getInTangoType());
-	outType = CommandTangoType.getTypeFromTango(config.getOutTangoType());
-	history = new CommandHistory(config.getOutTangoType());
+    public CommandImpl(final ICommandBehavior behavior, final String deviceName) throws DevFailed {
+        super();
+        config = behavior.getConfiguration();
+        name = config.getName();
+        this.behavior = behavior;
+        this.attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        inType = CommandTangoType.getTypeFromTango(config.getInTangoType());
+        outType = CommandTangoType.getTypeFromTango(config.getOutTangoType());
+        history = new CommandHistory(config.getOutTangoType());
     }
 
     /**
      * Execute the command.
      */
     public Object execute(final Object dataIn) throws DevFailed {
-	xlogger.entry(name);
-	Object result;
-	try {
-	    result = behavior.execute(dataIn);
-	} catch (final DevFailed e) {
-	    lastError = e;
-	    throw e;
-	}
-	xlogger.exit(name);
-	return result;
+        xlogger.entry(name);
+        Object result;
+        try {
+            result = behavior.execute(dataIn);
+        } catch (final DevFailed e) {
+            lastError = e;
+            throw e;
+        }
+        xlogger.exit(name);
+        return result;
     }
 
     /**
@@ -102,8 +101,9 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
      * 
      * @return The command name
      */
+    @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -113,15 +113,15 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
      */
 
     public CommandTangoType getInType() {
-	return inType;
+        return inType;
     }
 
     public int getInTangoType() {
-	return config.getInTangoType();
+        return config.getInTangoType();
     }
 
     public boolean isArginPrimitive() {
-	return config.getInType().isPrimitive();
+        return config.getInType().isPrimitive();
     }
 
     /**
@@ -131,11 +131,11 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
      */
 
     public CommandTangoType getOutType() {
-	return outType;
+        return outType;
     }
 
     public int getOutTangoType() {
-	return config.getOutTangoType();
+        return config.getOutTangoType();
     }
 
     /**
@@ -145,7 +145,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
      */
 
     public String getInTypeDesc() {
-	return config.getInTypeDesc();
+        return config.getInTypeDesc();
     }
 
     /**
@@ -155,138 +155,144 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
      */
 
     public String getOutTypeDesc() {
-	return config.getOutTypeDesc();
+        return config.getOutTypeDesc();
     }
 
     public int getTag() {
-	if (config.getDispLevel().equals(DispLevel.OPERATOR)) {
-	    return TANGO_OPERATOR_CMD;
-	} else {
-	    return TANGO_EXPERT_CMD;
-	}
+        if (config.getDispLevel().equals(DispLevel.OPERATOR)) {
+            return TANGO_OPERATOR_CMD;
+        } else {
+            return TANGO_EXPERT_CMD;
+        }
     }
 
     public DispLevel getDisplayLevel() {
-	return config.getDispLevel();
+        return config.getDispLevel();
     }
 
     public void setDisplayLevel(final DispLevel level) {
-	config.setDispLevel(level);
+        config.setDispLevel(level);
     }
 
     public void addToHistory(final Object value) throws DevFailed {
-	history.addToHistory(value, new DevError[0]);
+        history.addToHistory(value, new DevError[0]);
     }
 
     public void addErrorToHistory(final DevFailed e) throws DevFailed {
-	history.addToHistory(null, e.errors);
+        history.addToHistory(null, e.errors);
     }
 
     public CommandHistory getHistory() {
-	return history;
+        return history;
     }
 
     @Override
     public String toString() {
-	final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
-		ToStringStyle.MULTI_LINE_STYLE);
-	reflectionToStringBuilder.setExcludeFieldNames(new String[] { "inType", "outType", "history" });
-	return reflectionToStringBuilder.toString();
+        final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
+                ToStringStyle.MULTI_LINE_STYLE);
+        reflectionToStringBuilder.setExcludeFieldNames(new String[] { "inType", "outType", "history" });
+        return reflectionToStringBuilder.toString();
     }
 
     public ICommandBehavior getBehavior() {
-	return behavior;
+        return behavior;
     }
 
+    @Override
     public int getPollingPeriod() {
-	return config.getPollingPeriod();
+        return config.getPollingPeriod();
     }
 
+    @Override
     public boolean isPolled() {
-	return config.isPolled();
+        return config.isPolled();
     }
 
+    @Override
     public void configurePolling(final int pollingPeriod) throws DevFailed {
-	PollingUtils.configurePolling(pollingPeriod, config, attributePropertiesManager);
-	history.clear();
+        PollingUtils.configurePolling(pollingPeriod, config, attributePropertiesManager);
+        history.clear();
     }
 
+    @Override
     public void resetPolling() throws DevFailed {
-	PollingUtils.resetPolling(config, attributePropertiesManager);
+        PollingUtils.resetPolling(config, attributePropertiesManager);
     }
 
     public void updatePollingConfigFromDB() throws DevFailed {
-	PollingUtils.updatePollingConfigFromDB(config, attributePropertiesManager);
+        PollingUtils.updatePollingConfigFromDB(config, attributePropertiesManager);
     }
 
     @Override
     public int compareTo(final CommandImpl o) {
-	return getName().compareTo(o.getName());
+        return getName().compareTo(o.getName());
     }
 
+    @Override
     public int getPollRingDepth() {
-	return history.getMaxSize();
+        return history.getMaxSize();
     }
 
+    @Override
     public void setPollRingDepth(final int pollRingDepth) {
-	history.setMaxSize(pollRingDepth);
+        history.setMaxSize(pollRingDepth);
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + (name == null ? 0 : name.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(final Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getClass() != obj.getClass()) {
-	    return false;
-	}
-	final CommandImpl other = (CommandImpl) obj;
-	if (name == null) {
-	    if (other.name != null) {
-		return false;
-	    }
-	} else if (!name.equals(other.name)) {
-	    return false;
-	}
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CommandImpl other = (CommandImpl) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public double getExecutionDuration() {
-	return executionDuration;
+        return executionDuration;
     }
 
     @Override
     public double getLastUpdateTime() {
-	return lastUpdateTime;
+        return lastUpdateTime;
     }
 
     @Override
     public double getDeltaTime() {
-	return deltaTime;
+        return deltaTime;
     }
 
     @Override
     public void setPollingStats(final double executionDuration, final double lastUpdateTime, final double deltaTime) {
-	this.executionDuration = executionDuration;
-	this.lastUpdateTime = lastUpdateTime;
-	this.deltaTime = deltaTime;
+        this.executionDuration = executionDuration;
+        this.lastUpdateTime = lastUpdateTime;
+        this.deltaTime = deltaTime;
     }
 
     @Override
     public String getLastDevFailed() {
-	return PollingUtils.toString(lastError);
+        return PollingUtils.toString(lastError);
     }
 
 }

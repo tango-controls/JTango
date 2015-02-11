@@ -149,6 +149,27 @@ public final class TangoExporter implements IExporter {
     }
 
     @Override
+    public void unexportDevice(final String deviceName) throws DevFailed {
+//        DeviceClassBuilder clazzToRemove = null;
+        for (final DeviceClassBuilder clazz : deviceClassList) {
+            if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
+                for (final DeviceImpl device : clazz.getDeviceImplList()) {
+                    if (deviceName.equalsIgnoreCase(device.getName())) {
+                        logger.debug("unexport device {}", device.getName());
+                        ORBUtils.unexportDevice(device);
+                        clazz.removeDevice(deviceName);
+//                        clazzToRemove = clazz;
+                        break;
+                    }
+                }
+            }
+        }
+//        if (clazzToRemove != null) {
+//            clazzToRemove.removeDevice(deviceName);
+//        }
+    }
+
+    @Override
     public void unexportAll() throws DevFailed {
         xlogger.entry();
         for (final DeviceClassBuilder clazz : deviceClassList) {
@@ -181,6 +202,21 @@ public final class TangoExporter implements IExporter {
             }
         }
         xlogger.exit();
+    }
+
+    @Override
+    public DeviceImpl buildDevice(final String deviceName, final Class<?> clazz) throws DevFailed {
+        DeviceClassBuilder builder = null;
+        for (final DeviceClassBuilder classBuilder : deviceClassList) {
+            if (classBuilder.getDeviceClass().equals(clazz)) {
+                builder = classBuilder;
+                break;
+            }
+        }
+        if (builder == null) {
+            throw DevFailedUtils.newDevFailed("class not found");
+        }
+        return buildDevice(deviceName, builder);
     }
 
     @Override

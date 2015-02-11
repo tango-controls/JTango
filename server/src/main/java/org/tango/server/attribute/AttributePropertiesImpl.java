@@ -25,12 +25,22 @@
 package org.tango.server.attribute;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.tango.server.ExceptionMessages;
+import org.tango.server.properties.AttributePropertiesManager;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.ArchiveEventProp;
 import fr.esrf.Tango.ChangeEventProp;
+import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.EventProperties;
 import fr.esrf.Tango.PeriodicEventProp;
 
@@ -44,7 +54,7 @@ public final class AttributePropertiesImpl {
 
     public static final String PERIOD_1000 = "1000";
 
-    private static final String FORMAT_6_2F = "%6.2f";
+    public static final String FORMAT_6_2F = "%6.2f";
     // default values
     public static final String NOT_SPECIFIED = "Not specified";
     public static final String NO_UNIT = "No unit";
@@ -54,28 +64,29 @@ public final class AttributePropertiesImpl {
     public static final String NONE = "None";
     public static final String NAN = "NAN";
 
-    // attribute names in tango db
-    public static final String LABEL = "label";
-    public static final String FORMAT = "format";
-    public static final String UNIT = "unit";
-    public static final String DISPLAY_UNIT = "display_unit";
-    public static final String STANDARD_UNIT = "standard_unit";
-    public static final String MIN_VAL = "min_value";
-    public static final String MAX_VAL = "max_value";
-    public static final String MIN_ALARM = "min_alarm";
-    public static final String MAX_ALARM = "max_alarm";
-    public static final String MIN_WARNING = "min_warning";
-    public static final String MAX_WARNING = "max_warning";
-    public static final String DELTA_T = "delta_t";
-    public static final String DELTA_VAL = "delta_val";
-    public static final String DESC = "description";
-    public static final String EVENT_CHANGE_ABS = "abs_change";
-    public static final String EVENT_CHANGE_REL = "rel_change";
-    public static final String EVENT_PERIOD = "event_period";
+    // attribute properties names in tango db
+    private static final String LABEL = "label";
+    private static final String FORMAT = "format";
+    private static final String UNIT = "unit";
+    private static final String DISPLAY_UNIT = "display_unit";
+    private static final String STANDARD_UNIT = "standard_unit";
+    private static final String MIN_VAL = "min_value";
+    private static final String MAX_VAL = "max_value";
+    private static final String MIN_ALARM = "min_alarm";
+    private static final String MAX_ALARM = "max_alarm";
+    private static final String MIN_WARNING = "min_warning";
+    private static final String MAX_WARNING = "max_warning";
+    private static final String DELTA_T = "delta_t";
+    private static final String DELTA_VAL = "delta_val";
+    private static final String DESC = "description";
+    private static final String EVENT_CHANGE_ABS = "abs_change";
+    private static final String EVENT_CHANGE_REL = "rel_change";
+    private static final String EVENT_PERIOD = "event_period";
     public static final String EVENT_ARCHIVE_PERIOD = "archive_period";
-    public static final String EVENT_ARCHIVE_REL = "archive_rel_change";
-    public static final String EVENT_ARCHIVE_ABS = "archive_abs_change";
-
+    private static final String EVENT_ARCHIVE_REL = "archive_rel_change";
+    private static final String EVENT_ARCHIVE_ABS = "archive_abs_change";
+    private static final String ENUM_LABELS = "enum_labels";
+    private static final String ROOT_ATTRIBUTE = "__root_att";
     private String label = "";
     private String description = NO_DESCRIPTION;
     private String unit = NO_UNIT;
@@ -103,8 +114,15 @@ public final class AttributePropertiesImpl {
     private String[] extensions = new String[0];
     private String[] sysExtensions = new String[0];
     private double deltaValDouble = 0;
+    private String[] enumLabels = new String[] { NOT_SPECIFIED };
+    private String rootAttribute = NOT_SPECIFIED;
+
+    private boolean isEnumMutable = true;
+
+    private boolean isFwdAttribute = false;
 
     public AttributePropertiesImpl() {
+        isEnumMutable = true;
         eventProp = createEmptyEventProperties();
     }
 
@@ -136,6 +154,9 @@ public final class AttributePropertiesImpl {
         eventProp = props.eventProp;
         extensions = Arrays.copyOf(props.extensions, props.extensions.length);
         sysExtensions = Arrays.copyOf(props.sysExtensions, props.sysExtensions.length);
+        enumLabels = Arrays.copyOf(props.enumLabels, props.enumLabels.length);
+        isEnumMutable = props.isEnumMutable;
+        isFwdAttribute = props.isFwdAttribute;
 
     }
 
@@ -170,9 +191,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setDescription(final String description) {
-        if (description.isEmpty() || description.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || description.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.description = AttributePropertiesImpl.NO_DESCRIPTION;
+        if (description.isEmpty() || description.equalsIgnoreCase(NOT_SPECIFIED) || description.equalsIgnoreCase(NONE)) {
+            this.description = NO_DESCRIPTION;
         } else {
             this.description = description;
         }
@@ -183,9 +203,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setUnit(final String unit) {
-        if (unit.isEmpty() || unit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || unit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.unit = AttributePropertiesImpl.NO_UNIT;
+        if (unit.isEmpty() || unit.equalsIgnoreCase(NOT_SPECIFIED) || unit.equalsIgnoreCase(NONE)) {
+            this.unit = NO_UNIT;
         } else {
             this.unit = unit;
         }
@@ -196,9 +215,9 @@ public final class AttributePropertiesImpl {
     }
 
     public void setStandardUnit(final String standardUnit) {
-        if (standardUnit.isEmpty() || standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || standardUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.standardUnit = AttributePropertiesImpl.NO_STD_UNIT;
+        if (standardUnit.isEmpty() || standardUnit.equalsIgnoreCase(NOT_SPECIFIED)
+                || standardUnit.equalsIgnoreCase(NONE)) {
+            this.standardUnit = NO_STD_UNIT;
         } else {
             this.standardUnit = standardUnit;
         }
@@ -209,9 +228,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setDisplayUnit(final String displayUnit) {
-        if (displayUnit.isEmpty() || displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || displayUnit.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.displayUnit = AttributePropertiesImpl.NO_DIPLAY_UNIT;
+        if (displayUnit.isEmpty() || displayUnit.equalsIgnoreCase(NOT_SPECIFIED) || displayUnit.equalsIgnoreCase(NONE)) {
+            this.displayUnit = NO_DIPLAY_UNIT;
         } else {
             this.displayUnit = displayUnit;
         }
@@ -222,9 +240,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setFormat(final String format) {
-        if (format.isEmpty() || format.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || format.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.format = AttributePropertiesImpl.FORMAT_6_2F;
+        if (format.isEmpty() || format.equalsIgnoreCase(NOT_SPECIFIED) || format.equalsIgnoreCase(NONE)) {
+            this.format = FORMAT_6_2F;
         } else {
             this.format = format;
         }
@@ -235,9 +252,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMinValue(final String minValue) {
-        if (minValue.isEmpty() || minValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || minValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.minValue = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (minValue.isEmpty() || minValue.equalsIgnoreCase(NAN) || minValue.equalsIgnoreCase(NONE)) {
+            this.minValue = NOT_SPECIFIED;
             minValueDouble = -Double.MAX_VALUE;
         } else {
             this.minValue = minValue;
@@ -253,9 +269,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMaxValue(final String maxValue) {
-        if (maxValue.isEmpty() || maxValue.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || maxValue.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.maxValue = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (maxValue.isEmpty() || maxValue.equalsIgnoreCase(NAN) || maxValue.equalsIgnoreCase(NONE)) {
+            this.maxValue = NOT_SPECIFIED;
             maxValueDouble = Double.MAX_VALUE;
         } else {
             this.maxValue = maxValue;
@@ -271,9 +286,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMinAlarm(final String minAlarm) {
-        if (minAlarm.isEmpty() || minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || minAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.minAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (minAlarm.isEmpty() || minAlarm.equalsIgnoreCase(NAN) || minAlarm.equalsIgnoreCase(NONE)) {
+            this.minAlarm = NOT_SPECIFIED;
             minAlarmDouble = -Double.MAX_VALUE;
         } else {
             this.minAlarm = minAlarm;
@@ -289,9 +303,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMaxAlarm(final String maxAlarm) {
-        if (maxAlarm.isEmpty() || maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || maxAlarm.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.maxAlarm = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (maxAlarm.isEmpty() || maxAlarm.equalsIgnoreCase(NAN) || maxAlarm.equalsIgnoreCase(NONE)) {
+            this.maxAlarm = NOT_SPECIFIED;
             maxAlarmDouble = Double.MAX_VALUE;
         } else {
             this.maxAlarm = maxAlarm;
@@ -341,16 +354,14 @@ public final class AttributePropertiesImpl {
 
     private String getDefaultValue(final String field) {
         String result = field;
-        if (field.equalsIgnoreCase(AttributePropertiesImpl.NONE) || field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
+        if (field.equalsIgnoreCase(NONE) || field.equalsIgnoreCase(NAN)) {
             result = NOT_SPECIFIED;
         }
         return result;
     }
 
     private void setDefaultPeriod(final String field) {
-        if (field.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                || field.equalsIgnoreCase(AttributePropertiesImpl.NONE)
-                || field.equalsIgnoreCase(AttributePropertiesImpl.NAN)) {
+        if (field.equalsIgnoreCase(NOT_SPECIFIED) || field.equalsIgnoreCase(NONE) || field.equalsIgnoreCase(NAN)) {
             eventProp.per_event.period = PERIOD_1000;
         } else {
             eventProp.per_event.period = field;
@@ -398,9 +409,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMinWarning(final String minWarning) {
-        if (minWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || minWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.minWarning = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (minWarning.equalsIgnoreCase(NAN) || minWarning.equalsIgnoreCase(NONE)) {
+            this.minWarning = NOT_SPECIFIED;
             minWarningDouble = -Double.MAX_VALUE;
         } else {
             this.minWarning = minWarning;
@@ -412,9 +422,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setMaxWarning(final String maxWarning) {
-        if (maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || maxWarning.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.maxWarning = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (maxWarning.equalsIgnoreCase(NAN) || maxWarning.equalsIgnoreCase(NONE)) {
+            this.maxWarning = NOT_SPECIFIED;
             maxWarningDouble = Double.MAX_VALUE;
         } else {
             this.maxWarning = maxWarning;
@@ -426,9 +435,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setDeltaT(final String deltaT) {
-        if (deltaT.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || deltaT.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.deltaT = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (deltaT.equalsIgnoreCase(NAN) || deltaT.equalsIgnoreCase(NONE)) {
+            this.deltaT = NOT_SPECIFIED;
             deltaTLong = 0;
         } else {
             this.deltaT = deltaT;
@@ -440,9 +448,8 @@ public final class AttributePropertiesImpl {
     }
 
     public void setDeltaVal(final String deltaVal) {
-        if (deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NAN)
-                || deltaVal.equalsIgnoreCase(AttributePropertiesImpl.NONE)) {
-            this.deltaVal = AttributePropertiesImpl.NOT_SPECIFIED;
+        if (deltaVal.equalsIgnoreCase(NAN) || deltaVal.equalsIgnoreCase(NONE)) {
+            this.deltaVal = NOT_SPECIFIED;
         } else {
             this.deltaVal = deltaVal;
             try {
@@ -482,6 +489,47 @@ public final class AttributePropertiesImpl {
 
     public double getMaxWarningDouble() {
         return maxWarningDouble;
+    }
+
+    public String[] getEnumLabels() {
+        return enumLabels;
+    }
+
+    public void setEnumLabels(final String[] enumLabels) throws DevFailed {
+        if (!isEnumMutable) {
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                    "It's not supported to change enumeration labels number from outside the Tango device class code");
+        }
+        setEnumLabelsPrivate(enumLabels);
+    }
+
+    private void setEnumLabelsPrivate(final String[] enumLabels) throws DevFailed {
+        if (enumLabels.length == 1) {
+            if (enumLabels[0].isEmpty() || enumLabels[0].equalsIgnoreCase(NAN) || enumLabels[0].equalsIgnoreCase(NONE)) {
+                enumLabels[0] = NOT_SPECIFIED;
+            }
+        }
+
+        if (enumLabels != null && enumLabels.length > 0) {
+            // find duplicate values
+            final List<String> inputList = Arrays.asList(enumLabels);
+            final Set<String> inputSet = new HashSet<String>(inputList);
+            if (inputSet.size() < inputList.size()) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "duplicate enum values not allowed");
+            }
+            this.enumLabels = Arrays.copyOf(enumLabels, enumLabels.length);
+            // set min max values
+            if (enumLabels.length >= 1 && !enumLabels[0].equals(NOT_SPECIFIED)) {
+                setMinValue("0");
+                setMaxValue(Integer.toString(enumLabels.length - 1));
+            }
+        }
+
+    }
+
+    public void setEnumLabels(final String[] enumLabels, final boolean isMutable) throws DevFailed {
+        this.isEnumMutable = isMutable;
+        setEnumLabelsPrivate(enumLabels);
     }
 
     @Override
@@ -534,4 +582,155 @@ public final class AttributePropertiesImpl {
         return isEqual;
     }
 
+    public boolean isEnumMutable() {
+        return isEnumMutable;
+    }
+
+    public String getRootAttribute() {
+        return rootAttribute;
+    }
+
+    public void setRootAttribute(final String rootAttribute) {
+        this.rootAttribute = rootAttribute;
+        isFwdAttribute = true;
+    }
+
+    void persist(final String deviceName, final String attributeName) throws DevFailed {
+        final Map<String, String[]> properties = new HashMap<String, String[]>();
+        properties.put(LABEL, new String[] { getLabel() });
+        if (!isFwdAttribute) {
+            properties.put(FORMAT, new String[] { getFormat() });
+            properties.put(UNIT, new String[] { getUnit() });
+            properties.put(DISPLAY_UNIT, new String[] { getDisplayUnit() });
+            properties.put(STANDARD_UNIT, new String[] { getStandardUnit() });
+            properties.put(MIN_VAL, new String[] { getMinValue() });
+            properties.put(MAX_VAL, new String[] { getMaxValue() });
+            properties.put(MIN_ALARM, new String[] { getMinAlarm() });
+            properties.put(MAX_ALARM, new String[] { getMaxAlarm() });
+            properties.put(MIN_WARNING, new String[] { getMinWarning() });
+            properties.put(MAX_WARNING, new String[] { getMaxWarning() });
+            properties.put(DELTA_T, new String[] { getDeltaT() });
+            properties.put(DELTA_VAL, new String[] { getDeltaVal() });
+            properties.put(DESC, new String[] { getDescription() });
+            properties.put(ENUM_LABELS, getEnumLabels());
+
+            final EventProperties eventProp = getEventProp();
+            properties.put(EVENT_ARCHIVE_ABS, new String[] { eventProp.arch_event.abs_change });
+            properties.put(EVENT_ARCHIVE_PERIOD, new String[] { eventProp.arch_event.period });
+            properties.put(EVENT_ARCHIVE_REL, new String[] { eventProp.arch_event.rel_change });
+            properties.put(EVENT_CHANGE_ABS, new String[] { eventProp.ch_event.abs_change });
+            properties.put(EVENT_PERIOD, new String[] { eventProp.per_event.period });
+            properties.put(EVENT_CHANGE_REL, new String[] { eventProp.ch_event.rel_change });
+        }
+        final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        attributePropertiesManager.setAttributePropertiesInDB(attributeName, properties);
+    }
+
+    void load(final String deviceName, final String attributeName) throws DevFailed {
+        final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        final Map<String, String[]> propValues = attributePropertiesManager.getAttributePropertiesFromDB(attributeName);
+        // use a second map for attribute props that have one value
+        final Map<String, String> propValuesSingle = new HashMap<String, String>(propValues.size());
+        for (final Entry<String, String[]> entry : propValues.entrySet()) {
+            final String[] value = entry.getValue();
+            if (value.length == 1) {
+                propValuesSingle.put(entry.getKey(), value[0]);
+            } else if (value.length == 0) {
+                propValuesSingle.put(entry.getKey(), "");
+            }
+        }
+//        if (propValues.containsKey(ROOT_ATTRIBUTE)) {
+//            setRootAttribute(propValuesSingle.get(ROOT_ATTRIBUTE));
+//        }
+        if (propValues.containsKey(LABEL)) {
+            setLabel(propValuesSingle.get(LABEL));
+        }
+        if (!isFwdAttribute) {
+            if (propValues.containsKey(FORMAT)) {
+                setFormat(propValuesSingle.get(FORMAT));
+            }
+            if (propValues.containsKey(UNIT)) {
+                setUnit(propValuesSingle.get(UNIT));
+            }
+            if (propValues.containsKey(DISPLAY_UNIT)) {
+                setDisplayUnit(propValuesSingle.get(DISPLAY_UNIT));
+            }
+            if (propValues.containsKey(STANDARD_UNIT)) {
+                setStandardUnit(propValuesSingle.get(STANDARD_UNIT));
+            }
+            setMinMax(propValuesSingle);
+            if (propValues.containsKey(DESC)) {
+                setDescription(propValuesSingle.get(DESC));
+            }
+            setEventProperties(propValuesSingle);
+            if (propValues.containsKey(ENUM_LABELS)) {
+                setEnumLabels(propValues.get(ENUM_LABELS));
+            }
+        }
+    }
+
+    String loadAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
+        final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        setRootAttribute(attributePropertiesManager.getAttributePropertyFromDB(attributeName, ROOT_ATTRIBUTE));
+        return getRootAttribute();
+    }
+
+    void persistAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
+        new AttributePropertiesManager(deviceName).setAttributePropertyInDB(attributeName, ROOT_ATTRIBUTE,
+                getRootAttribute());
+    }
+
+    private void setMinMax(final Map<String, String> propValues) {
+        if (propValues.containsKey(MIN_VAL)) {
+            setMinValue(propValues.get(MIN_VAL));
+        }
+        if (propValues.containsKey(MAX_VAL)) {
+            setMaxValue(propValues.get(MAX_VAL));
+        }
+        if (propValues.containsKey(MIN_ALARM)) {
+            setMinAlarm(propValues.get(MIN_ALARM));
+        }
+        if (propValues.containsKey(MAX_ALARM)) {
+            setMaxAlarm(propValues.get(MAX_ALARM));
+        }
+        if (propValues.containsKey(MIN_WARNING)) {
+            setMinWarning(propValues.get(MIN_WARNING));
+        }
+        if (propValues.containsKey(MAX_WARNING)) {
+            setMaxWarning(propValues.get(MAX_WARNING));
+        }
+        if (propValues.containsKey(DELTA_T)) {
+            setDeltaT(propValues.get(DELTA_T));
+        }
+        if (propValues.containsKey(DELTA_VAL)) {
+            setDeltaVal(propValues.get(DELTA_VAL));
+        }
+    }
+
+    private void setEventProperties(final Map<String, String> propValues) {
+
+        if (propValues.containsKey(EVENT_ARCHIVE_ABS)) {
+            setArchivingEventAbsChange(propValues.get(EVENT_ARCHIVE_ABS));
+        }
+        if (propValues.containsKey(EVENT_ARCHIVE_PERIOD)) {
+            setArchivingEventPeriod(propValues.get(EVENT_ARCHIVE_PERIOD));
+        }
+        if (propValues.containsKey(EVENT_ARCHIVE_REL)) {
+            setArchivingEventRelChange(propValues.get(EVENT_ARCHIVE_REL));
+        }
+        if (propValues.containsKey(EVENT_CHANGE_ABS)) {
+            setEventAbsChange(propValues.get(EVENT_CHANGE_ABS));
+        }
+        if (propValues.containsKey(EVENT_PERIOD)) {
+            setEventPeriod(propValues.get(EVENT_PERIOD));
+        }
+        if (propValues.containsKey(EVENT_CHANGE_REL)) {
+            setEventRelChange(propValues.get(EVENT_CHANGE_REL));
+        }
+    }
+
+    void clear(final String deviceName, final String attributeName) throws DevFailed {
+        final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
+        attributePropertiesManager.removeAttributeProperties(attributeName);
+    }
 }

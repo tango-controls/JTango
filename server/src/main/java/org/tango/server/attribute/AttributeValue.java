@@ -31,12 +31,13 @@ import java.lang.reflect.Array;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
+import org.tango.server.IValue;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 
-public final class AttributeValue implements Cloneable, Serializable {
+public final class AttributeValue implements Cloneable, Serializable, IValue<Object> {
 
     private static final String CANNOT_BE_AN_ATTRIBUTE = " cannot be an attribute";
 
@@ -87,6 +88,7 @@ public final class AttributeValue implements Cloneable, Serializable {
         this.yDim = yDim;
     }
 
+    @Override
     public Object getValue() {
         return value;
     }
@@ -105,6 +107,7 @@ public final class AttributeValue implements Cloneable, Serializable {
      *            attribute value.
      * @throws DevFailed
      */
+    @Override
     public void setValue(final Object value) throws DevFailed {
         time = System.currentTimeMillis();
         if (value != null) {
@@ -149,6 +152,7 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @param time
      * @throws DevFailed
      */
+    @Override
     public void setValue(final Object value, final long time) throws DevFailed {
         this.setValue(value);
         this.setTime(time);
@@ -182,6 +186,7 @@ public final class AttributeValue implements Cloneable, Serializable {
      * @param time
      *            timestamp in milliseconds
      */
+    @Override
     public void setTime(final long time) {
         this.time = time;
     }

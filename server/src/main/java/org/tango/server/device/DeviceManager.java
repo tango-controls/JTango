@@ -1,26 +1,26 @@
 /**
- * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * Copyright (C) : 2012
+ * 
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * 
  * This file is part of Tango.
- *
+ * 
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.device;
 
@@ -34,6 +34,8 @@ import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
+import org.tango.server.pipe.PipeImpl;
+import org.tango.server.pipe.PipeValue;
 import org.tango.server.servant.AttributeGetterSetter;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
@@ -145,7 +147,6 @@ public final class DeviceManager {
         } catch (final DevFailed e) {
             return device.getCommand(polledObject).isPolled();
         }
-
     }
 
     /**
@@ -231,9 +232,9 @@ public final class DeviceManager {
                 try {
                     attribute.updateValue();
                     // push the event
-                    EventManager.getInstance().pushEvent(name, attributeName, eventType);
+                    EventManager.getInstance().pushAttributeEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeEvent(name, attributeName, e);
                 }
                 break;
             default:
@@ -260,9 +261,9 @@ public final class DeviceManager {
                 try {
                     attribute.updateValue(value);
                     // push the event
-                    EventManager.getInstance().pushEvent(name, attributeName, eventType);
+                    EventManager.getInstance().pushAttributeEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeEvent(name, attributeName, e);
                 }
                 break;
             default:
@@ -274,10 +275,32 @@ public final class DeviceManager {
      * Push a DATA_READY event if some client had registered it
      * 
      * @param attributeName The attribute name
+     * @param counter
      * @throws DevFailed
      */
     public void pushDataReadyEvent(final String attributeName, final int counter) throws DevFailed {
-        EventManager.getInstance().pushDataReadyEvent(name, attributeName, counter);
+        EventManager.getInstance().pushAttributeDataReadyEvent(name, attributeName, counter);
+    }
+
+    /**
+     * Push a PIPE EVENT event if some client had registered it
+     * 
+     * @param pipeName The pipe name
+     * @param blob The pipe data
+     * @throws DevFailed
+     */
+    public void pushPipeEvent(final String pipeName, final PipeValue blob) throws DevFailed {
+
+        // set attribute value
+        final PipeImpl pipe = DeviceImpl.getPipe(pipeName, device.getPipeList());
+        try {
+            pipe.updateValue(blob);
+            // push the event
+            EventManager.getInstance().pushPipeEvent(name, pipeName, blob);
+        } catch (final DevFailed e) {
+            EventManager.getInstance().pushPipeEvent(name, pipeName, e);
+        }
+
     }
 
     /**
@@ -297,6 +320,10 @@ public final class DeviceManager {
      */
     public String getClientHostName() {
         return ServerRequestInterceptor.getInstance().getClientHostName();
+    }
+
+    public boolean hasEventSubsriber() {
+        return EventManager.getInstance().hasSubscriber(name);
     }
 
     @Override

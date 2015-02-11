@@ -25,7 +25,7 @@
 package org.tango.server.build;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,17 +40,17 @@ final class DeviceSchedulerBuilder {
     private final Logger logger = LoggerFactory.getLogger(DeviceSchedulerBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceSchedulerBuilder.class);
 
-    public void build(final List<Method> methods, final DeviceImpl device) throws DevFailed {
-	xlogger.entry();
-	logger.debug("Has scheduled methods: {}", methods);
+    public void build(final Set<Method> methods, final DeviceImpl device) throws DevFailed {
+        xlogger.entry();
+        logger.debug("Has scheduled methods: {}", methods);
 
-	for (final Method method : methods) {
-	    if (method.getParameterTypes().length != 0 && !method.getReturnType().equals(void.class)) {
-		DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
-	    }
-	}
+        for (final Method method : methods) {
+            if (method.getParameterTypes().length != 0 && !method.getReturnType().equals(void.class)) {
+                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
+            }
+        }
 
-	device.setDeviceScheduler(methods);
-	xlogger.exit();
+        device.setDeviceScheduler(methods);
+        xlogger.exit();
     }
 }

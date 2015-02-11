@@ -61,47 +61,46 @@ final class CommandBuilder {
      * @throws DevFailed
      */
     public void build(final DeviceImpl device, final Object businessObject, final Method m, final boolean isOnDeviceImpl)
-	    throws DevFailed {
-	xlogger.entry();
-	final Command annot = m.getAnnotation(Command.class);
-	// retrieve parameter type
-	final Class<?>[] paramTypeTable = m.getParameterTypes();
-	if (paramTypeTable.length > 1) {
-	    DevFailedUtils.throwDevFailed("INIT_FAILED", "Command can have only one parameter");
-	}
-	Class<?> paramType;
-	if (paramTypeTable.length == 0) {
-	    paramType = Void.class;
-	} else {
-	    paramType = paramTypeTable[0];
-	}
-	// retrieve returned type
-	final Class<?> returnedType = m.getReturnType();
-	// logger
-	// .debug("get returned type of cmd {}", returnedType
-	// .getCanonicalName());
-	String cmdName;
-	if ("".equals(annot.name())) {
-	    cmdName = m.getName();
-	} else {
-	    cmdName = annot.name();
-	}
-	logger.debug("Has a command: {} type {}", cmdName, paramType.getCanonicalName());
-	final CommandConfiguration config = new CommandConfiguration(cmdName, paramType, returnedType,
-		annot.inTypeDesc(), annot.outTypeDesc(), DispLevel.from_int(annot.displayLevel()), annot.isPolled(),
-		annot.pollingPeriod());
+            throws DevFailed {
+        xlogger.entry();
+        final Command annot = m.getAnnotation(Command.class);
+        // retrieve parameter type
+        final Class<?>[] paramTypeTable = m.getParameterTypes();
+        if (paramTypeTable.length > 1) {
+            DevFailedUtils.throwDevFailed("INIT_FAILED", "Command can have only one parameter");
+        }
+        Class<?> paramType;
+        if (paramTypeTable.length == 0) {
+            paramType = Void.class;
+        } else {
+            paramType = paramTypeTable[0];
+        }
+        // retrieve returned type
+        final Class<?> returnedType = m.getReturnType();
+        // logger
+        // .debug("get returned type of cmd {}", returnedType
+        // .getCanonicalName());
+        String cmdName;
+        if ("".equals(annot.name())) {
+            cmdName = m.getName();
+        } else {
+            cmdName = annot.name();
+        }
+        logger.debug("Has a command: {} type {}", cmdName, paramType.getCanonicalName());
+        final CommandConfiguration config = new CommandConfiguration(cmdName, paramType, returnedType,
+                annot.inTypeDesc(), annot.outTypeDesc(), DispLevel.from_int(annot.displayLevel()), annot.isPolled(),
+                annot.pollingPeriod());
 
-	ReflectCommandBehavior behavior = null;
-	if (isOnDeviceImpl) {
-	    behavior = new ReflectCommandBehavior(m, device, config);
+        ReflectCommandBehavior behavior = null;
+        if (isOnDeviceImpl) {
+            behavior = new ReflectCommandBehavior(m, device, config);
 
-	} else {
-	    behavior = new ReflectCommandBehavior(m, businessObject, config);
-	}
-	final CommandImpl command = new CommandImpl(behavior, device.getAttributeProperties());
-	BuilderUtils.setStateMachine(m, command);
-	device.addCommand(command);
-	xlogger.exit();
+        } else {
+            behavior = new ReflectCommandBehavior(m, businessObject, config);
+        }
+        final CommandImpl command = new CommandImpl(behavior, device.getName());
+        BuilderUtils.setStateMachine(m, command);
+        device.addCommand(command);
+        xlogger.exit();
     }
-
 }

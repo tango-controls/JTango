@@ -24,9 +24,6 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -43,39 +40,41 @@ public class AlreadyRunningTest {
 
     @Test(expected = DevFailed.class)
     public void testDB() throws DevFailed {
-	assertThat(System.getProperty("TANGO_HOST"), notNullValue());
-	JTangoTest.start();
-	ORBManager.init(true, "dserver/" + JTangoTest.SERVER_NAME + "/" + JTangoTest.INSTANCE_NAME);
+        // assertThat(System.getProperty("TANGO_HOST"), notNullValue());
+        JTangoTest.start();
+        ORBManager.init(true, "dserver/" + JTangoTest.SERVER_NAME + "/" + JTangoTest.INSTANCE_NAME);
     }
 
     @Test(expected = DevFailed.class)
     public void test() throws DevFailed, IOException {
-	ServerSocket ss1 = null;
-	try {
-	    ss1 = new ServerSocket(0);
-	    ss1.setReuseAddress(true);
-	    ss1.close();
-	    JTangoTest.startNoDb(ss1.getLocalPort());
-	} finally {
-	    if (ss1 != null)
-		ss1.close();
-	}
-	ServerSocket ss2 = null;
-	try {
-	    ss2 = new ServerSocket(0);
-	    ss2.setReuseAddress(true);
-	    ss2.close();
-	    JTangoTest.startNoDb(ss2.getLocalPort());
-	} finally {
-	    if (ss2 != null)
-		ss2.close();
-	}
+        ServerSocket ss1 = null;
+        try {
+            ss1 = new ServerSocket(0);
+            ss1.setReuseAddress(true);
+            ss1.close();
+            JTangoTest.startNoDb(ss1.getLocalPort());
+        } finally {
+            if (ss1 != null) {
+                ss1.close();
+            }
+        }
+        ServerSocket ss2 = null;
+        try {
+            ss2 = new ServerSocket(0);
+            ss2.setReuseAddress(true);
+            ss2.close();
+            JTangoTest.startNoDb(ss2.getLocalPort());
+        } finally {
+            if (ss2 != null) {
+                ss2.close();
+            }
+        }
 
     }
 
     @After
     public void stopDevice() throws DevFailed {
-	ServerManager.getInstance().stop();
+        ServerManager.getInstance().stop();
     }
 
 }

@@ -51,74 +51,81 @@ public final class DynamicAttributeTest implements IAttributeBehavior, ISetValue
 
     private static final Map<Class<?>, Object> RESULTS_MAP = new HashMap<Class<?>, Object>();
     static {
-	RESULTS_MAP.put(boolean.class, false);
-	RESULTS_MAP.put(short.class, (short) 0);
-	RESULTS_MAP.put(int.class, 0);
-	RESULTS_MAP.put(byte.class, (byte) 0);
-	RESULTS_MAP.put(float.class, 0.0F);
-	RESULTS_MAP.put(long.class, 0L);
-	RESULTS_MAP.put(double.class, 0.0);
-	RESULTS_MAP.put(String.class, "");
-	RESULTS_MAP.put(DeviceState.class, DeviceState.ON);
-	RESULTS_MAP.put(DevEncoded.class, new DevEncoded());
-	RESULTS_MAP.put(short[].class, new short[] {});
-	RESULTS_MAP.put(int[].class, new int[] {});
-	RESULTS_MAP.put(byte[].class, new byte[] {});
-	RESULTS_MAP.put(float[].class, new float[] {});
-	RESULTS_MAP.put(double[].class, new double[] {});
-	RESULTS_MAP.put(long[].class, new long[] {});
-	RESULTS_MAP.put(String[].class, new String[] {});
-	RESULTS_MAP.put(boolean[].class, new boolean[] {});
-	RESULTS_MAP.put(DeviceState[].class, new DeviceState[] {});
-	RESULTS_MAP.put(DevEncoded[].class, new DevEncoded[] {});
-	RESULTS_MAP.put(short[][].class, new short[][] { {} });
-	RESULTS_MAP.put(int[][].class, new int[][] { {} });
-	RESULTS_MAP.put(byte[][].class, new byte[][] { {} });
-	RESULTS_MAP.put(float[][].class, new float[][] { {} });
-	RESULTS_MAP.put(double[][].class, new double[][] { {} });
-	RESULTS_MAP.put(long[][].class, new long[][] { {} });
-	RESULTS_MAP.put(String[][].class, new String[][] { {} });
-	RESULTS_MAP.put(boolean[][].class, new boolean[][] { {} });
-	RESULTS_MAP.put(DeviceState[][].class, new DeviceState[][] { {} });
-	RESULTS_MAP.put(DevEncoded[][].class, new DevEncoded[][] { {} });
+        RESULTS_MAP.put(boolean.class, false);
+        RESULTS_MAP.put(short.class, (short) 0);
+        RESULTS_MAP.put(int.class, 0);
+        RESULTS_MAP.put(byte.class, (byte) 0);
+        RESULTS_MAP.put(float.class, 0.0F);
+        RESULTS_MAP.put(long.class, 0L);
+        RESULTS_MAP.put(double.class, 0.0);
+        RESULTS_MAP.put(String.class, "");
+        RESULTS_MAP.put(DeviceState.class, DeviceState.ON);
+        RESULTS_MAP.put(DevEncoded.class, new DevEncoded());
+        RESULTS_MAP.put(short[].class, new short[] {});
+        RESULTS_MAP.put(int[].class, new int[] {});
+        RESULTS_MAP.put(byte[].class, new byte[] {});
+        RESULTS_MAP.put(float[].class, new float[] {});
+        RESULTS_MAP.put(double[].class, new double[] {});
+        RESULTS_MAP.put(long[].class, new long[] {});
+        RESULTS_MAP.put(String[].class, new String[] {});
+        RESULTS_MAP.put(boolean[].class, new boolean[] {});
+        RESULTS_MAP.put(DeviceState[].class, new DeviceState[] {});
+        RESULTS_MAP.put(DevEncoded[].class, new DevEncoded[] {});
+        RESULTS_MAP.put(short[][].class, new short[][] { {} });
+        RESULTS_MAP.put(int[][].class, new int[][] { {} });
+        RESULTS_MAP.put(byte[][].class, new byte[][] { {} });
+        RESULTS_MAP.put(float[][].class, new float[][] { {} });
+        RESULTS_MAP.put(double[][].class, new double[][] { {} });
+        RESULTS_MAP.put(long[][].class, new long[][] { {} });
+        RESULTS_MAP.put(String[][].class, new String[][] { {} });
+        RESULTS_MAP.put(boolean[][].class, new boolean[][] { {} });
+        RESULTS_MAP.put(DeviceState[][].class, new DeviceState[][] { {} });
+        RESULTS_MAP.put(DevEncoded[][].class, new DevEncoded[][] { {} });
     }
 
     public DynamicAttributeTest(final Class<?> clazz) throws DevFailed {
-	configAttr.setType(clazz);
-	configAttr.setName(clazz.getSimpleName() + "Dynamic");
-	configAttr.setWritable(AttrWriteType.READ_WRITE);
-	value.setValue(RESULTS_MAP.get(configAttr.getType()));
+        configAttr.setType(clazz);
+        configAttr.setName(clazz.getSimpleName() + "Dynamic");
+        configAttr.setWritable(AttrWriteType.READ_WRITE);
+        value.setValue(RESULTS_MAP.get(configAttr.getType()));
+    }
+
+    public DynamicAttributeTest(final Class<?> clazz, final String attributeName) throws DevFailed {
+        configAttr.setType(clazz);
+        configAttr.setName(attributeName);
+        configAttr.setWritable(AttrWriteType.READ_WRITE);
+        value.setValue(RESULTS_MAP.get(configAttr.getType()));
     }
 
     @Override
     public AttributeValue getValue() throws DevFailed {
-	return value;
+        return value;
     }
 
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
-	this.value = value;
+        this.value = value;
     }
 
     @Override
     public AttributeConfiguration getConfiguration() throws DevFailed {
-	return configAttr;
+        return configAttr;
     }
 
     @Override
     public StateMachineBehavior getStateMachine() {
-	final StateMachineBehavior stateMachine = new StateMachineBehavior();
-	stateMachine.setDeniedStates(DeviceState.FAULT);
-	stateMachine.setEndState(DeviceState.ON);
-	return stateMachine;
+        final StateMachineBehavior stateMachine = new StateMachineBehavior();
+        stateMachine.setDeniedStates(DeviceState.FAULT);
+        stateMachine.setEndState(DeviceState.ON);
+        return stateMachine;
     }
 
     @Override
     public AttributeValue getSetValue() throws DevFailed {
-	if (configAttr.getType().equals(double.class)) {
-	    return new AttributeValue(120.3);
-	} else {
-	    return value;
-	}
+        if (configAttr.getType().equals(double.class)) {
+            return new AttributeValue(120.3);
+        } else {
+            return value;
+        }
     }
 }

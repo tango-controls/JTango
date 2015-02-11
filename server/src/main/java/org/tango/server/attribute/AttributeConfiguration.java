@@ -29,6 +29,7 @@ import java.lang.reflect.Array;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
+import org.tango.server.IConfigurable;
 import org.tango.server.PolledObjectConfig;
 
 import fr.esrf.Tango.AttrDataFormat;
@@ -37,7 +38,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DispLevel;
 import fr.esrf.TangoDs.TangoConst;
 
-public final class AttributeConfiguration implements PolledObjectConfig {
+public final class AttributeConfiguration implements PolledObjectConfig, IConfigurable {
     private String name = "";
     private AttrDataFormat format = AttrDataFormat.SCALAR;
     private AttrWriteType writable = AttrWriteType.READ;
@@ -52,11 +53,11 @@ public final class AttributeConfiguration implements PolledObjectConfig {
     private int pollingPeriod = 0;
     private boolean isPolled = false;
     private AttributePropertiesImpl attributeProperties = new AttributePropertiesImpl();
-    boolean pushDataReady;
-    boolean pushChangeEvent;
-    boolean checkChangeEvent;
-    boolean pushArchiveEvent;
-    boolean checkArchivingEvent;
+    private boolean pushDataReady;
+    private boolean pushChangeEvent;
+    private boolean checkChangeEvent;
+    private boolean pushArchiveEvent;
+    private boolean checkArchivingEvent;
 
     public AttributeConfiguration() {
 
@@ -82,7 +83,7 @@ public final class AttributeConfiguration implements PolledObjectConfig {
         attributeProperties = config.attributeProperties;
     }
 
-    DispLevel getDispLevel() {
+    public DispLevel getDispLevel() {
         return dispLevel;
     }
 
@@ -191,12 +192,27 @@ public final class AttributeConfiguration implements PolledObjectConfig {
         return attributeProperties;
     }
 
-    public void setAttributeProperties(final AttributePropertiesImpl attributeProperties) {
+    public void setAttributeProperties(final AttributePropertiesImpl attributeProperties) throws DevFailed {
         this.attributeProperties = new AttributePropertiesImpl(attributeProperties);
         if (this.attributeProperties.getLabel().isEmpty()
                 || this.attributeProperties.getLabel().equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
             this.attributeProperties.setLabel(name);
         }
+    }
+
+    @Override
+    public void persist(final String deviceName) throws DevFailed {
+        attributeProperties.persist(deviceName, name);
+    }
+
+    @Override
+    public void load(final String deviceName) throws DevFailed {
+        attributeProperties.load(deviceName, name);
+    }
+
+    @Override
+    public void clear(final String deviceName) throws DevFailed {
+        attributeProperties.clear(deviceName, name);
     }
 
     public int getTangoType() {

@@ -31,12 +31,12 @@ public final class TangoCacheThreadFactory implements ThreadFactory {
     private static final AtomicInteger THREAD_NR = new AtomicInteger(0);
 
     public TangoCacheThreadFactory() {
-	THREAD_NR.set(0);
+        THREAD_NR.set(0);
     }
 
     @Override
     public Thread newThread(final Runnable r) {
-	return new Thread(r, "Polling thread " + THREAD_NR.incrementAndGet());
+        return new Thread(r, "Polling " + THREAD_NR.incrementAndGet());
     }
 
 }

@@ -29,11 +29,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.pipe.PipeImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
 import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevIntrChange;
+import fr.esrf.Tango.DevPipeData;
 
 /**
  * based on AttributeImpl object with event information
@@ -45,7 +48,7 @@ final class EventImpl {
     private final Logger logger = LoggerFactory.getLogger(EventImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
 
-    private final AttributeImpl attribute;
+    private AttributeImpl attribute;
     private final IEventTrigger eventTrigger;
     private long subscribeTime;
     private int counter = 0;
@@ -68,6 +71,33 @@ final class EventImpl {
     }
 
     /**
+     * Create a Event object based on an PipeImpl with its event parameters.
+     * 
+     * @param attribute the attribute for specified event
+     * @throws DevFailed
+     */
+
+    EventImpl(final PipeImpl pipe) throws DevFailed {
+        this.eventType = EventType.PIPE_EVENT;
+        eventTrigger = new DefaultEventTrigger();
+        logger.debug("event trigger for {} type is {}", pipe.getName(), eventTrigger.getClass());
+        updateSubscribeTime();
+    }
+
+    /**
+     * Create a Event object based without attribute for EventType.INTERFACE_CHANGE_EVENT.
+     * 
+     * @throws DevFailed
+     */
+
+    EventImpl() throws DevFailed {
+        this.eventType = EventType.INTERFACE_CHANGE_EVENT;
+        eventTrigger = new DefaultEventTrigger();
+        logger.debug("event trigger for {} type is {}", eventTrigger.getClass());
+        updateSubscribeTime();
+    }
+
+    /**
      * Update the subscribe time to manage if subscribe is still active.
      */
     void updateSubscribeTime() {
@@ -85,6 +115,10 @@ final class EventImpl {
         return dt < EventConstants.EVENT_RESUBSCRIBE_PERIOD;
     }
 
+    void updateAttributeValue() throws DevFailed {
+        attribute.updateValue();
+    }
+
     /**
      * Fire an event containing a value.
      * 
@@ -93,30 +127,48 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    void pushEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    void forcePushEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
-        eventTrigger.setError(null);
-        eventTrigger.updateProperties();
-        if (eventTrigger.doCheck()) {
-            if (eventTrigger.isSendEvent()) {
-                if (eventType.equals(EventType.ATT_CONF_EVENT)) {
-                    pushConfigEvent(eventSocket, fullName);
-                } else {
-                    sendEvent(eventSocket, fullName);
-                }
-            }
-        }
-        else {
-            if (eventType.equals(EventType.ATT_CONF_EVENT)) {
-                pushConfigEvent(eventSocket, fullName);
-            } else {
-                sendEvent(eventSocket, fullName);
-            }
+        if (eventType.equals(EventType.ATT_CONF_EVENT)) {
+            pushAttributeConfigEvent(eventSocket, fullName);
+        } else {
+            sendAttributeEvent(eventSocket, fullName);
         }
         xlogger.exit();
     }
 
-    private void sendEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    /**
+     * Fire an event containing a value is condition is valid.
+     * 
+     * @param eventSocket the socket to send event
+     * @param fullName event full name
+     * @throws DevFailed
+     */
+
+    void pushAttributeEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+        xlogger.entry();
+        eventTrigger.setError(null);
+        eventTrigger.updateProperties();
+        final boolean sendEvent = isAttributeValueEvent()
+                && (eventTrigger.doCheck() && eventTrigger.isSendEvent() || !eventTrigger.doCheck());
+        if (sendEvent) {
+            sendAttributeEvent(eventSocket, fullName);
+        }
+        xlogger.exit();
+    }
+
+    /**
+     * check if is an attribute value
+     * 
+     * @param eventType
+     * @return
+     */
+    private boolean isAttributeValueEvent() {
+        return eventType.equals(EventType.ARCHIVE_EVENT) || eventType.equals(EventType.PERIODIC_EVENT)
+                || eventType.equals(EventType.CHANGE_EVENT);
+    }
+
+    private void sendAttributeEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
         try {
             eventSocket.sendMore(fullName);
@@ -139,7 +191,8 @@ final class EventImpl {
      * @param counter a counter value
      * @throws DevFailed
      */
-    void pushDataReadyEvent(final ZMQ.Socket eventSocket, final String fullName, int counter) throws DevFailed {
+    void pushAttributeDataReadyEvent(final ZMQ.Socket eventSocket, final String fullName, final int counter)
+            throws DevFailed {
         xlogger.entry();
         try {
             final AttDataReady dataReady = new AttDataReady(attribute.getName(), attribute.getTangoType(), counter);
@@ -147,7 +200,7 @@ final class EventImpl {
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter, false), ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(dataReady), 0);
-            logger.debug("sent event: {}", fullName);
+            logger.debug("sent {} event: {}", EventType.DATA_READY_EVENT, fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
@@ -155,14 +208,46 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushConfigEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    void pushAttributeConfigEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
         xlogger.entry();
         try {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshallConfig(attribute), 0);
-            logger.debug("sent event: {}", fullName);
+            logger.debug("sent {} event: {}", EventType.ATT_CONF_EVENT, fullName);
+        } catch (final org.zeromq.ZMQException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+
+        xlogger.exit();
+    }
+
+    void pushInterfaceChangeEvent(final ZMQ.Socket eventSocket, final String fullName,
+            final DevIntrChange deviceInterface) throws DevFailed {
+        xlogger.entry();
+        try {
+            eventSocket.sendMore(fullName);
+            eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(deviceInterface), 0);
+            logger.debug("sent {} event: {}", EventType.INTERFACE_CHANGE_EVENT, fullName);
+        } catch (final org.zeromq.ZMQException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+
+        xlogger.exit();
+    }
+
+    void pushPipeEvent(final ZMQ.Socket eventSocket, final String fullName, final DevPipeData pipeData)
+            throws DevFailed {
+        xlogger.entry();
+        try {
+            eventSocket.sendMore(fullName);
+            eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
+            eventSocket.send(EventUtilities.marshall(pipeData), 0);
+            logger.debug("sent {} event: {}", EventType.PIPE_EVENT, fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
