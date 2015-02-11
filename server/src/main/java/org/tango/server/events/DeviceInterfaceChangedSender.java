@@ -90,11 +90,23 @@ public class DeviceInterfaceChangedSender {
         });
     }
 
-    public synchronized void pushEvent(final DevIntrChange deviceInterface) {
+    public synchronized void pushEvent(final DevIntrChange deviceInterface, final boolean isStarted) {
         logger.debug("request for interface changed of {} queued", deviceName);
-        task.add(deviceInterface);
-        if (future == null && EventManager.getInstance().hasSubscriber(deviceName)) {
-            future = executor.submit(task);
+        if (isStarted) {
+            // device startup, send event and empty queue
+            try {
+                EventManager.getInstance().pushInterfaceChangedEvent(deviceName, deviceInterface);
+            } catch (final DevFailed e) {
+                logger.error(DevFailedUtils.toString(e));
+                logger.error("impossible to send event", e);
+            }
+            task.clear();
+        } else {
+            // queue event
+            task.add(deviceInterface);
+            if (future == null && EventManager.getInstance().hasSubscriber(deviceName)) {
+                future = executor.submit(task);
+            }
         }
     }
 
