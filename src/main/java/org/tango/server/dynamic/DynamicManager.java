@@ -26,17 +26,22 @@ package org.tango.server.dynamic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.ExceptionMessages;
 import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.command.ICommandBehavior;
+import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.server.servant.DeviceImpl;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -65,6 +70,8 @@ public final class DynamicManager {
      */
     private final List<CommandImpl> dynamicCommands = new ArrayList<CommandImpl>();
 
+    private final List<String> forwardedAttributes = new ArrayList<String>();
+
     /**
      * Ctr
      * 
@@ -72,7 +79,7 @@ public final class DynamicManager {
      *            the associated device
      */
     public DynamicManager(final DeviceImpl deviceImpl) {
-	this.deviceImpl = deviceImpl;
+        this.deviceImpl = deviceImpl;
     }
 
     /**
@@ -82,12 +89,24 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void addAttribute(final IAttributeBehavior behavior) throws DevFailed {
-	xlogger.entry("adding dynamic attribute {}", behavior.getConfiguration().getName());
-	final AttributeImpl attrImpl = new AttributeImpl(behavior, deviceImpl.getAttributeProperties());
-	attrImpl.setStateMachine(behavior.getStateMachine());
-	deviceImpl.addAttribute(attrImpl);
-	dynamicAttributes.add(attrImpl);
-	xlogger.exit();
+        xlogger.entry("adding dynamic attribute {}", behavior.getConfiguration().getName());
+        if (behavior instanceof ForwardedAttribute) {
+            // check if this attribute is already created
+            final ForwardedAttribute att = (ForwardedAttribute) behavior;
+            final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
+            if (forwardedAttributes.contains(lower)) {
+                DevFailedUtils.throwDevFailed(ExceptionMessages.FWD_DOUBLE_USED,
+                        "root attribute already used in this device");
+            } else {
+                forwardedAttributes.add(lower);
+            }
+        }
+        final AttributeImpl attrImpl = new AttributeImpl(behavior, deviceImpl.getName());
+        attrImpl.setStateMachine(behavior.getStateMachine());
+        deviceImpl.addAttribute(attrImpl);
+        deviceImpl.pushInterfaceChangeEvent(false);
+        dynamicAttributes.add(attrImpl);
+        xlogger.exit();
     }
 
     /**
@@ -98,13 +117,22 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void removeAttribute(final String attributeName) throws DevFailed {
-	for (final AttributeImpl attributeImpl : dynamicAttributes) {
-	    if (attributeImpl.getName().equalsIgnoreCase(attributeName)) {
-		deviceImpl.removeAttribute(attributeImpl);
-		dynamicAttributes.remove(attributeImpl);
-		break;
-	    }
-	}
+        for (final AttributeImpl attributeImpl : dynamicAttributes) {
+            if (attributeImpl.getBehavior() instanceof ForwardedAttribute) {
+                // check if this attribute is already created
+                final ForwardedAttribute att = (ForwardedAttribute) attributeImpl.getBehavior();
+                final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
+                forwardedAttributes.remove(lower);
+                deviceImpl.pushInterfaceChangeEvent(false);
+            }
+
+            if (attributeImpl.getName().equalsIgnoreCase(attributeName)) {
+                deviceImpl.removeAttribute(attributeImpl);
+                dynamicAttributes.remove(attributeImpl);
+                deviceImpl.pushInterfaceChangeEvent(false);
+                break;
+            }
+        }
     }
 
     /**
@@ -115,10 +143,10 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void removeAttribute(final String attributeName, final boolean clearAttributeProperties) throws DevFailed {
-	removeAttribute(attributeName);
-	if (clearAttributeProperties) {
-	    deviceImpl.getAttributeProperties().removeAttributeProperties(attributeName);
-	}
+        removeAttribute(attributeName);
+        if (clearAttributeProperties) {
+            new AttributePropertiesManager(deviceImpl.getName()).removeAttributeProperties(attributeName);
+        }
     }
 
     /**
@@ -129,14 +157,14 @@ public final class DynamicManager {
      * @return The dynamic attribute
      */
     public IAttributeBehavior getAttribute(final String attributeName) {
-	IAttributeBehavior attribute = null;
-	for (final AttributeImpl attributeImpl : dynamicAttributes) {
-	    if (attributeImpl.getName().equalsIgnoreCase(attributeName)) {
-		attribute = attributeImpl.getBehavior();
-		break;
-	    }
-	}
-	return attribute;
+        IAttributeBehavior attribute = null;
+        for (final AttributeImpl attributeImpl : dynamicAttributes) {
+            if (attributeImpl.getName().equalsIgnoreCase(attributeName)) {
+                attribute = attributeImpl.getBehavior();
+                break;
+            }
+        }
+        return attribute;
     }
 
     /**
@@ -146,12 +174,13 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void addCommand(final ICommandBehavior behavior) throws DevFailed {
-	xlogger.entry("adding dynamic command {}", behavior.getConfiguration().getName());
-	final CommandImpl commandImpl = new CommandImpl(behavior, deviceImpl.getAttributeProperties());
-	commandImpl.setStateMachine(behavior.getStateMachine());
-	deviceImpl.addCommand(commandImpl);
-	dynamicCommands.add(commandImpl);
-	xlogger.exit();
+        xlogger.entry("adding dynamic command {}", behavior.getConfiguration().getName());
+        final CommandImpl commandImpl = new CommandImpl(behavior, deviceImpl.getName());
+        commandImpl.setStateMachine(behavior.getStateMachine());
+        deviceImpl.addCommand(commandImpl);
+        dynamicCommands.add(commandImpl);
+        deviceImpl.pushInterfaceChangeEvent(false);
+        xlogger.exit();
     }
 
     /**
@@ -162,13 +191,14 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void removeCommand(final String commandName) throws DevFailed {
-	for (final CommandImpl cmdImpl : dynamicCommands) {
-	    if (cmdImpl.getName().equalsIgnoreCase(commandName)) {
-		deviceImpl.removeCommand(cmdImpl);
-		dynamicCommands.remove(cmdImpl);
-		break;
-	    }
-	}
+        for (final CommandImpl cmdImpl : dynamicCommands) {
+            if (cmdImpl.getName().equalsIgnoreCase(commandName)) {
+                deviceImpl.removeCommand(cmdImpl);
+                dynamicCommands.remove(cmdImpl);
+                deviceImpl.pushInterfaceChangeEvent(false);
+                break;
+            }
+        }
     }
 
     /**
@@ -179,14 +209,14 @@ public final class DynamicManager {
      * @return The dynamic command
      */
     public ICommandBehavior getCommand(final String commandName) {
-	ICommandBehavior command = null;
-	for (final CommandImpl cmdImpl : dynamicCommands) {
-	    if (cmdImpl.getName().equalsIgnoreCase(commandName)) {
-		command = cmdImpl.getBehavior();
-		break;
-	    }
-	}
-	return command;
+        ICommandBehavior command = null;
+        for (final CommandImpl cmdImpl : dynamicCommands) {
+            if (cmdImpl.getName().equalsIgnoreCase(commandName)) {
+                command = cmdImpl.getBehavior();
+                break;
+            }
+        }
+        return command;
     }
 
     /**
@@ -196,8 +226,8 @@ public final class DynamicManager {
      * 
      */
     public void clearAll() throws DevFailed {
-	clearCommands();
-	clearAttributes();
+        clearCommands();
+        clearAttributes();
     }
 
     /**
@@ -208,8 +238,8 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void clearAll(final boolean clearAttributeProperties) throws DevFailed {
-	clearCommands();
-	clearAttributes(clearAttributeProperties);
+        clearCommands();
+        clearAttributes(clearAttributeProperties);
     }
 
     /**
@@ -218,10 +248,10 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void clearCommands() throws DevFailed {
-	for (final CommandImpl cmdImpl : dynamicCommands) {
-	    deviceImpl.removeCommand(cmdImpl);
-	}
-	dynamicCommands.clear();
+        for (final CommandImpl cmdImpl : dynamicCommands) {
+            deviceImpl.removeCommand(cmdImpl);
+        }
+        dynamicCommands.clear();
     }
 
     /**
@@ -230,10 +260,12 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void clearAttributes() throws DevFailed {
-	for (final AttributeImpl attributeImpl : dynamicAttributes) {
-	    deviceImpl.removeAttribute(attributeImpl);
-	}
-	dynamicAttributes.clear();
+
+        for (final AttributeImpl attributeImpl : dynamicAttributes) {
+            deviceImpl.removeAttribute(attributeImpl);
+        }
+        forwardedAttributes.clear();
+        dynamicAttributes.clear();
     }
 
     /**
@@ -244,10 +276,10 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void clearAttributes(final boolean clearAttributeProperties) throws DevFailed {
-	clearAttributes();
-	if (clearAttributeProperties) {
-	    deviceImpl.getAttributeProperties().removeAttributeProperties();
-	}
+        clearAttributes();
+        if (clearAttributeProperties) {
+            new AttributePropertiesManager(deviceImpl.getName()).removeAttributeProperties();
+        }
     }
 
     /**
@@ -256,11 +288,11 @@ public final class DynamicManager {
      * @return Dynamic attributes
      */
     public List<IAttributeBehavior> getDynamicAttributes() {
-	final List<IAttributeBehavior> result = new ArrayList<IAttributeBehavior>();
-	for (final AttributeImpl attributeImpl : dynamicAttributes) {
-	    result.add(attributeImpl.getBehavior());
-	}
-	return result;
+        final List<IAttributeBehavior> result = new ArrayList<IAttributeBehavior>();
+        for (final AttributeImpl attributeImpl : dynamicAttributes) {
+            result.add(attributeImpl.getBehavior());
+        }
+        return result;
     }
 
     /**
@@ -269,10 +301,10 @@ public final class DynamicManager {
      * @return Dynamic commands
      */
     public List<ICommandBehavior> getDynamicCommands() {
-	final List<ICommandBehavior> result = new ArrayList<ICommandBehavior>();
-	for (final CommandImpl cmdImpl : dynamicCommands) {
-	    result.add(cmdImpl.getBehavior());
-	}
-	return result;
+        final List<ICommandBehavior> result = new ArrayList<ICommandBehavior>();
+        for (final CommandImpl cmdImpl : dynamicCommands) {
+            result.add(cmdImpl.getBehavior());
+        }
+        return result;
     }
 }
