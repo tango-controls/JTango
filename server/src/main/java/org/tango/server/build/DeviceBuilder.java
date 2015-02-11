@@ -87,6 +87,8 @@ public final class DeviceBuilder {
         xlogger.entry();
 
         checkIsTangoDevice(clazz, name);
+        DeviceManagerBuilder.clear();
+        DynamicManagerBuilder.clear();
 
         try {
             final Device annotation = clazz.getAnnotation(Device.class);
@@ -113,11 +115,11 @@ public final class DeviceBuilder {
             final Reflections reflectionsFields = new Reflections(clazz.getCanonicalName(),
                     new FieldAnnotationsScanner());
             createBusinessObjectState(reflectionsFields);
+            createBusinessObjectFields(reflectionsFields);
             createBusinessObjectAttrField(reflectionsFields, false);
             createBusinessObjectAttrCmd(reflectionsMethods, false);
             createBusinessObjectInitDelete(reflectionsMethods);
             createBusinessObjectAroundInvoke(reflectionsMethods);
-            createBusinessObjectFields(reflectionsFields);
             createBusinessObjectDeviceProperties(reflectionsFields);
             createBusinessObjectProps(reflectionsFields);
             createBusinessObjectPipes(reflectionsFields);
@@ -237,6 +239,7 @@ public final class DeviceBuilder {
     private void createBusinessObjectFields(final Reflections reflectionsFields) throws DevFailed {
         // DynamicManagement
         final Set<Field> dynF = reflectionsFields.getFieldsAnnotatedWith(DynamicManagement.class);
+        System.out.println("createBusinessObjectFields " + dynF);
         if (dynF != null) {
             if (dynF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
@@ -251,7 +254,7 @@ public final class DeviceBuilder {
         final Set<Field> deviceF = reflectionsFields.getFieldsAnnotatedWith(DeviceManagement.class);
         if (deviceF != null) {
             if (deviceF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
+                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceManagement.class
                         + MUST_BE_UNIQUE);
             }
             if (deviceF.size() == 1) {

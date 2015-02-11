@@ -446,7 +446,6 @@ public final class DeviceImpl extends Device_5POA {
             isCorrectlyInit.set(false);
             deleteDevice();
             doInit();
-            pushInterfaceChangeEvent(false);
         }
         xlogger.exit();
     }
@@ -471,10 +470,23 @@ public final class DeviceImpl extends Device_5POA {
             if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
                 attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
             }
-//            if (!isCorrectlyInit.get()) {
-//                pushInterfaceChangeEvent(false);
-//            }
         }
+    }
+
+    /**
+     * remove an attribute of the device. Not possible to remove State or Status
+     * 
+     * @param attribute
+     * @throws DevFailed
+     */
+    public synchronized void removeAttribute(final AttributeImpl attribute) throws DevFailed {
+        if (attribute.getName().equalsIgnoreCase(STATUS_NAME) || attribute.getName().equalsIgnoreCase(STATE_NAME)) {
+            return;
+        }
+        pollingManager.removeAttributePolling(attribute.getName());
+        statusImpl.removeAttributeAlarm(attribute.getName());
+        stateImpl.removeAttributeAlarm(attribute.getName());
+        attributeList.remove(attribute);
     }
 
     /**
@@ -532,26 +544,6 @@ public final class DeviceImpl extends Device_5POA {
      */
     public CommandImpl getCommand(final String name) throws DevFailed {
         return CommandGetter.getCommand(name, commandList);
-    }
-
-    /**
-     * remove an attribute of the device. Not possible to remove State or Status
-     * 
-     * @param attribute
-     * @throws DevFailed
-     */
-    public synchronized void removeAttribute(final AttributeImpl attribute) throws DevFailed {
-        if (attribute.getName().equalsIgnoreCase(STATUS_NAME) || attribute.getName().equalsIgnoreCase(STATE_NAME)) {
-            return;
-        }
-        pollingManager.removeAttributePolling(attribute.getName());
-        statusImpl.removeAttributeAlarm(attribute.getName());
-        stateImpl.removeAttributeAlarm(attribute.getName());
-        attributeList.remove(attribute);
-//        if (!isCorrectlyInit.get()) {
-//            pushInterfaceChangeEvent(false);
-//        }
-
     }
 
     /**
@@ -668,7 +660,7 @@ public final class DeviceImpl extends Device_5POA {
         if (interfaceChangeSender == null) {
             interfaceChangeSender = new DeviceInterfaceChangedSender(name);
         }
-        interfaceChangeSender.pushEvent(devInterface);
+        interfaceChangeSender.pushEvent(devInterface, isStarted);
     }
 
     /**
@@ -1777,10 +1769,13 @@ public final class DeviceImpl extends Device_5POA {
                     result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
                 }
             }
+
             result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(AttributeGetterSetter.getAttribute(STATE_NAME,
                     attrList));
+
             result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(AttributeGetterSetter.getAttribute(STATUS_NAME,
                     attrList));
+
         } else {
             result = new AttributeConfig_5[attributeNames.length];
             int i = 0;
@@ -2106,11 +2101,7 @@ public final class DeviceImpl extends Device_5POA {
             if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
                 command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
             }
-            if (!isCorrectlyInit.get()) {
-                pushInterfaceChangeEvent(false);
-            }
         }
-
     }
 
     /**
@@ -2120,12 +2111,9 @@ public final class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public synchronized void removeCommand(final CommandImpl command) throws DevFailed {
-        if (!command.getName().equals(INIT_CMD)) {
+        if (!command.getName().equalsIgnoreCase(INIT_CMD)) {
             pollingManager.removeCommandPolling(command.getName());
             commandList.remove(command);
-            if (!isCorrectlyInit.get()) {
-                pushInterfaceChangeEvent(false);
-            }
         }
 
     }

@@ -104,8 +104,8 @@ public final class DynamicManager {
         final AttributeImpl attrImpl = new AttributeImpl(behavior, deviceImpl.getName());
         attrImpl.setStateMachine(behavior.getStateMachine());
         deviceImpl.addAttribute(attrImpl);
-        deviceImpl.pushInterfaceChangeEvent(false);
         dynamicAttributes.add(attrImpl);
+        deviceImpl.pushInterfaceChangeEvent(false);
         xlogger.exit();
     }
 
@@ -123,7 +123,6 @@ public final class DynamicManager {
                 final ForwardedAttribute att = (ForwardedAttribute) attributeImpl.getBehavior();
                 final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
                 forwardedAttributes.remove(lower);
-                deviceImpl.pushInterfaceChangeEvent(false);
             }
 
             if (attributeImpl.getName().equalsIgnoreCase(attributeName)) {
