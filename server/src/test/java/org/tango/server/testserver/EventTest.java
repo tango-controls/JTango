@@ -33,6 +33,7 @@ import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.tango.server.ServerManager;
@@ -47,7 +48,7 @@ import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
 
-//@Ignore("TODO: tests not fully stable (work 99% of time)")
+@Ignore("TODO: tests not fully stable (work 99% of time)")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EventTest {
 // XXX dependency to tangodb
