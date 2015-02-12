@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright (C) : 2012 Synchrotron Soleil L'Orme des merisiers Saint Aubin 
+	BP48 91192 GIF-SUR-YVETTE CEDEX This file is part of Tango. Tango is free 
+	software: you can redistribute it and/or modify it under the terms of the 
+	GNU Lesser General Public License as published by the Free Software Foundation, 
+	either version 3 of the License, or (at your option) any later version. Tango 
+	is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the GNU Lesser General Public License for more details. You 
+	should have received a copy of the GNU Lesser General Public License along 
+	with Tango. If not, see <http://www.gnu.org/licenses/>. -->
+<configuration>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%-5level %d [%thread - %X{deviceName}] %logger{36}.%M:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>REQUEST %d [%X{deviceName}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.jacorb" level="OFF" />
+	<logger name="org.tango" level="DEBUG" />
+	<logger name="org.quartz" level="OFF" />
+	<logger name="net.sf.ehcache" level="OFF"/>
+	<logger name="ch.qos.logback" level="OFF"/>
+	<logger name="TangoClientRequests" level="OFF" additivity="false">
+		<appender-ref ref="CONSOLE-REQUEST" />
+	</logger>
+
+	<root level="ERROR">
+		<appender-ref ref="CONSOLE" />
+	</root>
+</configuration>
