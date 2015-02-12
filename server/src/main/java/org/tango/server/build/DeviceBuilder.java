@@ -28,9 +28,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -55,6 +52,7 @@ import org.tango.server.annotation.Status;
 import org.tango.server.annotation.TransactionType;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
+import org.tango.utils.ReflectionScanner;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -76,7 +74,7 @@ public final class DeviceBuilder {
     private Object businessObject;
 
     DeviceBuilder(final Class<?> clazz, final String className, final String name) {
-        this.clazz = clazz;
+       this.clazz = clazz;
         this.className = className;
         this.name = name;
 
@@ -103,26 +101,21 @@ public final class DeviceBuilder {
             addSuperDevices();
 
             // create default attributes and commands
-            final Reflections reflectionsMethodsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
-                    new MethodAnnotationsScanner());
-            final Reflections reflectionsFieldsDeviceImpl = new Reflections(device.getClass().getCanonicalName(),
-                    new FieldAnnotationsScanner());
-            createBusinessObjectAttrField(reflectionsFieldsDeviceImpl, true);
-            createBusinessObjectAttrCmd(reflectionsMethodsDeviceImpl, true);
+            final ReflectionScanner deviceImplScanner = new ReflectionScanner(device.getClass());
 
-            final Reflections reflectionsMethods = new Reflections(clazz.getCanonicalName(),
-                    new MethodAnnotationsScanner());
-            final Reflections reflectionsFields = new Reflections(clazz.getCanonicalName(),
-                    new FieldAnnotationsScanner());
-            createBusinessObjectState(reflectionsFields);
-            createBusinessObjectFields(reflectionsFields);
-            createBusinessObjectAttrField(reflectionsFields, false);
-            createBusinessObjectAttrCmd(reflectionsMethods, false);
-            createBusinessObjectInitDelete(reflectionsMethods);
-            createBusinessObjectAroundInvoke(reflectionsMethods);
-            createBusinessObjectDeviceProperties(reflectionsFields);
-            createBusinessObjectProps(reflectionsFields);
-            createBusinessObjectPipes(reflectionsFields);
+            createBusinessObjectAttrField(deviceImplScanner, true);
+            createBusinessObjectAttrCmd(deviceImplScanner, true);
+
+            final ReflectionScanner boScanner = new ReflectionScanner(clazz);
+            createBusinessObjectState(boScanner);
+            createBusinessObjectFields(boScanner);
+            createBusinessObjectAttrField(boScanner, false);
+            createBusinessObjectAttrCmd(boScanner, false);
+            createBusinessObjectInitDelete(boScanner);
+            createBusinessObjectAroundInvoke(boScanner);
+            createBusinessObjectDeviceProperties(boScanner);
+            createBusinessObjectProps(boScanner);
+            createBusinessObjectPipes(boScanner);
 
         } catch (final InstantiationException e) {
             DevFailedUtils.throwDevFailed(e);
@@ -138,36 +131,32 @@ public final class DeviceBuilder {
         Class<?> superDeviceClass = clazz.getSuperclass();
         while (superDeviceClass != null && superDeviceClass.getAnnotation(Device.class) != null) {
             logger.debug("adding super class to device {}", superDeviceClass.getCanonicalName());
-            final Reflections reflectionsMethods = new Reflections(superDeviceClass.getCanonicalName(),
-                    new MethodAnnotationsScanner());
-            final Reflections reflectionsFields = new Reflections(superDeviceClass.getCanonicalName(),
-                    new FieldAnnotationsScanner());
-            createBusinessObjectAttrCmd(reflectionsMethods, false);
-            createBusinessObjectAttrField(reflectionsFields, false);
-            createBusinessObjectProps(reflectionsFields);
-            createBusinessObjectFields(reflectionsFields);
-            createBusinessObjectState(reflectionsFields);
-            createBusinessObjectInitDelete(reflectionsMethods);
-            createBusinessObjectPipes(reflectionsFields);
-
+            final ReflectionScanner superClassScanner = new ReflectionScanner(superDeviceClass);
+            createBusinessObjectAttrCmd(superClassScanner, false);
+            createBusinessObjectAttrField(superClassScanner, false);
+            createBusinessObjectProps(superClassScanner);
+            createBusinessObjectFields(superClassScanner);
+            createBusinessObjectState(superClassScanner);
+            createBusinessObjectInitDelete(superClassScanner);
+            createBusinessObjectPipes(superClassScanner);
             superDeviceClass = superDeviceClass.getSuperclass();
         }
     }
 
-    private void createBusinessObjectAttrCmd(final Reflections reflectionsMethods, final boolean isOnDeviceImpl)
+    private void createBusinessObjectAttrCmd(final ReflectionScanner scanner, final boolean isOnDeviceImpl)
             throws DevFailed {
 
         // Command
-        final Set<Method> cmds = reflectionsMethods.getMethodsAnnotatedWith(Command.class);
-        if (cmds != null) {
+        final Set<Method> cmds = scanner.getMethodsAnnotatedWith(Command.class);
+       if (cmds != null) {
             final CommandBuilder cmd = new CommandBuilder();
             for (final Method method : cmds) {
                 cmd.build(device, businessObject, method, isOnDeviceImpl);
             }
         }
         // Attribute
-        final Set<Method> attrs = reflectionsMethods.getMethodsAnnotatedWith(Attribute.class);
-        if (attrs != null) {
+        final Set<Method> attrs = scanner.getMethodsAnnotatedWith(Attribute.class);
+       if (attrs != null) {
             final AttributeMethodBuilder attr = new AttributeMethodBuilder();
             for (final Method method : attrs) {
                 attr.build(device, businessObject, method, isOnDeviceImpl);
@@ -175,9 +164,9 @@ public final class DeviceBuilder {
         }
     }
 
-    private void createBusinessObjectInitDelete(final Reflections reflectionsMethods) throws DevFailed {
+    private void createBusinessObjectInitDelete(final ReflectionScanner scanner) throws DevFailed {
         // Init
-        final Set<Method> initM = reflectionsMethods.getMethodsAnnotatedWith(Init.class);
+        final Set<Method> initM = scanner.getMethodsAnnotatedWith(Init.class);
         if (initM != null && initM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Init.class + MUST_BE_UNIQUE);
         }
@@ -185,7 +174,7 @@ public final class DeviceBuilder {
             new InitBuilder().build(initM.iterator().next(), device, businessObject);
         }
         // Delete
-        final Set<Method> deleteM = reflectionsMethods.getMethodsAnnotatedWith(Delete.class);
+        final Set<Method> deleteM = scanner.getMethodsAnnotatedWith(Delete.class);
         if (deleteM != null && deleteM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Delete.class + MUST_BE_UNIQUE);
         }
@@ -194,15 +183,15 @@ public final class DeviceBuilder {
             new DeleteBuilder().build(deleteM.iterator().next(), device);
         }
         // Schedule
-        final Set<Method> scheduleM = reflectionsMethods.getMethodsAnnotatedWith(Schedule.class);
+        final Set<Method> scheduleM = scanner.getMethodsAnnotatedWith(Schedule.class);
         if (scheduleM != null && scheduleM.size() == 1) {
             new DeviceSchedulerBuilder().build(scheduleM, device);
         }
     }
 
-    private void createBusinessObjectAroundInvoke(final Reflections reflectionsMethods) throws DevFailed {
+    private void createBusinessObjectAroundInvoke(final ReflectionScanner scanner) throws DevFailed {
         // AroundInvoke
-        final Set<Method> invokeM = reflectionsMethods.getMethodsAnnotatedWith(AroundInvoke.class);
+        final Set<Method> invokeM = scanner.getMethodsAnnotatedWith(AroundInvoke.class);
         if (invokeM != null && invokeM.size() > 1) {
             DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, AroundInvoke.class + MUST_BE_UNIQUE);
         }
@@ -211,10 +200,10 @@ public final class DeviceBuilder {
         }
     }
 
-    private void createBusinessObjectAttrField(final Reflections reflectionsFields, final boolean isOnDeviceImpl)
+    private void createBusinessObjectAttrField(final ReflectionScanner scanner, final boolean isOnDeviceImpl)
             throws DevFailed {
         // Attribute
-        final Set<Field> attributeF = reflectionsFields.getFieldsAnnotatedWith(Attribute.class);
+        final Set<Field> attributeF = scanner.getFieldsAnnotatedWith(Attribute.class);
         if (attributeF != null) {
             final AttributeFieldBuilder attr = new AttributeFieldBuilder();
             for (final Field field : attributeF) {
@@ -224,9 +213,9 @@ public final class DeviceBuilder {
 
     }
 
-    private void createBusinessObjectPipes(final Reflections reflectionsFields) throws DevFailed {
+    private void createBusinessObjectPipes(final ReflectionScanner scanner) throws DevFailed {
         // Pipe
-        final Set<Field> fields = reflectionsFields.getFieldsAnnotatedWith(Pipe.class);
+        final Set<Field> fields = scanner.getFieldsAnnotatedWith(Pipe.class);
         if (fields != null) {
             final PipeBuilder pipe = new PipeBuilder();
             for (final Field field : fields) {
@@ -236,10 +225,9 @@ public final class DeviceBuilder {
 
     }
 
-    private void createBusinessObjectFields(final Reflections reflectionsFields) throws DevFailed {
+    private void createBusinessObjectFields(final ReflectionScanner scanner) throws DevFailed {
         // DynamicManagement
-        final Set<Field> dynF = reflectionsFields.getFieldsAnnotatedWith(DynamicManagement.class);
-        System.out.println("createBusinessObjectFields " + dynF);
+        final Set<Field> dynF = scanner.getFieldsAnnotatedWith(DynamicManagement.class);
         if (dynF != null) {
             if (dynF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
@@ -251,7 +239,7 @@ public final class DeviceBuilder {
         }
 
         // DeviceManagement
-        final Set<Field> deviceF = reflectionsFields.getFieldsAnnotatedWith(DeviceManagement.class);
+        final Set<Field> deviceF = scanner.getFieldsAnnotatedWith(DeviceManagement.class);
         if (deviceF != null) {
             if (deviceF.size() > 1) {
                 DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceManagement.class
@@ -263,10 +251,10 @@ public final class DeviceBuilder {
         }
     }
 
-    private void createBusinessObjectState(final Reflections reflectionsFields) throws DevFailed {
+    private void createBusinessObjectState(final ReflectionScanner scanner) throws DevFailed {
 
         // State
-        final Set<Field> stateF = reflectionsFields.getFieldsAnnotatedWith(State.class);
+        final Set<Field> stateF = scanner.getFieldsAnnotatedWith(State.class);
         if (stateF != null) {
             final StateBuilder stateB = new StateBuilder();
             if (stateF.size() > 1) {
@@ -277,7 +265,7 @@ public final class DeviceBuilder {
             }
         }
         // Status
-        final Set<Field> statusF = reflectionsFields.getFieldsAnnotatedWith(Status.class);
+        final Set<Field> statusF = scanner.getFieldsAnnotatedWith(Status.class);
         if (statusF != null) {
             final StatusBuilder statusB = new StatusBuilder();
             if (statusF.size() > 1) {
@@ -290,10 +278,10 @@ public final class DeviceBuilder {
 
     }
 
-    private void createBusinessObjectDeviceProperties(final Reflections reflectionsFields) throws DevFailed {
+    private void createBusinessObjectDeviceProperties(final ReflectionScanner scanner) throws DevFailed {
 
         // DeviceProperties
-        final Set<Field> devicePropsF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperties.class);
+        final Set<Field> devicePropsF = scanner.getFieldsAnnotatedWith(DeviceProperties.class);
         if (devicePropsF != null) {
             final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
             if (devicePropsF.size() > 1) {
@@ -306,10 +294,10 @@ public final class DeviceBuilder {
         }
     }
 
-    private void createBusinessObjectProps(final Reflections reflectionsFields) throws DevFailed {
+    private void createBusinessObjectProps(final ReflectionScanner scanner) throws DevFailed {
 
         // DeviceProperties
-        final Set<Field> devicePropsF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperties.class);
+        final Set<Field> devicePropsF = scanner.getFieldsAnnotatedWith(DeviceProperties.class);
         if (devicePropsF != null) {
             final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
             if (devicePropsF.size() > 1) {
@@ -321,7 +309,7 @@ public final class DeviceBuilder {
             }
         }
         // DeviceProperty
-        final Set<Field> devicePropF = reflectionsFields.getFieldsAnnotatedWith(DeviceProperty.class);
+        final Set<Field> devicePropF = scanner.getFieldsAnnotatedWith(DeviceProperty.class);
         if (devicePropF != null) {
             final DevicePropertyBuilder devicePropB = new DevicePropertyBuilder();
             for (final Field field : devicePropF) {
@@ -329,7 +317,7 @@ public final class DeviceBuilder {
             }
         }
         // ClassProperty
-        final Set<Field> classPropF = reflectionsFields.getFieldsAnnotatedWith(ClassProperty.class);
+        final Set<Field> classPropF = scanner.getFieldsAnnotatedWith(ClassProperty.class);
         if (classPropF != null) {
             final ClassPropertyBuilder classPropB = new ClassPropertyBuilder();
             for (final Field field : classPropF) {

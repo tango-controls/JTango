@@ -185,17 +185,17 @@
       <artifactId>commons-math3</artifactId>
       <version>3.2</version>
     </dependency>
-    <dependency>
+   <!--  <dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.9-RC1</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
-    </dependency>
+    </dependency> 
     <dependency>
       <groupId>org.databene</groupId>
       <artifactId>contiperf</artifactId>
