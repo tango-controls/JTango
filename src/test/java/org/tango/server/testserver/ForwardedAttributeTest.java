@@ -78,7 +78,7 @@ public class ForwardedAttributeTest {
             inheritIO(process.getErrorStream(), System.err);
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (final InterruptedException e) {
             }
 
