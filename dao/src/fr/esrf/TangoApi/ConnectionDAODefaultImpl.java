@@ -356,7 +356,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
 		// Construct the Object
 		if (connection.getObj()._is_a("IDL:Tango/Device_5:1.0")) {
-	    	System.out.println(connection.devname + " Device is a Tango/Device_5:1.0 !!!!!!!!!");
+	    	//System.out.println(connection.devname + " Device is a Tango/Device_5:1.0 !!!!!!!!!");
 	    	connection.device_5 = Device_5Helper.narrow(connection.getObj());
 	    	connection.device_4 = connection.device_5;
 	    	connection.device_3 = connection.device_5;
