@@ -38,6 +38,7 @@ package fr.esrf.TangoApi.events;
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.Tango.ErrSeverity;
 import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
@@ -364,7 +365,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     @Override
     protected  void checkDeviceConnection(DeviceProxy deviceProxy,
                         String attribute, DeviceData deviceData, String event_name) throws DevFailed {
-// ToDo now attributeName is null
+
         //  Check if address is coherent (??)
         deviceData = checkZmqAddress(deviceData, deviceProxy);
 
@@ -513,6 +514,14 @@ public class ZmqEventConsumer extends EventConsumer implements
                     //	Push exception
                     if (dev_error != null)
                         pushReceivedException(channelStruct, callbackStruct, dev_error);
+                    else {
+                        //  ToDo Re connect without error means heartbeat missing
+                        dev_error = new DevError("API_NoHeartbeat",
+                                ErrSeverity.ERR, "No heartbeat from " +
+                                    channelStruct.adm_device_proxy.get_name(),
+                                "ZmqEventConsumer.checkIfHeartbeatSkipped()");
+                        pushReceivedException(channelStruct, callbackStruct, dev_error);
+                    }
 
                     //	If reconnection done, try to re subscribe
                     //		and read attribute in synchronous mode
@@ -567,7 +576,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             reConnected = true;
         }
         catch (DevFailed e) {
-            System.err.println(e.errors[0].desc);
+            //System.err.println(e.errors[0].desc);
             reConnected = false;
         }
         return reConnected;
@@ -590,7 +599,6 @@ public class ZmqEventConsumer extends EventConsumer implements
             if (eventCallBackStruct.channel_name.equals(name) && (eventCallBackStruct.callback != null)) {
                 try {
                     EventChannelStruct channelStruct = channel_map.get(name);
-
                     DevVarLongStringArray   lsa =
                             ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                                     channelStruct.adm_device_proxy,
