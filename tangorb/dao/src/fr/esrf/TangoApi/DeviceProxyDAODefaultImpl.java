@@ -3220,7 +3220,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
         final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
         for (int tr=0; tr<retries && !done ; tr++) {
             try {
-                PipeConfig[]    configurations = deviceProxy.device_5.get_pipe_config_5(new String[]{"All pipes"});
+                PipeConfig[]    configurations =
+                        deviceProxy.device_5.get_pipe_config_5(new String[]{"All pipes"});
                 for (PipeConfig configuration : configurations) {
                     infoList.add(new PipeInfo(configuration));
                 }
@@ -3229,6 +3230,10 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 // Except.print_exception(e);
                 throw e;
             } catch (final Exception e) {
+                if (e.toString().startsWith("org.omg.CORBA.UNKNOWN: Server-side")) {
+                    //  Server does not implement pipe features
+                    return infoList;
+                }
                 manageExceptionReconnection(deviceProxy, retries, tr, e,
                         this.getClass() + ".DeviceProxy.getPipeConfig");
             }
