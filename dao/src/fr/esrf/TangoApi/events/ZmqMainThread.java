@@ -398,10 +398,10 @@ public class ZmqMainThread extends Thread {
                 devErrorList = ZMQutils.deMarshallErrorList(recData, littleEndian);
             }
             else {
-                //  ToDo needs idl version
                 Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
                 EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
                 if (eventChannelStruct!=null) {
+                    //  Needs idl version
                     int idl = eventChannelStruct.getIdlVersion();
 
                     //  Else check event type
@@ -630,6 +630,7 @@ public class ZmqMainThread extends Thread {
 
             case ZMQutils.ZMQ_CONNECT_HEARTBEAT:
                 connectIfNotDone(heartbeatSocket, controlStructure);
+				//System.out.println("-------> ZMQ_CONNECT_HEARTBEAT: " + controlStructure.eventName);
                 heartbeatSocket.subscribe(controlStructure.eventName.getBytes());
                 break;
 
@@ -661,6 +662,8 @@ public class ZmqMainThread extends Thread {
             //  Check if it ia a reconnection -> disconnect before connection
             if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint)) {
                 try {
+                    //  needs an un subscribe before disconnection
+                    //socket.unsubscribe(controlStructure.eventName.getBytes());
                     socket.disconnect(controlStructure.endPoint);
                 }
                 catch (org.zeromq.ZMQException e) {
@@ -707,10 +710,8 @@ public class ZmqMainThread extends Thread {
             traceZmqSubscription(eventName, false);
             eventList.remove(eventName);
             if (eventList.size()==0) {
-                //  Not available in ZMQ 3.1
-                //socket.disconnect(endpoint);
-
-                //connectedMap.remove(endpoint);
+                socket.disconnect(endpoint);
+                connectedMap.remove(endpoint);
             }
         }
     }

@@ -114,7 +114,7 @@ public class  ZMQutils {
                     zmqVersion = Double.parseDouble(strVersion);
                 }
                 catch (NumberFormatException e) {
-                    System.err.println(e);
+                    System.err.println("ZMQutils.getZmqVersion(): " + e);
                 }
             }
             catch (Exception e) { /*System.err.println(e);*/  }
