@@ -51,6 +51,10 @@ public class TimeStampTest extends NoDBDeviceManager {
 
             att.read();
             final long time1 = att.getTimestamp();
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+            }
             att.read();
             final long time2 = att.getTimestamp();
             assertThat(time1, not(time2));

@@ -36,7 +36,7 @@ import org.tango.server.dynamic.DynamicManager;
  * 
  * <pre>
  * &#064;DynamicManagement
- * {@link DynamicManager} dynamicManager;
+ * private {@link DynamicManager} dynamicManager;
  * 
  * public void setDynamicManager({@link DynamicManager} dynamicManager) {
  *  this.dynamicManager = dynamicManager;
