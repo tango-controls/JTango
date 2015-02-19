@@ -35,6 +35,12 @@ import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.TangoConst;
 
+/**
+ * An image attribute that contains logs from a list of {@link Logger}
+ * 
+ * @author ABEILLE
+ * 
+ */
 public class LogAttribute implements IAttributeBehavior {
 
     private final AttributeAppender attributeAppender;

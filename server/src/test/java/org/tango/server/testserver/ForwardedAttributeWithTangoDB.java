@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
@@ -44,7 +45,7 @@ import fr.esrf.TangoDs.TangoConst;
  * @author ABEILLE
  * 
  */
-//@Ignore(value = "attribute_history and events do not work without tango db")
+@Ignore
 public class ForwardedAttributeWithTangoDB {
     // XXX a device has to be declared in tangoddb
     private static String deviceNameRoot = "tango9/java/events.1";
@@ -64,7 +65,7 @@ public class ForwardedAttributeWithTangoDB {
             ForwardedAttributeTest.inheritIO(process.getErrorStream(), System.err);
 
             try {
-                Thread.sleep(20000);
+                Thread.sleep(5000);
             } catch (final InterruptedException e) {
             }
             ForwardedServer.setNoDbFwdAttributeName("tango9/java/events.1/doubleAtt");
