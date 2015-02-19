@@ -29,8 +29,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.tango.server.pipe.PipeValue;
+
 import fr.esrf.Tango.DispLevel;
 
+/**
+ * <p>
+ * Declare a pipe of a tango device.
+ * </p>
+ * 
+ * Example:
+ * 
+ * <pre>
+ * &#064;Pipe
+ * private {@link PipeValue} myPipe;
+ * 
+ * public PipeValue getMyPipe(){..};
+ * </pre>
+ * 
+ * @author ABEILLE
+ * 
+ */
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Pipe {

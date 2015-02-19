@@ -54,9 +54,11 @@ public class NoDBDeviceManager {
             ss1.setReuseAddress(true);
             ss1.close();
             JTangoTest.startNoDb(ss1.getLocalPort());
+
             deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
             adminName = "tango://localhost:" + ss1.getLocalPort() + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
                     + ServerManager.getInstance().getServerName() + "#dbase=no";
+            System.out.println("START " + deviceName);
         } finally {
             if (ss1 != null) {
                 ss1.close();
@@ -67,6 +69,7 @@ public class NoDBDeviceManager {
 
     @AfterClass
     public static void stopDevice() throws DevFailed {
+        System.out.println("STOP");
         ServerManager.getInstance().stop();
     }
 
