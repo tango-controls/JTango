@@ -1,3 +1,7 @@
+9.0.0
+-----
+- Add all Tango 9 features: pipes, attribute of type devenum, forwarded attributes, event interface changed
+
 1.1.7
 -----
 - fix regression in timestamp that was not changing.
