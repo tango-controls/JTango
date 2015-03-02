@@ -12,7 +12,7 @@
 
 
 	<artifactId>JavaTangoIDL</artifactId>
-	<version>4.0.4-SNAPSHOT</version>
+	<version>5.0.1-SNAPSHOT</version>
 	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
 	<inceptionYear>2004</inceptionYear>
 
