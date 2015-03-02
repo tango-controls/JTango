@@ -9,7 +9,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
-	<version>9.0.0-SNAPSHOT</version>
+	<version>9.0.0</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
