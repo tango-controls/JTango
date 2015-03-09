@@ -60,11 +60,11 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
     public Object createEntry(final Object key) throws DevFailed {
 
         Object result = null;
-        deviceLock.lockAttribute();
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
-                .getName()));
-        try {
-            synchronized (attribute) {
+        synchronized (deviceLock.getAttributeLock()) {
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
+                    .getName()));
+            try {
+                synchronized (attribute) {
                 final long time1 = System.nanoTime();
                 attribute.updateValue();
                 final long now = System.nanoTime();
@@ -76,21 +76,20 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
                 command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
                 attribute.addToHistory();
                 result = attribute.getReadValue();
+                }
+                command.addToHistory(((AttributeValue) result).getValue());
+                EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName());
+            } catch (final DevFailed e) {
+                command.addErrorToHistory(e);
+                attribute.addErrorToHistory(e);
+
+                EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName(), e);
+                throw e;
+            } finally {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
+                        attribute.getName()));
             }
-            command.addToHistory(((AttributeValue) result).getValue());
-            EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName());
-        } catch (final DevFailed e) {
-            command.addErrorToHistory(e);
-            attribute.addErrorToHistory(e);
-
-            EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName(), e);
-            throw e;
-        } finally {
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
-                    attribute.getName()));
-            deviceLock.unlockAttribute();
-        }
-
+        }// synchronized
         return result;
     }
 

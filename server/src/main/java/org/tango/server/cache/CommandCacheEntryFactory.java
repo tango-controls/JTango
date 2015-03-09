@@ -59,26 +59,27 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
     public Object createEntry(final Object key) throws DevFailed {
         logger.debug("Creating entry for key = {} , command {} ", key, command.getName());
         Object result = null;
-        deviceLock.lockCommand();
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, command.getName()));
-        try {
-            final long time1 = System.nanoTime();
-            result = command.execute(null);
-            final long now = System.nanoTime();
-            final long nowMilli = System.currentTimeMillis();
-            final long deltaTime = now - lastUpdateTime;
-            lastUpdateTime = now;
-            final long executionDuration = lastUpdateTime - time1;
-            command.addToHistory(result);
-            command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-        } catch (final DevFailed e) {
-            command.addErrorToHistory(e);
-            throw e;
-        } finally {
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, CallType.POLLING, command
+        synchronized (deviceLock.getCommandLock()) {
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, command
                     .getName()));
-            deviceLock.lockCommand();
-        }
+            try {
+                final long time1 = System.nanoTime();
+                result = command.execute(null);
+                final long now = System.nanoTime();
+                final long nowMilli = System.currentTimeMillis();
+                final long deltaTime = now - lastUpdateTime;
+                lastUpdateTime = now;
+                final long executionDuration = lastUpdateTime - time1;
+                command.addToHistory(result);
+                command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+            } catch (final DevFailed e) {
+                command.addErrorToHistory(e);
+                throw e;
+            } finally {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, CallType.POLLING, command
+                        .getName()));
+            }
+        }// synchronized
         return result;
     }
 

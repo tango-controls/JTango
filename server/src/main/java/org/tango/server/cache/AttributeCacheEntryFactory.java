@@ -46,7 +46,7 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
     private final Logger logger = LoggerFactory.getLogger(AttributeCacheEntryFactory.class);
 
     private final AttributeImpl attribute;
-    // private Profiler profilerPeriod = new Profiler("period");
+//    private Profiler profilerPeriod = new Profiler("period");
     private final DeviceLock deviceLock;
     private long lastUpdateTime;
 
@@ -68,47 +68,48 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
         logger.debug("Creating entry for key = {} , attribute {}/{} ",
                 new Object[] { key, deviceName, attribute.getName() });
 
-        // profilerPeriod.stop().print();
-        // profilerPeriod = new Profiler("period");
-        // profilerPeriod.start(attribute.getName());
-        // if (element != null) {
-        // logger.debug("{} hint {}", element.getHitCount());
-        // System.out.println(element.getExpirationTime());
-        // }
-        // final Profiler profiler = new Profiler("read time");
-        // profiler.start(attribute.getName());
+//        profilerPeriod.stop().print();
+//        profilerPeriod = new Profiler("period");
+//        profilerPeriod.start(attribute.getName());
+//        if (element != null) {
+//            logger.debug("{} hint {}", element.getHitCount());
+//            System.out.println(element.getExpirationTime());
+//        }
+//        final Profiler profiler = new Profiler("read time");
+//        profiler.start(attribute.getName());
         Object result = null;
 
         if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            deviceLock.lockAttribute();
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
-                    .getName()));
-            try {
-                synchronized (attribute) {
-                    final long time1 = System.nanoTime();
-                    attribute.updateValue();
-                    final long now = System.nanoTime();
-                    final long nowMilli = System.currentTimeMillis();
-                    final long deltaTime = now - lastUpdateTime;
-                    lastUpdateTime = now;
-                    final long executionDuration = lastUpdateTime - time1;
-                    attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-                    attribute.addToHistory();
-                    result = attribute.getReadValue();
-                    EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName());
-                }
-            } catch (final DevFailed e) {
-                attribute.addErrorToHistory(e);
-                EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName(), e);
-                throw e;
-            } finally {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
+            synchronized (deviceLock.getAttributeLock()) {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING,
                         attribute.getName()));
-                deviceLock.unlockAttribute();
-            }
+                try {
+                    synchronized (attribute) {
+                        final long time1 = System.nanoTime();
+                        attribute.updateValue();
+                        final long now = System.nanoTime();
+                        final long nowMilli = System.currentTimeMillis();
+                        final long deltaTime = now - lastUpdateTime;
+                        lastUpdateTime = now;
+                        final long executionDuration = lastUpdateTime - time1;
+                        attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime
+                                / NANO_TO_MILLI);
+                        attribute.addToHistory();
+                        result = attribute.getReadValue();
+                        EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName());
+                    }
+                } catch (final DevFailed e) {
+                    attribute.addErrorToHistory(e);
+                    EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName(), e);
+                    throw e;
+                } finally {
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
+                            attribute.getName()));
+                }
+            }// synchronized
         }
 
-        // profiler.stop().print();
+//        profiler.stop().print();
 
         return result;
     }
