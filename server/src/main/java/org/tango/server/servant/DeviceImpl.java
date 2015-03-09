@@ -931,10 +931,12 @@ public final class DeviceImpl extends Device_5POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
         AttributeValue[] result = null;
-        deviceLock.lockAttribute();
+
         try {
-            result = AttributeGetterSetter.getAttributesValues(attributeNames, pollingManager, attributeList,
-                    aroundInvokeImpl, null);
+            synchronized (deviceLock.getAttributeLock()) {
+                result = AttributeGetterSetter.getAttributesValues(attributeNames, pollingManager, attributeList,
+                        aroundInvokeImpl, null);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -943,8 +945,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
         return result;
     }
@@ -973,11 +973,13 @@ public final class DeviceImpl extends Device_5POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
 
-        deviceLock.lockAttribute();
         AttributeValue[] result = null;
+
         try {
-            result = AttributeGetterSetter.getAttributesValues(names, pollingManager, attributeList, aroundInvokeImpl,
-                    source);
+            synchronized (deviceLock.getAttributeLock()) {
+                result = AttributeGetterSetter.getAttributesValues(names, pollingManager, attributeList,
+                        aroundInvokeImpl, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -986,9 +988,8 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
+
         xlogger.exit();
         return result;
     }
@@ -1016,12 +1017,13 @@ public final class DeviceImpl extends Device_5POA {
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-
-        deviceLock.lockAttribute();
         AttributeValue_3[] result = null;
+
         try {
-            result = AttributeGetterSetter.getAttributesValues3(names, pollingManager, attributeList, aroundInvokeImpl,
-                    source);
+            synchronized (deviceLock.getAttributeLock()) {
+                result = AttributeGetterSetter.getAttributesValues3(names, pollingManager, attributeList,
+                        aroundInvokeImpl, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1030,8 +1032,7 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
+
         }
         xlogger.exit();
         return result;
@@ -1069,11 +1070,13 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        deviceLock.lockAttribute();
+
         AttributeValue_4[] result = null;
         try {
-            result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source);
+            synchronized (deviceLock.getAttributeLock()) {
+                result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
+                        aroundInvokeImpl, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1082,8 +1085,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
         xlogger.exit();
         // profilerPeriod.stop().print();
@@ -1105,14 +1106,20 @@ public final class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
             throws DevFailed {
+
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(names));
+        // final Profiler profiler = new Profiler("read time");
+        // profiler.start(Arrays.toString(names));
+
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
+        // profiler.start("blackbox");
 
         blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
+        // profiler.start("locking");
         clientIdentity = clIdent;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1120,11 +1127,16 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        deviceLock.lockAttribute();
+        // profiler.start("lock");
+
         AttributeValue_5[] result = null;
+
         try {
-            result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source);
+            // profiler.start("get value");
+            synchronized (deviceLock.getAttributeLock()) {
+                result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
+                        aroundInvokeImpl, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1133,9 +1145,9 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
+
+        // profiler.stop().print();
         xlogger.exit();
         return result;
     }
@@ -1159,9 +1171,11 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
             logger.debug("writing {}", names[i]);
         }
-        deviceLock.lockAttribute();
+
         try {
-            AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+            synchronized (deviceLock.getAttributeLock()) {
+                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1170,8 +1184,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
         xlogger.exit();
     }
@@ -1195,9 +1207,10 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
             logger.debug("writing {}", names[i]);
         }
-        deviceLock.lockAttribute();
         try {
-            AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+            synchronized (deviceLock.getAttributeLock()) {
+                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1206,8 +1219,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
         xlogger.exit();
 
@@ -1238,10 +1249,10 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        deviceLock.lockAttribute();
-
         try {
-            AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl);
+            synchronized (deviceLock.getAttributeLock()) {
+                AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl);
+            }
         } catch (final Exception e) {
             if (e instanceof MultiDevFailed) {
                 throw (MultiDevFailed) e;
@@ -1250,8 +1261,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
 
         xlogger.exit();
@@ -1283,9 +1292,10 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        deviceLock.lockAttribute();
         try {
-            val = writeRead(values);
+            synchronized (deviceLock.getAttributeLock()) {
+                val = writeRead(values);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1294,8 +1304,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
 
         xlogger.exit();
@@ -1326,23 +1334,24 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        deviceLock.lockAttribute();
+
         AttributeValue_5[] resultValues = null;
         try {
-            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES,
-                    CallType.CACHE_DEV, name));
-            // write attributes
-            try {
-                AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl);
-            } catch (final MultiDevFailed e) {
-                throw new DevFailed(e.errors[0].err_list);
+            synchronized (deviceLock.getAttributeLock()) {
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES,
+                        CallType.CACHE_DEV, name));
+                // write attributes
+                try {
+                    AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl);
+                } catch (final MultiDevFailed e) {
+                    throw new DevFailed(e.errors[0].err_list);
+                }
+                // read attributes
+                resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager,
+                        attributeList, aroundInvokeImpl, DevSource.DEV);
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
+                        CallType.CACHE_DEV, name));
             }
-            // read attributes
-
-            resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager, attributeList,
-                    aroundInvokeImpl, DevSource.DEV);
-            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
-                    CallType.CACHE_DEV, name));
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1351,8 +1360,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockAttribute();
         }
         return resultValues;
     }
@@ -1515,9 +1522,10 @@ public final class DeviceImpl extends Device_5POA {
         blackBox.insertInblackBox("command_inout " + command);
         clientIdentity = null;
         Any argout = null;
-        deviceLock.lockCommand();
         try {
-            argout = commandHandler(command, argin, DevSource.CACHE_DEV);
+            synchronized (deviceLock.getCommandLock()) {
+                argout = commandHandler(command, argin, DevSource.CACHE_DEV);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1526,8 +1534,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockCommand();
         }
         xlogger.exit();
         return argout;
@@ -1556,9 +1562,10 @@ public final class DeviceImpl extends Device_5POA {
         clientIdentity = null;
         Any argout = null;
 
-        deviceLock.lockCommand();
         try {
-            argout = commandHandler(command, argin, source);
+            synchronized (deviceLock.getCommandLock()) {
+                argout = commandHandler(command, argin, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1567,8 +1574,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockCommand();
         }
         xlogger.exit();
         return argout;
@@ -1603,9 +1608,10 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, commandName);
         }
-        deviceLock.lockCommand();
         try {
-            argout = commandHandler(commandName, argin, source);
+            synchronized (deviceLock.getCommandLock()) {
+                argout = commandHandler(commandName, argin, source);
+            }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1614,8 +1620,6 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
-        } finally {
-            deviceLock.unlockCommand();
         }
         xlogger.exit();
         return argout;
