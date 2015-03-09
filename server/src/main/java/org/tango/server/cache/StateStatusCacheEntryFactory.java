@@ -60,22 +60,23 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
     public Object createEntry(final Object key) throws DevFailed {
 
         Object result = null;
-        synchronized (deviceLock.getAttributeLock()) {
+        final Object lock = deviceLock.getAttributeLock();
+        synchronized (lock != null ? lock : new Object()) {
             aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
                     .getName()));
             try {
                 synchronized (attribute) {
-                final long time1 = System.nanoTime();
-                attribute.updateValue();
-                final long now = System.nanoTime();
-                final long nowMilli = System.currentTimeMillis();
-                final long deltaTime = now - lastUpdateTime;
-                lastUpdateTime = now;
-                final long executionDuration = lastUpdateTime - time1;
-                attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-                command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
-                attribute.addToHistory();
-                result = attribute.getReadValue();
+                    final long time1 = System.nanoTime();
+                    attribute.updateValue();
+                    final long now = System.nanoTime();
+                    final long nowMilli = System.currentTimeMillis();
+                    final long deltaTime = now - lastUpdateTime;
+                    lastUpdateTime = now;
+                    final long executionDuration = lastUpdateTime - time1;
+                    attribute.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+                    command.setPollingStats(executionDuration / NANO_TO_MILLI, nowMilli, deltaTime / NANO_TO_MILLI);
+                    attribute.addToHistory();
+                    result = attribute.getReadValue();
                 }
                 command.addToHistory(((AttributeValue) result).getValue());
                 EventManager.getInstance().pushAttributeEvent(deviceName, attribute.getName());

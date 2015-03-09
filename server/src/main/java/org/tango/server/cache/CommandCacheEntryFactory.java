@@ -59,7 +59,8 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
     public Object createEntry(final Object key) throws DevFailed {
         logger.debug("Creating entry for key = {} , command {} ", key, command.getName());
         Object result = null;
-        synchronized (deviceLock.getCommandLock()) {
+        final Object lock = deviceLock.getCommandLock();
+        synchronized (lock != null ? lock : new Object()) {
             aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, command
                     .getName()));
             try {
