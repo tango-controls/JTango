@@ -43,7 +43,7 @@
 			<dependency>
 				<groupId>org.tango</groupId>
 				<artifactId>TangORB</artifactId>
-				<version>8.7.2-SNAPSHOT</version>
+				<version>9.0.2-SNAPSHOT</version>
 				<exclusions>
 					<exclusion>
 						<artifactId>log4j</artifactId>
