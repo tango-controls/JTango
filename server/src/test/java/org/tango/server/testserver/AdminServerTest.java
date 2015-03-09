@@ -41,185 +41,185 @@ public class AdminServerTest extends NoDBDeviceManager {
 
     @Test
     public void testQueryClass() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "QueryClass");
-	    cmd.execute();
-	    assertThat(cmd.extractToString(","), containsString(JTangoTest.class.getCanonicalName()));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "QueryClass");
+            cmd.execute();
+            assertThat(cmd.extractToString(","), containsString(JTangoTest.class.getCanonicalName()));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testQueryDevice() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "QueryDevice");
-	    cmd.execute();
-	    assertThat(cmd.extractToString(","), containsString(JTangoTest.NO_DB_DEVICE_NAME));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "QueryDevice");
+            cmd.execute();
+            assertThat(cmd.extractToString(","), containsString(JTangoTest.NO_DB_DEVICE_NAME));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testQueryWizardDevProperty() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "QueryWizardDevProperty");
-	    cmd.execute(JTangoTest.class.getCanonicalName());
-	    assertThat(cmd.extractToString(","), containsString("myProp"));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "QueryWizardDevProperty");
+            cmd.execute(JTangoTest.class.getCanonicalName());
+            assertThat(cmd.extractToString(","), containsString("myProp"));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testQueryWizardClassProperty() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "QueryWizardClassProperty");
-	    cmd.execute(JTangoTest.class.getCanonicalName());
-	    assertThat(cmd.extractToString(","), containsString("myClassProp"));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "QueryWizardClassProperty");
+            cmd.execute(JTangoTest.class.getCanonicalName());
+            assertThat(cmd.extractToString(","), containsString("myClassProp"));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testRestartDevice() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "DevRestart");
-	    cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
-	    new DeviceProxy(deviceName).ping();
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "DevRestart");
+            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            new DeviceProxy(deviceName).ping();
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testDevEmptyPollStatus() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
-	    cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
-	    System.out.println(cmd.extractToString(","));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
+            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            System.out.println(cmd.extractToString(","));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     private void addAttPoll() throws DevFailed {
-	final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	final int[] param1 = new int[] { 3000 };
-	final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(),
-		"shortScalar" };
-	cmd.insertMixArgin(param1, param2);
-	cmd.execute();
+        final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+        final int[] param1 = new int[] { 3000 };
+        final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(),
+                "shortScalar" };
+        cmd.insertMixArgin(param1, param2);
+        cmd.execute();
     }
 
     private void remAttPoll() throws DevFailed {
-	final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
+        final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+        rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
     }
 
     @Test
     public void testAddPollingAttr() throws DevFailed {
-	try {
-	    addAttPoll();
-	    final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
-	    attr.read();
-	    final TangoCommand status = new TangoCommand(adminName, "DevPollStatus");
-	    status.execute(JTangoTest.NO_DB_DEVICE_NAME);
-	    System.out.println(status.extractToString(","));
-	    remAttPoll();
+        try {
+            addAttPoll();
+            final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
+            attr.read();
+            final TangoCommand status = new TangoCommand(adminName, "DevPollStatus");
+            status.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            System.out.println(status.extractToString(","));
+            remAttPoll();
 
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testAddPollingCmd() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-	    final int[] param1 = new int[] { 500 };
-	    final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(),
-		    "testPolling" };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
-	    final TangoCommand cmdPolled = new TangoCommand(deviceName + "/testPolling");
-	    cmdPolled.execute();
-	    final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-	    rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(), "testPolling");
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
+            final int[] param1 = new int[] { 500 };
+            final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(),
+                    "testPollingArray" };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
+            final TangoCommand cmdPolled = new TangoCommand(deviceName + "/testPollingArray");
+            cmdPolled.execute();
+            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(), "testPollingArray");
 
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testDevPollStatus() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
-	    cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
-	    System.out.println(cmd.extractToString(","));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
+            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            System.out.println(cmd.extractToString(","));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testStopPolling() throws DevFailed {
-	try {
-	    addAttPoll();
-	    final TangoCommand cmd = new TangoCommand(adminName, "StopPolling");
-	    cmd.execute();
-	    remAttPoll();
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            addAttPoll();
+            final TangoCommand cmd = new TangoCommand(adminName, "StopPolling");
+            cmd.execute();
+            remAttPoll();
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testStartPolling() throws DevFailed {
-	try {
-	    addAttPoll();
-	    final TangoCommand cmd = new TangoCommand(adminName, "StopPolling");
-	    cmd.execute();
-	    final TangoCommand cmd2 = new TangoCommand(adminName, "StartPolling");
-	    cmd2.execute();
-	    remAttPoll();
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            addAttPoll();
+            final TangoCommand cmd = new TangoCommand(adminName, "StopPolling");
+            cmd.execute();
+            final TangoCommand cmd2 = new TangoCommand(adminName, "StartPolling");
+            cmd2.execute();
+            remAttPoll();
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testLoggingLevel() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "SetLoggingLevel");
-	    final int[] param1 = new int[] { 1 };
-	    final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
-	    cmd.insertMixArgin(param1, param2);
-	    cmd.execute();
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "SetLoggingLevel");
+            final int[] param1 = new int[] { 1 };
+            final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
+            cmd.insertMixArgin(param1, param2);
+            cmd.execute();
 
-	    final TangoCommand cmd2 = new TangoCommand(adminName, "GetLoggingLevel");
-	    final Object in = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
-	    cmd2.execute(in);
-	    final int result = cmd2.getNumLongMixArrayArgout()[0];
-	    assertThat(result, equalTo(param1[0]));
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+            final TangoCommand cmd2 = new TangoCommand(adminName, "GetLoggingLevel");
+            final Object in = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
+            cmd2.execute(in);
+            final int result = cmd2.getNumLongMixArrayArgout()[0];
+            assertThat(result, equalTo(param1[0]));
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     // @Test need a device appender
@@ -237,24 +237,24 @@ public class AdminServerTest extends NoDBDeviceManager {
 
     @Test
     public void testStopLogging() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "StopLogging");
-	    cmd.execute();
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "StopLogging");
+            cmd.execute();
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     @Test
     public void testStartLogging() throws DevFailed {
-	try {
-	    final TangoCommand cmd = new TangoCommand(adminName, "StartLogging");
-	    cmd.execute();
-	} catch (final DevFailed e) {
-	    DevFailedUtils.printDevFailed(e);
-	    throw e;
-	}
+        try {
+            final TangoCommand cmd = new TangoCommand(adminName, "StartLogging");
+            cmd.execute();
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
     }
 
     // @Test
