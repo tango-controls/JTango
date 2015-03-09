@@ -80,7 +80,8 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
         Object result = null;
 
         if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            synchronized (deviceLock.getAttributeLock()) {
+            final Object lock = deviceLock.getAttributeLock();
+            synchronized (lock != null ? lock : new Object()) {
                 aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING,
                         attribute.getName()));
                 try {
