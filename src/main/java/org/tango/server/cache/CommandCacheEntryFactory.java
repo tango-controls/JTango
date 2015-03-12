@@ -33,7 +33,7 @@ import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 
 import fr.esrf.Tango.DevFailed;
 
@@ -42,13 +42,13 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
     private static final double NANO_TO_MILLI = 1000000.0;
     private final CommandImpl command;
     // private Profiler profilerPeriod = new Profiler("period");
-    private final DeviceLock deviceLock;
+    private final DeviceLocker deviceLock;
 
     private final AroundInvokeImpl aroundInvoke;
 
     private long lastUpdateTime;
 
-    public CommandCacheEntryFactory(final CommandImpl command, final DeviceLock deviceLock,
+    public CommandCacheEntryFactory(final CommandImpl command, final DeviceLocker deviceLock,
             final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.command = command;

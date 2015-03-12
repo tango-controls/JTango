@@ -69,7 +69,7 @@ import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 import org.tango.server.device.InitImpl;
 import org.tango.server.device.StateImpl;
 import org.tango.server.device.StatusImpl;
@@ -202,7 +202,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * Manage device locking
      */
-    private final DeviceLock deviceLock;
+    private final DeviceLocker deviceLock;
 
     /**
      * the device's attributes
@@ -293,7 +293,7 @@ public final class DeviceImpl extends Device_5POA {
         name = deviceName;
         this.className = className;
         this.deviceType = deviceType;
-        deviceLock = new DeviceLock(txType, businessObject.getClass());
+        deviceLock = new DeviceLocker(txType, businessObject.getClass());
 
         this.businessObject = businessObject;
         stateCheckAttrAlarm = false;
@@ -931,12 +931,9 @@ public final class DeviceImpl extends Device_5POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
         AttributeValue[] result = null;
-        final Object lock = deviceLock.getAttributeLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                result = AttributeGetterSetter.getAttributesValues(attributeNames, pollingManager, attributeList,
-                        aroundInvokeImpl, null);
-            }
+            result = AttributeGetterSetter.getAttributesValues(name, attributeNames, pollingManager, attributeList,
+                    aroundInvokeImpl, DevSource.CACHE_DEV, deviceLock);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -974,12 +971,9 @@ public final class DeviceImpl extends Device_5POA {
         }
 
         AttributeValue[] result = null;
-        final Object lock = deviceLock.getAttributeLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                result = AttributeGetterSetter.getAttributesValues(names, pollingManager, attributeList,
-                        aroundInvokeImpl, source);
-            }
+            result = AttributeGetterSetter.getAttributesValues(name, names, pollingManager, attributeList,
+                    aroundInvokeImpl, source, deviceLock);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1018,12 +1012,9 @@ public final class DeviceImpl extends Device_5POA {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
         AttributeValue_3[] result = null;
-        final Object lock = deviceLock.getAttributeLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                result = AttributeGetterSetter.getAttributesValues3(names, pollingManager, attributeList,
-                        aroundInvokeImpl, source);
-            }
+            result = AttributeGetterSetter.getAttributesValues3(name, names, pollingManager, attributeList,
+                    aroundInvokeImpl, source, deviceLock);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1072,12 +1063,9 @@ public final class DeviceImpl extends Device_5POA {
         }
 
         AttributeValue_4[] result = null;
-        final Object lock = deviceLock.getAttributeLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
-                        aroundInvokeImpl, source);
-            }
+            result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
+                    aroundInvokeImpl, source, deviceLock);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1110,17 +1098,17 @@ public final class DeviceImpl extends Device_5POA {
 
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(names));
-        // final Profiler profiler = new Profiler("read time");
-        // profiler.start(Arrays.toString(names));
+//        final Profiler profiler = new Profiler("read time");
+//        profiler.start(Arrays.toString(names));
 
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        // profiler.start("blackbox");
+//        profiler.start("blackbox");
 
         blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
-        // profiler.start("locking");
+//        profiler.start("locking");
         clientIdentity = clIdent;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1128,16 +1116,14 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
-        // profiler.start("lock");
 
         AttributeValue_5[] result = null;
-        final Object lock = deviceLock.getAttributeLock();
+
         try {
-            // profiler.start("get value");
-            synchronized (lock != null ? lock : new Object()) {
-                result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
-                        aroundInvokeImpl, source);
-            }
+//            profiler.start("get value");
+            result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
+                    aroundInvokeImpl, source, deviceLock);
+
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1148,7 +1134,7 @@ public final class DeviceImpl extends Device_5POA {
             }
         }
 
-        // profiler.stop().print();
+//        profiler.stop().print();
         xlogger.exit();
         return result;
     }
@@ -1172,9 +1158,9 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
             logger.debug("writing {}", names[i]);
         }
-
+        final Object lock = deviceLock.getAttributeLock();
         try {
-            synchronized (deviceLock.getAttributeLock()) {
+            synchronized (lock != null ? lock : new Object()) {
                 AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
             }
         } catch (final Exception e) {
@@ -1190,7 +1176,7 @@ public final class DeviceImpl extends Device_5POA {
     }
 
     /**
-     * Write some attributes. IDL 2 version
+     * Write some attributes. IDL 3 version
      * 
      * @param values
      *            a container for attribute values.
@@ -1353,7 +1339,7 @@ public final class DeviceImpl extends Device_5POA {
                 }
                 // read attributes
                 resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager,
-                        attributeList, aroundInvokeImpl, DevSource.DEV);
+                        attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock);
                 aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
                         CallType.CACHE_DEV, name));
             }
@@ -1387,7 +1373,7 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
         }
         final AttributeValue_4[] resultValues = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager,
-                attributeList, aroundInvokeImpl, DevSource.DEV);
+                attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock);
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
                 name));
         return resultValues;
@@ -1528,9 +1514,7 @@ public final class DeviceImpl extends Device_5POA {
         clientIdentity = null;
         Any argout = null;
         try {
-            synchronized (deviceLock.getCommandLock()) {
-                argout = commandHandler(command, argin, DevSource.CACHE_DEV);
-            }
+            argout = commandHandler(command, argin, DevSource.CACHE_DEV);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1566,11 +1550,8 @@ public final class DeviceImpl extends Device_5POA {
         blackBox.insertInblackBox("command_inout_2 " + command, source);
         clientIdentity = null;
         Any argout = null;
-        final Object lock = deviceLock.getCommandLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                argout = commandHandler(command, argin, source);
-            }
+            argout = commandHandler(command, argin, source);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1613,11 +1594,8 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, commandName);
         }
-        final Object lock = deviceLock.getCommandLock();
         try {
-            synchronized (lock != null ? lock : new Object()) {
-                argout = commandHandler(commandName, argin, source);
-            }
+            argout = commandHandler(commandName, argin, source);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1728,17 +1706,20 @@ public final class DeviceImpl extends Device_5POA {
         }
         // Call the always executed method
         final CallType callType = CallType.getFromDevSource(source);
-        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
         // Execute the command
         if (cmd.isPolled() && fromCache) {
             logger.debug("execute command {} from CACHE", cmd.getName());
             ret = pollingManager.getCommandCacheElement(cmd);
         } else {
             logger.debug("execute command {} from DEVICE", cmd.getName());
-            final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
-            ret = cmd.execute(input);
+            final Object lock = deviceLock.getCommandLock();
+            synchronized (lock != null ? lock : new Object()) {
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
+                final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
+                ret = cmd.execute(input);
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
+            }
         }
-        aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
         stateImpl.stateMachine(cmd.getEndState());
 
         xlogger.exit();
@@ -1766,7 +1747,6 @@ public final class DeviceImpl extends Device_5POA {
         if (length == 1 && attributeNames[0].contains(ALL_ATTR)) {
             getAllConfig = true;
         }
-
         AttributeConfig_5[] result;
         if (getAllConfig) {
             logger.debug("get All");

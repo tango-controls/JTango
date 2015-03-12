@@ -66,8 +66,7 @@ public final class DeviceBlackBox {
     }
 
     public void insertInblackBox(final String message) {
-        final StringBuilder sb = new StringBuilder(message);
-        sb.append(insertHostName());
+        final StringBuilder sb = new StringBuilder(message).append(insertHostName());
         offerInblackBox(sb.toString());
     }
 
@@ -77,8 +76,7 @@ public final class DeviceBlackBox {
         }
         final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
         final StringBuilder sb = new StringBuilder(dateFormat.format(new Date()));
-        sb.append(" : ");
-        sb.append(message);
+        sb.append(" : ").append(message);
         clientRequestsLogger.debug(message);
         final boolean isInserted = blackbox.offer(sb.toString());
         if (!isInserted) {
@@ -104,31 +102,19 @@ public final class DeviceBlackBox {
             // ignore
             logger.debug("{}", e);
         }
-        sb.append(insertHostName());
-        sb.append(" ");
-        sb.append(cli);
+        sb.append(insertHostName()).append(" ").append(cli);
         offerInblackBox(sb.toString());
     }
 
     private StringBuilder insertHostName() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(" requested from ");
-        sb.append(ServerRequestInterceptor.getInstance().getClientHostName());
+        sb.append(" requested from ").append(ServerRequestInterceptor.getInstance().getClientHostName());
         return sb;
     }
 
     private StringBuilder insertSource(final String message, final DevSource devSource) {
-        String src = "";
-        if (devSource.value() == DevSource._CACHE) {
-            src = "cache";
-        } else if (devSource.value() == DevSource._DEV) {
-            src = "device";
-        } else if (devSource.value() == DevSource._CACHE_DEV) {
-            src = "cache_device";
-        }
         final StringBuilder sb = new StringBuilder(message);
-        sb.append(" from ");
-        sb.append(src);
+        sb.append(" from ").append(devSource.toString());
         return sb;
     }
 
@@ -145,9 +131,7 @@ public final class DeviceBlackBox {
             logger.debug("{}", e);
         }
         final StringBuilder sb = new StringBuilder(message);
-        sb.append(" from  \"");
-        sb.append(cli);
-        sb.append("\"");
+        sb.append(" from  \"").append(cli).append("\"");
         offerInblackBox(sb.toString());
     }
 }
