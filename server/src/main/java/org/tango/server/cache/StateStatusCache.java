@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 
 public final class StateStatusCache {
     private final Logger logger = LoggerFactory.getLogger(StateStatusCache.class);
@@ -47,7 +47,7 @@ public final class StateStatusCache {
     private final CommandImpl command;
 
     public StateStatusCache(final CacheManager manager, final CommandImpl command, final AttributeImpl attribute,
-            final String deviceName, final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
+            final String deviceName, final DeviceLocker deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.command = command;
         final String cacheName = "stateStatusTangoPollingCache." + deviceName + "/" + command.getName();
         Cache defaultCache = manager.getCache(cacheName);

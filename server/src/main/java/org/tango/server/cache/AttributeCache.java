@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 
 public final class AttributeCache {
     private final Logger logger = LoggerFactory.getLogger(AttributeCache.class);
@@ -47,7 +47,7 @@ public final class AttributeCache {
     private final AttributeImpl attribute;
 
     public AttributeCache(final CacheManager manager, final AttributeImpl attr, final String deviceName,
-            final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
+            final DeviceLocker deviceLock, final AroundInvokeImpl aroundInvoke) {
         attribute = attr;
         final String cacheName = "attrTangoPollingCache." + deviceName + "/" + attr.getName();
         Cache defaultCache = manager.getCache(cacheName);

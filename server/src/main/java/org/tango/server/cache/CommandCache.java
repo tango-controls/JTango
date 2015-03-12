@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 
 public final class CommandCache {
     private final Logger logger = LoggerFactory.getLogger(CommandCache.class);
@@ -47,7 +47,7 @@ public final class CommandCache {
     private final CommandImpl command;
 
     public CommandCache(final CacheManager manager, final CommandImpl command, final String deviceName,
-            final DeviceLock deviceLock, final AroundInvokeImpl aroundInvoke) {
+            final DeviceLocker deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.command = command;
         final String cacheName = "cmdTangoPollingCache." + deviceName + "/" + command.getName();
         Cache defaultCache = manager.getCache(cacheName);

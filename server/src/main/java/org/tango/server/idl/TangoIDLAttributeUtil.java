@@ -80,8 +80,6 @@ public final class TangoIDLAttributeUtil {
             value2.time = TangoIDLUtil.getTime(value.getTime());
             value2.dim_x = value.getXDim();
             value2.dim_y = value.getYDim();
-            // value.err_list = new DevError[0];
-            // TODO: fill err_list
         } catch (final IllegalArgumentException e) {
             DevFailedUtils.throwDevFailed(e);
         }

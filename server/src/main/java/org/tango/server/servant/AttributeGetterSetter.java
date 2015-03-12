@@ -25,7 +25,10 @@
 package org.tango.server.servant;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.ehcache.CacheException;
 
@@ -43,6 +46,7 @@ import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.device.AroundInvokeImpl;
+import org.tango.server.device.DeviceLocker;
 import org.tango.server.device.StateImpl;
 import org.tango.server.idl.CleverAnyAttribute;
 import org.tango.server.idl.CleverAttrValUnion;
@@ -75,7 +79,6 @@ public final class AttributeGetterSetter {
         AttributeImpl result = null;
         for (final AttributeImpl attribute : attributeList) {
             if (attribute.getName().equalsIgnoreCase(name)) {
-
                 result = attribute;
                 break;
             }
@@ -159,29 +162,21 @@ public final class AttributeGetterSetter {
 
     static AttributeValue_5[] getAttributesValues5(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source) throws DevFailed {
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+//        final Profiler profiler = new Profiler("get value time");
+        final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
-
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
         final AttributeValue_5[] back = new AttributeValue_5[names.length];
+//        profiler.start(Arrays.toString(names));
+        // sort attributes with cache
+        final Map<Integer, AttributeImpl> cacheAttributes = new HashMap<Integer, AttributeImpl>();
+        final Map<Integer, AttributeImpl> notCacheAttributes = new HashMap<Integer, AttributeImpl>();
         for (int i = 0; i < names.length; i++) {
             AttributeImpl att = null;
             try {
                 att = getAttribute(names[i], attributeList);
-            } catch (final DevFailed e) {
-                back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], AttrDataFormat.FMT_UNKNOWN, 0, e);
-            }
-
-            if (att != null) {
-                aroundInvoke
-                        .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
                 if (source.equals(DevSource.DEV) && att.isPolled() && att.getPollingPeriod() == 0) {
-                    // attribute is polled, so throw exception except for
-                    // admin device
+                    // attribute is polled, so throw exception except
                     back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(
                             names[i],
                             AttrDataFormat.FMT_UNKNOWN,
@@ -190,89 +185,114 @@ public final class AttributeGetterSetter {
                                     + " value is available only by CACHE"));
                 } else if (!deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())
                         && source.equals(DevSource.CACHE) && !att.isPolled()) {
-                    // attribute is not polled, so throw exception except for
-                    // admin device
+                    // attribute is not polled, so throw exception except for admin device
                     back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(
                             names[i],
                             AttrDataFormat.FMT_UNKNOWN,
                             0,
                             DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, ATTRIBUTE + names[i]
                                     + " not polled"));
+                } else if (att.isPolled() && fromCache) {
+                    cacheAttributes.put(i, att);
                 } else {
-                    if (att.isPolled() && fromCache) {
-                        // get value from cache
-                        try {
-                            LOGGER.debug("read from CACHE {}", att.getName());
-                            final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
-                            if (readValue == null) {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(
-                                        names[i],
-                                        att.getFormat(),
-                                        att.getTangoType(),
-                                        DevFailedUtils.newDevFailed("CACHE_ERROR", names[i]
-                                                + " not available from cache"));
-                            } else {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue5(att, readValue, att.getWriteValue());
-                            }
-                        } catch (final CacheException e) {
-                            if (e.getCause() instanceof DevFailed) {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i],
-                                        AttrDataFormat.FMT_UNKNOWN, 0, (DevFailed) e.getCause());
-                            }
-                        }
-                    } else {
-                        LOGGER.debug("read from DEVICE {} ", att.getName());
-                        try {
-                            synchronized (att) {
-                                if (att.getBehavior() instanceof ForwardedAttribute) {
-                                    // special case for fwd attribute where we retrieve directly a AttributeValue_5
-                                    final ForwardedAttribute fwdAttr = (ForwardedAttribute) att.getBehavior();
-                                    back[i] = fwdAttr.getValue5();
-                                } else {
-                                    att.updateValue();
-                                    back[i] = TangoIDLAttributeUtil.toAttributeValue5(att, att.getReadValue(),
-                                            att.getWriteValue());
-                                }
-                            }
-                        } catch (final DevFailed e) {
-                            back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
-                                    att.getTangoType(), e);
-                        }
-
-                    }
+                    notCacheAttributes.put(i, att);
                 }
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                        .getName()));
+            } catch (final DevFailed e) {
+                back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], AttrDataFormat.FMT_UNKNOWN, 0, e);
             }
         }
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+
+        // get value from cache
+        for (final Entry<Integer, AttributeImpl> attribute : cacheAttributes.entrySet()) {
+            final AttributeImpl att = attribute.getValue();
+            final int i = attribute.getKey();
+            try {
+                LOGGER.debug("read from CACHE {}", att.getName());
+//                aroundInvoke
+//                        .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
+                // profiler.start("get cache");
+                final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
+                // profiler.start("to idl 5");
+                if (readValue == null) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
+                            att.getTangoType(),
+                            DevFailedUtils.newDevFailed("CACHE_ERROR", names[i] + " not available from cache"));
+                } else {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue5(att, readValue, att.getWriteValue());
+                }
+                // profiler.stop().print();
+            } catch (final CacheException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], AttrDataFormat.FMT_UNKNOWN, 0,
+                            (DevFailed) e.getCause());
+                }
+            }
+            // aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
+            // att.getName()));
+        }
+        // get attributes values
+        if (!notCacheAttributes.isEmpty()) {
+            final Object lock = locker.getAttributeLock();
+            // lock if necessary
+            synchronized (lock != null ? lock : new Object()) {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
+                    final AttributeImpl att = attribute.getValue();
+                    final int i = attribute.getKey();
+                    LOGGER.debug("read from DEVICE {} ", att.getName());
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                    try {
+
+                        synchronized (att) {
+                            if (att.getBehavior() instanceof ForwardedAttribute) {
+                                // special case for fwd attribute where we retrieve directly a AttributeValue_5
+                                final ForwardedAttribute fwdAttr = (ForwardedAttribute) att.getBehavior();
+                                back[i] = fwdAttr.getValue5();
+                            } else {
+                                att.updateValue();
+                                back[i] = TangoIDLAttributeUtil.toAttributeValue5(att, att.getReadValue(),
+                                        att.getWriteValue());
+                            }
+
+                        }
+                    } catch (final DevFailed e) {
+                        back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
+                                att.getTangoType(), e);
+                    }
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                } // for
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+            } // synchronized
+        }
+
         return back;
+    }
+
+    private static boolean isFromCache(final DevSource source) {
+        boolean fromCache = false;
+        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
+            fromCache = true;
+        }
+        return fromCache;
     }
 
     static AttributeValue_4[] getAttributesValues4(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source) throws DevFailed {
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+        final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
-
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
         final AttributeValue_4[] back = new AttributeValue_4[names.length];
+        // sort attributes with cache
+        final Map<Integer, AttributeImpl> cacheAttributes = new HashMap<Integer, AttributeImpl>();
+        final Map<Integer, AttributeImpl> notCacheAttributes = new HashMap<Integer, AttributeImpl>();
         for (int i = 0; i < names.length; i++) {
             AttributeImpl att = null;
             try {
                 att = getAttribute(names[i], attributeList);
-            } catch (final DevFailed e) {
-                back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], AttrDataFormat.FMT_UNKNOWN, e);
-            }
-            if (att != null) {
-                aroundInvoke
-                        .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
                 if (source.equals(DevSource.DEV) && att.isPolled() && att.getPollingPeriod() == 0) {
-                    // attribute is polled, so throw exception except for
-                    // admin device
+                    // attribute is polled, so throw exception except
                     back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(
                             names[i],
                             AttrDataFormat.FMT_UNKNOWN,
@@ -280,85 +300,140 @@ public final class AttributeGetterSetter {
                                     + " value is available only by CACHE"));
                 } else if (!deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())
                         && source.equals(DevSource.CACHE) && !att.isPolled()) {
-                    // attribute is not polled, so throw exception except for
-                    // admin device
+                    // attribute is not polled, so throw exception e'xcept for admin device
                     back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(
                             names[i],
                             AttrDataFormat.FMT_UNKNOWN,
                             DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, ATTRIBUTE + names[i]
                                     + " not polled"));
+                } else if (att.isPolled() && fromCache) {
+                    cacheAttributes.put(i, att);
                 } else {
-                    if (att.isPolled() && fromCache) {
-                        // get value from cache
-                        try {
-                            LOGGER.debug("read from CACHE {}", att.getName());
-                            final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
-                            if (readValue == null) {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(
-                                        names[i],
-                                        att.getFormat(),
-                                        DevFailedUtils.newDevFailed("CACHE_ERROR", names[i]
-                                                + " not available from cache"));
-                            } else {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, readValue, att.getWriteValue());
-                            }
-                        } catch (final CacheException e) {
-                            if (e.getCause() instanceof DevFailed) {
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i],
-                                        AttrDataFormat.FMT_UNKNOWN, (DevFailed) e.getCause());
-                            }
-                        }
-                    } else {
-                        LOGGER.debug("read from DEVICE {} ", att.getName());
-                        try {
-                            synchronized (att) {
-                                att.updateValue();
-                                back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, att.getReadValue(),
-                                        att.getWriteValue());
-                            }
-                        } catch (final DevFailed e) {
-                            back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], att.getFormat(), e);
-                        }
-
-                    }
+                    notCacheAttributes.put(i, att);
                 }
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                        .getName()));
+            } catch (final DevFailed e) {
+                back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], AttrDataFormat.FMT_UNKNOWN, e);
             }
         }
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+
+        // get value from cache
+        for (final Entry<Integer, AttributeImpl> attribute : cacheAttributes.entrySet()) {
+            final AttributeImpl att = attribute.getValue();
+            final int i = attribute.getKey();
+            try {
+                LOGGER.debug("read from CACHE {}", att.getName());
+                final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
+                if (readValue == null) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], att.getFormat(),
+                            DevFailedUtils.newDevFailed("CACHE_ERROR", names[i] + " not available from cache"));
+                } else {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, readValue, att.getWriteValue());
+                }
+            } catch (final CacheException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], AttrDataFormat.FMT_UNKNOWN,
+                            (DevFailed) e.getCause());
+                }
+            }
+        }
+        // get attributes values
+        if (!notCacheAttributes.isEmpty()) {
+            final Object lock = locker.getAttributeLock();
+            // lock if necessary
+            synchronized (lock != null ? lock : new Object()) {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
+                    final AttributeImpl att = attribute.getValue();
+                    final int i = attribute.getKey();
+                    LOGGER.debug("read from DEVICE {} ", att.getName());
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                    try {
+                        synchronized (att) {
+                            att.updateValue();
+                            back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, att.getReadValue(),
+                                    att.getWriteValue());
+                        }
+                    } catch (final DevFailed e) {
+                        back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], att.getFormat(), e);
+                    }
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                } // for
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+            } // synchronized
+        }
+
         return back;
     }
 
-    static AttributeValue_3[] getAttributesValues3(final String[] names, final PollingManager cacheManager,
-            final List<AttributeImpl> attributeList, final AroundInvokeImpl aroundInvoke, final DevSource source)
-            throws DevFailed {
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
+    static AttributeValue_3[] getAttributesValues3(final String deviceName, final String[] names,
+            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+        final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
         final AttributeValue_3[] back = new AttributeValue_3[names.length];
+        // sort attributes with cache
+        final Map<Integer, AttributeImpl> cacheAttributes = new HashMap<Integer, AttributeImpl>();
+        final Map<Integer, AttributeImpl> notCacheAttributes = new HashMap<Integer, AttributeImpl>();
         for (int i = 0; i < names.length; i++) {
             AttributeImpl att = null;
             try {
                 att = getAttribute(names[i], attributeList);
+                if (source.equals(DevSource.DEV) && att.isPolled() && att.getPollingPeriod() == 0) {
+                    // attribute is polled, so throw exception except
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(
+                            names[i],
+                            DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, ATTRIBUTE + names[i]
+                                    + " value is available only by CACHE"));
+                } else if (!deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())
+                        && source.equals(DevSource.CACHE) && !att.isPolled()) {
+                    // attribute is not polled, so throw exception e'xcept for admin device
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(
+                            names[i],
+                            DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, ATTRIBUTE + names[i]
+                                    + " not polled"));
+                } else if (att.isPolled() && fromCache) {
+                    cacheAttributes.put(i, att);
+                } else {
+                    notCacheAttributes.put(i, att);
+                }
             } catch (final DevFailed e) {
                 back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i], e);
             }
-            if (att != null) {
-                aroundInvoke
-                        .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
-                if (att.isPolled() && fromCache) {
-                    // get value from cache
-//                    final Element element = cacheManager.getAttributeCache(att).get(
-//                            names[i].toLowerCase(Locale.ENGLISH));
-                    final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
-                    back[i] = TangoIDLAttributeUtil.toAttributeValue3(att, readValue, att.getWriteValue());
-                    LOGGER.debug("read from CACHE {}", att.getName());
+        }
+
+        // get value from cache
+        for (final Entry<Integer, AttributeImpl> attribute : cacheAttributes.entrySet()) {
+            final AttributeImpl att = attribute.getValue();
+            final int i = attribute.getKey();
+            try {
+                LOGGER.debug("read from CACHE {}", att.getName());
+                final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
+                if (readValue == null) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i],
+                            DevFailedUtils.newDevFailed("CACHE_ERROR", names[i] + " not available from cache"));
                 } else {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue3(att, readValue, att.getWriteValue());
+                }
+            } catch (final CacheException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i], (DevFailed) e.getCause());
+                }
+            }
+        }
+        // get attributes values
+        if (!notCacheAttributes.isEmpty()) {
+            final Object lock = locker.getAttributeLock();
+            // lock if necessary
+            synchronized (lock != null ? lock : new Object()) {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
+                    final AttributeImpl att = attribute.getValue();
+                    final int i = attribute.getKey();
                     LOGGER.debug("read from DEVICE {} ", att.getName());
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
+                            .getName()));
                     try {
                         synchronized (att) {
                             att.updateValue();
@@ -368,43 +443,83 @@ public final class AttributeGetterSetter {
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i], e);
                     }
-                }
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                        .getName()));
-            }
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                } // for
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+            } // synchronized
         }
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
         return back;
     }
 
-    static fr.esrf.Tango.AttributeValue[] getAttributesValues(final String[] names, final PollingManager cacheManager,
-            final List<AttributeImpl> attributeList, final AroundInvokeImpl aroundInvoke, final DevSource source)
-            throws DevFailed {
-        boolean fromCache = false;
-        if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
-            fromCache = true;
-        }
+    static fr.esrf.Tango.AttributeValue[] getAttributesValues(final String deviceName, final String[] names,
+            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+        final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+
         final fr.esrf.Tango.AttributeValue[] back = new fr.esrf.Tango.AttributeValue[names.length];
+        final Map<Integer, AttributeImpl> cacheAttributes = new HashMap<Integer, AttributeImpl>();
+        final Map<Integer, AttributeImpl> notCacheAttributes = new HashMap<Integer, AttributeImpl>();
         for (int i = 0; i < names.length; i++) {
             final AttributeImpl att = getAttribute(names[i], attributeList);
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
-            if (att.isPolled() && fromCache) {
-                // get value from cache
-                final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
-                back[i] = TangoIDLAttributeUtil.toAttributeValue(att, readValue);
-                LOGGER.debug("read from CACHE {}", att.getName());
+            if (source.equals(DevSource.DEV) && att.isPolled() && att.getPollingPeriod() == 0) {
+                // attribute is polled, so throw exception except
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, ATTRIBUTE + names[i]
+                        + " value is available only by CACHE");
+            } else if (!deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())
+                    && source.equals(DevSource.CACHE) && !att.isPolled()) {
+                // attribute is not polled, so throw exception e'xcept for admin device
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, ATTRIBUTE + names[i]
+                        + " not polled");
+            } else if (att.isPolled() && fromCache) {
+                cacheAttributes.put(i, att);
             } else {
-                LOGGER.debug("read from DEVICE {} ", att.getName());
-                synchronized (att) {
-                    att.updateValue();
-                    back[i] = TangoIDLAttributeUtil.toAttributeValue(att, att.getReadValue());
+                notCacheAttributes.put(i, att);
+            }
+
+        }
+
+        // get value from cache
+        for (final Entry<Integer, AttributeImpl> attribute : cacheAttributes.entrySet()) {
+            final AttributeImpl att = attribute.getValue();
+            final int i = attribute.getKey();
+            try {
+                LOGGER.debug("read from CACHE {}", att.getName());
+                final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
+                if (readValue == null) {
+                    throw DevFailedUtils.newDevFailed("CACHE_ERROR", names[i] + " not available from cache");
+                } else {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue(att, readValue);
+                }
+            } catch (final CacheException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    throw (DevFailed) e.getCause();
                 }
             }
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att.getName()));
         }
-        aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+        // get attributes values
+        if (!notCacheAttributes.isEmpty()) {
+            final Object lock = locker.getAttributeLock();
+            // lock if necessary
+            synchronized (lock != null ? lock : new Object()) {
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
+                    final AttributeImpl att = attribute.getValue();
+                    final int i = attribute.getKey();
+                    LOGGER.debug("read from DEVICE {} ", att.getName());
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                    synchronized (att) {
+                        att.updateValue();
+                        back[i] = TangoIDLAttributeUtil.toAttributeValue(att, att.getReadValue());
+                    }
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
+                            .getName()));
+                } // for
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+            } // synchronized
+        }
         return back;
     }
 }

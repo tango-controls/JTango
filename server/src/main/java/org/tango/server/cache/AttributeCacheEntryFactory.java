@@ -35,7 +35,7 @@ import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 import org.tango.server.events.EventManager;
 
 import fr.esrf.Tango.DevFailed;
@@ -47,14 +47,14 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
 
     private final AttributeImpl attribute;
 //    private Profiler profilerPeriod = new Profiler("period");
-    private final DeviceLock deviceLock;
+    private final DeviceLocker deviceLock;
     private long lastUpdateTime;
 
     private final String deviceName;
 
     private final AroundInvokeImpl aroundInvoke;
 
-    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLock deviceLock,
+    public AttributeCacheEntryFactory(final AttributeImpl attribute, final DeviceLocker deviceLock,
             final String deviceName, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.attribute = attribute;
