@@ -36,7 +36,7 @@ import org.tango.server.annotation.TransactionType;
  * @author ABEILLE
  * 
  */
-public final class DeviceLock {
+public final class DeviceLocker {
     /**
      * Lock for attributes
      */
@@ -54,6 +54,8 @@ public final class DeviceLock {
      */
     private static final Map<Class<?>, Object> CLASS_LOCKS = new HashMap<Class<?>, Object>();
 
+    private final TransactionType txType;
+
     /**
      * Ctr
      * 
@@ -62,8 +64,8 @@ public final class DeviceLock {
      * @param deviceClass
      *            the class to lock
      */
-    public DeviceLock(final TransactionType txType, final Class<?> deviceClass) {
-
+    public DeviceLocker(final TransactionType txType, final Class<?> deviceClass) {
+        this.txType = txType;
         switch (txType) {
             case DEVICE:
                 attributeLock = new Object();
@@ -109,6 +111,10 @@ public final class DeviceLock {
 
     public Object getCommandLock() {
         return commandLock;
+    }
+
+    public TransactionType getTxType() {
+        return txType;
     }
 
 }

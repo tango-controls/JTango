@@ -33,7 +33,7 @@ import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLock;
+import org.tango.server.device.DeviceLocker;
 import org.tango.server.events.EventManager;
 
 import fr.esrf.Tango.DevFailed;
@@ -42,13 +42,13 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
     private static final double NANO_TO_MILLI = 1000000.0;
     private final CommandImpl command;
     private final AttributeImpl attribute;
-    private final DeviceLock deviceLock;
+    private final DeviceLocker deviceLock;
     private long lastUpdateTime;
     private final String deviceName;
     private final AroundInvokeImpl aroundInvoke;
 
     public StateStatusCacheEntryFactory(final CommandImpl command, final AttributeImpl attribute,
-            final DeviceLock deviceLock, final String deviceName, final AroundInvokeImpl aroundInvoke) {
+            final DeviceLocker deviceLock, final String deviceName, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
         this.command = command;
         this.attribute = attribute;
