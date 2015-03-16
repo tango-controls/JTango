@@ -200,12 +200,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     public void updateValue() throws DevFailed {
         xlogger.entry(getName());
         // invoke on device
-        try {
-            final AttributeValue returnedValue = (AttributeValue) behavior.getValue().clone();
-            this.updateValue(returnedValue);
-        } catch (final CloneNotSupportedException e) {
-            throw DevFailedUtils.newDevFailed(e);
-        }
+        final AttributeValue returnedValue = behavior.getValue();
+        this.updateValue(returnedValue);
         xlogger.exit(getName());
     }
 
@@ -220,14 +216,18 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         if (inValue == null) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
         }
+        // update quality if necessary
+        if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
+            updateQuality(inValue);
+        }
         try {
             // copy value
             readValue = (AttributeValue) inValue.clone();
         } catch (final CloneNotSupportedException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-        try {
 
+        try {
             if (inValue.getValue() != null) {
                 checkUpdateErrors(inValue);
                 // get as array if necessary (for image)
@@ -253,10 +253,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             } else {
                 DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
             }
-            // check alarms if necessary
-            if (!inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
-                updateQuality(inValue);
-            }
+
             updateDefaultWritePart();
         } catch (final DevFailed e) {
             readValue.setQuality(AttrQuality.ATTR_INVALID);
@@ -323,14 +320,14 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void checkSpectrumQuality(final AttributeValue returnedValue, final double maxAlarm, final double minAlarm,
             final double maxWarning, final double minWarning, final long deltaTime) {
         final long currentDeltaTime = returnedValue.getTime() - writtenTimestamp;
-        final String[] readArray = ArrayUtils.toStringArray(readValue.getValue());
+        final String[] readArray = ArrayUtils.toStringArray(returnedValue.getValue());
         String[] writeArray = null;
         if (writtenTimestamp != 0 && deltaTime != 0) {
             writeArray = ArrayUtils.toStringArray(writeValue.getValue());
         }
         if (writeArray != null && readArray.length != writeArray.length && currentDeltaTime > deltaTime) {
             // if size is different for read and write, may be an Delta alarm
-            readValue.setQuality(AttrQuality.ATTR_ALARM);
+            returnedValue.setQuality(AttrQuality.ATTR_ALARM);
         } else {
             int i = 0;
             for (final String element : readArray) {
@@ -341,7 +338,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     final double valWrite = Double.parseDouble(writeArray[i++]);
                     final double diff = Math.abs(readVal - valWrite);
                     if (currentDeltaTime > deltaTime && diff > deltaVal) {
-                        readValue.setQuality(AttrQuality.ATTR_ALARM);
+                        returnedValue.setQuality(AttrQuality.ATTR_ALARM);
                         isDeltaAlarm = true;
                         logger.debug("{} is delta alarm", getName());
                         break;
@@ -357,7 +354,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                         isAlarmToHigh = false;
                         logger.debug("{} is too low alarm {}", getName(), minAlarm);
                     }
-                    readValue.setQuality(AttrQuality.ATTR_ALARM);
+                    returnedValue.setQuality(AttrQuality.ATTR_ALARM);
                     break;
                 } else if (readVal >= maxWarning || readVal <= minWarning) {
                     // warning
@@ -369,7 +366,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                         isAlarmToHigh = false;
                         logger.debug("{} is too low warning {}", getName(), minWarning);
                     }
-                    readValue.setQuality(AttrQuality.ATTR_WARNING);
+                    returnedValue.setQuality(AttrQuality.ATTR_WARNING);
                     break;
                 }
             }
@@ -378,9 +375,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     private void checkScalarQuality(final AttributeValue returnedValue, final double maxAlarm, final double minAlarm,
             final double maxWarning, final double minWarning, final long deltaTime) {
-        final double valRead = Double.parseDouble(readValue.getValue().toString());
+        final double valRead = Double.parseDouble(returnedValue.getValue().toString());
         checkScalarDeltaAlarm(returnedValue, deltaTime, valRead);
-        if (!readValue.getQuality().equals(AttrQuality.ATTR_ALARM)) {
+        if (!returnedValue.getQuality().equals(AttrQuality.ATTR_ALARM)) {
             if (valRead >= maxAlarm || valRead <= minAlarm) {
                 // check min and max alarm props
                 isOutOfLimits = true;
@@ -391,7 +388,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     isAlarmToHigh = false;
                     logger.debug("{} is too low alarm {}", getName(), minAlarm);
                 }
-                readValue.setQuality(AttrQuality.ATTR_ALARM);
+                returnedValue.setQuality(AttrQuality.ATTR_ALARM);
             } else if (valRead >= maxWarning || valRead <= minWarning) {
                 // check min and max warning props
                 isOutOfLimits = true;
@@ -402,7 +399,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     isAlarmToHigh = false;
                     logger.debug("{} is too low warning {} ", getName(), minWarning);
                 }
-                readValue.setQuality(AttrQuality.ATTR_WARNING);
+                returnedValue.setQuality(AttrQuality.ATTR_WARNING);
             }
         }
     }
@@ -416,7 +413,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             final double valWrite = Double.parseDouble(writeValue.getValue().toString());
             final double diff = Math.abs(valRead - valWrite);
             if (currentDeltaTime > deltaTime && diff > deltaVal) {
-                readValue.setQuality(AttrQuality.ATTR_ALARM);
+                returnedValue.setQuality(AttrQuality.ATTR_ALARM);
                 isDeltaAlarm = true;
                 logger.debug("{} is delta alarm", getName());
             }
@@ -453,8 +450,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 dimY = 1;
             }
             value2D.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY));
-            value2D.setQuality(value.getQuality());
-            // value2D.setTime(value.getTime());
             behavior.setValue(value2D);
 
             if (isMemorized() && getFormat().equals(AttrDataFormat.SCALAR)) {
