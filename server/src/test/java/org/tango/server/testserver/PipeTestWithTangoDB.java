@@ -63,6 +63,8 @@ public class PipeTestWithTangoDB {
                 public void push_event(final EventData evt) {
                     System.out.println("///////Received event " + evt.devicePipe.getPipeName());
                     // super.push_event(evt);
+                    System.out.println(evt.devicePipe.getPipeBlob());
+
                 }
 
             }, new String[0]);
