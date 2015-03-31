@@ -142,6 +142,28 @@ class EventUtilities {
     }
 
     /**
+     * Add 8 bytes at beginning for C++ alignment
+     * 
+     * @param data buffer to be aligned
+     * @return buffer after c++ alignment.
+     */
+    static byte[] cppAlignmentAdd8(final byte[] data) {
+        xlogger.entry();
+        final byte[] buffer = new byte[data.length + 8];
+        buffer[0] = (byte) 0xc0;
+        buffer[1] = (byte) 0xde;
+        buffer[2] = (byte) 0xc0;
+        buffer[3] = (byte) 0xde;
+        buffer[4] = (byte) 0xc0;
+        buffer[5] = (byte) 0xde;
+        buffer[6] = (byte) 0xc0;
+        buffer[7] = (byte) 0xde;
+        System.arraycopy(data, 0, buffer, 8, data.length);
+        xlogger.exit();
+        return buffer;
+    }
+
+    /**
      * Add 4 bytes at beginning for C++ alignment
      * 
      * @param data buffer to be aligned
@@ -279,7 +301,7 @@ class EventUtilities {
         try {
             DevPipeDataHelper.write(os, pipeData);
             xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
+            return cppAlignmentAdd8(os.getBufferCopy());
         } finally {
             os.close();
         }
