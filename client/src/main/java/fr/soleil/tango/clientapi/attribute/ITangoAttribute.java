@@ -99,4 +99,6 @@ public interface ITangoAttribute {
     long getTimestamp() throws DevFailed;
 
     AttrQuality getQuality() throws DevFailed;
+
+    void setTimeout(final int timeout) throws DevFailed;
 }

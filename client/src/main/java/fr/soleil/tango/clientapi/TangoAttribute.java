@@ -465,4 +465,8 @@ public final class TangoAttribute {
         str.append("writeType", attributeImpl.getWriteType().value());
         return str.toString();
     }
+
+    public void setTimeout(final int timeout) throws DevFailed {
+        attributeImpl.setTimeout(timeout);
+    }
 }
