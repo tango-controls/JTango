@@ -52,4 +52,6 @@ public interface ITangoCommand {
     int getArginType() throws DevFailed;
 
     int getArgoutType() throws DevFailed;
+
+    void setTimeout(final int timeout) throws DevFailed;
 }

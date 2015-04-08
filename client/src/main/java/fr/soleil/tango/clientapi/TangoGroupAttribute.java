@@ -215,7 +215,7 @@ public final class TangoGroupAttribute {
         return group.isThrowExceptions();
     }
 
-    public synchronized void setTimeout(final int timeout) {
+    public void setTimeout(final int timeout) {
         group.setTimeout(timeout);
     }
 }
