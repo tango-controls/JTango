@@ -291,4 +291,9 @@ public final class RealCommand implements ITangoCommand {
         return InsertExtractUtils.extract(outData);
     }
 
+    @Override
+    public void setTimeout(final int timeout) throws DevFailed {
+        devProxy.set_timeout_millis(timeout);
+    }
+
 }
