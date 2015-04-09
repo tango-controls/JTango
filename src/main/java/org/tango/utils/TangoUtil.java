@@ -363,6 +363,35 @@ public final class TangoUtil {
     }
 
     /**
+     * Get the list of device names which matches the pattern p
+     * 
+     * @param deviceNamePattern
+     *            The pattern. The wild char is *
+     * @param boolean to get the exported device
+     * @return A list of device names
+     * @throws DevFailed
+     */
+    public static String[] getDevicesForPattern(final String deviceNamePattern, final boolean exported)
+            throws DevFailed {
+        checkNullOrEmptyString(deviceNamePattern);
+        String[] devices;
+        if (exported) {
+            devices = getDevicesForPattern(deviceNamePattern);
+        } else {
+            if (!deviceNamePattern.contains(DEVICE_PATTERN)) {
+                // p is a pure device name
+                devices = new String[1];
+                devices[0] = getfullNameForDevice(deviceNamePattern);
+            } else {
+                // ask the db the list of device matching pattern p
+                final Database db = ApiUtil.get_db_obj();
+                devices = db.get_device_list(deviceNamePattern);
+            }
+        }
+        return devices;
+    }
+
+    /**
      * Return the attribute name part without device name
      * It is able to resolve attribute alias before
      * 
