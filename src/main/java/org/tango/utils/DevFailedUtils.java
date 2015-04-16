@@ -26,7 +26,7 @@ public final class DevFailedUtils {
     }
 
     public static DevFailed newDevFailed(final String msg) {
-        LOGGER.error("{}", msg);
+        LOGGER.error(msg);
         final DevFailed ex = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
         LOGGER.error("", ex);
         return ex;
@@ -34,7 +34,7 @@ public final class DevFailedUtils {
 
     public static void throwDevFailed(final String msg) throws DevFailed {
         final DevFailed e = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
-        LOGGER.error("{}", msg);
+        LOGGER.error(msg);
         LOGGER.error("", e);
         throw e;
     }
