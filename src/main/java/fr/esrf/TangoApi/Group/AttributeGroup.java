@@ -138,7 +138,7 @@ public final class AttributeGroup {
                     readAnswersIDs.put(deviceName, rid);
                 } catch (final DevFailed e) {
                     logger.error("error", e);
-                    logger.error("", DevFailedUtils.toString(e));
+                    logger.error(DevFailedUtils.toString(e));
 
                     for (final String attribute : attributeNames) {
                         errorsMap.put(deviceName + "/" + attribute, e.errors);
@@ -174,7 +174,7 @@ public final class AttributeGroup {
                             }
                         } catch (final DevFailed e) {
                             logger.error("error", e);
-                            logger.error("", DevFailedUtils.toString(e));
+                            logger.error(DevFailedUtils.toString(e));
 
                             for (final String attribute : attributeNames) {
                                 errorsMap.put(deviceName + "/" + attribute, e.errors);
@@ -241,7 +241,7 @@ public final class AttributeGroup {
                     writeAnswersIDs.put(deviceName, answersID);
                 } catch (final DevFailed e) {
                     logger.error("error", e);
-                    logger.error("", DevFailedUtils.toString(e));
+                    logger.error(DevFailedUtils.toString(e));
                     final DevError[] errors = e.errors;
                     final List<String> attributeNames = attributesMap.get(deviceName);
                     for (final String attribute : attributeNames) {
@@ -263,7 +263,7 @@ public final class AttributeGroup {
                             devElement.write_attribute_reply(writeAnswersIDs.get(deviceName), timeout);
                         } catch (final DevFailed e) {
                             logger.error("error", e);
-                            logger.error("", DevFailedUtils.toString(e));
+                            logger.error(DevFailedUtils.toString(e));
 
                             if (e instanceof NamedDevFailedList) {
                                 final NamedDevFailedList list = (NamedDevFailedList) e;
@@ -339,7 +339,7 @@ public final class AttributeGroup {
                     }
                 } catch (final DevFailed e) {
                     logger.error("error", e);
-                    logger.error("", DevFailedUtils.toString(e));
+                    logger.error(DevFailedUtils.toString(e));
                     final DevError[] errors = e.errors;
                     for (final DevError error : errors) {
                         allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
