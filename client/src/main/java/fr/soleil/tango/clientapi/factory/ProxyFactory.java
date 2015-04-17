@@ -9,6 +9,7 @@ import org.tango.utils.TangoUtil;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeProxy;
 import fr.esrf.TangoApi.DeviceProxy;
+import fr.esrf.TangoApi.DeviceProxyFactory;
 import fr.esrf.TangoApi.Group.AttributeGroup;
 import fr.esrf.TangoApi.Group.Group;
 
@@ -68,11 +69,9 @@ public final class ProxyFactory {
         final String fullDeviceName = TangoUtil.getfullNameForDevice(deviceName);
         synchronized (devicesMap) {
             if (!devicesMap.containsKey(fullDeviceName)) {
-                dev = new DeviceProxy(fullDeviceName);
+                dev = DeviceProxyFactory.get(fullDeviceName);
                 try {
-                    if (dev.get_timeout_millis() < timeout) {
-                        dev.set_timeout_millis(timeout);
-                    }
+                    dev.set_timeout_millis(timeout);
                 } catch (final DevFailed e) {
                 }
                 devicesMap.put(fullDeviceName, dev);
