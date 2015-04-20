@@ -75,6 +75,10 @@
 							<value>${env.TANGO_HOST}</value>
 						</property>
 						<property>
+							<name>org.tango.server.checkalarms</name>
+							<value>false</value>
+						</property>
+						<property>
 							<name>logback.configurationFile</name>
 							<value>./src/test/logback.xml</value>
 						</property>
