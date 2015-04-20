@@ -24,7 +24,6 @@
  */
 package org.tango.server.build;
 
-import java.lang.Thread.State;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.DeviceState;
+import org.tango.server.annotation.State;
 import org.tango.server.device.StateImpl;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
@@ -62,42 +62,45 @@ final class StateBuilder {
      * @throws DevFailed
      */
     public void build(final Class<?> clazz, final Field field, final DeviceImpl device, final Object businessObject)
-	    throws DevFailed {
-	xlogger.entry();
-	BuilderUtils.checkStatic(field);
-	Method getter;
-	final String stateName = field.getName();
-	final String getterName = BuilderUtils.GET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ stateName.substring(1);
-	try {
-	    getter = clazz.getMethod(getterName);
-	} catch (final NoSuchMethodException e) {
-	    throw DevFailedUtils.newDevFailed(e);
-	}
-	if (getter.getParameterTypes().length != 0) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
-	}
+            throws DevFailed {
+        xlogger.entry();
+        BuilderUtils.checkStatic(field);
+        Method getter;
+        final String stateName = field.getName();
+        final String getterName = BuilderUtils.GET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + stateName.substring(1);
+        try {
+            getter = clazz.getMethod(getterName);
+        } catch (final NoSuchMethodException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+        if (getter.getParameterTypes().length != 0) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
+        }
 
-	logger.debug("Has an state : {}", field.getName());
-	if (getter.getReturnType() != DeviceState.class && getter.getReturnType() != DevState.class) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
-		    + DeviceState.class.getCanonicalName() + " or " + DevState.class.getCanonicalName());
-	}
-	Method setter;
-	final String setterName = BuilderUtils.SET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ stateName.substring(1);
-	try {
-	    setter = clazz.getMethod(setterName, DeviceState.class);
-	} catch (final NoSuchMethodException e) {
-	    try {
-		setter = clazz.getMethod(setterName, DevState.class);
-	    } catch (final NoSuchMethodException e1) {
-		throw DevFailedUtils.newDevFailed(e1);
-	    }
-	}
-	device.setStateImpl(new StateImpl(businessObject, getter, setter));
-
-	xlogger.exit();
+        logger.debug("Has an state : {}", field.getName());
+        if (getter.getReturnType() != DeviceState.class && getter.getReturnType() != DevState.class) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
+                    + DeviceState.class.getCanonicalName() + " or " + DevState.class.getCanonicalName());
+        }
+        Method setter;
+        final String setterName = BuilderUtils.SET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + stateName.substring(1);
+        try {
+            setter = clazz.getMethod(setterName, DeviceState.class);
+        } catch (final NoSuchMethodException e) {
+            try {
+                setter = clazz.getMethod(setterName, DevState.class);
+            } catch (final NoSuchMethodException e1) {
+                throw DevFailedUtils.newDevFailed(e1);
+            }
+        }
+        device.setStateImpl(new StateImpl(businessObject, getter, setter));
+        final State annot = field.getAnnotation(State.class);
+        if (annot.isPolled()) {
+            device.addAttributePolling(DeviceImpl.STATE_NAME, annot.pollingPeriod());
+        }
+        xlogger.exit();
     }
 
 }

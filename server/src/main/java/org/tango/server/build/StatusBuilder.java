@@ -32,11 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.annotation.Status;
 import org.tango.server.device.StatusImpl;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
-import ch.qos.logback.core.status.Status;
 import fr.esrf.Tango.DevFailed;
 
 /**
@@ -59,37 +59,41 @@ final class StatusBuilder {
      * @throws DevFailed
      */
     public void build(final Class<?> clazz, final Field field, final DeviceImpl device, final Object businessObject)
-	    throws DevFailed {
-	xlogger.entry();
-	BuilderUtils.checkStatic(field);
-	Method getter;
-	final String stateName = field.getName();
-	final String getterName = BuilderUtils.GET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ stateName.substring(1);
-	try {
-	    getter = clazz.getMethod(getterName);
-	} catch (final NoSuchMethodException e) {
-	    throw DevFailedUtils.newDevFailed(e);
-	}
-	if (getter.getParameterTypes().length != 0) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
-	}
+            throws DevFailed {
+        xlogger.entry();
+        BuilderUtils.checkStatic(field);
+        Method getter;
+        final String stateName = field.getName();
+        final String getterName = BuilderUtils.GET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + stateName.substring(1);
+        try {
+            getter = clazz.getMethod(getterName);
+        } catch (final NoSuchMethodException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+        if (getter.getParameterTypes().length != 0) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
+        }
 
-	logger.debug("Has an status : {}", field.getName());
-	if (getter.getReturnType() != String.class) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
-		    + String.class);
-	}
-	Method setter;
-	final String setterName = BuilderUtils.SET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-		+ stateName.substring(1);
-	try {
-	    setter = clazz.getMethod(setterName, String.class);
-	} catch (final NoSuchMethodException e) {
-	    throw DevFailedUtils.newDevFailed(e);
-	}
-	device.setStatusImpl(new StatusImpl(businessObject, getter, setter));
-	xlogger.exit();
+        logger.debug("Has an status : {}", field.getName());
+        if (getter.getReturnType() != String.class) {
+            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
+                    + String.class);
+        }
+        Method setter;
+        final String setterName = BuilderUtils.SET + stateName.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                + stateName.substring(1);
+        try {
+            setter = clazz.getMethod(setterName, String.class);
+        } catch (final NoSuchMethodException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+        device.setStatusImpl(new StatusImpl(businessObject, getter, setter));
+        final Status annot = field.getAnnotation(Status.class);
+        if (annot.isPolled()) {
+            device.addAttributePolling(DeviceImpl.STATUS_NAME, annot.pollingPeriod());
+        }
+        xlogger.exit();
     }
 
 }

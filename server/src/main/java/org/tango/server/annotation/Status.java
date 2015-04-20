@@ -53,4 +53,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Status {
 
+    /**
+     * define if attribute is polled. period must be configured. see {@link Attribute#pollingPeriod()}
+     * 
+     * @return is polled
+     */
+    boolean isPolled() default false;
+
+    /**
+     * Configure polling period in ms. use only is {@link Attribute#isPolled()} is true
+     * 
+     * @return polling period
+     */
+    int pollingPeriod() default 0;
+
 }

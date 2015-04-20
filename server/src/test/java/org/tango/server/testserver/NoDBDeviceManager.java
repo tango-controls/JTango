@@ -48,6 +48,7 @@ public class NoDBDeviceManager {
 
     @BeforeClass
     public static void startDevice() throws DevFailed, IOException {
+        System.setProperty("org.tango.server.checkalarms", "false");
         ServerSocket ss1 = null;
         try {
             ss1 = new ServerSocket(0);

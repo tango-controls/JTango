@@ -66,9 +66,9 @@ public final class StateImpl {
      * @param setStateMethod
      */
     public StateImpl(final Object businessObject, final Method getStateMethod, final Method setStateMethod) {
-	this.businessObject = businessObject;
-	this.getStateMethod = getStateMethod;
-	this.setStateMethod = setStateMethod;
+        this.businessObject = businessObject;
+        this.getStateMethod = getStateMethod;
+        this.setStateMethod = setStateMethod;
     }
 
     /**
@@ -77,7 +77,7 @@ public final class StateImpl {
      * @return true if a default state
      */
     public boolean isDefaultState() {
-	return getStateMethod == null;
+        return getStateMethod == null;
     }
 
     /**
@@ -87,43 +87,44 @@ public final class StateImpl {
      * @throws DevFailed
      */
     public DevState updateState() throws DevFailed {
-	xlogger.entry();
-	Object getState;
-	if (getStateMethod != null) {
-	    try {
-		getState = getStateMethod.invoke(businessObject);
-		if (getState != null) {
-		    if (getState instanceof DeviceState) {
-			state = ((DeviceState) getState).getDevState();
-		    } else {
-			state = (DevState) getState;
-		    }
-		}
-	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
-	    } catch (final InvocationTargetException e) {
-		if (e.getCause() instanceof DevFailed) {
-		    throw (DevFailed) e.getCause();
-		} else {
-		    DevFailedUtils.throwDevFailed(e.getCause());
-		}
-	    }
-	}
-	if (!attributeAlarm.isEmpty()) {
-	    state = DevState.ALARM;
-	}
-	xlogger.exit();
-	return state;
+        xlogger.entry();
+        Object getState;
+        if (getStateMethod != null) {
+            try {
+                getState = getStateMethod.invoke(businessObject);
+                if (getState != null) {
+                    if (getState instanceof DeviceState) {
+                        state = ((DeviceState) getState).getDevState();
+                    } else {
+                        state = (DevState) getState;
+                    }
+                }
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                if (e.getCause() instanceof DevFailed) {
+                    throw (DevFailed) e.getCause();
+                } else {
+                    DevFailedUtils.throwDevFailed(e.getCause());
+                }
+            }
+        }
+//	if (!attributeAlarm.isEmpty()) {
+//	    state = DevState.ALARM;
+//	}
+        xlogger.exit();
+        return state;
     }
 
     public void addAttributeAlarm(final String attributeName) {
-	attributeAlarm.add(attributeName);
+        attributeAlarm.add(attributeName);
+        state = DevState.ALARM;
     }
 
     public void removeAttributeAlarm(final String attributeName) {
-	attributeAlarm.remove(attributeName);
+        attributeAlarm.remove(attributeName);
     }
 
     /**
@@ -133,42 +134,42 @@ public final class StateImpl {
      * @throws DevFailed
      */
     public synchronized void stateMachine(final DeviceState state) throws DevFailed {
-	if (state != null) {
-	    this.state = state.getDevState();
-	    if (setStateMethod != null) {
-		logger.debug("Changing state to {}", state);
-		try {
-		    if (setStateMethod.getParameterTypes()[0].equals(DeviceState.class)) {
-			setStateMethod.invoke(businessObject, state);
-		    } else {
-			setStateMethod.invoke(businessObject, this.state);
-		    }
-		} catch (final IllegalArgumentException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		} catch (final IllegalAccessException e) {
-		    DevFailedUtils.throwDevFailed(e);
-		} catch (final InvocationTargetException e) {
-		    if (e.getCause() instanceof DevFailed) {
-			throw (DevFailed) e.getCause();
-		    } else {
-			DevFailedUtils.throwDevFailed(e.getCause());
-		    }
-		}
-	    }
-	}
+        if (state != null) {
+            this.state = state.getDevState();
+            if (setStateMethod != null) {
+                logger.debug("Changing state to {}", state);
+                try {
+                    if (setStateMethod.getParameterTypes()[0].equals(DeviceState.class)) {
+                        setStateMethod.invoke(businessObject, state);
+                    } else {
+                        setStateMethod.invoke(businessObject, this.state);
+                    }
+                } catch (final IllegalArgumentException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                } catch (final IllegalAccessException e) {
+                    DevFailedUtils.throwDevFailed(e);
+                } catch (final InvocationTargetException e) {
+                    if (e.getCause() instanceof DevFailed) {
+                        throw (DevFailed) e.getCause();
+                    } else {
+                        DevFailedUtils.throwDevFailed(e.getCause());
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	builder.append("getStateMethod", getStateMethod);
-	builder.append("setStateMethod", setStateMethod);
-	builder.append("device class", businessObject.getClass());
-	return builder.toString();
+        final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        builder.append("getStateMethod", getStateMethod);
+        builder.append("setStateMethod", setStateMethod);
+        builder.append("device class", businessObject.getClass());
+        return builder.toString();
     }
 
     public DevState getState() {
-	return state;
+        return state;
     }
 
 }

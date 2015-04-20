@@ -54,4 +54,17 @@ import org.tango.DeviceState;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface State {
+    /**
+     * define if attribute is polled. period must be configured. see {@link Attribute#pollingPeriod()}
+     * 
+     * @return is polled
+     */
+    boolean isPolled() default false;
+
+    /**
+     * Configure polling period in ms. use only is {@link Attribute#isPolled()} is true
+     * 
+     * @return polling period
+     */
+    int pollingPeriod() default 0;
 }
