@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tango.client.database.DatabaseFactory;
@@ -50,6 +51,16 @@ public class AlarmTest extends NoDBDeviceManager {
         final String propName = "StateCheckAttrAlarm";
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { "true" });
+        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        new DeviceProxy(deviceName).command_inout("Init");
+    }
+
+    @AfterClass
+    public static void after() throws DevFailed {
+        final ITangoDB db = DatabaseFactory.getDatabase();
+        final String propName = "StateCheckAttrAlarm";
+        final Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put(propName, new String[] { "false" });
         db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
         new DeviceProxy(deviceName).command_inout("Init");
     }
