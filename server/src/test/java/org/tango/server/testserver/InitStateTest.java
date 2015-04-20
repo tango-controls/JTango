@@ -60,7 +60,7 @@ public class InitStateTest extends NoDBDeviceManager {
         tangoCommand.execute();
         final TangoCommand tangoCommand2 = new TangoCommand(deviceName + "/State");
         final Object state = tangoCommand2.executeExtract(null);
-        assertThat(DevState.FAULT, equalTo(state));
+        assertThat((DevState) state, equalTo(DevState.FAULT));
     }
 
     @Test
