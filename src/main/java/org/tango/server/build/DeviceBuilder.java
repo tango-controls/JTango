@@ -74,7 +74,7 @@ public final class DeviceBuilder {
     private Object businessObject;
 
     DeviceBuilder(final Class<?> clazz, final String className, final String name) {
-       this.clazz = clazz;
+        this.clazz = clazz;
         this.className = className;
         this.name = name;
 
@@ -107,7 +107,7 @@ public final class DeviceBuilder {
             createBusinessObjectAttrCmd(deviceImplScanner, true);
 
             final ReflectionScanner boScanner = new ReflectionScanner(clazz);
-            createBusinessObjectState(boScanner);
+
             createBusinessObjectFields(boScanner);
             createBusinessObjectAttrField(boScanner, false);
             createBusinessObjectAttrCmd(boScanner, false);
@@ -116,6 +116,7 @@ public final class DeviceBuilder {
             createBusinessObjectDeviceProperties(boScanner);
             createBusinessObjectProps(boScanner);
             createBusinessObjectPipes(boScanner);
+            createBusinessObjectState(boScanner);
 
         } catch (final InstantiationException e) {
             DevFailedUtils.throwDevFailed(e);
@@ -136,9 +137,10 @@ public final class DeviceBuilder {
             createBusinessObjectAttrField(superClassScanner, false);
             createBusinessObjectProps(superClassScanner);
             createBusinessObjectFields(superClassScanner);
-            createBusinessObjectState(superClassScanner);
+
             createBusinessObjectInitDelete(superClassScanner);
             createBusinessObjectPipes(superClassScanner);
+            createBusinessObjectState(superClassScanner);
             superDeviceClass = superDeviceClass.getSuperclass();
         }
     }
@@ -148,7 +150,7 @@ public final class DeviceBuilder {
 
         // Command
         final Set<Method> cmds = scanner.getMethodsAnnotatedWith(Command.class);
-       if (cmds != null) {
+        if (cmds != null) {
             final CommandBuilder cmd = new CommandBuilder();
             for (final Method method : cmds) {
                 cmd.build(device, businessObject, method, isOnDeviceImpl);
@@ -156,7 +158,7 @@ public final class DeviceBuilder {
         }
         // Attribute
         final Set<Method> attrs = scanner.getMethodsAnnotatedWith(Attribute.class);
-       if (attrs != null) {
+        if (attrs != null) {
             final AttributeMethodBuilder attr = new AttributeMethodBuilder();
             for (final Method method : attrs) {
                 attr.build(device, businessObject, method, isOnDeviceImpl);

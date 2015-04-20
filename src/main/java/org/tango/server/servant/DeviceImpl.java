@@ -1612,8 +1612,6 @@ public final class DeviceImpl extends Device_5POA {
             }
         }
         xlogger.exit();
-
-        System.out.println("OUT command");
         return argout;
     }
 
@@ -1722,10 +1720,10 @@ public final class DeviceImpl extends Device_5POA {
             logger.debug("execute command {} from DEVICE", cmd.getName());
             final Object lock = deviceLock.getCommandLock();
             synchronized (lock != null ? lock : new Object()) {
-            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
-            final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
-            ret = cmd.execute(input);
-            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
+                final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
+                ret = cmd.execute(input);
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
             }
         }
         stateImpl.stateMachine(cmd.getEndState());
@@ -2323,11 +2321,11 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
-            // read all attributes to check alarms
-            if (stateCheckAttrAlarm) {
+            state = stateImpl.updateState();
+            // read all attributes to check alarms only if on
+            if (state == DevState.ON && stateCheckAttrAlarm) {
                 checkAlarms();
             }
-            state = stateImpl.updateState();
         } else {
             state = stateImpl.getState();
         }
@@ -2347,16 +2345,16 @@ public final class DeviceImpl extends Device_5POA {
                             attr.updateValue();
                         }
                     }
-
                 }
-
             } catch (final DevFailed e) {
             }
             if (attr.isOutOfLimits()) {
                 // update device state and status with alarm
+                logger.debug("{} is out of limits", attr.getName());
                 stateImpl.addAttributeAlarm(attr.getName());
                 statusImpl.addAttributeAlarm(attr.getName(), attr.isAlarmToHigh());
             } else if (attr.isDeltaAlarm()) {
+                logger.debug("{} has a delta alarm", attr.getName());
                 // update device state and status with alarm
                 stateImpl.addAttributeAlarm(attr.getName());
                 statusImpl.addDeltaAttributeAlarm(attr.getName());
@@ -2365,6 +2363,7 @@ public final class DeviceImpl extends Device_5POA {
                 stateImpl.removeAttributeAlarm(attr.getName());
             }
         }
+        state = stateImpl.getState();
     }
 
     /**
