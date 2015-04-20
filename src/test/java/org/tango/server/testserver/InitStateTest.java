@@ -51,7 +51,7 @@ public class InitStateTest extends NoDBDeviceManager {
     public void testInitState() throws DevFailed {
         final TangoCommand tangoCommand = new TangoCommand(deviceName, "Status");
         final Object status = tangoCommand.executeExtract(null);
-        assertThat("hello", equalTo(status));
+        assertThat(status.toString(), equalTo("hello"));
     }
 
     @Test
