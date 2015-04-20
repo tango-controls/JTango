@@ -134,6 +134,10 @@ public final class DeviceImpl extends Device_5POA {
     private static final String READ_ASKED_FOR_0_ATTRIBUTES = "read asked for 0 attributes";
     private static final String READ_ERROR = "READ_ERROR";
     /**
+     * Retrieve the default value from a system property. {@link stateCheckAttrAlarm}
+     */
+    private static final String STATE_CHECK_ALARMS_DEFAULT = System.getProperty("org.tango.server.checkalarms", "true");
+    /**
      * TANGO system version
      */
     public static final int SERVER_VERSION = 5;
@@ -245,6 +249,9 @@ public final class DeviceImpl extends Device_5POA {
      * Manage lazy init
      */
     private final AtomicBoolean isCorrectlyInit = new AtomicBoolean(false);
+    /**
+     * Check all attributes alarms while get state of the device
+     */
     private boolean stateCheckAttrAlarm = false;
     /**
      * client info of lastest command. Used for locking device from client
@@ -296,7 +303,6 @@ public final class DeviceImpl extends Device_5POA {
         deviceLock = new DeviceLocker(txType, businessObject.getClass());
 
         this.businessObject = businessObject;
-        stateCheckAttrAlarm = false;
         if (CLIENT_LOCKING_MAP.containsKey(deviceName)) {
             clientLocking = CLIENT_LOCKING_MAP.get(deviceName);
             clientLocking.init();
@@ -306,11 +312,12 @@ public final class DeviceImpl extends Device_5POA {
         }
         // add default device properties
         try {
+
             final DevicePropertyImpl property = new DevicePropertyImpl(
                     "StateCheckAttrAlarm",
                     "boolean. If true, all attributes will be read at each state/status request to check if alarm is present",
                     this.getClass().getMethod("setStateCheckAttrAlarm", boolean.class), this, name, className, false,
-                    "false");
+                    STATE_CHECK_ALARMS_DEFAULT);
             addDeviceProperty(property);
             final DevicePropertyImpl property2 = new DevicePropertyImpl("cmd_min_poll_period",
                     "min poll value for commands", this.getClass().getMethod("setMinCommandPolling", String[].class),
@@ -1095,7 +1102,6 @@ public final class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
             throws DevFailed {
-
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(names));
 //        final Profiler profiler = new Profiler("read time");
@@ -1606,6 +1612,8 @@ public final class DeviceImpl extends Device_5POA {
             }
         }
         xlogger.exit();
+
+        System.out.println("OUT command");
         return argout;
     }
 
@@ -1714,10 +1722,10 @@ public final class DeviceImpl extends Device_5POA {
             logger.debug("execute command {} from DEVICE", cmd.getName());
             final Object lock = deviceLock.getCommandLock();
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
-                final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
-                ret = cmd.execute(input);
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
+            final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
+            ret = cmd.execute(input);
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
             }
         }
         stateImpl.stateMachine(cmd.getEndState());
