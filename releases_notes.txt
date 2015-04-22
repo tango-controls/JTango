@@ -1,3 +1,9 @@
+9.0.1
+-----
+- http://sourceforge.net/p/tango-cs/bugs/693: calculated quality from alarms accessible from device code. 
+- http://sourceforge.net/p/tango-cs/bugs/691: alarm state calculated only if state is ON. Add system property org.tango.server.checkalarms 
+to set device property StateCheckAttrAlarm default value.
+
 9.0.0
 -----
 - Add all Tango 9 features: pipes, attribute of type devenum, forwarded attributes, event interface changed
