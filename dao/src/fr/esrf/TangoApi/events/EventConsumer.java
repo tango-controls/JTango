@@ -250,18 +250,20 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
         String deviceName = device.fullName();
         String callback_key = deviceName.toLowerCase();
-        if (device.get_idl_version()>=5) {
-            if (event_name.equals("intr_change"))   //  No IDL for insterface change
-                callback_key += "." + event_name;
-            else
-            if (event_name.equals("pipe")) //    No IDL for pipe
-                callback_key += "/" + attribute + "." + event_name;
-            else
-                callback_key += "/" + attribute + ".idl" + device.get_idl_version()+ "_" + event_name;
-        }
-        else
-            callback_key += "/" + attribute + "." + event_name;
         try {
+            //  Check idl version
+            if (device.get_idl_version()>=5) {
+                if (event_name.equals("intr_change"))   //  No IDL for interface change
+                    callback_key += "." + event_name;
+                else
+                if (event_name.equals("pipe")) //    No IDL for pipe
+                    callback_key += "/" + attribute + "." + event_name;
+                else
+                    callback_key += "/" + attribute + ".idl" + device.get_idl_version()+ "_" + event_name;
+            }
+            else
+                callback_key += "/" + attribute + "." + event_name;
+
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
             String  att = (attribute==null)? null : attribute.toLowerCase();
