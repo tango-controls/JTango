@@ -8,7 +8,7 @@
     <version>1.0.2</version>
   </parent>
   <artifactId>JTangoClientLang</artifactId>
-  <version>9.0.2-SNAPSHOT</version>
+  <version>9.0.2</version>
   <name>JTango Client Lang</name>
   <description>Tango client utilities</description>
   <developers>
