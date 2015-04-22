@@ -156,7 +156,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>9.0.1</version>
+			<version>9.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
