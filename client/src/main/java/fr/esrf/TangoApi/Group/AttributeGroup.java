@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -91,8 +92,10 @@ public final class AttributeGroup {
         devices = new DeviceProxy[attributes.length];
         int i = 0;
         for (final String attributeName : attributes) {
-            final String deviceName = TangoUtil.getfullDeviceNameForAttribute(attributeName);
-            final String fullAttribute = TangoUtil.getfullAttributeNameForAttribute(attributeName);
+            final String deviceName = TangoUtil.getfullDeviceNameForAttribute(attributeName)
+                    .toLowerCase(Locale.ENGLISH);
+            final String fullAttribute = TangoUtil.getfullAttributeNameForAttribute(attributeName).toLowerCase(
+                    Locale.ENGLISH);
             userAttributesNames[i] = fullAttribute;
             try {
                 final DeviceProxy device = ProxyFactory.getInstance().createDeviceProxy(deviceName);
