@@ -63,15 +63,27 @@ public class ForwardedAttribute implements IAttributeBehavior {
     private String localLabel;
     private String remoteLabel;
 
+    /**
+     * Create a forwarded attribute.
+     * 
+     * @param fullRootAttributeName The default value of the root attribute. May be overriden by __root_attr attribute
+     *            property
+     * @param attributeName The name of the fowarded attribute
+     * @param defaultLabel Its default label
+     * @throws DevFailed if creation failed
+     */
     public ForwardedAttribute(final String fullRootAttributeName, final String attributeName, final String defaultLabel)
             throws DevFailed {
         this.attributeName = attributeName;
         this.fullRootAttributeName = fullRootAttributeName;
-        rootAttributeName = TangoUtil.getAttributeName(fullRootAttributeName);
         this.localLabel = defaultLabel;
     }
 
-    void init() throws DevFailed {
+    public void init() throws DevFailed {
+        if (fullRootAttributeName == null || fullRootAttributeName.isEmpty()) {
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.FWD_MISSING_ROOT, "root attribute name is empty");
+        }
+        rootAttributeName = TangoUtil.getAttributeName(fullRootAttributeName);
         proxy = new TangoAttribute(fullRootAttributeName);
         if (proxy.getAttributeProxy().get_idl_version() != DeviceImpl.SERVER_VERSION) {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.FWD_TOO_OLD_ROOT_DEVICE,
@@ -81,7 +93,7 @@ public class ForwardedAttribute implements IAttributeBehavior {
 
     }
 
-    void init(final String rootAttributeProperty) throws DevFailed {
+    public void init(final String rootAttributeProperty) throws DevFailed {
         this.fullRootAttributeName = rootAttributeProperty;
         rootAttributeName = TangoUtil.getAttributeName(fullRootAttributeName);
         proxy = new TangoAttribute(rootAttributeProperty);
@@ -138,14 +150,10 @@ public class ForwardedAttribute implements IAttributeBehavior {
         info.name = rootAttributeName;
         localLabel = info.label;
         info.label = remoteLabel;
-//        System.out
-//                .println("set properties " + ToStringBuilder.reflectionToString(info, ToStringStyle.MULTI_LINE_STYLE));
         proxy.getAttributeProxy().set_info(new AttributeInfoEx[] { info });
     }
 
     AttributePropertiesImpl getProperties() throws DevFailed {
-//        System.out.println("get properties "
-//                + ToStringBuilder.reflectionToString(props, ToStringStyle.MULTI_LINE_STYLE));
         return getConfiguration().getAttributeProperties();
     }
 
@@ -166,7 +174,6 @@ public class ForwardedAttribute implements IAttributeBehavior {
 
     public void subscribe(final EventType eventType) throws DevFailed {
         logger.info("fowarded attribute {} event subscribe {}", attributeName, eventType);
-        // subscribe to change event
         @SuppressWarnings("serial")
         final CallBack callback = new CallBack() {
             @Override
@@ -187,7 +194,6 @@ public class ForwardedAttribute implements IAttributeBehavior {
                                 break;
                             case ATT_CONF_EVENT:
                                 EventManager.getInstance().pushAttributeConfigEvent(deviceName, attributeName);
-                                // proxy.getAttributeProxy().set_info(new AttributeInfoEx[] { evt.attr_config });
                                 break;
                             case DATA_READY_EVENT:
                                 EventManager.getInstance().pushAttributeDataReadyEvent(deviceName, attributeName,
