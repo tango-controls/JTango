@@ -35,6 +35,7 @@ import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.server.command.CommandImpl;
@@ -91,11 +92,26 @@ public final class DynamicManager {
     public void addAttribute(final IAttributeBehavior behavior) throws DevFailed {
         xlogger.entry("adding dynamic attribute {}", behavior.getConfiguration().getName());
         if (behavior instanceof ForwardedAttribute) {
-            // check if this attribute is already created
+            // init attribute with either the attribute property value, or the value defined in its constructor
             final ForwardedAttribute att = (ForwardedAttribute) behavior;
+            final String attributeName = behavior.getConfiguration().getName();
+            final String deviceName = deviceImpl.getName();
+            final String rootAttributeName = behavior.getConfiguration().getAttributeProperties()
+                    .loadAttributeRootName(deviceName, attributeName);
+            if (rootAttributeName == null || rootAttributeName.isEmpty()
+                    || rootAttributeName.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
+                att.init();
+                // persist root attribute name in tango db
+                behavior.getConfiguration().getAttributeProperties()
+                        .persistAttributeRootName(deviceName, attributeName);
+            } else {
+                // use attribute property
+                att.init(rootAttributeName);
+            }
+            // check if this attribute is already created
             final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
             if (forwardedAttributes.contains(lower)) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.FWD_DOUBLE_USED,
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.FWD_DOUBLE_USED,
                         "root attribute already used in this device");
             } else {
                 forwardedAttributes.add(lower);
