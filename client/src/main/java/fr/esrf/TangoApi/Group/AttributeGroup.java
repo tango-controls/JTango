@@ -77,7 +77,7 @@ public final class AttributeGroup {
     }
 
     public DeviceProxy getDevice(final String attributeName) throws DevFailed {
-        return devicesMap.get(TangoUtil.getfullDeviceNameForAttribute(attributeName));
+        return devicesMap.get(TangoUtil.getfullDeviceNameForAttribute(attributeName).toLowerCase(Locale.ENGLISH));
     }
 
     /**
@@ -367,7 +367,7 @@ public final class AttributeGroup {
     }
 
     public DeviceProxy getDeviceProxy(final String attributeName) {
-        return devicesMap.get(attributeName);
+        return devicesMap.get(attributeName.toLowerCase(Locale.ENGLISH));
     }
 
     public synchronized String[] getAttributeNames() {
