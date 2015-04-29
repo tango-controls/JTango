@@ -157,7 +157,6 @@ public final class AttributePropertiesImpl {
         enumLabels = Arrays.copyOf(props.enumLabels, props.enumLabels.length);
         isEnumMutable = props.isEnumMutable;
         isFwdAttribute = props.isFwdAttribute;
-
     }
 
     public EventProperties createEmptyEventProperties() {
@@ -669,13 +668,13 @@ public final class AttributePropertiesImpl {
         }
     }
 
-    String loadAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
+    public String loadAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
         final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
         setRootAttribute(attributePropertiesManager.getAttributePropertyFromDB(attributeName, ROOT_ATTRIBUTE));
         return getRootAttribute();
     }
 
-    void persistAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
+    public void persistAttributeRootName(final String deviceName, final String attributeName) throws DevFailed {
         new AttributePropertiesManager(deviceName).setAttributePropertyInDB(attributeName, ROOT_ATTRIBUTE,
                 getRootAttribute());
     }

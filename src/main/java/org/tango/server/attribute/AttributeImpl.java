@@ -96,22 +96,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         this.deviceName = deviceName;
         this.attributePropertiesManager = new AttributePropertiesManager(deviceName);
         isFwdAttribute = behavior instanceof ForwardedAttribute;
-        if (isFwdAttribute) {
-            // init attribute with either the attribute property value, or the value defined in its constructor
-            final ForwardedAttribute att = (ForwardedAttribute) behavior;
-            final String rootAttributeName = behavior.getConfiguration().getAttributeProperties()
-                    .loadAttributeRootName(deviceName, name);
-            if (rootAttributeName.isEmpty()
-                    || rootAttributeName.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
-                att.init();
-                // persist root attribute name in tango db
-                behavior.getConfiguration().getAttributeProperties().persistAttributeRootName(deviceName, name);
-            } else {
-                // use attribute property
-                att.init(rootAttributeName);
-            }
-        }
-        // get config only when fwd attribute is initialized
         config = behavior.getConfiguration();
         this.behavior = behavior;
 
