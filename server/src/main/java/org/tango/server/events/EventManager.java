@@ -473,7 +473,7 @@ public final class EventManager {
     }
 
     /**
-     * update attribute value and fire event without check
+     * fire event without check
      * 
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
@@ -486,7 +486,6 @@ public final class EventManager {
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.updateAttributeValue();
             eventImpl.forcePushEvent(eventSocket, fullName);
         }
         xlogger.exit();
@@ -526,6 +525,7 @@ public final class EventManager {
         xlogger.entry();
         final String fullName = EventUtilities.buildDeviceEventName(deviceName, EventType.INTERFACE_CHANGE_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
+        System.out.println("pushInterfaceChangedEvent " + eventImpl + " -" + fullName);
         if (eventImpl != null) {
             eventImpl.pushInterfaceChangeEvent(eventSocket, fullName, deviceInterface);
         }

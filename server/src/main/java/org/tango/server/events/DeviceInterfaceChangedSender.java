@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.server.Constants;
+import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -91,18 +93,21 @@ public class DeviceInterfaceChangedSender {
     }
 
     public synchronized void pushEvent(final DevIntrChange deviceInterface, final boolean isStarted) {
-        logger.debug("request for interface changed of {} queued", deviceName);
-        if (isStarted) {
-            // device startup, send event and empty queue
-            try {
-                EventManager.getInstance().pushInterfaceChangedEvent(deviceName, deviceInterface);
-            } catch (final DevFailed e) {
-                logger.error(DevFailedUtils.toString(e));
-                logger.error("impossible to send event", e);
+        if (isStarted) { // device startup, send event and empty queue
+            if (!deviceName.equalsIgnoreCase(Constants.ADMIN_DEVICE_DOMAIN + "/"
+                    + ServerManager.getInstance().getServerName())) {
+                logger.debug("send event for interface changed of {}", deviceName);
+                try {
+                    EventManager.getInstance().pushInterfaceChangedEvent(deviceName, deviceInterface);
+                } catch (final DevFailed e) {
+                    logger.error(DevFailedUtils.toString(e));
+                    logger.error("impossible to send event", e);
+                }
+                task.clear();
             }
-            task.clear();
         } else {
             // queue event
+            logger.debug("request for interface changed of {} queued", deviceName);
             task.add(deviceInterface);
             if (future == null && EventManager.getInstance().hasSubscriber(deviceName)) {
                 future = executor.submit(task);
