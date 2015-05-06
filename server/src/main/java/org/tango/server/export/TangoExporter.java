@@ -111,10 +111,10 @@ public final class TangoExporter implements IExporter {
             // export all its devices
             final String[] deviceList = DatabaseFactory.getDatabase().getDeviceList(serverName, tangoClass);
             logger.debug("devices found  {}", Arrays.toString(deviceList));
-            if (deviceList.length == 0) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
-                        + tangoClass);
-            }
+//            if (deviceList.length == 0) {
+//                DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
+//                        + tangoClass);
+//            }
             for (final String deviceName : deviceList) {
                 buildDevice(deviceName, deviceClassBuilder);
             }
