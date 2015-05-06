@@ -104,13 +104,13 @@ public final class DynamicManager {
                     .loadAttributeRootName(deviceName, attributeName);
             if (rootAttributeName == null || rootAttributeName.isEmpty()
                     || rootAttributeName.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
-                att.init();
+                att.init(deviceName);
                 // persist root attribute name in tango db
                 behavior.getConfiguration().getAttributeProperties()
                         .persistAttributeRootName(deviceName, attributeName);
             } else {
                 // use attribute property
-                att.init(rootAttributeName);
+                att.init(deviceName, rootAttributeName);
             }
             // check if this attribute is already created
             final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
