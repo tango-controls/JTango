@@ -122,8 +122,11 @@ public class ForwardedAttribute implements IAttributeBehavior {
 
     @Override
     public AttributeValue getValue() throws DevFailed {
-        // not used
-        return null;
+        final AttributeValue readValue = new AttributeValue();
+        readValue.setValue(proxy.read());
+        readValue.setQuality(proxy.getDeviceAttribute().getQuality());
+        readValue.setTime(proxy.getTimestamp());
+        return readValue;
     }
 
     public AttributeValue_5 getValue5() throws DevFailed {

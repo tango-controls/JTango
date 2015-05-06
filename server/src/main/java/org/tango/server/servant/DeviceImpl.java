@@ -2345,7 +2345,7 @@ public final class DeviceImpl extends Device_5POA {
             try {
                 if (!attr.getName().equals(STATE_NAME) && !attr.getName().equals(STATUS_NAME)) {
                     synchronized (attr) {
-                        if (!attr.isPolled()) {
+                        if (!attr.isPolled() && !attr.isFwdAttribute()) {
                             // refresh value only if not polled
                             attr.updateValue();
                         }
@@ -2353,6 +2353,7 @@ public final class DeviceImpl extends Device_5POA {
                 }
             } catch (final DevFailed e) {
             }
+
             if (attr.isOutOfLimits()) {
                 // update device state and status with alarm
                 logger.debug("{} is out of limits", attr.getName());
