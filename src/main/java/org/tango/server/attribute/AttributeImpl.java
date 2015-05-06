@@ -202,7 +202,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         }
         // update quality if necessary
         if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
-            updateQuality(inValue);
+            
+                updateQuality(inValue);
+            
         }
         try {
             // copy value
@@ -289,6 +291,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 && props.getDeltaT().equals(AttributePropertiesImpl.NOT_SPECIFIED);
         if (!config.getWritable().equals(AttrWriteType.WRITE) && isNumber() && !isAlarmNotConfigured) {
             final double maxAlarm = props.getMaxAlarmDouble();
+
             final double minAlarm = props.getMinAlarmDouble();
             final double maxWarning = props.getMaxWarningDouble();
             final double minWarning = props.getMinWarningDouble();
@@ -391,7 +394,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void checkScalarDeltaAlarm(final AttributeValue returnedValue, final long deltaTime, final double valRead) {
         if (writtenTimestamp != 0 && deltaTime != 0) {
             // check difference between set value and actual value
-
             final double deltaVal = Math.abs(config.getAttributeProperties().getDeltaValDouble());
             final long currentDeltaTime = returnedValue.getTime() - writtenTimestamp;
             final double valWrite = Double.parseDouble(writeValue.getValue().toString());
@@ -755,5 +757,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         this.executionDuration = executionDuration;
         this.lastUpdateTime = lastUpdateTime;
         this.deltaTime = deltaTime;
+    }
+
+    public boolean isFwdAttribute() {
+        return isFwdAttribute;
     }
 }

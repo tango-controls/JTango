@@ -96,8 +96,9 @@ public final class StatusImpl {
                 }
             }
         } else {
-            if (status.isEmpty())
+            if (status.isEmpty()) {
                 status = "The device is in " + state + " state.";
+            }
         }
         StringBuilder statusAlarm = new StringBuilder();
         for (final String string : attributeAlarm.values()) {
