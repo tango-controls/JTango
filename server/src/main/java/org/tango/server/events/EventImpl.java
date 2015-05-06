@@ -116,10 +116,6 @@ final class EventImpl {
         return dt < EventConstants.EVENT_RESUBSCRIBE_PERIOD;
     }
 
-    void updateAttributeValue() throws DevFailed {
-        attribute.updateValue();
-    }
-
     /**
      * Fire an event containing a value.
      * 
