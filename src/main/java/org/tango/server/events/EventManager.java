@@ -525,7 +525,6 @@ public final class EventManager {
         xlogger.entry();
         final String fullName = EventUtilities.buildDeviceEventName(deviceName, EventType.INTERFACE_CHANGE_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
-        System.out.println("pushInterfaceChangedEvent " + eventImpl + " -" + fullName);
         if (eventImpl != null) {
             eventImpl.pushInterfaceChangeEvent(eventSocket, fullName, deviceInterface);
         }
