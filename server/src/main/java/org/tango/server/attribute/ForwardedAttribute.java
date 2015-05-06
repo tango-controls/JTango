@@ -26,7 +26,6 @@ package org.tango.server.attribute;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.StateMachineBehavior;
 import org.tango.server.dynamic.attribute.TangoConverter;
@@ -62,6 +61,7 @@ public class ForwardedAttribute implements IAttributeBehavior {
     private final String attributeName;
     private String localLabel;
     private String remoteLabel;
+    private String deviceName;
 
     /**
      * Create a forwarded attribute.
@@ -79,10 +79,11 @@ public class ForwardedAttribute implements IAttributeBehavior {
         this.localLabel = defaultLabel;
     }
 
-    public void init() throws DevFailed {
+    public void init(final String deviceName) throws DevFailed {
         if (fullRootAttributeName == null || fullRootAttributeName.isEmpty()) {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.FWD_MISSING_ROOT, "root attribute name is empty");
         }
+        this.deviceName = deviceName;
         rootAttributeName = TangoUtil.getAttributeName(fullRootAttributeName);
         proxy = new TangoAttribute(fullRootAttributeName);
         if (proxy.getAttributeProxy().get_idl_version() != DeviceImpl.SERVER_VERSION) {
@@ -90,10 +91,10 @@ public class ForwardedAttribute implements IAttributeBehavior {
                     "root device must have an IDL version 5");
         }
         logger.debug("forwarded attribute {} created ", fullRootAttributeName);
-
     }
 
-    public void init(final String rootAttributeProperty) throws DevFailed {
+    public void init(final String deviceName, final String rootAttributeProperty) throws DevFailed {
+        this.deviceName = deviceName;
         this.fullRootAttributeName = rootAttributeProperty;
         rootAttributeName = TangoUtil.getAttributeName(fullRootAttributeName);
         proxy = new TangoAttribute(rootAttributeProperty);
@@ -173,13 +174,12 @@ public class ForwardedAttribute implements IAttributeBehavior {
     }
 
     public void subscribe(final EventType eventType) throws DevFailed {
-        logger.info("fowarded attribute {} event subscribe {}", attributeName, eventType);
+        logger.info("fowarded attribute \"{}\" event subscribe {}", attributeName, eventType);
         @SuppressWarnings("serial")
         final CallBack callback = new CallBack() {
             @Override
             public void push_event(final EventData evt) {
                 try {
-                    final String deviceName = MDC.get(DeviceImpl.MDC_KEY);
                     if (evt.errors != null && evt.errors.length > 0) {
                         EventManager.getInstance().pushAttributeEvent(deviceName, attributeName,
                                 new DevFailed(evt.errors));
@@ -200,8 +200,6 @@ public class ForwardedAttribute implements IAttributeBehavior {
                                         evt.data_ready.ctr);
                                 break;
                             case INTERFACE_CHANGE_EVENT:
-                                // TODO INTERFACE_CHANGE_EVENT
-                                break;
                             default:
                                 break;
                         }
