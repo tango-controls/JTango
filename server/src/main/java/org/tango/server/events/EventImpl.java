@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.pipe.PipeImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
@@ -174,7 +175,12 @@ final class EventImpl {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(EventUtilities.marshall(attribute), 0);
+            if (attribute.getBehavior() instanceof ForwardedAttribute) {
+                final ForwardedAttribute att = (ForwardedAttribute) attribute.getBehavior();
+                eventSocket.send(EventUtilities.marshall(att.getValue5()), 0);
+            } else {
+                eventSocket.send(EventUtilities.marshall(attribute), 0);
+            }
             logger.debug("sent event: {}", fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);

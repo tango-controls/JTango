@@ -182,6 +182,25 @@ class EventUtilities {
     }
 
     /**
+     * Marshall the attribute with attribute Value 5Z
+     * 
+     * @param attribute attribute to marshall
+     * @return result of the marshall action
+     * @throws fr.esrf.Tango.DevFailed if marshall action failed
+     */
+    static byte[] marshall(final AttributeValue_5 attributeValue) throws DevFailed {
+        xlogger.entry();
+        final CDROutputStream os = new CDROutputStream();
+        try {
+            AttributeValue_5Helper.write(os, attributeValue);
+            xlogger.exit();
+            return cppAlignment(os.getBufferCopy());
+        } finally {
+            os.close();
+        }
+    }
+
+    /**
      * Marshall the attribute with attribute Value
      * 
      * @param attribute attribute to marshall
@@ -192,14 +211,7 @@ class EventUtilities {
         xlogger.entry();
         final AttributeValue_5 attributeValue = TangoIDLAttributeUtil.toAttributeValue5(attribute,
                 attribute.getReadValue(), attribute.getWriteValue());
-        final CDROutputStream os = new CDROutputStream();
-        try {
-            AttributeValue_5Helper.write(os, attributeValue);
-            xlogger.exit();
-            return cppAlignment(os.getBufferCopy());
-        } finally {
-            os.close();
-        }
+        return marshall(attributeValue);
     }
 
     /**

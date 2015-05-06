@@ -453,6 +453,12 @@ public final class DeviceImpl extends Device_5POA {
             isCorrectlyInit.set(false);
             deleteDevice();
             doInit();
+            try {
+                pushInterfaceChangeEvent(false);
+            } catch (final DevFailed e) {
+                // ignore
+                logger.error("error pushing event", e);
+            }
         }
         xlogger.exit();
     }
@@ -653,9 +659,8 @@ public final class DeviceImpl extends Device_5POA {
         try {
             pushInterfaceChangeEvent(true);
         } catch (final DevFailed e) {
-            // TODO don't know what to do with it
+            // ignore
             logger.error("error pushing event", e);
-            e.printStackTrace();
         }
         logger.debug("device init done");
         xlogger.exit();
