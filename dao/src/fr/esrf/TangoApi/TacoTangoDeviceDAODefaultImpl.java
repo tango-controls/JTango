@@ -66,7 +66,7 @@ public class TacoTangoDeviceDAODefaultImpl implements ITacoTangoDeviceDAO {
     public void init(TacoTangoDevice tacoDevice, String devname, String nethost) throws DevFailed {
         Except.throw_exception("Api_TacoFailed",
                 "Taco protocol not supported.\n" +
-                        "Patch TangORB.jar if Taco is needed.",
+                        "Patch JTango.jar if Taco is needed.",
                 "TacoTangoDeviceDAODefaultImpl.TacoTangoDeviceDAODefaultImpl(" + devname + ")");
     }
 
