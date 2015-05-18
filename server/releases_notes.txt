@@ -1,3 +1,8 @@
+9.0.3 (may 2015)
+-----
+- minor fixes on forwarded attributes
+- allow a server without device (mainly used in jive wizard)
+
 9.0.2 (may 2015)
 -----
 - refactoring of forwarded attribute building to avoid NPE
