@@ -70,6 +70,8 @@ import java.util.concurrent.ConcurrentMap;
 @ThreadSafe
 public final class DeviceProxyWrapper implements TangoProxy {
     private static final Logger logger = LoggerFactory.getLogger(DeviceProxyWrapper.class);
+    public static final String API_ATTR_NOT_FOUND = "API_AttrNotFound";
+    public static final String API_COMMAND_NOT_FOUND = "API_CommandNotFound";
 
     private final DeviceProxy proxy;
     private final TangoEventsAdapter eventsAdapter;
@@ -364,10 +366,10 @@ public final class DeviceProxyWrapper implements TangoProxy {
                 attributeInfo.put(attrName, attrInf);
                 return attrInf;
             } catch (DevFailed devFailed) {
-                logger.error("DeviceProxyWrapper#getAttributeInfo has failed.", TangoUtils.convertDevFailedToException(devFailed));
+                if(devFailed.errors.length > 0 && API_ATTR_NOT_FOUND.equalsIgnoreCase(devFailed.errors[0].reason))
                 return null;
+                else throw new TangoProxyException(devFailed);
             } catch (UnknownTangoDataType unknownTangoDataType) {
-                logger.error("DeviceProxyWrapper#getAttributeInfo has failed.", unknownTangoDataType);
                 throw new TangoProxyException(unknownTangoDataType);
             }
         }
@@ -408,11 +410,10 @@ public final class DeviceProxyWrapper implements TangoProxy {
                 commandInfo.put(cmdName, cmdInf);
                 return cmdInf;
             } catch (DevFailed devFailed) {
-                //TODO do we need to distinguish between different devFailed, aka connection error?
-                logger.error("DeviceProxyWrapper#getCommandInfo has failed.", TangoUtils.convertDevFailedToException(devFailed));
+                if(devFailed.errors.length > 0 && API_COMMAND_NOT_FOUND.equalsIgnoreCase(devFailed.errors[0].reason))
                 return null;
+                else throw new TangoProxyException(devFailed);
             } catch (UnknownTangoDataType e) {
-                logger.error("DeviceProxyWrapper#getCommandInfo has failed.", e);
                 throw new TangoProxyException(e);
             }
         }
