@@ -53,5 +53,5 @@ public interface TangoEventListener<T> {
      *
      * @param cause failure cause
      */
-    void onError(Throwable cause);
+    void onError(Exception cause);
 }

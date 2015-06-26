@@ -39,6 +39,7 @@ import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.events.*;
 import org.tango.client.ez.data.TangoDataWrapper;
 import org.tango.client.ez.data.format.TangoDataFormat;
+import org.tango.client.ez.util.TangoUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -69,7 +70,9 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
         try {
             dispatch(e.getValue());
         } catch (DevFailed devFailed) {
-            handleError(devFailed);
+            handleError(TangoUtils.convertDevFailedToException(devFailed));
+        } catch (Exception ex) {
+            handleError(ex);
         }
     }
 
@@ -90,12 +93,12 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
                     iterator.remove();
                 }
             }
-        } catch (Throwable throwable) {
+        } catch (Exception throwable) {
             handleError(throwable);
         }
     }
 
-    private void handleError(Throwable error) {
+    private void handleError(Exception error) {
         for (Iterator<WeakReference<TangoEventListener<T>>> iterator = listeners.iterator(); iterator.hasNext(); ) {
             WeakReference<TangoEventListener<T>> weakRef = iterator.next();
             TangoEventListener<T> listener = weakRef.get();
@@ -112,7 +115,9 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
         try {
             dispatch(e.getValue());
         } catch (DevFailed devFailed) {
-            handleError(devFailed);
+            handleError(TangoUtils.convertDevFailedToException(devFailed));
+        } catch (Exception ex) {
+            handleError(ex);
         }
     }
 
@@ -121,7 +126,9 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
         try {
             dispatch(e.getValue());
         } catch (DevFailed devFailed) {
-            handleError(devFailed);
+            handleError(TangoUtils.convertDevFailedToException(devFailed));
+        } catch (Exception ex) {
+            handleError(ex);
         }
     }
 
@@ -130,7 +137,9 @@ public class TangoEventDispatcher<T> implements ITangoChangeListener, ITangoPeri
         try {
             dispatch(e.getValue());
         } catch (DevFailed devFailed) {
-            handleError(devFailed);
+            handleError(TangoUtils.convertDevFailedToException(devFailed));
+        } catch (Exception ex) {
+            handleError(ex);
         }
     }
 }
