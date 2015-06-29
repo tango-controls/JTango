@@ -197,7 +197,7 @@ public class ZmqMainThread extends Thread {
      */
     //===============================================================
     private void manageInputBuffer(int source){
-        //System.out.println("manageInputBuffer -> "+source);
+        //System.out.println(System.currentTimeMillis() + " manageInputBuffer -> "+source);
         switch (source) {
             case ControlSock:
                 //System.out.println(System.currentTimeMillis() + " - receive Control");
@@ -220,7 +220,7 @@ public class ZmqMainThread extends Thread {
                 //System.out.println(System.currentTimeMillis() + " - receive heartbeat");
                 try {
                     //  Read input from socket (in 3 parts)
-                    byte[][]    inputs = readSocket(heartbeatSocket, 3);
+                    byte[][] inputs = readSocket(heartbeatSocket, 3);
                     manageHeartbeat(inputs);
                 }
                 catch (DevFailed e) {
@@ -231,7 +231,7 @@ public class ZmqMainThread extends Thread {
             case EventSock:
                 //System.out.println(System.currentTimeMillis() + " - receive event  -----------------");
                 try {
-                    byte[][]    inputs = readSocket(eventSocket, 4);
+                    byte[][] inputs = readSocket(eventSocket, 4);
                     manageEvent(inputs);
                 }
                 catch (DevFailed e) {
@@ -258,6 +258,7 @@ public class ZmqMainThread extends Thread {
      * @return the event name
      */
     //===============================================================
+    @SuppressWarnings("unused")
     private String getEventName(byte[] inputs) {
         String  s = new String(inputs);
         //  Remove Tango host
@@ -330,8 +331,12 @@ public class ZmqMainThread extends Thread {
             }
             ZmqCallInfo zmqCallInfo =
                     ZMQutils.deMarshallZmqCallInfo(inputs[ZmqInfoIdx], littleEndian);
-            manageEventValue(eventName, ApiUtil.toLongUnsigned(zmqCallInfo.ctr),
-                    inputs[ValueIdx], littleEndian, zmqCallInfo.call_is_except);
+            if (zmqCallInfo!=null) {
+                manageEventValue(eventName, ApiUtil.toLongUnsigned(zmqCallInfo.ctr),
+                        inputs[ValueIdx], littleEndian, zmqCallInfo.call_is_except);
+            }
+            else
+                throw new Exception("DeMarshalling returns null");
         }
         catch (Exception e) {
             if (e instanceof DevFailed)
@@ -564,16 +569,15 @@ public class ZmqMainThread extends Thread {
         //System.out.println("-----------> Receive Heartbeat for " + name);
         ZmqEventConsumer.getInstance().push_structured_event_heartbeat(name);
 
-        /*  NOT USED */
         //  Second one is endianess
-        if (inputs[EndianIdx].length>0) {
-            //boolean littleEndian = (inputs[EndianIdx][0]!=0);
-            //System.out.println("heartbeat "+ name + ":   little="+littleEndian);
-        }
-        else {
+        if (inputs[EndianIdx].length==0) {
             System.err.println("heartbeat "+ name + ":   endianess is missing !!!");
         }
-        /* */
+        /*
+        else {
+             NOT USED
+        }
+        */
     }
     //===============================================================
     //===============================================================
@@ -593,6 +597,7 @@ public class ZmqMainThread extends Thread {
     }
     //===============================================================
     //===============================================================
+    @SuppressWarnings("unused")
     private boolean isForcedJustified(ZMQutils.ControlStructure controlStructure) {
         EventList events = connectedMap.get(controlStructure.endPoint);
         if (events==null)
@@ -667,7 +672,7 @@ public class ZmqMainThread extends Thread {
                     socket.disconnect(controlStructure.endPoint);
                 }
                 catch (org.zeromq.ZMQException e) {
-                    System.err.println(e);
+                    System.err.println(e.getMessage());
                 }
             }
 
@@ -704,14 +709,16 @@ public class ZmqMainThread extends Thread {
     //===============================================================
     private void disconnect(ZMQ.Socket socket, String eventName){
         String   endpoint = getConnectedEndPoint(eventName);
-        EventList   eventList = connectedMap.get(endpoint);
-        if (eventList!=null) {
-            socket.unsubscribe(eventName.getBytes());
-            traceZmqSubscription(eventName, false);
-            eventList.remove(eventName);
-            if (eventList.size()==0) {
-                socket.disconnect(endpoint);
-                connectedMap.remove(endpoint);
+        if (endpoint!=null) {
+            EventList eventList = connectedMap.get(endpoint);
+            if (eventList!=null) {
+                socket.unsubscribe(eventName.getBytes());
+                traceZmqSubscription(eventName, false);
+                eventList.remove(eventName);
+                if (eventList.size()==0) {
+                    socket.disconnect(endpoint);
+                    connectedMap.remove(endpoint);
+                }
             }
         }
     }
