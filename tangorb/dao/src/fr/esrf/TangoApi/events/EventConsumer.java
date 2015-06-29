@@ -171,8 +171,9 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
     //===============================================================
     //===============================================================
-    private void callEventSubscriptionAndConnect(DeviceProxy device, String attribute, String eventType)
-            throws DevFailed {
+    private void callEventSubscriptionAndConnect(DeviceProxy device,
+                                                 String attribute,
+                                                 String eventType) throws DevFailed {
 
         String device_name = device.name();
         if (attribute==null) // Interface change event on device.
@@ -189,8 +190,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         String cmdName = getEventSubscriptionCommandName();
         ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
                     cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
-        DeviceData argOut =
-                device.get_adm_dev().command_inout(cmdName, argIn);
+        DeviceData argOut = device.get_adm_dev().command_inout(cmdName, argIn);
         ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
@@ -390,7 +390,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                                 return;
                             }
                             catch (DevFailed e2) {
-                               System.err.println(e2);
+                               System.err.println(e2.errors[0].desc);
                                 //  reset if both have failed
                                 eventCallBackStruct.consumer = null;
                                 //	Send error to callback
@@ -413,7 +413,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         return;
                     }
                     catch (DevFailed e) {
-                        System.err.println(e);
+                        System.err.println(e.errors[0].desc);
                         //	Send error to callback
                         sendErrorToCallback(eventCallBackStruct, callbackKey, e);
                     }
@@ -716,7 +716,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         String      attributeName;
         String      deviceName;
         String      eventName;
-        Database    dbase;
+        Database    database;
         DeviceData  deviceData = null;
         boolean     reconnect = false;
         //===========================================================
@@ -725,7 +725,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                             String deviceName,
                             String attributeName,
                             String eventName,
-                            Database dbase,
+                            Database database,
                             DeviceData deviceData,
                             boolean reconnect) {
             this.tangoHost      = tangoHost;
@@ -733,7 +733,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             this.deviceName     = deviceName;
             this.attributeName  = attributeName;
             this.eventName      = eventName;
-            this.dbase          = dbase;
+            this.database          = database;
             this.deviceData     = deviceData;
             this.reconnect      = reconnect;
         }
@@ -744,7 +744,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //===========================================================
         public String toString() {
             return "channel name: " + channelName +
-                 "\ndbase:        " + dbase +
+                 "\ndatabase:     " + database +
                  "\nreconnect:    " + reconnect;
         }
         //===========================================================
