@@ -71,7 +71,6 @@ class  HostInfo
 			while ( enet.hasMoreElements() ) {
 				NetworkInterface net = enet.nextElement();
 
-				//	Only on JDK 1.6
                 //  To do not have 127.x.x.x
 				if ( net.isLoopback() )
 					continue;

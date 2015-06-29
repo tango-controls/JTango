@@ -34,10 +34,7 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevInfo_3;
-import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
 import fr.esrf.TangoApi.events.EventData;
@@ -2001,10 +1998,36 @@ public class DeviceProxy extends Connection implements ApiDefs {
 
     //===================================================================
     //===================================================================
+    private int getTangoVersionFromZmqEventSubscriptionChange() throws DevFailed {
+        try {
+            DeviceData  argIn = new DeviceData();
+            argIn.insert(new String[] { "info" });
+            DeviceData  argOut = get_adm_dev().command_inout("ZmqEventSubscriptionChange", argIn);
+            DevVarLongStringArray lsa = argOut.extractLongStringArray();
+            if (lsa.lvalue.length==0)
+                return -1;
+            else
+                return lsa.lvalue[0];
+        }
+        catch (DevFailed e) {
+            if (e.errors[0].reason.equals("API_CommandNotFound"))
+                return -1;
+            else
+                throw e;
+        }
+    }
+    //===================================================================
+    //===================================================================
     public int getTangoVersion() throws DevFailed {
 
         //  Get idl for administrative device
         int adminIdl = get_adm_dev().get_idl_version();
+
+        //  Check with ZmqEventSubscriptionChange command
+        //  since 9.1.0 this command returns Tango release in info mode
+        int version = getTangoVersionFromZmqEventSubscriptionChange();
+        if (version>900)    //  Found
+            return version;
 
         //  Get the command list
         CommandInfo[] commandInfoList = get_adm_dev().command_list_query();
@@ -2017,7 +2040,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
                 return 200;
             case 3:
                 //  IDL 3 is for Tango 5 and 6. Unfortunately,
-                //  there is no way from the client side to determmine if it is Tango 5 or 6.
+                //  there is no way from the client side to determine if it is Tango 5 or 6.
                 //  The best we can do is to get the info that it is Tango 5.2 (or above)
                 for (CommandInfo commandInfo : commandInfoList) {
                     if (commandInfo.cmd_name.equals("QueryWizardClassProperty"))
@@ -2038,7 +2061,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
                 }
                 return 700;
              case 5:
-			 	return 910;
+			 	return 900;
        }
 
         //  Not found
