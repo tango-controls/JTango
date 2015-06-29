@@ -52,7 +52,6 @@ public abstract class EventDispatcher extends CallBack
      */
     public EventDispatcher(DeviceProxy device_proxy) {
         event_supplier = device_proxy;
-        //event_listeners = new EventListenerList();
         event_listeners = new TangoEventListenerList();
     }
 
