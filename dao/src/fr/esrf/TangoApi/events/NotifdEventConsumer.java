@@ -512,8 +512,8 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
         DeviceProxy adminDevice = DeviceProxyFactory.get(
-                cs.channelName, cs.dbase.getUrl().getTangoHost());
-        DbEventImportInfo received = getEventImportInfo(cs.channelName, cs.dbase, adminDevice);
+                cs.channelName, cs.database.getUrl().getTangoHost());
+        DbEventImportInfo received = getEventImportInfo(cs.channelName, cs.database, adminDevice);
 
         //	Keep host name without Fully Qualify Domain Name
         int idx = received.host.indexOf('.');

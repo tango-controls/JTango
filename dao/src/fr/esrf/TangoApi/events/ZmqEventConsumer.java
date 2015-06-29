@@ -45,6 +45,8 @@ import fr.esrf.TangoDs.TangoConst;
 import org.omg.CosEventComm.Disconnected;
 import org.omg.CosNotification.StructuredEvent;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
@@ -281,85 +283,129 @@ public class ZmqEventConsumer extends EventConsumer implements
 
     //===============================================================
     //===============================================================
-    private void connect(DeviceProxy deviceProxy, String attributeName, String eventName, DeviceData deviceData) throws DevFailed {
+    private void connect(DeviceProxy deviceProxy, String attributeName,
+                         String eventName, DeviceData deviceData) throws DevFailed {
         String deviceName = deviceProxy.fullName();
-        String adm_name = null;
         int tangoVersion = deviceData.extractLongStringArray().lvalue[0];
         try {
-            adm_name = deviceProxy.adm_name();  //.toLowerCase();
+            String adminName = deviceProxy.adm_name();  //.toLowerCase();
             //  Since Tango 8.1, heartbeat is sent in lower case.
             //tangoVersion = new DeviceProxy(adm_name).getTangoVersion();
             if (tangoVersion>=810)
-                adm_name = adm_name.toLowerCase();
+                adminName = adminName.toLowerCase();
 
+            // If no connection exists to this channel, create it
+            Database database = null;
+            if (!channel_map.containsKey(adminName)) {
+                if (deviceProxy.use_db())
+                    database = deviceProxy.get_db_obj();
+                ConnectionStructure connectionStructure =
+                        new ConnectionStructure(deviceProxy.get_tango_host(),
+                                adminName, deviceName, attributeName,
+                                eventName, database, deviceData, false);
+                connect_event_channel(connectionStructure);
+            } else if (deviceProxy.use_db()) {
+                database = deviceProxy.get_db_obj();
+                ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
+                        attributeName, deviceData.extractLongStringArray(), eventName,false);
+            }
+            EventChannelStruct eventChannelStruct = channel_map.get(adminName);
+            eventChannelStruct.adm_device_proxy =  new DeviceProxy(adminName);
+            eventChannelStruct.use_db = deviceProxy.use_db();
+            eventChannelStruct.dbase = database;
+            eventChannelStruct.setTangoRelease(tangoVersion);
 
-        } catch (DevFailed e) {
+            device_channel_map.put(deviceName, adminName);
+        }
+        catch (DevFailed e) {
             Except.throw_event_system_failed("API_BadConfigurationProperty",
                     "Can't subscribe to event for device " + deviceName
                             + "\n Check that device server is running...",
                     "ZmqEventConsumer.connect");
         }
-
-        String channelName = adm_name;
-
-        // If no connection exists to this channel, create it
-        Database dbase = null;
-        if (!channel_map.containsKey(channelName)) {
-            if (deviceProxy.use_db())
-                dbase = deviceProxy.get_db_obj();
-            ConnectionStructure connectionStructure =
-                    new ConnectionStructure(deviceProxy.get_tango_host(),
-                            channelName, deviceName, attributeName,
-                            eventName, dbase, deviceData, false);
-            connect_event_channel(connectionStructure);
-        } else if (deviceProxy.use_db()) {
-            dbase = deviceProxy.get_db_obj();
-            ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
-                        attributeName, deviceData.extractLongStringArray(), eventName,false);
-        }
-        EventChannelStruct eventChannelStruct = channel_map.get(channelName);
-        eventChannelStruct.adm_device_proxy =  new DeviceProxy(adm_name);
-        eventChannelStruct.use_db = deviceProxy.use_db();
-        eventChannelStruct.dbase = dbase;
-        eventChannelStruct.setTangoRelease(tangoVersion);
-
-        device_channel_map.put(deviceName, channelName);
-        //ToDo
     }
     //===============================================================
     /**
      *  Due to a problem when there is more than one network card,
-     *  The address for ZMQ ports, must be the same than 
-     *  host where deviceProxy is running.
+     *  The address returned by the command ZmqEventSubscriptionChange
+     *  is different than the getHostAddress() call !!!
+     *  In this case the address from getHostAddress()
+     *  replace the address in device data.
      */
    //===============================================================
-    private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
-        DevVarLongStringArray   lsa = deviceData.extractLongStringArray();
+    private DeviceData checkWithHostAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed {
+// ToDo
+        DevVarLongStringArray lsa = deviceData.extractLongStringArray();
         try {
             java.net.InetAddress iadd =
                     java.net.InetAddress.getByName(deviceProxy.get_host_name());
             String hostAddress = iadd.getHostAddress();
-            if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
-                //System.err.println("Host address is      " + hostAddress);
-                //System.err.println("Server returns " + lsa.svalue[0]);
-                String  wrongAdd = lsa.svalue[0];
-                int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
-                if (idx>0) {
-                    lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
-                    lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
-                    System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
-                    deviceData = new DeviceData();
-                    deviceData.insert(lsa);
-                }
-            }
-        }
-        catch (UnknownHostException e) {
-            Except.throw_exception("UnknownHostException", 
+            System.err.println("Host address is " + hostAddress);
+            System.err.println("Server returns  " + lsa.svalue[0]);
+             if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
+                 String  wrongAdd = lsa.svalue[0];
+                 int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
+                 if (idx>0) {
+                     lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
+                     lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
+                     System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
+                     deviceData = new DeviceData();
+                     deviceData.insert(lsa);
+                 }
+             }
+        } catch (UnknownHostException e) {
+            Except.throw_exception("UnknownHostException",
                     e.toString(), "ZmqEventConsumer.checkZmqAddress()");
         }
         return deviceData;
     }
-    
+    //===============================================================
+    /**
+     * In case of several endpoints, check which one is connected.
+     * @param deviceData    data from ZmqEventSubscriptionChange command
+     * @param deviceProxy   the admin device
+     * @return the endpoints after checked
+     * @throws DevFailed
+     */
+    //===============================================================
+    private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
+        DevVarLongStringArray lsa = deviceData.extractLongStringArray();
+        for (int i=0 ; i<lsa.svalue.length ; i+=2) {
+            String endpoint = lsa.svalue[i];
+            if (isEndpointAvailable(endpoint)) {
+                lsa.svalue[0] = lsa.svalue[i];
+                lsa.svalue[1] = lsa.svalue[i+1];
+                //System.out.println(endpoint + " Connected !!!!");
+                return deviceData;
+            }
+        }
+        //  Not found check with host address
+        return checkWithHostAddress(deviceData, deviceProxy);
+    }
+    //===============================================================
+    //===============================================================
+    private boolean isEndpointAvailable(String endpoint) {
+        try {
+            //  Split address and port
+            int start = endpoint.indexOf("//");
+            if (start<0)  throw new Exception(endpoint + ": Bad syntax");
+            int end = endpoint.indexOf(":", start);
+            if (end<0)  throw new Exception(endpoint + ": Bad syntax");
+            String address = endpoint.substring(start+2, end);
+            int    port    = Integer.parseInt(endpoint.substring(end+1));
+
+            //  Try to connect
+            InetSocketAddress ip = new InetSocketAddress(address, port);
+            Socket socket = new Socket();
+            socket.connect(ip, 10);
+            socket.close();
+            return true;
+        }
+        catch (Exception e) {
+            System.out.println(endpoint + " Failed:\n   " + e.getMessage());
+            return false;
+        }
+    }
     //===============================================================
     //===============================================================
     @Override
