@@ -31,6 +31,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.pipe.PipeImpl;
+import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
@@ -41,7 +42,7 @@ import fr.esrf.Tango.DevPipeData;
 
 /**
  * based on AttributeImpl object with event information
- * 
+ *
  * @author verdier
  */
 final class EventImpl {
@@ -54,18 +55,21 @@ final class EventImpl {
     private long subscribeTime;
     private int counter = 0;
     private final EventType eventType;
+    private final boolean islatestIDLVersion;
 
     /**
      * Create a Event object based on an AttributeImpl with its event parameters.
-     * 
+     *
      * @param attribute the attribute for specified event
      * @param eventType the event type
+     * @param idlVersion the event IDL version
      * @throws DevFailed
      */
 
-    EventImpl(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
+    EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion) throws DevFailed {
         this.attribute = attribute;
         this.eventType = eventType;
+        islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         eventTrigger = EventTriggerFactory.createEventTrigger(eventType, attribute);
         logger.debug("event trigger for {} type is {}", attribute.getName(), eventTrigger.getClass());
         updateSubscribeTime();
@@ -73,13 +77,14 @@ final class EventImpl {
 
     /**
      * Create a Event object based on an PipeImpl with its event parameters.
-     * 
+     *
      * @param attribute the attribute for specified event
      * @throws DevFailed
      */
 
-    EventImpl(final PipeImpl pipe) throws DevFailed {
+    EventImpl(final PipeImpl pipe, final int idlVersion) throws DevFailed {
         this.eventType = EventType.PIPE_EVENT;
+        islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         eventTrigger = new DefaultEventTrigger();
         logger.debug("event trigger for {} type is {}", pipe.getName(), eventTrigger.getClass());
         updateSubscribeTime();
@@ -87,12 +92,13 @@ final class EventImpl {
 
     /**
      * Create a Event object based without attribute for EventType.INTERFACE_CHANGE_EVENT.
-     * 
+     *
      * @throws DevFailed
      */
 
-    EventImpl() throws DevFailed {
+    EventImpl(final int idlVersion) throws DevFailed {
         this.eventType = EventType.INTERFACE_CHANGE_EVENT;
+        islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         eventTrigger = new DefaultEventTrigger();
         logger.debug("event trigger for {} type is {}", eventTrigger.getClass());
         updateSubscribeTime();
@@ -107,7 +113,7 @@ final class EventImpl {
 
     /**
      * Returns false if the last subscribe is too old.
-     * 
+     *
      * @return false if the last subscribe is too old.
      */
 
@@ -118,7 +124,7 @@ final class EventImpl {
 
     /**
      * Fire an event containing a value.
-     * 
+     *
      * @param eventSocket the socket to send event
      * @param fullName event full name
      * @throws DevFailed
@@ -136,7 +142,7 @@ final class EventImpl {
 
     /**
      * Fire an event containing a value is condition is valid.
-     * 
+     *
      * @param eventSocket the socket to send event
      * @param fullName event full name
      * @throws DevFailed
@@ -156,7 +162,7 @@ final class EventImpl {
 
     /**
      * check if is an attribute value
-     * 
+     *
      * @param eventType
      * @return
      */
@@ -173,9 +179,13 @@ final class EventImpl {
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
             if (attribute.getBehavior() instanceof ForwardedAttribute) {
                 final ForwardedAttribute att = (ForwardedAttribute) attribute.getBehavior();
-                eventSocket.send(EventUtilities.marshall(att.getValue5()), 0);
+                eventSocket.send(EventUtilities.marshallIDL5(att.getValue5()), 0);
             } else {
-                eventSocket.send(EventUtilities.marshall(attribute), 0);
+                if (islatestIDLVersion) {
+                    eventSocket.send(EventUtilities.marshallIDL5(attribute), 0);
+                } else {
+                    eventSocket.send(EventUtilities.marshallIDL4(attribute), 0);
+                }
             }
             logger.debug("sent event: {}", fullName);
         } catch (final org.zeromq.ZMQException e) {
@@ -187,7 +197,7 @@ final class EventImpl {
 
     /**
      * Send a data ready event
-     * 
+     *
      * @param eventSocket the socket to send event
      * @param fullName event full name
      * @param counter a counter value
@@ -216,12 +226,15 @@ final class EventImpl {
             eventSocket.sendMore(fullName);
             eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
             eventSocket.send(EventUtilities.marshall(counter++, false), ZMQ.SNDMORE);
-            eventSocket.send(EventUtilities.marshallConfig(attribute), 0);
+            if (islatestIDLVersion) {
+                eventSocket.send(EventUtilities.marshallIDL5Config(attribute), 0);
+            } else {
+                eventSocket.send(EventUtilities.marshallIDL4Config(attribute), 0);
+            }
             logger.debug("sent {} event: {}", EventType.ATT_CONF_EVENT, fullName);
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-
         xlogger.exit();
     }
 
@@ -237,7 +250,6 @@ final class EventImpl {
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-
         xlogger.exit();
     }
 
@@ -253,13 +265,12 @@ final class EventImpl {
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-
         xlogger.exit();
     }
 
     /**
      * Fire an event containing a DevFailed.
-     * 
+     *
      * @param eventSocket the socket to send event
      * @param fullName event full name
      * @param devFailed the failed object to be sent.
