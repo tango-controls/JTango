@@ -62,13 +62,15 @@ import fr.esrf.Tango.DevVarLongStringArray;
 
 /**
  * Set of ZMQ low level utilities
- * 
+ *
  * @author verdier
  */
 public final class EventManager {
 
     private static ZContext context;
     private static final EventManager INSTANCE = new EventManager();
+    public static final int MINIMUM_IDL_VERSION = 4;
+    public static final String IDL_LATEST = ".idl" + DeviceImpl.SERVER_VERSION + "_";
     private static ZMQ.Socket heartbeatSocket;
     private static ZMQ.Socket eventSocket;
     private static boolean isInitialized = false;
@@ -156,7 +158,7 @@ public final class EventManager {
 
     /**
      * Returns next port to connect the heartbeatSocket or eventSocket
-     * 
+     *
      * @throws DevFailed if no free port found
      */
     private int getNextAvailablePort() throws DevFailed {
@@ -186,7 +188,7 @@ public final class EventManager {
 
     /**
      * Check next port to connect the heartbeatSocket or eventSocket
-     * 
+     *
      * @param socketType HEARTBEAT or EVENT
      * @throws DevFailed if no free port found
      */
@@ -225,7 +227,7 @@ public final class EventManager {
 
     /**
      * Search the specified EventImpl object
-     * 
+     *
      * @param fullName specified EventImpl name.
      * @return the specified EventImpl object if found, otherwise returns null.
      */
@@ -296,10 +298,12 @@ public final class EventManager {
     /**
      * returns the connection parameters for specified event.
      */
-    public DevVarLongStringArray getConnectionParameters() {
+    public DevVarLongStringArray getInfo() {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
-        longStringArray.lvalue = new int[0];
+        // longStringArray.lvalue = new int[0];
+        longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
+                EventConstants.ZMQ_RELEASE };
         if (heartbeatEndpoint == null || eventEndpoint == null) {
             longStringArray.svalue = new String[] { "No ZMQ event yet !" };
         } else {
@@ -313,12 +317,12 @@ public final class EventManager {
      * Initialize ZMQ event system if not already done,
      * subscribe to the specified event end
      * returns the connection parameters for specified event.
-     * 
+     *
      * @param deviceName The specified event device name
      * @param pipe The specified event pipe
      * @return the connection parameters for specified event.
      */
-    public DevVarLongStringArray getConnectionParameters(final String deviceName, final PipeImpl pipe) throws DevFailed {
+    public DevVarLongStringArray subcribe(final String deviceName, final PipeImpl pipe) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -330,7 +334,7 @@ public final class EventManager {
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(pipe);
+            eventImpl = new EventImpl(pipe, DeviceImpl.SERVER_VERSION);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -343,14 +347,14 @@ public final class EventManager {
      * Initialize ZMQ event system if not already done,
      * subscribe to the specified event end
      * returns the connection parameters for specified event.
-     * 
+     *
      * @param deviceName The specified event device name
      * @param attribute The specified event attribute
      * @param eventType The specified event type
      * @return the connection parameters for specified event.
      */
-    public DevVarLongStringArray getConnectionParameters(final String deviceName, final AttributeImpl attribute,
-            final EventType eventType) throws DevFailed {
+    public DevVarLongStringArray subcribe(final String deviceName, final AttributeImpl attribute,
+            final EventType eventType, final int idlVersion) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -358,7 +362,7 @@ public final class EventManager {
         }
 
         // check if event is already subscribed
-        final String fullName = EventUtilities.buildEventName(deviceName, attribute.getName(), eventType);
+        final String fullName = EventUtilities.buildEventName(deviceName, attribute.getName(), eventType, idlVersion);
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // special case for forwarded attribute, subscribe to root attribute
@@ -367,7 +371,7 @@ public final class EventManager {
                 fwdAttr.subscribe(eventType);
             }
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(attribute, eventType);
+            eventImpl = new EventImpl(attribute, eventType, idlVersion);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -380,11 +384,11 @@ public final class EventManager {
      * Initialize ZMQ event system if not already done,
      * subscribe to the interface change event end
      * returns the connection parameters.
-     * 
+     *
      * @param deviceName The specified event device name
      * @return the connection parameters.
      */
-    public DevVarLongStringArray getConnectionParameters(final String deviceName) throws DevFailed {
+    public DevVarLongStringArray subcribe(final String deviceName) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -396,7 +400,7 @@ public final class EventManager {
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl();
+            eventImpl = new EventImpl(DeviceImpl.SERVER_VERSION);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -409,7 +413,7 @@ public final class EventManager {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
-                EventConstants.ZMQ_RELEASE, };
+                EventConstants.ZMQ_RELEASE };
         longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
         logger.debug("event registered for {}", fullName);
         return longStringArray;
@@ -417,7 +421,7 @@ public final class EventManager {
 
     /**
      * Check if the event must be sent and fire it if must be done
-     * 
+     *
      * @param attributeName specified event attribute
      * @param devFailed the attribute failed error to be sent as event
      * @throws DevFailed
@@ -426,10 +430,10 @@ public final class EventManager {
             throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
-            final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
-            final EventImpl eventImpl = getEventImpl(fullName);
-            if (eventImpl != null) {
-                eventImpl.pushEvent(eventSocket, fullName, devFailed);
+            final String fullName5 = EventUtilities.buildEventName(deviceName, attributeName, eventType);
+            final EventImpl eventImpl5 = getEventImpl(fullName5);
+            if (eventImpl5 != null) {
+                eventImpl5.pushEvent(eventSocket, fullName5, devFailed);
             }
         }
         xlogger.exit();
@@ -437,14 +441,37 @@ public final class EventManager {
 
     /**
      * Check if the event must be sent and fire it if must be done
-     * 
+     *
      * @param attributeName specified event attribute
      * @throws DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
-            final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
+            for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
+                final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
+                final EventImpl eventImpl = getEventImpl(fullName);
+                if (eventImpl != null) {
+                    eventImpl.pushAttributeEvent(eventSocket, fullName);
+                }
+            }
+        }
+        xlogger.exit();
+    }
+
+    /**
+     * fire event
+     *
+     * @param deviceName Specified event device
+     * @param attributeName specified event attribute name
+     * @param eventType specified event type.
+     * @throws DevFailed
+     */
+    public void pushAttributeEvent(final String deviceName, final String attributeName, final EventType eventType)
+            throws DevFailed {
+        xlogger.entry();
+        for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
+            final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
                 eventImpl.pushAttributeEvent(eventSocket, fullName);
@@ -454,27 +481,8 @@ public final class EventManager {
     }
 
     /**
-     * fire event
-     * 
-     * @param deviceName Specified event device
-     * @param attributeName specified event attribute name
-     * @param eventType specified event type.
-     * @throws DevFailed
-     */
-    public void pushAttributeEvent(final String deviceName, final String attributeName, final EventType eventType)
-            throws DevFailed {
-        xlogger.entry();
-        final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
-        final EventImpl eventImpl = getEventImpl(fullName);
-        if (eventImpl != null) {
-            eventImpl.pushAttributeEvent(eventSocket, fullName);
-        }
-        xlogger.exit();
-    }
-
-    /**
      * fire event without check
-     * 
+     *
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param eventType specified event type.
@@ -493,7 +501,7 @@ public final class EventManager {
 
     /**
      * fire event with AttDataReady
-     * 
+     *
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param counter a counter value
@@ -512,10 +520,13 @@ public final class EventManager {
 
     public void pushAttributeConfigEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
-        final String fullName = EventUtilities.buildEventName(deviceName, attributeName, EventType.ATT_CONF_EVENT);
-        final EventImpl eventImpl = getEventImpl(fullName);
-        if (eventImpl != null) {
-            eventImpl.pushAttributeConfigEvent(eventSocket, fullName);
+        for (int idl = 4; idl <= DeviceImpl.SERVER_VERSION; idl++) {
+            final String fullName = EventUtilities.buildEventName(deviceName, attributeName, EventType.ATT_CONF_EVENT,
+                    idl);
+            final EventImpl eventImpl = getEventImpl(fullName);
+            if (eventImpl != null) {
+                eventImpl.pushAttributeConfigEvent(eventSocket, fullName);
+            }
         }
         xlogger.exit();
     }
@@ -556,7 +567,7 @@ public final class EventManager {
 
     /**
      * Check if event criteria are set for change and archive events
-     * 
+     *
      * @param attribute the specified attribute
      * @param eventType the specified event type
      * @throws DevFailed if event type is change or archive and no event criteria is set.

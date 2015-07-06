@@ -24,7 +24,10 @@
  */
 package org.tango.server.attribute.log;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tango.server.StateMachineBehavior;
 import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributeValue;
@@ -37,37 +40,39 @@ import fr.esrf.TangoDs.TangoConst;
 
 /**
  * An image attribute that contains logs from a list of {@link Logger}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public class LogAttribute implements IAttributeBehavior {
 
+    private final Logger logger = LoggerFactory.getLogger(LogAttribute.class);
     private final AttributeAppender attributeAppender;
     private String attributeName = "";
 
     /**
      * Build an attribute "log" which is an image of string.
-     * 
+     *
      * @param depth max logging size
      * @param loggers the loggers to log
      */
     public LogAttribute(final int depth, final Logger... loggers) {
+        logger.debug("create log attribute for loggers {}", Arrays.toString(loggers));
         attributeName = "log";
         attributeAppender = new AttributeAppender(depth);
         for (final Logger logger : loggers) {
             if (logger instanceof ch.qos.logback.classic.Logger) {
+                this.logger.debug(" add appender {}", logger);
                 final ch.qos.logback.classic.Logger loggerBack = (ch.qos.logback.classic.Logger) logger;
                 loggerBack.addAppender(attributeAppender);
                 attributeAppender.start();
             }
         }
-
     }
 
     /**
      * Build an attribute which is an image of string.
-     * 
+     *
      * @param attributeName The attribute name
      * @param depth max logging size
      * @param loggers the loggers to log

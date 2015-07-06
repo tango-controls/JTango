@@ -45,6 +45,8 @@ import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.DeviceState;
+import org.tango.logging.LoggingLevel;
+import org.tango.logging.LoggingManager;
 import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.InvocationContext;
@@ -118,15 +120,15 @@ import fr.esrf.Tango.PipeConfig;
 
 /**
  * The CORBA servant for a tango device server in IDL 5.
- * 
+ *
  * @author ABEILLE
  */
 public final class DeviceImpl extends Device_5POA {
 
     public static final String INIT_CMD = "Init";
-//    private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
-//    private static final String POLLED_OBJECT = "Polled object ";
-//    private static final String POLLED_ATTR = "polled_attr";
+    // private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
+    // private static final String POLLED_OBJECT = "Polled object ";
+    // private static final String POLLED_ATTR = "polled_attr";
     private final Logger logger = LoggerFactory.getLogger(DeviceImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceImpl.class);
 
@@ -284,7 +286,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Ctr
-     * 
+     *
      * @param deviceName
      *            The device name
      * @param className
@@ -312,36 +314,51 @@ public final class DeviceImpl extends Device_5POA {
         }
         // add default device properties
         try {
-
+            // StateCheckAttrAlarm
             final DevicePropertyImpl property = new DevicePropertyImpl(
                     "StateCheckAttrAlarm",
                     "boolean. If true, all attributes will be read at each state/status request to check if alarm is present",
                     this.getClass().getMethod("setStateCheckAttrAlarm", boolean.class), this, name, className, false,
                     STATE_CHECK_ALARMS_DEFAULT);
             addDeviceProperty(property);
+            // cmd_min_poll_period
             final DevicePropertyImpl property2 = new DevicePropertyImpl("cmd_min_poll_period",
                     "min poll value for commands", this.getClass().getMethod("setMinCommandPolling", String[].class),
                     this, name, className, false);
             addDeviceProperty(property2);
+            // min_poll_period
             final DevicePropertyImpl property3 = new DevicePropertyImpl("min_poll_period", "min poll value", this
                     .getClass().getMethod("setMinPolling", int.class), this, name, className, false, "0");
             addDeviceProperty(property3);
+            // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl("attr_min_poll_period",
                     "min poll value for attributes", this.getClass()
-                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
+            // cmd_poll_ring_depth
             final DevicePropertyImpl property5 = new DevicePropertyImpl("cmd_poll_ring_depth",
                     "command poll ring depth", this.getClass().getMethod("setCmdPollRingDepth", String[].class), this,
                     name, className, false);
             addDeviceProperty(property5);
+            // attr_poll_ring_depth
             final DevicePropertyImpl property6 = new DevicePropertyImpl("attr_poll_ring_depth",
                     "attribute poll ring depth", this.getClass().getMethod("setAttrPollRingDepth", String[].class),
                     this, name, className, false);
             addDeviceProperty(property6);
-
+            // POLLED_ATTR
             final DevicePropertyImpl property7 = new DevicePropertyImpl(Constants.POLLED_ATTR, "poll attributes", this
                     .getClass().getMethod("setPolledAttributes", String[].class), this, name, className, false);
             addDeviceProperty(property7);
+            // logging_target
+            final DevicePropertyImpl property9 = new DevicePropertyImpl("logging_target", "logging target", this
+                    .getClass().getMethod("setLoggingTarget", String.class), this, name, className, false);
+            addDeviceProperty(property9);
+            // logging_level
+            final DevicePropertyImpl property8 = new DevicePropertyImpl("logging_level", "logging level", this
+                    .getClass().getMethod("setLoggingLevel", String.class), this, name, className, false);
+            addDeviceProperty(property8);
+
+            // TODO "logging_rft
 
         } catch (final SecurityException e) {
             DevFailedUtils.throwDevFailed(e);
@@ -409,9 +426,27 @@ public final class DeviceImpl extends Device_5POA {
         }
     }
 
+    public void setLoggingLevel(final String level) {
+        final LoggingLevel l = LoggingLevel.getLevelFromString(level);
+        if (l != null) {
+            LoggingManager.getInstance().setLoggingLevel(name, l.toInt());
+        }
+    }
+
+    public void setLoggingTarget(final String target) throws DevFailed, ClassNotFoundException {
+        final String[] config = target.split(LoggingManager.LOGGING_TARGET_SEPARATOR);
+        if (config.length == 2) {
+            if (config[0].equalsIgnoreCase(LoggingManager.LOGGING_TARGET_DEVICE)) {
+                LoggingManager.getInstance().addDeviceAppender(config[1], Class.forName(className), name);
+            } else {
+                LoggingManager.getInstance().addFileAppender(config[1], name);
+            }
+        }
+    }
+
     /**
      * Command State
-     * 
+     *
      * @return the state
      * @throws DevFailed
      */
@@ -425,7 +460,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Command status
-     * 
+     *
      * @return status
      * @throws DevFailed
      */
@@ -440,7 +475,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Init the device. Calls {@link Delete} before {@link Init}
-     * 
+     *
      * @throws DevFailed
      */
     @Command(name = INIT_CMD)
@@ -465,7 +500,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Add an attribute to the device
-     * 
+     *
      * @param attribute
      * @throws DevFailed
      */
@@ -488,7 +523,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * remove an attribute of the device. Not possible to remove State or Status
-     * 
+     *
      * @param attribute
      * @throws DevFailed
      */
@@ -503,7 +538,7 @@ public final class DeviceImpl extends Device_5POA {
     }
 
     /**
-     * 
+     *
      * @param pipe
      * @throws DevFailed
      */
@@ -522,7 +557,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * remove pipe of the device. Not possible to remove State or Status
-     * 
+     *
      * @param attribute
      * @throws DevFailed
      */
@@ -532,7 +567,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get a copy of the commands
-     * 
+     *
      * @return the commands
      */
     public List<PipeImpl> getPipeList() {
@@ -541,7 +576,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get attributes (copy)
-     * 
+     *
      * @return the attributes
      */
     public List<AttributeImpl> getAttributeList() {
@@ -550,7 +585,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get a command
-     * 
+     *
      * @param name
      * @return The command
      * @throws DevFailed
@@ -561,7 +596,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * add a device property to this device {@link DeviceProperty}
-     * 
+     *
      * @param property
      */
     public void addDeviceProperty(final DevicePropertyImpl property) {
@@ -570,7 +605,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * add a class property to this device {@link ClassProperty}
-     * 
+     *
      * @param property
      */
     public void addClassProperty(final ClassPropertyImpl property) {
@@ -579,7 +614,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set a dynamic properties manager {@link DeviceProperties}
-     * 
+     *
      * @param properties
      */
     public synchronized void setDeviceProperties(final DevicePropertiesImpl properties) {
@@ -678,7 +713,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * Stops polling calls delete method {@link Delete}. Called before init and
      * at server shutdown
-     * 
+     *
      * @throws DevFailed
      */
     public void deleteDevice() throws DevFailed {
@@ -715,7 +750,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Check if an init is in progress
-     * 
+     *
      * @throws DevFailed if init is init progress
      */
     private synchronized void checkInitialization() throws DevFailed {
@@ -731,7 +766,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get info of this device in IDL1
-     * 
+     *
      * @return info
      * @throws DevFailed
      */
@@ -751,7 +786,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get info of this device in IDL3
-     * 
+     *
      * @return info
      * @throws DevFailed
      */
@@ -773,7 +808,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Dummy method to check if this device is responding
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -802,7 +837,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get the clients' requests history
-     * 
+     *
      * @param maxSize
      *            The maximum depth of history
      * @return the request history
@@ -821,7 +856,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get a description of this device
-     * 
+     *
      * @return description
      */
     @Override
@@ -838,7 +873,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get the name of the device
-     * 
+     *
      * @return name
      */
     @Override
@@ -852,7 +887,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * read an attribute history. IDL 2 version. The history is filled only be
      * attribute polling
-     * 
+     *
      * @param attributeName
      *            The attribute to retrieve
      * @param maxSize
@@ -872,7 +907,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * read an attribute history. IDL 3 version. The history is filled only be
      * attribute polling
-     * 
+     *
      * @param attributeName
      *            The attribute to retrieve
      * @param maxSize
@@ -892,7 +927,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * read an attribute history. IDL 4 version. The history is filled only be
      * attribute polling
-     * 
+     *
      * @param attributeName
      *            The attribute to retrieve
      * @param maxSize
@@ -923,7 +958,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Read some attributes. IDL 1 version.
-     * 
+     *
      * @param attributeNames
      *            The attributes names
      * @return The read results.
@@ -960,7 +995,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Read some attributes. IDL 2 version.
-     * 
+     *
      * @param names
      *            The attributes names
      * @param source
@@ -1002,7 +1037,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Read some attributes. IDL 3 version.
-     * 
+     *
      * @param names
      *            The attributes names
      * @param source
@@ -1043,7 +1078,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Read some attributes. IDL 4 version.
-     * 
+     *
      * @param names
      *            The attributes names
      * @param source
@@ -1094,7 +1129,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Read some attributes. IDL 5 version.
-     * 
+     *
      * @param names
      *            The attributes names
      * @param source
@@ -1109,17 +1144,17 @@ public final class DeviceImpl extends Device_5POA {
             throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(names));
-//        final Profiler profiler = new Profiler("read time");
-//        profiler.start(Arrays.toString(names));
+        // final Profiler profiler = new Profiler("read time");
+        // profiler.start(Arrays.toString(names));
 
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-//        profiler.start("blackbox");
+        // profiler.start("blackbox");
 
         blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
-//        profiler.start("locking");
+        // profiler.start("locking");
         clientIdentity = clIdent;
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1131,7 +1166,7 @@ public final class DeviceImpl extends Device_5POA {
         AttributeValue_5[] result = null;
 
         try {
-//            profiler.start("get value");
+            // profiler.start("get value");
             result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock);
 
@@ -1145,14 +1180,14 @@ public final class DeviceImpl extends Device_5POA {
             }
         }
 
-//        profiler.stop().print();
+        // profiler.stop().print();
         xlogger.exit();
         return result;
     }
 
     /**
      * Write some attributes. IDL 1 version
-     * 
+     *
      * @param values
      *            a container for attribute values.
      * @throws DevFailed
@@ -1188,7 +1223,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Write some attributes. IDL 3 version
-     * 
+     *
      * @param values
      *            a container for attribute values.
      * @throws DevFailed
@@ -1225,7 +1260,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Write some attributes. IDL 4 version
-     * 
+     *
      * @param values
      *            a container for attribute values.
      * @param clIdent
@@ -1234,7 +1269,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-            DevFailed {
+    DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -1268,7 +1303,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Write and read attributes in a single request
-     * 
+     *
      * @param values
      *            the values to write
      * @param clIdent
@@ -1313,7 +1348,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Write and read attributes in a single request
-     * 
+     *
      * @param writeValues
      *            the values to write
      * @param readNames
@@ -1392,7 +1427,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Query all commands details. IDL 1 version
-     * 
+     *
      * @return the commands details of this device
      * @throws DevFailed
      */
@@ -1423,7 +1458,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Query all commands details. IDL 2 version
-     * 
+     *
      * @return the commands details of this device
      * @throws DevFailed
      */
@@ -1455,7 +1490,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Query a command details. IDL 1 version.
-     * 
+     *
      * @param commandName
      *            the command name
      * @return the command details of this device
@@ -1480,7 +1515,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Query a command details. IDL 2 version.
-     * 
+     *
      * @param commandName
      *            the command name
      * @return the command details of this device
@@ -1506,7 +1541,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Execute a command. IDL 1 version
-     * 
+     *
      * @param command
      *            command name
      * @param argin
@@ -1541,7 +1576,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Execute a command. IDL 2 version
-     * 
+     *
      * @param command
      *            command name
      * @param argin
@@ -1578,7 +1613,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Execute a command. IDL 4 version
-     * 
+     *
      * @param commandName
      *            command name
      * @param argin
@@ -1622,7 +1657,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Command history. IDL 2 version.
-     * 
+     *
      * @param commandName
      *            the command name
      * @param maxSize
@@ -1643,7 +1678,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Command history. IDL 4 version.
-     * 
+     *
      * @param commandName
      *            the command name
      * @param maxSize
@@ -1677,7 +1712,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Update polling cache
-     * 
+     *
      * @param objectName
      *            The command or attribute to update
      * @throws DevFailed
@@ -1739,7 +1774,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get attributes config. IDL5 version
-     * 
+     *
      * @param attributeNames
      *            the attribute names or "All attributes"
      * @return the attribute configs
@@ -1792,7 +1827,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get attributes config. IDL3 version
-     * 
+     *
      * @param attributeNames
      *            the attribute names or "All attributes"
      * @return the attribute configs
@@ -1842,7 +1877,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get attributes config. IDL2 version
-     * 
+     *
      * @param attributeNames
      *            the attribute names or "All attributes"
      * @return the attribute configs
@@ -1894,7 +1929,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get attributes config. IDL1 version
-     * 
+     *
      * @param attributeNames
      *            the attribute names or "All attributes"
      * @return the attribute configs
@@ -1937,7 +1972,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set some attribute configs. IDL5 version
-     * 
+     *
      * @param newConf
      *            the new configurations
      * @param clIdent
@@ -1977,8 +2012,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                                "It's not supported to change enumeration labels number from outside the Tango device class code");
+                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                        "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }
@@ -1987,7 +2022,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set some attribute configs. IDL4 version
-     * 
+     *
      * @param newConf
      *            the new configurations
      * @param clIdent
@@ -2011,7 +2046,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set some attribute configs. IDL3 version
-     * 
+     *
      * @param newConf
      *            the new configurations
      * @throws DevFailed
@@ -2044,7 +2079,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set some attribute configs. IDL2 version
-     * 
+     *
      * @param newConf
      *            the new configurations
      * @throws DevFailed
@@ -2075,7 +2110,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get a copy of the commands
-     * 
+     *
      * @return the commands
      */
     public List<CommandImpl> getCommandList() {
@@ -2084,7 +2119,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * add a command
-     * 
+     *
      * @param command
      *            the new command
      * @throws DevFailed
@@ -2107,7 +2142,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Remove a command
-     * 
+     *
      * @param command
      * @throws DevFailed
      */
@@ -2121,7 +2156,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get device name
-     * 
+     *
      * @return device name
      */
     public String getName() {
@@ -2130,7 +2165,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Add attribute polling
-     * 
+     *
      * @param attributeName
      *            the attribute to poll
      * @param pollingPeriod
@@ -2144,7 +2179,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * Add command polling. Init command cannot be polled. Only command with
      * parameter void can be polled
-     * 
+     *
      * @param commandName
      *            the command to poll
      * @param pollingPeriod
@@ -2172,7 +2207,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Remove attribute polling
-     * 
+     *
      * @param attributeName
      *            the attribute
      * @throws DevFailed
@@ -2183,7 +2218,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Remove command polling
-     * 
+     *
      * @param commandName
      *            the command
      * @throws DevFailed
@@ -2210,7 +2245,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * get State
-     * 
+     *
      * @return state
      */
     @Override
@@ -2234,7 +2269,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * get Status
-     * 
+     *
      * @return status
      */
     @Override
@@ -2258,7 +2293,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * get CORBA id
-     * 
+     *
      * @return CORBA id
      */
     public byte[] getObjId() {
@@ -2267,7 +2302,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * set CORBA id
-     * 
+     *
      * @param objId
      */
     public void setObjId(final byte[] objId) {
@@ -2276,7 +2311,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set delete method {@link Delete}
-     * 
+     *
      * @param deleteMethod
      */
     public void setDeleteMethod(final Method deleteMethod) {
@@ -2285,7 +2320,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set around invoke method {@link AroundInvoke}
-     * 
+     *
      * @param aroundInvokeImpl
      */
     public void setAroundInvokeImpl(final AroundInvokeImpl aroundInvokeImpl) {
@@ -2300,7 +2335,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * build init method {@link Init}
-     * 
+     *
      * @return init
      */
     public synchronized InitImpl buildInit(final Method initMethod, final boolean isLazy) {
@@ -2318,7 +2353,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get State
-     * 
+     *
      * @return state
      * @throws DevFailed
      */
@@ -2374,7 +2409,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get status
-     * 
+     *
      * @return status
      * @throws DevFailed
      */
@@ -2398,7 +2433,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get class name as defined in tango db.
-     * 
+     *
      * @return class name
      */
     public String getClassName() {
@@ -2407,7 +2442,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Set state impl {@link State}
-     * 
+     *
      * @param stateImpl
      */
     public void setStateImpl(final StateImpl stateImpl) {
@@ -2416,7 +2451,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * set status impl {@link Status}
-     * 
+     *
      * @param statusImpl
      */
     public void setStatusImpl(final StatusImpl statusImpl) {
@@ -2425,7 +2460,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * String representation of device impl.
-     * 
+     *
      * @return a string
      */
     @Override
@@ -2441,7 +2476,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * get the implementation of the device
-     * 
+     *
      * @return business object
      */
     public Object getBusinessObject() {
@@ -2450,7 +2485,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * get the device properties
-     * 
+     *
      * @return device properties
      */
     public List<DevicePropertyImpl> getDevicePropertyList() {
@@ -2459,7 +2494,7 @@ public final class DeviceImpl extends Device_5POA {
 
     /**
      * Get the class properties
-     * 
+     *
      * @return class properties
      */
     public List<ClassPropertyImpl> getClassPropertyList() {
@@ -2485,7 +2520,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * read an attribute history. IDL 5 version. The history is filled only be
      * attribute polling
-     * 
+     *
      * @param attributeName
      *            The attribute to retrieve
      * @param maxSize
