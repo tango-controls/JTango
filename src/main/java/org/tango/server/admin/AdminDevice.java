@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -72,9 +74,9 @@ import fr.esrf.Tango.DevVarLongStringArray;
 /**
  * The administration device. Will be started automatically for each device
  * server.
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 @Device(transactionType = TransactionType.DEVICE)
 public final class AdminDevice {
@@ -100,7 +102,7 @@ public final class AdminDevice {
 
     /**
      * Init the device
-     * 
+     *
      * @throws DevFailed
      */
     @Init
@@ -116,7 +118,7 @@ public final class AdminDevice {
 
     /**
      * Set the tango exporter
-     * 
+     *
      * @param tangoExporter
      */
     public void setTangoExporter(final IExporter tangoExporter) {
@@ -125,7 +127,7 @@ public final class AdminDevice {
 
     /**
      * Set the class list
-     * 
+     *
      * @param classList
      */
     public void setClassList(final List<DeviceClassBuilder> classList) {
@@ -134,7 +136,7 @@ public final class AdminDevice {
 
     /**
      * get the polling status
-     * 
+     *
      * @param deviceName
      *            Device name
      * @return Device polling status
@@ -230,7 +232,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @return Device class list
      * @throws DevFailed
      */
@@ -249,7 +251,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @return Device list
      * @throws DevFailed
      */
@@ -270,7 +272,7 @@ public final class AdminDevice {
 
     /**
      * Command QuerySubDevice
-     * 
+     *
      * @return Device server sub device(s) list
      * @throws DevFailed
      */
@@ -283,7 +285,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @param deviceName
      *            Device name
      * @throws DevFailed
@@ -316,7 +318,7 @@ public final class AdminDevice {
 
     /**
      * Restart the whole server and its devices.
-     * 
+     *
      * @throws DevFailed
      */
     @Command(name = "RestartServer")
@@ -329,7 +331,7 @@ public final class AdminDevice {
 
     /**
      * Unexport everything and kill it self
-     * 
+     *
      * @throws DevFailed
      */
     @Command(name = "Kill")
@@ -373,7 +375,7 @@ public final class AdminDevice {
 
     /**
      * Send logs to a device
-     * 
+     *
      * @param argin
      * @throws DevFailed
      */
@@ -398,6 +400,7 @@ public final class AdminDevice {
                 }
                 if (className != null) {
                     LoggingManager.getInstance().addDeviceAppender(config[1], className, deviceName);
+
                 }
             } else {
                 LoggingManager.getInstance().addFileAppender(config[1], deviceName);
@@ -407,7 +410,7 @@ public final class AdminDevice {
 
     /**
      * remove logging to a device
-     * 
+     *
      * @param argin
      * @throws DevFailed
      */
@@ -428,7 +431,7 @@ public final class AdminDevice {
 
     /**
      * Get the logging level
-     * 
+     *
      * @param deviceNames
      * @return the current logging levels
      */
@@ -443,7 +446,7 @@ public final class AdminDevice {
 
     /**
      * Get logging target
-     * 
+     *
      * @param deviceName
      * @return Logging target list
      * @throws DevFailed
@@ -456,7 +459,7 @@ public final class AdminDevice {
 
     /**
      * Set logging level
-     * 
+     *
      * @param dvlsa
      *            Lg[i]=Logging Level. Str[i]=Device name.
      * @throws DevFailed
@@ -471,11 +474,12 @@ public final class AdminDevice {
         for (int i = 0; i < levels.length; i++) {
             LoggingManager.getInstance().setLoggingLevel(deviceNames[i], levels[i]);
         }
+
     }
 
     /**
      * Get status
-     * 
+     *
      * @return the status
      */
     public String getStatus() {
@@ -483,7 +487,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @return Polled device name list
      */
     @Command(name = "PolledDevice", outTypeDesc = "Polled device name list")
@@ -511,7 +515,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @param dvlsa
      *            Lg[0]=Upd period. Str[0]=Device name. Str[1]=Object
      *            type(COMMAND or ATTRIBUTE). Str[2]=Object name
@@ -548,7 +552,7 @@ public final class AdminDevice {
 
     /**
      * Command UpdObjPollingPeriod
-     * 
+     *
      * @param dvlsa
      * @throws DevFailed
      */
@@ -559,7 +563,7 @@ public final class AdminDevice {
 
     /**
      * Command RemObjPolling
-     * 
+     *
      * @param devices
      *            deviceName,type= {attribute or command},name1, namei
      * @throws DevFailed
@@ -622,7 +626,7 @@ public final class AdminDevice {
 
     /**
      * Get class properties
-     * 
+     *
      * @param className
      * @return class properties
      * @throws DevFailed
@@ -652,7 +656,7 @@ public final class AdminDevice {
 
     /**
      * Get device properties
-     * 
+     *
      * @param className
      * @return device properties and descriptions
      */
@@ -680,40 +684,75 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @param argin
      * @throws DevFailed
      */
     @Command(name = "ZmqEventSubscriptionChange", inTypeDesc = "Events consumer wants to subscribe to", outTypeDesc = "Str[0] = Heartbeat pub endpoint - Str[1] = Event pub endpoint - Lg[0] = Tango lib release - Lg[1] = Device IDL release")
     public DevVarLongStringArray zmqEventSubscriptionChange(final String[] argin) throws DevFailed {
-
         xlogger.entry();
-
         // A simple way to be used in debug
         if (argin.length == 1) {
             if (argin[0].equals("info")) {
-                return EventManager.getInstance().getConnectionParameters();
+                return EventManager.getInstance().getInfo();
             } else {
                 DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                         "Command ZmqEventSubscriptionChange expect 4 input arguments");
             }
         }
 
-        // Normal usage:
-        // Subscribe to the specified event
+        // Normal usage: Subscribe to the specified event
         if (argin.length < 4) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                     "Command ZmqEventSubscriptionChange expect 4 input arguments");
         }
         final String deviceName = argin[0].toLowerCase(Locale.ENGLISH);
         final String attributeName = argin[1].toLowerCase(Locale.ENGLISH);
-
         // argin[2] - "subscribe" not used.
         final EventType eventType = EventType.getEvent(argin[3].toLowerCase(Locale.ENGLISH));
+        int idlversion = EventManager.MINIMUM_IDL_VERSION;
+        if (argin.length == 5) {
+            idlversion = Integer.parseInt(argin[4]);
+        }
+        logger.debug("Subscribe event for {}/{} with type {}", new Object[] { deviceName, attributeName, eventType });
         // Search the specified device and attribute objects
+        final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, attributeName);
+        xlogger.exit();
+        return subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
+    }
+
+    @Command(name = "EventConfirmSubscription")
+    public void eventConfirmSubscription(final String[] argin) throws DevFailed {
+        xlogger.entry(Arrays.toString(argin));
+        if (argin.length == 0 || argin.length % 3 != 0) {
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS, "must a modulo 3 length");
+        }
+        final int eventNb = argin.length / 3;
+        for (int i = 0; i < eventNb; i++) {
+            final int idx = i * 3;
+            final String deviceName = argin[idx].toLowerCase(Locale.ENGLISH);
+            final String objName = argin[idx + 1].toLowerCase(Locale.ENGLISH);
+            final String eventTypeAndIDL = argin[idx + 2].toLowerCase(Locale.ENGLISH);
+            final String event = eventTypeAndIDL.substring(0, eventTypeAndIDL.lastIndexOf("."));
+            int idlversion = DeviceImpl.SERVER_VERSION;
+            if (!eventTypeAndIDL.contains(EventManager.IDL_LATEST)) {
+                idlversion = EventManager.MINIMUM_IDL_VERSION;
+            }
+            final EventType eventType = EventType.getEvent(event);
+            logger.debug("event confirmed subscription for {}, attribute/pipe {} with type {}", new Object[] {
+                    deviceName, objName, eventType });
+            final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, objName);
+            subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
+            xlogger.exit();
+        }
+
+    }
+
+    private Pair<PipeImpl, AttributeImpl> findSubscribers(final EventType eventType, final String deviceName,
+            final String objName) throws DevFailed {
         DeviceImpl device = null;
-        AttributeImpl attribute = null;
         PipeImpl pipe = null;
+        AttributeImpl attribute = null;
         for (final DeviceClassBuilder deviceClass : classList) {
             for (final DeviceImpl deviceImpl : deviceClass.getDeviceImplList()) {
                 if (deviceImpl.getName().toLowerCase(Locale.ENGLISH).equals(deviceName)) {
@@ -722,7 +761,7 @@ public final class AdminDevice {
                         device = deviceImpl;
                     } else if (eventType.equals(EventType.PIPE_EVENT)) {
                         for (final PipeImpl pipeImpl : deviceImpl.getPipeList()) {
-                            if (pipeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
+                            if (pipeImpl.getName().toLowerCase(Locale.ENGLISH).equals(objName)) {
                                 // Found. Store objects
                                 device = deviceImpl;
                                 pipe = pipeImpl;
@@ -730,7 +769,7 @@ public final class AdminDevice {
                         }
                     } else {
                         for (final AttributeImpl attributeImpl : deviceImpl.getAttributeList()) {
-                            if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(attributeName)) {
+                            if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(objName)) {
                                 if (attributeImpl.getBehavior() instanceof ForwardedAttribute) {
                                     // Found. Store objects
                                     device = deviceImpl;
@@ -741,7 +780,6 @@ public final class AdminDevice {
                                     // Found. Store objects
                                     device = deviceImpl;
                                     attribute = attributeImpl;
-
                                 } else {
                                     // check if event is pushed from device
                                     boolean throwError = false;
@@ -773,8 +811,8 @@ public final class AdminDevice {
                                     }
                                     if (throwError) {
                                         DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
-                                                "The polling (necessary to send events) for the attribute "
-                                                        + attributeName + " is not started");
+                                                "The polling (necessary to send events) for the attribute " + objName
+                                                        + " is not started");
                                     } else {
                                         device = deviceImpl;
                                         attribute = attributeImpl;
@@ -782,28 +820,27 @@ public final class AdminDevice {
                                 }
                             }
                         } // end for
-                    }
-
-                    if (eventType.equals(EventType.PIPE_EVENT)) {
-                        if (pipe == null) {
-                            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Pipe " + attributeName
-                                    + " not found");
-                        }
-                    } else if (!eventType.equals(EventType.INTERFACE_CHANGE_EVENT) && attribute == null) { // Not found
-                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + attributeName
-                                + " not found");
-                    }
-                }
+                    }// end if
+                }// end if
+            }// end for
+        } // end for
+        if (eventType.equals(EventType.PIPE_EVENT)) {
+            if (pipe == null) {
+                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Pipe " + objName + " not found");
             }
+        } else if (!eventType.equals(EventType.INTERFACE_CHANGE_EVENT) && attribute == null) { // Not
+            // found
+            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + objName + " not found");
         }
-        logger.debug("Subscribe event for {}/{} with type {}", new Object[] { deviceName, attributeName, eventType });
-
         if (device == null) { // Not found
             DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, "Device " + deviceName + " not found");
         }
+        return ImmutablePair.of(pipe, attribute);
+    }
 
-        xlogger.exit();
-
+    private DevVarLongStringArray subscribeEvent(final EventType eventType, final String deviceName,
+            final int idlversion, final AttributeImpl attribute, final PipeImpl pipe) throws DevFailed {
+        DevVarLongStringArray result;
         // Subscribe and returns connection parameters for client
         // Str[0] = Heartbeat pub endpoint -
         // Str[1] = Event pub endpoint
@@ -813,22 +850,19 @@ public final class AdminDevice {
         // - Lg[3] = Multicast info
         // - Lg[4] = Multicast info
         // - Lg[5] = ZMQ release
-        DevVarLongStringArray result;
         if (eventType.equals(EventType.INTERFACE_CHANGE_EVENT)) {
             // event for INTERFACE_CHANGE_EVENT does not have an attribute
-            result = EventManager.getInstance().getConnectionParameters(deviceName);
+            result = EventManager.getInstance().subcribe(deviceName);
         } else if (eventType.equals(EventType.PIPE_EVENT)) {
-            result = EventManager.getInstance().getConnectionParameters(deviceName, pipe);
+            result = EventManager.getInstance().subcribe(deviceName, pipe);
         } else {
-            result = EventManager.getInstance().getConnectionParameters(deviceName, attribute, eventType);
+            result = EventManager.getInstance().subcribe(deviceName, attribute, eventType, idlversion);
         }
         return result;
     }
 
-    // TODO command EventConfirmSubscription
-
     /**
-     * 
+     *
      * @param argin
      * @throws DevFailed
      */
@@ -869,7 +903,7 @@ public final class AdminDevice {
 
     /**
      * Command UnLockDevice
-     * 
+     *
      * @param argin
      * @return Device global lock counter
      * @throws DevFailed
@@ -900,7 +934,7 @@ public final class AdminDevice {
     }
 
     /**
-     * 
+     *
      * @param deviceNames
      * @throws DevFailed
      */
@@ -922,7 +956,7 @@ public final class AdminDevice {
 
     /**
      * Command DevLockStatus
-     * 
+     *
      * @param deviceName
      *            device name
      * @return lock status
@@ -950,7 +984,7 @@ public final class AdminDevice {
 
     /**
      * set status
-     * 
+     *
      * @param status
      */
     public void setStatus(final String status) {

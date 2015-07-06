@@ -49,9 +49,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage tango logging. Based on LogBack logging system
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class LoggingManager {
     private final Logger logger = LoggerFactory.getLogger(LoggingManager.class);
@@ -95,12 +95,13 @@ public final class LoggingManager {
 
     /**
      * Set the logging level of a device
-     * 
+     *
      * @param deviceName the device name
      * @param loggingLevel the level
      */
     public void setLoggingLevel(final String deviceName, final int loggingLevel) {
-        logger.debug("set logging level to {} on {}", loggingLevel, deviceName);
+        System.out.println("set logging level " + deviceName + "-" + LoggingLevel.getLevelFromInt(loggingLevel));
+        logger.debug("set logging level to {} on {}", LoggingLevel.getLevelFromInt(loggingLevel), deviceName);
         if (rootLoggingLevel < loggingLevel) {
             setRootLoggingLevel(loggingLevel);
         }
@@ -122,7 +123,7 @@ public final class LoggingManager {
 
     /**
      * Set the level of the root logger
-     * 
+     *
      * @param loggingLevel
      */
     public void setRootLoggingLevel(final int loggingLevel) {
@@ -134,7 +135,7 @@ public final class LoggingManager {
 
     /**
      * Set the level of all loggers of JTangoServer
-     * 
+     *
      * @param loggingLevel
      */
     public void setLoggingLevel(final int loggingLevel, final Class<?>... deviceClassNames) {
@@ -142,6 +143,7 @@ public final class LoggingManager {
         if (rootLoggingLevel < loggingLevel) {
             setRootLoggingLevel(loggingLevel);
         }
+        System.out.println("set logging to " + LoggingLevel.getLevelFromInt(loggingLevel));
         final Logger tangoLogger = LoggerFactory.getLogger("org.tango.server");
         if (tangoLogger instanceof ch.qos.logback.classic.Logger) {
             final ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) tangoLogger;
@@ -164,7 +166,7 @@ public final class LoggingManager {
 
     /**
      * Logging of device sent to logviewer device
-     * 
+     *
      * @param deviceTargetName
      * @param deviceClassName
      * @param loggingDeviceName
@@ -173,6 +175,7 @@ public final class LoggingManager {
     public void addDeviceAppender(final String deviceTargetName, final Class<?> deviceClassName,
             final String loggingDeviceName) throws DevFailed {
         if (rootLoggerBack != null) {
+            System.out.println("add device appender" + deviceTargetName + "-" + loggingDeviceName);
             logger.debug("add device appender {} on {}", deviceTargetName, loggingDeviceName);
             final DeviceAppender appender = new DeviceAppender(deviceTargetName, deviceClassName.getName(),
                     loggingDeviceName);
@@ -187,7 +190,7 @@ public final class LoggingManager {
 
     /**
      * Add an file appender for a device
-     * 
+     *
      * @param fileName
      * @param deviceName
      * @throws DevFailed
@@ -207,10 +210,10 @@ public final class LoggingManager {
             }
             if (!f.canWrite()) {
                 DevFailedUtils
-                        .throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
+                .throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
             }
             // debug level by default
-            setLoggingLevel(deviceName, LoggingLevel.DEBUG.toInt());
+            // setLoggingLevel(deviceName, LoggingLevel.DEBUG.toInt());
             System.out.println("create file  " + f);
             final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
             final FileAppender rfAppender = new FileAppender(deviceNameLower);

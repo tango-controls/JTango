@@ -22,39 +22,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
-//+======================================================================
-// $Source$
-//
-// Project:   Tango
-//
-// Description:  java source code for the TANGO client/server API.
-//
-// $Author: pascal_verdier $
-//
-// Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,
-//						European Synchrotron Radiation Facility
-//                      BP 220, Grenoble 38043
-//                      FRANCE
-//
-// This file is part of Tango.
-//
-// Tango is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Tango is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with Tango.  If not, see <http://www.gnu.org/licenses/>.
-//
-// $Revision:  $
-//
-//-======================================================================
-
 package org.tango.server.events;
 
 import java.util.ArrayList;
@@ -71,8 +38,12 @@ import org.tango.utils.TangoUtil;
 
 import fr.esrf.Tango.AttDataReady;
 import fr.esrf.Tango.AttDataReadyHelper;
+import fr.esrf.Tango.AttributeConfig_3;
+import fr.esrf.Tango.AttributeConfig_3Helper;
 import fr.esrf.Tango.AttributeConfig_5;
 import fr.esrf.Tango.AttributeConfig_5Helper;
+import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_4Helper;
 import fr.esrf.Tango.AttributeValue_5;
 import fr.esrf.Tango.AttributeValue_5Helper;
 import fr.esrf.Tango.DevErrorListHelper;
@@ -86,7 +57,7 @@ import fr.esrf.Tango.ZmqCallInfoHelper;
 
 /**
  * This class is a set of static utilities used for event management.
- * 
+ *
  * @author verdier
  */
 
@@ -94,15 +65,27 @@ class EventUtilities {
 
     private static final String HEARTBEAT = ".heartbeat";
     private static final String TANGO = "tango://";
-    private static final String IDL5 = ".idl5_";
+    private static final String IDLversion = ".idlversion_";
+    private static final String version = "version";
     private static double zmqVersion = -1.0;
     private static String tangoHost = null;
     private static final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
 
+    static String buildEventName(final String deviceName, final String attributeName, final EventType eventType,
+            final int idlVersion) throws DevFailed {
+        String fullName = buildEventNameBeginning(deviceName, attributeName);
+        if (idlVersion >= 5) {
+            fullName += IDLversion.replace(version, Integer.toString(idlVersion)) + eventType.getString();
+        } else {
+            fullName += "." + eventType.getString();
+        }
+        return fullName;
+    }
+
     static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, attributeName);
-        fullName += IDL5 + eventType.getString();
+        fullName += EventManager.IDL_LATEST + eventType.getString();
         return fullName;
     }
 
@@ -129,11 +112,10 @@ class EventUtilities {
         if (tangoHost == null) {
             tangoHost = DatabaseFactory.getDatabase().getPossibleTangoHosts()[0];
         }
-
-//        String deviceName2 = deviceName;
-//        if (!DatabaseFactory.isUseDb()) {
-//            deviceName2 = deviceName + "#dbase=no";
-//        }
+        // String deviceName2 = deviceName;
+        // if (!DatabaseFactory.isUseDb()) {
+        // deviceName2 = deviceName + "#dbase=no";
+        // }
         String fullName = TANGO + tangoHost + TangoUtil.DEVICE_SEPARATOR + deviceName.toLowerCase(Locale.ENGLISH);
         if (attributeName != null) {
             fullName += TangoUtil.DEVICE_SEPARATOR + attributeName.toLowerCase(Locale.ENGLISH);
@@ -143,7 +125,7 @@ class EventUtilities {
 
     /**
      * Add 8 bytes at beginning for C++ alignment
-     * 
+     *
      * @param data buffer to be aligned
      * @return buffer after c++ alignment.
      */
@@ -165,7 +147,7 @@ class EventUtilities {
 
     /**
      * Add 4 bytes at beginning for C++ alignment
-     * 
+     *
      * @param data buffer to be aligned
      * @return buffer after c++ alignment.
      */
@@ -182,13 +164,13 @@ class EventUtilities {
     }
 
     /**
-     * Marshall the attribute with attribute Value 5Z
-     * 
+     * Marshall the attribute with attribute Value
+     *
      * @param attribute attribute to marshall
      * @return result of the marshall action
      * @throws fr.esrf.Tango.DevFailed if marshall action failed
      */
-    static byte[] marshall(final AttributeValue_5 attributeValue) throws DevFailed {
+    static byte[] marshallIDL5(final AttributeValue_5 attributeValue) throws DevFailed {
         xlogger.entry();
         final CDROutputStream os = new CDROutputStream();
         try {
@@ -202,21 +184,54 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with attribute Value
-     * 
+     *
      * @param attribute attribute to marshall
      * @return result of the marshall action
      * @throws fr.esrf.Tango.DevFailed if marshall action failed
      */
-    static byte[] marshall(final AttributeImpl attribute) throws DevFailed {
+    static byte[] marshallIDL4(final AttributeValue_4 attributeValue) throws DevFailed {
+        xlogger.entry();
+        final CDROutputStream os = new CDROutputStream();
+        try {
+            AttributeValue_4Helper.write(os, attributeValue);
+            xlogger.exit();
+            return cppAlignment(os.getBufferCopy());
+        } finally {
+            os.close();
+        }
+    }
+
+    /**
+     * Marshall the attribute with attribute Value
+     *
+     * @param attribute attribute to marshall
+     * @return result of the marshall action
+     * @throws fr.esrf.Tango.DevFailed if marshall action failed
+     */
+    static byte[] marshallIDL5(final AttributeImpl attribute) throws DevFailed {
         xlogger.entry();
         final AttributeValue_5 attributeValue = TangoIDLAttributeUtil.toAttributeValue5(attribute,
                 attribute.getReadValue(), attribute.getWriteValue());
-        return marshall(attributeValue);
+        return marshallIDL5(attributeValue);
+    }
+
+    /**
+     * Marshall the attribute with attribute Value
+     *
+     * @param attribute attribute to marshall
+     * @return result of the marshall action
+     * @throws fr.esrf.Tango.DevFailed if marshall action failed
+     */
+    static byte[] marshallIDL4(final AttributeImpl attribute) throws DevFailed {
+        xlogger.entry();
+        final AttributeValue_4 attributeValue = TangoIDLAttributeUtil.toAttributeValue4(attribute,
+                attribute.getReadValue(), attribute.getWriteValue());
+        return marshallIDL4(attributeValue);
     }
 
     /**
      * Marshall AttDataReady
-     * 
+     *
      * @param dataReady the DataReady object to marshall
      * @return result of the marshall action
      * @throws DevFailed
@@ -235,11 +250,30 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with attribute config
-     * 
+     *
      * @return result of the marshall action
      * @throws DevFailed if marshall action failed
      */
-    static byte[] marshallConfig(final AttributeImpl attribute) throws DevFailed {
+    static byte[] marshallIDL4Config(final AttributeImpl attribute) throws DevFailed {
+        xlogger.entry();
+        final AttributeConfig_3 config = TangoIDLAttributeUtil.toAttributeConfig3(attribute);
+        final CDROutputStream os = new CDROutputStream();
+        try {
+            AttributeConfig_3Helper.write(os, config);
+            xlogger.exit();
+            return cppAlignment(os.getBufferCopy());
+        } finally {
+            os.close();
+        }
+    }
+
+    /**
+     * Marshall the attribute with attribute config
+     *
+     * @return result of the marshall action
+     * @throws DevFailed if marshall action failed
+     */
+    static byte[] marshallIDL5Config(final AttributeImpl attribute) throws DevFailed {
         xlogger.entry();
         final AttributeConfig_5 config = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
         final CDROutputStream os = new CDROutputStream();
@@ -254,7 +288,7 @@ class EventUtilities {
 
     /**
      * Marshall the attribute with a DevFailed object
-     * 
+     *
      * @param devFailed DevFailed object to marshall
      * @return result of the marshall action
      * @throws DevFailed if marshall action failed
@@ -273,7 +307,7 @@ class EventUtilities {
 
     /**
      * Marshall the ZmqCallInfo object
-     * 
+     *
      * @param counter event counter
      * @param isException true if the attribute has failed
      * @return result of the marshall action
@@ -320,23 +354,10 @@ class EventUtilities {
 
     }
 
-    static void dump(final byte[] rec) {
-        for (int i = 0; i < rec.length; i++) {
-
-            final String s = String.format("%02x", 0xFF & rec[i]);
-            // logger.debug("0x{} ",s);
-            System.out.print("0x" + s + " ");
-            if ((i + 1) % 16 == 0) {
-                System.out.println();
-            }
-        }
-        System.out.println();
-    }
-
     /**
      * Return the zmq version as a double like
      * 3.22 for "3.2.2" or 0.0 if zmq not available
-     * 
+     *
      * @return the TangORB version as a String
      */
     static double getZmqVersion() {
