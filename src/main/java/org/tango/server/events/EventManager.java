@@ -70,7 +70,7 @@ public final class EventManager {
     private static ZContext context;
     private static final EventManager INSTANCE = new EventManager();
     public static final int MINIMUM_IDL_VERSION = 4;
-    public static final String IDL_LATEST = ".idl" + DeviceImpl.SERVER_VERSION + "_";
+    public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
     private static ZMQ.Socket heartbeatSocket;
     private static ZMQ.Socket eventSocket;
     private static boolean isInitialized = false;
