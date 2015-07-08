@@ -733,14 +733,16 @@ public final class AdminDevice {
             final String deviceName = argin[idx].toLowerCase(Locale.ENGLISH);
             final String objName = argin[idx + 1].toLowerCase(Locale.ENGLISH);
             final String eventTypeAndIDL = argin[idx + 2].toLowerCase(Locale.ENGLISH);
-            final String event = eventTypeAndIDL.substring(0, eventTypeAndIDL.lastIndexOf("."));
-            int idlversion = DeviceImpl.SERVER_VERSION;
-            if (!eventTypeAndIDL.contains(EventManager.IDL_LATEST)) {
-                idlversion = EventManager.MINIMUM_IDL_VERSION;
+            // event name "idl5_archive" or "archive"
+            String event = eventTypeAndIDL;
+            int idlversion = EventManager.MINIMUM_IDL_VERSION;
+            if (eventTypeAndIDL.contains(EventManager.IDL_LATEST)) {
+                idlversion = DeviceImpl.SERVER_VERSION;
+                event = eventTypeAndIDL.substring(eventTypeAndIDL.indexOf("_") + 1, eventTypeAndIDL.length());
             }
             final EventType eventType = EventType.getEvent(event);
-            logger.debug("event confirmed subscription for {}, attribute/pipe {} with type {}", new Object[] {
-                    deviceName, objName, eventType });
+            logger.debug("event confirmed subscription for {}, attribute/pipe {} with type {} and IDL {}",
+                    new Object[] { deviceName, objName, eventType, idlversion });
             final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, objName);
             subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
             xlogger.exit();
@@ -812,7 +814,7 @@ public final class AdminDevice {
                                     if (throwError) {
                                         DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
                                                 "The polling (necessary to send events) for the attribute " + objName
-                                                        + " is not started");
+                                                + " is not started");
                                     } else {
                                         device = deviceImpl;
                                         attribute = attributeImpl;
