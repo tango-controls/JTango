@@ -65,8 +65,9 @@ class EventUtilities {
 
     private static final String HEARTBEAT = ".heartbeat";
     private static final String TANGO = "tango://";
-    private static final String IDLversion = ".idlversion_";
-    private static final String version = "version";
+    private static final String IDL_VERSION = "idlversion_";
+    private static final String DOT = ".";
+    private static final String VERSION = "version";
     private static double zmqVersion = -1.0;
     private static String tangoHost = null;
     private static final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
@@ -75,9 +76,9 @@ class EventUtilities {
             final int idlVersion) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, attributeName);
         if (idlVersion >= 5) {
-            fullName += IDLversion.replace(version, Integer.toString(idlVersion)) + eventType.getString();
+            fullName += DOT + IDL_VERSION.replace(VERSION, Integer.toString(idlVersion)) + eventType.getString();
         } else {
-            fullName += "." + eventType.getString();
+            fullName += DOT + eventType.getString();
         }
         return fullName;
     }
@@ -85,7 +86,7 @@ class EventUtilities {
     static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, attributeName);
-        fullName += EventManager.IDL_LATEST + eventType.getString();
+        fullName += DOT + EventManager.IDL_LATEST + eventType.getString();
         return fullName;
     }
 
@@ -104,7 +105,7 @@ class EventUtilities {
 
     static String buildDeviceEventName(final String deviceName, final EventType eventType) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, null);
-        fullName += "." + eventType.getString();
+        fullName += DOT + eventType.getString();
         return fullName;
     }
 
