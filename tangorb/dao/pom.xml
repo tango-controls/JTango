@@ -52,7 +52,6 @@
 	</build>
 
 
-
 	<dependencies>
 		<dependency>
 			<groupId>org.jacorb</groupId>
@@ -67,7 +66,7 @@
 		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jeromq</artifactId>
-			<version>0.3.2</version>
+			<version>0.3.4</version>
 		</dependency>
 
 		<dependency>
