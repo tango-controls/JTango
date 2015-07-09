@@ -33,12 +33,12 @@ import java.util.Map;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.server.command.CommandImpl;
@@ -52,9 +52,9 @@ import fr.esrf.Tango.DevFailed;
 /**
  * Manage dynamic commands and attributes. The creation of commands and attributes should done in {@link Init}. Don't
  * forget to delete them in {@link Delete} This class is injected by {@link DynamicManagement}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class DynamicManager {
 
@@ -78,7 +78,7 @@ public final class DynamicManager {
 
     /**
      * Ctr
-     * 
+     *
      * @param deviceImpl
      *            the associated device
      */
@@ -88,7 +88,7 @@ public final class DynamicManager {
 
     /**
      * Add attribute. Only if not already exists on device.
-     * 
+     *
      * @param behavior
      * @throws DevFailed
      */
@@ -103,11 +103,11 @@ public final class DynamicManager {
             final String rootAttributeName = behavior.getConfiguration().getAttributeProperties()
                     .loadAttributeRootName(deviceName, attributeName);
             if (rootAttributeName == null || rootAttributeName.isEmpty()
-                    || rootAttributeName.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
+                    || rootAttributeName.equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
                 att.init(deviceName);
                 // persist root attribute name in tango db
                 behavior.getConfiguration().getAttributeProperties()
-                        .persistAttributeRootName(deviceName, attributeName);
+                .persistAttributeRootName(deviceName, attributeName);
             } else {
                 // use attribute property
                 att.init(deviceName, rootAttributeName);
@@ -131,7 +131,7 @@ public final class DynamicManager {
 
     /**
      * remove a dynamic attribute
-     * 
+     *
      * @param attributeName
      *            attribute name
      * @throws DevFailed
@@ -150,7 +150,7 @@ public final class DynamicManager {
 
     /**
      * remove a dynamic attribute
-     * 
+     *
      * @param attributeName
      *            attribute name
      * @throws DevFailed
@@ -164,7 +164,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic attributes with exceptions
-     * 
+     *
      * @param exclude The attribute that will not be removed
      * @throws DevFailed
      */
@@ -182,7 +182,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic attributes
-     * 
+     *
      * @throws DevFailed
      */
     public void clearAttributes() throws DevFailed {
@@ -195,7 +195,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic attributes
-     * 
+     *
      * @param clearAttributeProperties
      *            true to remove all attributes properties from tango db
      * @throws DevFailed
@@ -209,7 +209,7 @@ public final class DynamicManager {
 
     /**
      * Retrieve all dynamic attributes
-     * 
+     *
      * @return Dynamic attributes
      */
     public List<IAttributeBehavior> getDynamicAttributes() {
@@ -222,7 +222,7 @@ public final class DynamicManager {
 
     /**
      * Get a dynamic attribute
-     * 
+     *
      * @param attributeName
      *            the attribute name
      * @return The dynamic attribute
@@ -233,7 +233,7 @@ public final class DynamicManager {
 
     /**
      * Add command. Only if not already exists on device
-     * 
+     *
      * @param behavior
      * @throws DevFailed
      */
@@ -250,7 +250,7 @@ public final class DynamicManager {
 
     /**
      * Remove a command
-     * 
+     *
      * @param commandName
      *            command name
      * @throws DevFailed
@@ -264,7 +264,7 @@ public final class DynamicManager {
 
     /**
      * Get a dynamic command
-     * 
+     *
      * @param commandName
      *            command name
      * @return The dynamic command
@@ -275,7 +275,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic commands
-     * 
+     *
      * @throws DevFailed
      */
     public void clearCommands() throws DevFailed {
@@ -287,7 +287,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic command with exceptions
-     * 
+     *
      * @param exclude The commands that will not be removed
      * @throws DevFailed
      */
@@ -305,7 +305,7 @@ public final class DynamicManager {
 
     /**
      * Retrieve all dynamic commands
-     * 
+     *
      * @return Dynamic commands
      */
     public List<ICommandBehavior> getDynamicCommands() {
@@ -318,9 +318,9 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic attributes and commands
-     * 
+     *
      * @throws DevFailed
-     * 
+     *
      */
     public void clearAll() throws DevFailed {
         clearCommands();
@@ -329,7 +329,7 @@ public final class DynamicManager {
 
     /**
      * Remove all dynamic attributes and commands
-     * 
+     *
      * @param clearAttributeProperties
      *            to remove attributes properties from tango db
      * @throws DevFailed

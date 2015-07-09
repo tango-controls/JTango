@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.tango.server.Constants;
 import org.tango.server.IConfigurable;
 import org.tango.server.properties.PropertiesUtils;
 
@@ -38,21 +39,13 @@ import fr.esrf.Tango.PipeWriteType;
 
 public final class PipeConfiguration implements IConfigurable {
 
-    public static final String LABEL = "label";
-    public static final String DESC = "description";
-
-    public static final String NO_DESCRIPTION = "No description";
-    public static final String NONE = "None";
-    public static final String NAN = "NAN";
-    public static final String NOT_SPECIFIED = "Not specified";
-
     private final String name;
     private String label = "";
     private String description = "";
     private DispLevel displayLevel;
     private PipeWriteType writeType;
-//    private int pollingPeriod = 0;
-//    private boolean isPolled = false;
+    // private int pollingPeriod = 0;
+    // private boolean isPolled = false;
     private String[] extensions = new String[0];
 
     public PipeConfiguration(final String name) {
@@ -102,8 +95,9 @@ public final class PipeConfiguration implements IConfigurable {
     }
 
     public void setDescription(final String description) {
-        if (description.isEmpty() || description.equalsIgnoreCase(NOT_SPECIFIED) || description.equalsIgnoreCase(NONE)) {
-            this.description = NO_DESCRIPTION;
+        if (description.isEmpty() || description.equalsIgnoreCase(Constants.NOT_SPECIFIED)
+                || description.equalsIgnoreCase(Constants.NONE)) {
+            this.description = Constants.NO_DESCRIPTION;
         } else {
             this.description = description;
         }
@@ -113,10 +107,10 @@ public final class PipeConfiguration implements IConfigurable {
     public void persist(final String deviceName) throws DevFailed {
         final Map<String, String[]> properties = new HashMap<String, String[]>();
         if (!getLabel().isEmpty()) {
-            properties.put(LABEL, new String[] { getLabel() });
+            properties.put(Constants.LABEL, new String[] { getLabel() });
         }
-        if (!getDescription().equals(NO_DESCRIPTION)) {
-            properties.put(DESC, new String[] { getDescription() });
+        if (!getDescription().equals(Constants.NO_DESCRIPTION)) {
+            properties.put(Constants.DESC, new String[] { getDescription() });
         }
         PropertiesUtils.setDevicePipePropertiesInDB(deviceName, name, properties);
     }
@@ -124,11 +118,11 @@ public final class PipeConfiguration implements IConfigurable {
     @Override
     public void load(final String deviceName) throws DevFailed {
         // TODO set class name
-        final String[] labels = PropertiesUtils.getDevicePipeProperty(deviceName, "", name, LABEL);
+        final String[] labels = PropertiesUtils.getDevicePipeProperty(deviceName, "", name, Constants.LABEL);
         if (labels.length == 1) {
             setLabel(labels[0]);
         }
-        final String[] descs = PropertiesUtils.getDevicePipeProperty(deviceName, "", name, DESC);
+        final String[] descs = PropertiesUtils.getDevicePipeProperty(deviceName, "", name, Constants.DESC);
         if (descs.length == 1) {
             setDescription(descs[0]);
         }
