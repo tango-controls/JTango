@@ -60,7 +60,7 @@ import fr.esrf.Tango.DispLevel;
 
 /**
  * Tango attribute
- * 
+ *
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
@@ -177,7 +177,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     /**
      * read attribute on device
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -191,7 +191,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     /**
      * set the read value
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -202,9 +202,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         }
         // update quality if necessary
         if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
-            
-                updateQuality(inValue);
-            
+
+            updateQuality(inValue);
+
         }
         try {
             // copy value
@@ -284,11 +284,11 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         isOutOfLimits = false;
         isDeltaAlarm = false;
         final AttributePropertiesImpl props = config.getAttributeProperties();
-        final boolean isAlarmNotConfigured = props.getMaxAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.getMinAlarm().equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.getMaxWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.getMinWarning().equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.getDeltaT().equals(AttributePropertiesImpl.NOT_SPECIFIED);
+        final boolean isAlarmNotConfigured = props.getMaxAlarm().equals(Constants.NOT_SPECIFIED)
+                && props.getMinAlarm().equals(Constants.NOT_SPECIFIED)
+                && props.getMaxWarning().equals(Constants.NOT_SPECIFIED)
+                && props.getMinWarning().equals(Constants.NOT_SPECIFIED)
+                && props.getDeltaT().equals(Constants.NOT_SPECIFIED);
         if (!config.getWritable().equals(AttrWriteType.WRITE) && isNumber() && !isAlarmNotConfigured) {
             final double maxAlarm = props.getMaxAlarmDouble();
 
@@ -412,7 +412,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     /**
      * write attribute
-     * 
+     *
      * @param value
      * @throws DevFailed
      */
@@ -495,7 +495,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     /**
      * Set the attribute properties.
-     * 
+     *
      * @param properties
      *            The attribute properties
      * @throws DevFailed

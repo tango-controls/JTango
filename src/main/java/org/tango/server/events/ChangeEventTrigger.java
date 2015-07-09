@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
@@ -45,9 +45,9 @@ import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#CHANGE_EVENT}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public class ChangeEventTrigger implements IEventTrigger {
 
@@ -67,7 +67,7 @@ public class ChangeEventTrigger implements IEventTrigger {
 
     /**
      * Ctr
-     * 
+     *
      * @param attribute The attribute that send event
      * @param absolute The absolute change delta
      * @param relative The relative change delta
@@ -284,7 +284,7 @@ public class ChangeEventTrigger implements IEventTrigger {
 
     /**
      * Check if event criteria are set for specified events
-     * 
+     *
      * @param attribute the specified attribute
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
@@ -295,12 +295,12 @@ public class ChangeEventTrigger implements IEventTrigger {
         }
         // Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.ch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.ch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
+        if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
             DevFailedUtils
-                    .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                            "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
-                                    + " are not set");
+            .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                    "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                    + " are not set");
         }
     }
 

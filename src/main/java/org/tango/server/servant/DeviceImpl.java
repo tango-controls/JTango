@@ -126,19 +126,13 @@ import fr.esrf.Tango.PipeConfig;
 public final class DeviceImpl extends Device_5POA {
 
     public static final String INIT_CMD = "Init";
-    // private static final String MIN_POLLING_PERIOD_IS = "min polling period is ";
-    // private static final String POLLED_OBJECT = "Polled object ";
-    // private static final String POLLED_ATTR = "polled_attr";
     private final Logger logger = LoggerFactory.getLogger(DeviceImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceImpl.class);
 
     private static final String NOT_IMPORTANT_ERROR = "not important error";
     private static final String READ_ASKED_FOR_0_ATTRIBUTES = "read asked for 0 attributes";
     private static final String READ_ERROR = "READ_ERROR";
-    /**
-     * Retrieve the default value from a system property. {@link stateCheckAttrAlarm}
-     */
-    private static final String STATE_CHECK_ALARMS_DEFAULT = System.getProperty("org.tango.server.checkalarms", "true");
+
     /**
      * TANGO system version
      */
@@ -316,32 +310,32 @@ public final class DeviceImpl extends Device_5POA {
         try {
             // StateCheckAttrAlarm
             final DevicePropertyImpl property = new DevicePropertyImpl(
-                    "StateCheckAttrAlarm",
+                    Constants.STATE_CHECK_ATTR_ALARM,
                     "boolean. If true, all attributes will be read at each state/status request to check if alarm is present",
                     this.getClass().getMethod("setStateCheckAttrAlarm", boolean.class), this, name, className, false,
-                    STATE_CHECK_ALARMS_DEFAULT);
+                    Constants.STATE_CHECK_ALARMS_DEFAULT);
             addDeviceProperty(property);
             // cmd_min_poll_period
-            final DevicePropertyImpl property2 = new DevicePropertyImpl("cmd_min_poll_period",
+            final DevicePropertyImpl property2 = new DevicePropertyImpl(Constants.CMD_MIN_POLL_PERIOD,
                     "min poll value for commands", this.getClass().getMethod("setMinCommandPolling", String[].class),
                     this, name, className, false);
             addDeviceProperty(property2);
             // min_poll_period
-            final DevicePropertyImpl property3 = new DevicePropertyImpl("min_poll_period", "min poll value", this
-                    .getClass().getMethod("setMinPolling", int.class), this, name, className, false, "0");
+            final DevicePropertyImpl property3 = new DevicePropertyImpl(Constants.MIN_POLL_PERIOD, "min poll value",
+                    this.getClass().getMethod("setMinPolling", int.class), this, name, className, false, "0");
             addDeviceProperty(property3);
             // attr_min_poll_period
-            final DevicePropertyImpl property4 = new DevicePropertyImpl("attr_min_poll_period",
+            final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
             // cmd_poll_ring_depth
-            final DevicePropertyImpl property5 = new DevicePropertyImpl("cmd_poll_ring_depth",
+            final DevicePropertyImpl property5 = new DevicePropertyImpl(Constants.CMD_POLL_RING_DEPTH,
                     "command poll ring depth", this.getClass().getMethod("setCmdPollRingDepth", String[].class), this,
                     name, className, false);
             addDeviceProperty(property5);
             // attr_poll_ring_depth
-            final DevicePropertyImpl property6 = new DevicePropertyImpl("attr_poll_ring_depth",
+            final DevicePropertyImpl property6 = new DevicePropertyImpl(Constants.ATTR_POLL_RING_DEPTH,
                     "attribute poll ring depth", this.getClass().getMethod("setAttrPollRingDepth", String[].class),
                     this, name, className, false);
             addDeviceProperty(property6);
@@ -350,11 +344,11 @@ public final class DeviceImpl extends Device_5POA {
                     .getClass().getMethod("setPolledAttributes", String[].class), this, name, className, false);
             addDeviceProperty(property7);
             // logging_target
-            final DevicePropertyImpl property9 = new DevicePropertyImpl("logging_target", "logging target", this
-                    .getClass().getMethod("setLoggingTarget", String.class), this, name, className, false);
+            final DevicePropertyImpl property9 = new DevicePropertyImpl(Constants.LOGGING_TARGET, "logging target",
+                    this.getClass().getMethod("setLoggingTarget", String.class), this, name, className, false);
             addDeviceProperty(property9);
             // logging_level
-            final DevicePropertyImpl property8 = new DevicePropertyImpl("logging_level", "logging level", this
+            final DevicePropertyImpl property8 = new DevicePropertyImpl(Constants.LOGGING_LEVEL, "logging level", this
                     .getClass().getMethod("setLoggingLevel", String.class), this, name, className, false);
             addDeviceProperty(property8);
 
@@ -1269,7 +1263,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-    DevFailed {
+            DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -2012,8 +2006,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                        "It's not supported to change enumeration labels number from outside the Tango device class code");
+                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                                "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }

@@ -34,15 +34,15 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.client.database.DatabaseFactory;
-import org.tango.server.attribute.AttributePropertiesImpl;
+import org.tango.server.Constants;
 
 import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage attribute properties persistancy in tango db.
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class AttributePropertiesManager {
 
@@ -56,7 +56,7 @@ public final class AttributePropertiesManager {
 
     /**
      * Get an attribute's properties from tango db
-     * 
+     *
      * @param attributeName
      * @return The properties
      * @throws DevFailed
@@ -69,7 +69,7 @@ public final class AttributePropertiesManager {
 
     /**
      * Get an attribute's properties from tango db
-     * 
+     *
      * @param attributeName
      * @return The properties
      * @throws DevFailed
@@ -98,7 +98,7 @@ public final class AttributePropertiesManager {
 
     /**
      * Get an attribute property from tango db
-     * 
+     *
      * @param attributeName
      * @param propertyName
      * @return The property
@@ -124,7 +124,7 @@ public final class AttributePropertiesManager {
 
     /**
      * Set attribute property in tango db
-     * 
+     *
      * @param attributeName
      * @param propertyName
      * @param value
@@ -160,7 +160,7 @@ public final class AttributePropertiesManager {
 
     /**
      * Set attribute properties in tango db
-     * 
+     *
      * @param attributeName
      * @param properties
      * @throws DevFailed
@@ -182,10 +182,10 @@ public final class AttributePropertiesManager {
                 boolean isADefaultValue = false;
                 if (presentValue != null) {
                     isADefaultValue = presentValue.isEmpty()
-                            && (value.equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)
-                                    || value.equalsIgnoreCase(AttributePropertiesImpl.NO_DIPLAY_UNIT)
-                                    || value.equalsIgnoreCase(AttributePropertiesImpl.NO_UNIT) || value
-                                        .equalsIgnoreCase(AttributePropertiesImpl.NO_STD_UNIT));
+                            && (value.equalsIgnoreCase(Constants.NOT_SPECIFIED)
+                                    || value.equalsIgnoreCase(Constants.NO_DIPLAY_UNIT)
+                                    || value.equalsIgnoreCase(Constants.NO_UNIT) || value
+                                        .equalsIgnoreCase(Constants.NO_STD_UNIT));
                 }
                 if (!isADefaultValue) {
                     if (presentValue == null) {

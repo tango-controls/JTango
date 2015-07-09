@@ -29,6 +29,7 @@ import java.lang.reflect.Array;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
+import org.tango.server.Constants;
 import org.tango.server.IConfigurable;
 import org.tango.server.PolledObjectConfig;
 
@@ -130,7 +131,7 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
 
     /**
      * Set the attribute type with Java class. Can be scalar, array or matrix
-     * 
+     *
      * @param type
      * @throws DevFailed
      */
@@ -195,7 +196,7 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
     public void setAttributeProperties(final AttributePropertiesImpl attributeProperties) throws DevFailed {
         this.attributeProperties = new AttributePropertiesImpl(attributeProperties);
         if (this.attributeProperties.getLabel().isEmpty()
-                || this.attributeProperties.getLabel().equalsIgnoreCase(AttributePropertiesImpl.NOT_SPECIFIED)) {
+                || this.attributeProperties.getLabel().equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
             this.attributeProperties.setLabel(name);
         }
     }
@@ -221,7 +222,7 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
 
     /**
      * Set the attribute type with Tango type.
-     * 
+     *
      * @see TangoConst for possible values
      * @param tangoType
      * @throws DevFailed
