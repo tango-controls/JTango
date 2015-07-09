@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
-import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -38,9 +38,9 @@ import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#ARCHIVE_EVENT}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public class ArchiveEventTrigger implements IEventTrigger {
     private final Logger logger = LoggerFactory.getLogger(ArchiveEventTrigger.class);
@@ -52,7 +52,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     /**
      * Ctr
-     * 
+     *
      * @param period The archive period
      * @param absolute The archive absolute change delta
      * @param relative The archive relative change delta
@@ -85,7 +85,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     /**
      * Check if event criteria are set for specified attribute
-     * 
+     *
      * @param attribute the specified attribute
      * @throws DevFailed if no event criteria is set for specified attribute.
      */
@@ -96,9 +96,9 @@ public class ArchiveEventTrigger implements IEventTrigger {
         }
         // Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.arch_event.period.equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.arch_event.abs_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)
-                && props.arch_event.rel_change.equals(AttributePropertiesImpl.NOT_SPECIFIED)) {
+        if (props.arch_event.period.equals(Constants.NOT_SPECIFIED)
+                && props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
                     "Archive event properties (archive_abs_change or "
                             + "archive_rel_change or archive_period) for attribute " + attribute.getName()

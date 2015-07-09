@@ -50,7 +50,6 @@ import fr.esrf.Tango.DevFailed;
 
 public final class TangoExporter implements IExporter {
 
-    private static final String ADMIN_SERVER_CLASS_NAME = "DServer";
     private final Logger logger = LoggerFactory.getLogger(TangoExporter.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(TangoExporter.class);
 
@@ -70,7 +69,7 @@ public final class TangoExporter implements IExporter {
 
     /**
      * Build all devices of all classes that are is this executable
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -78,7 +77,7 @@ public final class TangoExporter implements IExporter {
         // load tango db cache
         DatabaseFactory.getDatabase().loadCache(serverName, hostName);
         // special case for admin device
-        final DeviceClassBuilder clazz = new DeviceClassBuilder(AdminDevice.class, ADMIN_SERVER_CLASS_NAME);
+        final DeviceClassBuilder clazz = new DeviceClassBuilder(AdminDevice.class, Constants.ADMIN_SERVER_CLASS_NAME);
         deviceClassList.add(clazz);
         final DeviceImpl dev = buildDevice(Constants.ADMIN_DEVICE_DOMAIN + "/" + serverName, clazz);
         ((AdminDevice) dev.getBusinessObject()).setTangoExporter(this);
@@ -96,7 +95,7 @@ public final class TangoExporter implements IExporter {
 
     /**
      * Export all devices except admin device
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -111,10 +110,10 @@ public final class TangoExporter implements IExporter {
             // export all its devices
             final String[] deviceList = DatabaseFactory.getDatabase().getDeviceList(serverName, tangoClass);
             logger.debug("devices found  {}", Arrays.toString(deviceList));
-//            if (deviceList.length == 0) {
-//                DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
-//                        + tangoClass);
-//            }
+            // if (deviceList.length == 0) {
+            // DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
+            // + tangoClass);
+            // }
             for (final String deviceName : deviceList) {
                 buildDevice(deviceName, deviceClassBuilder);
             }
@@ -123,7 +122,7 @@ public final class TangoExporter implements IExporter {
 
     /**
      * Unexport all except admin device
-     * 
+     *
      * @throws DevFailed
      */
     @Override
@@ -150,7 +149,7 @@ public final class TangoExporter implements IExporter {
 
     @Override
     public void unexportDevice(final String deviceName) throws DevFailed {
-//        DeviceClassBuilder clazzToRemove = null;
+        // DeviceClassBuilder clazzToRemove = null;
         for (final DeviceClassBuilder clazz : deviceClassList) {
             if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
                 for (final DeviceImpl device : clazz.getDeviceImplList()) {
@@ -158,15 +157,15 @@ public final class TangoExporter implements IExporter {
                         logger.debug("unexport device {}", device.getName());
                         ORBUtils.unexportDevice(device);
                         clazz.removeDevice(deviceName);
-//                        clazzToRemove = clazz;
+                        // clazzToRemove = clazz;
                         break;
                     }
                 }
             }
         }
-//        if (clazzToRemove != null) {
-//            clazzToRemove.removeDevice(deviceName);
-//        }
+        // if (clazzToRemove != null) {
+        // clazzToRemove.removeDevice(deviceName);
+        // }
     }
 
     @Override
@@ -234,7 +233,7 @@ public final class TangoExporter implements IExporter {
 
     @Override
     public DeviceImpl getDevice(final String className, final String deviceName) throws DevFailed {
-        if (!className.equalsIgnoreCase(ADMIN_SERVER_CLASS_NAME) && !tangoClasses.containsKey(className)) {
+        if (!className.equalsIgnoreCase(Constants.ADMIN_SERVER_CLASS_NAME) && !tangoClasses.containsKey(className)) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, className
                     + " does not exists on this server");
         }
@@ -255,7 +254,7 @@ public final class TangoExporter implements IExporter {
     /**
      * Get the started devices of this server. WARNING: result is filled after
      * server has been started
-     * 
+     *
      * @param tangoClass
      * @return The devices
      * @throws DevFailed
