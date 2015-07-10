@@ -30,6 +30,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -709,16 +711,27 @@ public final class AdminDevice {
         final String deviceName = argin[0].toLowerCase(Locale.ENGLISH);
         final String attributeName = argin[1].toLowerCase(Locale.ENGLISH);
         // argin[2] - "subscribe" not used.
-        final EventType eventType = EventType.getEvent(argin[3].toLowerCase(Locale.ENGLISH));
-        int idlversion = EventManager.MINIMUM_IDL_VERSION;
-        if (argin.length == 5) {
-            idlversion = Integer.parseInt(argin[4]);
+        final String eventTypeAndIDL = argin[3].toLowerCase(Locale.ENGLISH);
+        // check idl version is contained in event name like "idl5_archive"
+        final Pattern p = Pattern.compile(EventManager.IDL_REGEX);
+        final Matcher m = p.matcher(eventTypeAndIDL);
+        DevVarLongStringArray returned;
+        if (m.matches()) {
+            returned = subcribeIDLInEventString(eventTypeAndIDL, deviceName, attributeName);
+        } else {
+            int idlversion = EventManager.MINIMUM_IDL_VERSION;
+            if (argin.length == 5) {
+                idlversion = Integer.parseInt(argin[4]);
+            }
+            final EventType eventType = EventType.getEvent(eventTypeAndIDL);
+            logger.debug("Subscribe event for {}/{} with type {}",
+                    new Object[] { deviceName, attributeName, eventType });
+            // Search the specified device and attribute objects
+            final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, attributeName);
+            returned = subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
         }
-        logger.debug("Subscribe event for {}/{} with type {}", new Object[] { deviceName, attributeName, eventType });
-        // Search the specified device and attribute objects
-        final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, attributeName);
         xlogger.exit();
-        return subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
+        return returned;
     }
 
     @Command(name = "EventConfirmSubscription")
@@ -733,21 +746,36 @@ public final class AdminDevice {
             final String deviceName = argin[idx].toLowerCase(Locale.ENGLISH);
             final String objName = argin[idx + 1].toLowerCase(Locale.ENGLISH);
             final String eventTypeAndIDL = argin[idx + 2].toLowerCase(Locale.ENGLISH);
-            // event name "idl5_archive" or "archive"
-            String event = eventTypeAndIDL;
-            int idlversion = EventManager.MINIMUM_IDL_VERSION;
-            if (eventTypeAndIDL.contains(EventManager.IDL_LATEST)) {
-                idlversion = DeviceImpl.SERVER_VERSION;
-                event = eventTypeAndIDL.substring(eventTypeAndIDL.indexOf("_") + 1, eventTypeAndIDL.length());
-            }
-            final EventType eventType = EventType.getEvent(event);
-            logger.debug("event confirmed subscription for {}, attribute/pipe {} with type {} and IDL {}",
-                    new Object[] { deviceName, objName, eventType, idlversion });
-            final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, objName);
-            subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
+            // event name like "idl5_archive" or "archive"
+            subcribeIDLInEventString(eventTypeAndIDL, deviceName, objName);
             xlogger.exit();
         }
 
+    }
+
+    /**
+     * Manage event subcription with event name like "idl5_archive" or "archive"
+     *
+     * @param eventTypeAndIDL
+     * @param deviceName
+     * @param objName
+     * @return
+     * @throws DevFailed
+     */
+    private DevVarLongStringArray subcribeIDLInEventString(final String eventTypeAndIDL, final String deviceName,
+            final String objName) throws DevFailed {
+        // event name like "idl5_archive" or "archive"
+        String event = eventTypeAndIDL;
+        int idlversion = EventManager.MINIMUM_IDL_VERSION;
+        if (eventTypeAndIDL.contains(EventManager.IDL_LATEST)) {
+            idlversion = DeviceImpl.SERVER_VERSION;
+            event = eventTypeAndIDL.substring(eventTypeAndIDL.indexOf("_") + 1, eventTypeAndIDL.length());
+        }
+        final EventType eventType = EventType.getEvent(event);
+        logger.debug("event subscription/confirmation for {}, attribute/pipe {} with type {} and IDL {}", new Object[] {
+                deviceName, objName, eventType, idlversion });
+        final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, objName);
+        return subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
     }
 
     private Pair<PipeImpl, AttributeImpl> findSubscribers(final EventType eventType, final String deviceName,
