@@ -98,11 +98,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         isFwdAttribute = behavior instanceof ForwardedAttribute;
         config = behavior.getConfiguration();
         this.behavior = behavior;
-
         history = new AttributeHistory(config.getName(), config.getWritable().equals(AttrWriteType.READ_WRITE),
                 config.getTangoType(), config.getFormat());
         isAlarmToHigh = false;
-
     }
 
     private Object getMemorizedValue() throws DevFailed {
@@ -114,7 +112,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             try {
                 obj = transmorph.convert(value, config.getType());
             } catch (final ConverterException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return obj;
@@ -123,7 +121,6 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     public void applyMemorizedValue() throws DevFailed {
         if (isMemorized() && !config.getWritable().equals(AttrWriteType.READ)) {
             xlogger.entry(config.getName());
-
             final Object value = getMemorizedValue();
             if (value != null) {
                 final AttributeValue attrValue = new AttributeValue(value, AttrQuality.ATTR_VALID);
@@ -198,13 +195,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     public void updateValue(final AttributeValue inValue) throws DevFailed {
         xlogger.entry(getName());
         if (inValue == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
+                    + " read value has not been updated");
         }
         // update quality if necessary
         if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
-
             updateQuality(inValue);
-
         }
         try {
             // copy value
@@ -237,9 +233,9 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                     readValue = writeValue;
                 }
             } else {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, "read value has not been updated");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
+                        + " read value has not been updated");
             }
-
             updateDefaultWritePart();
         } catch (final DevFailed e) {
             readValue.setQuality(AttrQuality.ATTR_INVALID);
@@ -254,12 +250,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void checkUpdateErrors(final AttributeValue returnedValue) throws DevFailed {
         if (config.getFormat().equals(AttrDataFormat.SCALAR) && returnedValue.getXDim() != 1
                 && returnedValue.getYDim() != 0) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP,
-                    "Data size for attribute " + config.getName() + " exceeds given limit");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "Data size for attribute " + name
+                    + " exceeds given limit");
         }
         if (!ArrayUtils.checkDimensions(returnedValue.getValue(), returnedValue.getXDim(), returnedValue.getYDim())) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP,
-                    "Data size for attribute " + config.getName() + " exceeds given limit");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "Data size for attribute " + name
+                    + " exceeds given limit");
         }
     }
 
@@ -274,7 +270,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             try {
                 writeValue = (AttributeValue) readValue.clone();
             } catch (final CloneNotSupportedException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
             writeValue.setValue(AttributeTangoType.getDefaultValue(readValue.getValue().getClass()));
         }
@@ -424,7 +420,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             try {
                 writeValue = (AttributeValue) value.clone();
             } catch (final CloneNotSupportedException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
 
             checkMinMaxValue();
@@ -451,7 +447,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 // }
             }
         } else {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_WRITABLE, config.getName() + " is not writable");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_WRITABLE, name + " is not writable");
         }
     }
 
@@ -462,7 +458,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             if (getFormat().equals(AttrDataFormat.SCALAR)) {
                 final double val = Double.parseDouble(writeValue.getValue().toString());
                 if (val > max || val < min) {
-                    DevFailedUtils.throwDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
                             "value is outside allowed range: " + min + "<" + max);
                 }
             } else {
@@ -470,7 +466,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 for (final String element : array) {
                     final double val = Double.parseDouble(element);
                     if (val > max || val < min) {
-                        DevFailedUtils.throwDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
+                        throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
                                 "value is outside allowed range: " + min + "<" + max);
                     }
                 }
@@ -480,16 +476,16 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     private void checkSetErrors(final AttributeValue value) throws DevFailed {
         if (!ArrayUtils.checkDimensions(value.getValue(), value.getXDim(), value.getYDim())) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_INCORRECT_DATA_NUMBER,
-                    "data size does not correspond to dimensions");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_INCORRECT_DATA_NUMBER, name
+                    + "data size does not correspond to dimensions");
         }
         if (getFormat().equals(AttrDataFormat.SPECTRUM) && value.getXDim() > getMaxX()) {
-            DevFailedUtils
-                    .throwDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, "value has a max size of " + getMaxX());
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, "value has a max size of "
+                    + getMaxX());
         } else if (getFormat().equals(AttrDataFormat.IMAGE)
                 && (value.getXDim() > getMaxX() || value.getYDim() > getMaxY())) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, "value has a max size of " + getMaxX()
-                    + "*" + getMaxY());
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, name + " value has a max size of "
+                    + getMaxX() + "*" + getMaxY());
         }
     }
 
@@ -504,7 +500,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         if (isMemorized() && getMemorizedValue() != null) {
             final double memoValue = Double.parseDouble(getMemorizedValue().toString());
             if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
-                DevFailedUtils.throwDevFailed("min or max value not possible for current memorized value");
+                throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
             }
         }
         config.setAttributeProperties(properties);
