@@ -67,4 +67,25 @@ public class DevicePipeTest {
 
         instance.nextArray(new float[0], 5);
     }
+
+    @Test(expected = DevFailed.class)
+    public void testScannerAPI_arrayOfWrongType() throws Exception {
+        PipeScanner instance = new DevicePipe("TestPipe", blob);
+
+        instance.move();
+
+        instance.nextArray(int[].class);
+    }
+
+    @Test
+    public void testScannerAPI_nextArray() throws Exception {
+        PipeScanner instance = new DevicePipe("TestPipe", blob);
+
+        instance.move();
+
+        float[] result = instance.nextArray(float[].class);
+
+        assertTrue(3 == result.length);
+        assertArrayEquals(new float[]{1.23f, 4.56f, 7.89f}, result, 0.1F);
+    }
 }
