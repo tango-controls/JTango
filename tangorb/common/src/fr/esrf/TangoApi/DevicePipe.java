@@ -47,10 +47,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 //@NotThreadSafe
 public class DevicePipe implements PipeScanner {
     private static final DevError[] DEV_ERRORS = new DevError[0];
+    private final int size;
+    private final AtomicInteger ndx = new AtomicInteger(0);
     private String pipeName = "";
-    private TimeVal  timeVal;
-    private PipeBlob pipeBlob;
     // ===================================================================
+    private TimeVal timeVal;
+    // ===================================================================
+    private PipeBlob pipeBlob;
     /**
      * Create a DevicePipe object
      * @param pipeName the pipe name
@@ -60,9 +63,9 @@ public class DevicePipe implements PipeScanner {
     public DevicePipe(String pipeName, PipeBlob pipeBlob) {
         this.pipeName = pipeName;
         long t = System.currentTimeMillis();
-        int sec  = (int)(t/1000);
-        int usec = (int)(t-(1000*sec))*1000;
-        this.timeVal  = new TimeVal(sec, usec, 0);
+        int sec = (int) (t / 1000);
+        int usec = (int) (t - (1000 * sec)) * 1000;
+        this.timeVal = new TimeVal(sec, usec, 0);
         this.pipeBlob = pipeBlob;
         size = pipeBlob.size();
     }
@@ -74,10 +77,12 @@ public class DevicePipe implements PipeScanner {
     // ===================================================================
     public DevicePipe(DevPipeData pipeData) {
         this.pipeName = pipeData.name;
-        this.timeVal  = pipeData.time;
+        this.timeVal = pipeData.time;
         this.pipeBlob = new PipeBlob(pipeData.data_blob);
         size = this.pipeBlob.size();
     }
+    // ===================================================================
+
     // ===================================================================
     // ===================================================================
     public DevPipeData getDevPipeDataObject() {
@@ -85,6 +90,7 @@ public class DevicePipe implements PipeScanner {
         return new DevPipeData(pipeName, timeVal, devPipeBlob);
     }
     // ===================================================================
+
     /**
      * @return return pipe name
      */
@@ -93,6 +99,7 @@ public class DevicePipe implements PipeScanner {
         return pipeName;
     }
     // ===================================================================
+
     /**
      * Set pipe name
      * @param pipeName pipe name
@@ -102,6 +109,7 @@ public class DevicePipe implements PipeScanner {
         this.pipeName = pipeName;
     }
     // ===================================================================
+
     /**
      * @return return pipe blob
      */
@@ -110,6 +118,7 @@ public class DevicePipe implements PipeScanner {
         return pipeBlob;
     }
     // ===================================================================
+
     /**
      * Set pipe blob
      * @param pipeBlob pipe blob
@@ -119,6 +128,7 @@ public class DevicePipe implements PipeScanner {
         this.pipeBlob = pipeBlob;
     }
     // ===================================================================
+
     /**
      * @return pipe time stamp
      */
@@ -126,27 +136,30 @@ public class DevicePipe implements PipeScanner {
     public TimeVal getTimeVal() {
         return timeVal;
     }
-    // ===================================================================
-    /**
-     * Set pipe time
-     * @param timeVal pipe time
-     */
-    // ===================================================================
-    public void setTimeVal(TimeVal timeVal) {
-        this.timeVal = timeVal;
-    }
-    // ===================================================================
+    // ===========================================
+
     /**
      * Set pipe time
      * @param t pipe time (number of milli seconds since EPOCH)
      */
     // ===================================================================
     public void setTimeVal(long t) {
-        int seconds = (int) (t/1000);
-        int millis  = (int) (t-1000*t);
-        this.timeVal = new TimeVal(seconds, millis*1000, 0);
+        int seconds = (int) (t / 1000);
+        int millis = (int) (t - 1000 * t);
+        this.timeVal = new TimeVal(seconds, millis * 1000, 0);
     }
     // ===========================================
+
+    /**
+     * Set pipe time
+     *
+     * @param timeVal pipe time
+     */
+    // ===================================================================
+    public void setTimeVal(TimeVal timeVal) {
+        this.timeVal = timeVal;
+    }
+
     /**
      * Return attribute time value in seconds since EPOCH.
      *
@@ -156,7 +169,7 @@ public class DevicePipe implements PipeScanner {
     public long getTimeValSec() throws DevFailed {
         return (long) timeVal.tv_sec;
     }
-    // ===========================================
+
     /**
      * Return attribute time value in milli seconds since EPOCH.
      *
@@ -166,9 +179,6 @@ public class DevicePipe implements PipeScanner {
     public long getTimeValMillisSec() throws DevFailed {
         return (long)timeVal.tv_sec*1000 + timeVal.tv_usec/1000;
     }
-
-    private final int size;
-    private final AtomicInteger ndx = new AtomicInteger(0);
 
     @Override
     public boolean hasNext() {
@@ -275,6 +285,8 @@ public class DevicePipe implements PipeScanner {
         return new DevicePipe(pipeName,el.extractPipeBlob());
     }
 
+
+
     @Override
     public <T> void nextArray(T[] target, int size) throws DevFailed {
         Object array = nextArray();
@@ -291,7 +303,7 @@ public class DevicePipe implements PipeScanner {
         System.arraycopy(array,0,target,0,size);
     }
 
-    private Object nextArray() throws DevFailed {
+    public Object nextArray() throws DevFailed {
         if(!hasNext()) throw new DevFailed("EOF pipe has reached!",DEV_ERRORS);
         PipeDataElement el = getPipeBlob().get(ndx.getAndIncrement());
         switch(el.getType()) {
@@ -325,6 +337,18 @@ public class DevicePipe implements PipeScanner {
                 return el.extractDevEncodedArray();
         }
         throw new AssertionError("Unreachable statement");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T nextArray(Class<T> type) throws DevFailed {
+        if (!type.isArray()) throw new DevFailed("Target type is not an array type!", DEV_ERRORS);
+        Object result = nextArray();
+        Class<?> componentType = result.getClass().getComponentType();
+        Class<?> targetComponentType = type.getComponentType();
+        if (componentType != targetComponentType)
+            throw new DevFailed("Underlying array's component type[" + componentType.getSimpleName() + "] is not " + targetComponentType.getSimpleName(), DEV_ERRORS);
+        return (T) result;//if
     }
 
     // ===================================================================
