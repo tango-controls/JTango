@@ -66,5 +66,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<version>9.0.2-SNAPSHOT</version>
+	<version>9.1.0</version>
 </project>
