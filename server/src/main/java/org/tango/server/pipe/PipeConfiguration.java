@@ -27,8 +27,8 @@ package org.tango.server.pipe;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.server.Constants;
 import org.tango.server.IConfigurable;
 import org.tango.server.properties.PropertiesUtils;

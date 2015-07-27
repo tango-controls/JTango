@@ -30,8 +30,8 @@ import net.entropysoft.transmorph.ConverterException;
 import net.entropysoft.transmorph.DefaultConverters;
 import net.entropysoft.transmorph.Transmorph;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -64,7 +64,7 @@ import fr.esrf.Tango.DispLevel;
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-        IReadableWritable<AttributeValue> {
+IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);

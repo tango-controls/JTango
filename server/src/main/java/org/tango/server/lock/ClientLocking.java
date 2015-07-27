@@ -26,7 +26,7 @@ package org.tango.server.lock;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DatabaseFactory;
@@ -46,9 +46,9 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 /**
  * Manage device locking with client request
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ClientLocking {
 
@@ -136,7 +136,7 @@ public final class ClientLocking {
     }
 
     /**
-     * 
+     *
      * @param clIdent
      * @param names
      * @throws DevFailed

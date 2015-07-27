@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.Constants;
@@ -107,7 +107,7 @@ public final class DynamicManager {
                 att.init(deviceName);
                 // persist root attribute name in tango db
                 behavior.getConfiguration().getAttributeProperties()
-                .persistAttributeRootName(deviceName, attributeName);
+                        .persistAttributeRootName(deviceName, attributeName);
             } else {
                 // use attribute property
                 att.init(deviceName, rootAttributeName);

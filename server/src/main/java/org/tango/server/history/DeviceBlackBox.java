@@ -30,7 +30,7 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Queue;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.omg.CORBA.BAD_OPERATION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

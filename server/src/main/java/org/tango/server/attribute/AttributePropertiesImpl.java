@@ -32,11 +32,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.properties.AttributePropertiesManager;
+import org.tango.utils.CaseInsensitiveMap;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.ArchiveEventProp;
@@ -542,7 +543,7 @@ public final class AttributePropertiesImpl {
     @Override
     public boolean equals(final Object obj) {
         final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-        .toString();
+                .toString();
         final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
         boolean isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
         if (isEqual) {
@@ -600,7 +601,7 @@ public final class AttributePropertiesImpl {
         final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
         final Map<String, String[]> propValues = attributePropertiesManager.getAttributePropertiesFromDB(attributeName);
         // use a second map for attribute props that have one value
-        final Map<String, String> propValuesSingle = new HashMap<String, String>(propValues.size());
+        final Map<String, String> propValuesSingle = new CaseInsensitiveMap<String>(propValues.size());
         for (final Entry<String, String[]> entry : propValues.entrySet()) {
             final String[] value = entry.getValue();
             if (value.length == 1) {

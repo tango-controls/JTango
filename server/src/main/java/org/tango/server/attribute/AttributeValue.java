@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
 import org.tango.server.IValue;
 import org.tango.utils.DevFailedUtils;
@@ -42,7 +42,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
     private static final String CANNOT_BE_AN_ATTRIBUTE = " cannot be an attribute";
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 717857459565709770L;
 
@@ -102,7 +102,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
      * <li>2D array: x=array[0].length, y=array.length</li>
      * </ul>
      * Time is set to System.currentTimeMillis().
-     * 
+     *
      * @param value
      *            attribute value.
      * @throws DevFailed
@@ -148,7 +148,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
 
     /**
      * Set Value and time. cf {@link #setValue(Object)} for details
-     * 
+     *
      * @param value
      * @param time
      * @throws DevFailed
@@ -169,7 +169,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
 
     /**
      * Set the quality of the attribute {@link AttrQuality}
-     * 
+     *
      * @param quality
      */
     public void setQuality(final AttrQuality quality) {
@@ -183,7 +183,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
 
     /**
      * Set timestamp. By default, time is set to System.currentTimeMillis() in {@link #setValue(Object)}.
-     * 
+     *
      * @param time
      *            timestamp in milliseconds
      */
@@ -198,7 +198,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
 
     /**
      * Set x dimension.Must be called after setValue to override default value
-     * 
+     *
      * @param xDim
      */
     public void setXDim(final int xDim) {
@@ -211,7 +211,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
 
     /**
      * Set y dimension. Must be called after setValue to override default value
-     * 
+     *
      * @param yDim
      */
     public void setYDim(final int yDim) {
