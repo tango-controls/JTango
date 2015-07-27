@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>JTangoCommons</artifactId>
-	<version>9.0.2-SNAPSHOT</version>
+	<version>9.0.2</version>
 
 	<name>JTango's Commons</name>
 	<description>commons for java tango</description>
@@ -43,7 +43,7 @@
 			<dependency>
 				<groupId>org.tango</groupId>
 				<artifactId>TangORB</artifactId>
-				<version>9.0.2-SNAPSHOT</version>
+				<version>9.1.0</version>
 				<exclusions>
 					<exclusion>
 						<artifactId>log4j</artifactId>
