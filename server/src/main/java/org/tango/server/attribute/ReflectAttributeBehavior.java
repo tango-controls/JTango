@@ -27,9 +27,9 @@ package org.tango.server.attribute;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
@@ -42,9 +42,9 @@ import fr.esrf.Tango.DevState;
 
 /**
  * Behavior a Tango attribute using java reflection
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ReflectAttributeBehavior implements IAttributeBehavior {
 
@@ -57,7 +57,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
 
     /**
      * Ctr
-     * 
+     *
      * @param config
      *            The attribute configuration
      * @param businessObject

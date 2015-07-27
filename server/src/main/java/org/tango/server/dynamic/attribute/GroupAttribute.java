@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.tango.server.StateMachineBehavior;
 import org.tango.server.attribute.AttributeConfiguration;
@@ -52,9 +52,9 @@ import fr.soleil.tango.clientapi.TangoGroupAttribute;
  * not string) and of the same format. Write is possible only if at least one attribute is writable.NB1:for spectrum and
  * images, if not all same dimensions, some zeros will be added. NB2: read value for images may be not relevant if not
  * all attributes have the same dimensions.
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public class GroupAttribute implements IAttributeBehavior {
 
@@ -67,7 +67,7 @@ public class GroupAttribute implements IAttributeBehavior {
     private DeviceAttribute[] readValues;
 
     /**
-     * 
+     *
      * @param groupAttributeName
      *            the name of this attribute
      * @param isExternalRead

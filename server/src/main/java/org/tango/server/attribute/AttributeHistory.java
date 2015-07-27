@@ -27,8 +27,8 @@ package org.tango.server.attribute;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.Constants;
@@ -78,12 +78,12 @@ public final class AttributeHistory {
 
     public synchronized DevAttrHistory_4 getAttrHistory4(final int maxSize) throws DevFailed {
         return new AttributeHistoryConvertor(attributeName, valueHistory, maxSize, tangoType, format, isReadWrite)
-                .getAttrHistory4();
+        .getAttrHistory4();
     }
 
     public synchronized DevAttrHistory_5 getAttrHistory5(final int maxSize) throws DevFailed {
         return new AttributeHistoryConvertor(attributeName, valueHistory, maxSize, tangoType, format, isReadWrite)
-                .getAttrHistory5();
+        .getAttrHistory5();
     }
 
     @Override

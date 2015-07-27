@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -56,9 +56,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage a tango server.
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ServerManager {
     private static final String SERVER_NAME_LOGGING = "serverName";
@@ -114,7 +114,7 @@ public final class ServerManager {
 
     /**
      * Get a ServerManager
-     * 
+     *
      * @return the server manager
      */
     public static ServerManager getInstance() {
@@ -123,7 +123,7 @@ public final class ServerManager {
 
     /**
      * Add a class to the server.
-     * 
+     *
      * @param tangoClass
      *            The class name as defined in the tango database
      * @param deviceClass
@@ -159,12 +159,12 @@ public final class ServerManager {
      * using the tango database. If the tango db is not used, the system
      * property OAPort(for jacorb) must be set. The errors occurred will be only
      * logged.
-     * 
+     *
      * <pre>
      * ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
      * ServerManager.getInstance().start(new String[] { &quot;1&quot; }, &quot;JTangoTest&quot;);
      * </pre>
-     * 
+     *
      * @param args
      *            The arguments to pass. instanceName [-v[trace level]] [-nodb
      *            [-dlist <device name list>]]
@@ -185,7 +185,7 @@ public final class ServerManager {
     /**
      * Idem as start but throw exceptions. @see ServerManager#start(String[],
      * String)
-     * 
+     *
      * @param args
      * @param execName
      * @throws DevFailed
@@ -201,11 +201,11 @@ public final class ServerManager {
      * Starts a Tango server. The system property TANGO_HOST is mandatory if
      * using the tango database. If the tango db is not used the system property
      * OAPort(for jacorb) must be set. The errors occurred will be only logged.
-     * 
+     *
      * <pre>
      * ServerManager.getInstance().start(new String[] { &quot;1&quot; }, JTangoTest.class);
      * </pre>
-     * 
+     *
      * @param args
      *            The arguments to pass. instanceName [-v[trace level]] [-nodb
      *            [-dlist <device name list>]]
@@ -268,7 +268,7 @@ public final class ServerManager {
 
     /**
      * Stop the server and clear all
-     * 
+     *
      * @throws DevFailed
      */
     public void stop() throws DevFailed {
@@ -291,7 +291,7 @@ public final class ServerManager {
 
     /**
      * Get main argurments
-     * 
+     *
      * @return The usage
      */
     private String getUsage() {
@@ -302,7 +302,7 @@ public final class ServerManager {
     /**
      * Check the command line arguments. The first one is mandatory and is the
      * server name. A -v option is authorized with an optional argument.
-     * 
+     *
      * @param argv
      * @throws DevFailed
      */
@@ -339,7 +339,7 @@ public final class ServerManager {
 
     /**
      * Configure {@link DatabaseFactory} without a tango db
-     * 
+     *
      * @param argv
      * @param currentIdx
      * @return The list of no db devices
@@ -376,7 +376,7 @@ public final class ServerManager {
     /**
      * Configure {@link DatabaseFactory} without a tango db and a file for
      * properties
-     * 
+     *
      * @param argv
      * @param arg
      * @param noDbDevices
@@ -400,7 +400,7 @@ public final class ServerManager {
 
     /**
      * Set the transaction type for all server. Overrides {@link Device#transactionType()}
-     * 
+     *
      * @param transactionType
      */
     public void setTransactionType(final TransactionType transactionType) {
@@ -413,7 +413,7 @@ public final class ServerManager {
 
     /**
      * WARNING: it is jvm dependent (works for sun')
-     * 
+     *
      * @throws DevFailed
      */
     private void initPIDAndHostName() throws DevFailed {
@@ -439,7 +439,7 @@ public final class ServerManager {
 
     /**
      * The host on which this server is running
-     * 
+     *
      * @return the host name
      */
     public String getHostName() {
@@ -448,7 +448,7 @@ public final class ServerManager {
 
     /**
      * The pid of this server
-     * 
+     *
      * @return the pid
      */
     public String getPid() {
@@ -457,7 +457,7 @@ public final class ServerManager {
 
     /**
      * execName/instanceName
-     * 
+     *
      * @return execName/instanceName
      */
     public String getExecName() {
@@ -466,7 +466,7 @@ public final class ServerManager {
 
     /**
      * The instance name
-     * 
+     *
      * @return The instance name
      */
     public String getInstanceName() {
@@ -475,7 +475,7 @@ public final class ServerManager {
 
     /**
      * The server name
-     * 
+     *
      * @return The server name
      */
     public String getServerName() {
@@ -485,7 +485,7 @@ public final class ServerManager {
     /**
      * Get the started devices of this server. WARNING: result is filled after
      * server has been started
-     * 
+     *
      * @param tangoClass
      * @return The devices
      * @throws DevFailed
@@ -499,7 +499,7 @@ public final class ServerManager {
     }
 
     /**
-     * 
+     *
      * @return true is the server is running
      */
     public boolean isStarted() {

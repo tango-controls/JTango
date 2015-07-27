@@ -27,17 +27,17 @@ package org.tango.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.DeviceState;
 import org.tango.server.annotation.StateMachine;
 
 /**
  * State machine
- * 
+ *
  * @see StateMachine
  * @author ABEILLE
- * 
+ *
  */
 public final class StateMachineBehavior implements Cloneable {
     /**
@@ -51,64 +51,64 @@ public final class StateMachineBehavior implements Cloneable {
 
     /**
      * Check if a state is allowed
-     * 
+     *
      * @param state
      * @return true if allowed
      */
     public boolean isAllowed(final DeviceState state) {
-	boolean isAllowed = true;
-	if (deniedStates.contains(state)) {
-	    isAllowed = false;
-	}
-	return isAllowed;
+        boolean isAllowed = true;
+        if (deniedStates.contains(state)) {
+            isAllowed = false;
+        }
+        return isAllowed;
     }
 
     /**
-     * 
+     *
      * @return denied states {@link DeviceState}
      */
     public DeviceState[] getDeniedStates() {
-	return deniedStates.toArray(new DeviceState[deniedStates.size()]);
+        return deniedStates.toArray(new DeviceState[deniedStates.size()]);
     }
 
     /**
      * Set denied states
-     * 
+     *
      * @param deniedStates
      */
     public void setDeniedStates(final DeviceState... deniedStates) {
-	for (final DeviceState deviceState : deniedStates) {
-	    this.deniedStates.add(deviceState);
-	}
+        for (final DeviceState deviceState : deniedStates) {
+            this.deniedStates.add(deviceState);
+        }
     }
 
     /**
-     * 
+     *
      * @return end state {@link DeviceState}
      */
     public DeviceState getEndState() {
-	return endState;
+        return endState;
     }
 
     /**
      * Set end state
-     * 
+     *
      * @param endState
      */
     public void setEndState(final DeviceState endState) {
-	this.endState = endState;
+        this.endState = endState;
     }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-	final StateMachineBehavior copy = (StateMachineBehavior) super.clone();
-	copy.deniedStates = new ArrayList<DeviceState>(deniedStates);
-	return copy;
+        final StateMachineBehavior copy = (StateMachineBehavior) super.clone();
+        copy.deniedStates = new ArrayList<DeviceState>(deniedStates);
+        return copy;
     }
 
     @Override
     public String toString() {
-	return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
 }

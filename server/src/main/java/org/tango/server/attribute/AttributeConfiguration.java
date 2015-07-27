@@ -26,8 +26,8 @@ package org.tango.server.attribute;
 
 import java.lang.reflect.Array;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
 import org.tango.server.Constants;
 import org.tango.server.IConfigurable;

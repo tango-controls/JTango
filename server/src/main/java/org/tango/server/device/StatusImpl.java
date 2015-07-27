@@ -29,9 +29,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -44,10 +44,10 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage the status of the device
- * 
+ *
  * @see Status
  * @author ABEILLE
- * 
+ *
  */
 public final class StatusImpl {
     private final Logger logger = LoggerFactory.getLogger(StatusImpl.class);
@@ -60,7 +60,7 @@ public final class StatusImpl {
 
     /**
      * Ctr
-     * 
+     *
      * @param businessObject
      * @param getStatusMethod
      * @param setStatusMethod
@@ -74,7 +74,7 @@ public final class StatusImpl {
 
     /**
      * Get the status of the device
-     * 
+     *
      * @return the status
      * @throws DevFailed
      */
@@ -91,7 +91,7 @@ public final class StatusImpl {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed("INVOCATION_ERROR", ExceptionUtils.getFullStackTrace(e.getCause())
+                    DevFailedUtils.throwDevFailed("INVOCATION_ERROR", ExceptionUtils.getStackTrace(e.getCause())
                             + " InvocationTargetException");
                 }
             }
@@ -110,7 +110,7 @@ public final class StatusImpl {
 
     /**
      * Change status of the device
-     * 
+     *
      * @param status
      * @throws DevFailed
      */

@@ -24,8 +24,8 @@
  */
 package org.tango.server.command;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.command.CommandTangoType;
 import org.tango.server.PolledObjectConfig;
 
@@ -76,107 +76,110 @@ public final class CommandConfiguration implements PolledObjectConfig {
     }
 
     public CommandConfiguration(final String name, final Class<?> inType, final Class<?> outType,
-	    final String inTypeDesc, final String outTypeDesc, final DispLevel dispLevel, final boolean isPolled,
-	    final int pollingPeriod) throws DevFailed {
-	super();
-	this.name = name;
-	this.inType = inType;
-	inTangoType = CommandTangoType.getTypeFromClass(inType).getTangoIDLType();
-	this.outType = outType;
-	outTangoType = CommandTangoType.getTypeFromClass(outType).getTangoIDLType();
-	this.inTypeDesc = inTypeDesc;
-	this.outTypeDesc = outTypeDesc;
-	this.dispLevel = dispLevel;
-	this.isPolled = isPolled;
-	this.pollingPeriod = pollingPeriod;
+            final String inTypeDesc, final String outTypeDesc, final DispLevel dispLevel, final boolean isPolled,
+            final int pollingPeriod) throws DevFailed {
+        super();
+        this.name = name;
+        this.inType = inType;
+        inTangoType = CommandTangoType.getTypeFromClass(inType).getTangoIDLType();
+        this.outType = outType;
+        outTangoType = CommandTangoType.getTypeFromClass(outType).getTangoIDLType();
+        this.inTypeDesc = inTypeDesc;
+        this.outTypeDesc = outTypeDesc;
+        this.dispLevel = dispLevel;
+        this.isPolled = isPolled;
+        this.pollingPeriod = pollingPeriod;
     }
 
+    @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     public void setName(final String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public Class<?> getInType() {
-	return inType;
+        return inType;
     }
 
     public void setInType(final Class<?> inType) throws DevFailed {
-	this.inType = inType;
-	inTangoType = CommandTangoType.getTypeFromClass(inType).getTangoIDLType();
+        this.inType = inType;
+        inTangoType = CommandTangoType.getTypeFromClass(inType).getTangoIDLType();
     }
 
     public Class<?> getOutType() {
-	return outType;
+        return outType;
     }
 
     public void setOutType(final Class<?> outType) throws DevFailed {
-	this.outType = outType;
-	outTangoType = CommandTangoType.getTypeFromClass(outType).getTangoIDLType();
+        this.outType = outType;
+        outTangoType = CommandTangoType.getTypeFromClass(outType).getTangoIDLType();
     }
 
     public String getInTypeDesc() {
-	return inTypeDesc;
+        return inTypeDesc;
     }
 
     public void setInTypeDesc(final String inTypeDesc) {
-	this.inTypeDesc = inTypeDesc;
+        this.inTypeDesc = inTypeDesc;
     }
 
     public String getOutTypeDesc() {
-	return outTypeDesc;
+        return outTypeDesc;
     }
 
     public void setOutTypeDesc(final String outTypeDesc) {
-	this.outTypeDesc = outTypeDesc;
+        this.outTypeDesc = outTypeDesc;
     }
 
     public DispLevel getDispLevel() {
-	return dispLevel;
+        return dispLevel;
     }
 
     public void setDispLevel(final DispLevel dispLevel) {
-	this.dispLevel = dispLevel;
+        this.dispLevel = dispLevel;
     }
 
     public int getInTangoType() {
-	return inTangoType;
+        return inTangoType;
     }
 
     public void setInTangoType(final int inTangoType) throws DevFailed {
-	this.inTangoType = inTangoType;
-	inType = CommandTangoType.getTypeFromTango(inTangoType).getCmdClass();
+        this.inTangoType = inTangoType;
+        inType = CommandTangoType.getTypeFromTango(inTangoType).getCmdClass();
     }
 
     public int getOutTangoType() {
-	return outTangoType;
+        return outTangoType;
     }
 
     public void setOutTangoType(final int outTangoType) throws DevFailed {
-	this.outTangoType = outTangoType;
-	outType = CommandTangoType.getTypeFromTango(outTangoType).getCmdClass();
+        this.outTangoType = outTangoType;
+        outType = CommandTangoType.getTypeFromTango(outTangoType).getCmdClass();
     }
 
     @Override
     public String toString() {
-	return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
     public int getPollingPeriod() {
-	return pollingPeriod;
+        return pollingPeriod;
     }
 
+    @Override
     public void setPollingPeriod(final int pollingPeriod) {
-	this.pollingPeriod = pollingPeriod;
+        this.pollingPeriod = pollingPeriod;
     }
 
     public boolean isPolled() {
-	return isPolled;
+        return isPolled;
     }
 
+    @Override
     public void setPolled(final boolean isPolled) {
-	this.isPolled = isPolled;
+        this.isPolled = isPolled;
     }
 }

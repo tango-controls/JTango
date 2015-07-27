@@ -27,8 +27,8 @@ package org.tango.server.device;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.InvocationContext;
@@ -39,9 +39,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * {@link AroundInvoke} implementation
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class AroundInvokeImpl {
 
@@ -54,7 +54,7 @@ public final class AroundInvokeImpl {
 
     /**
      * Ctr
-     * 
+     *
      * @param businessObject
      * @param aroundInvokeMethod
      */
@@ -65,7 +65,7 @@ public final class AroundInvokeImpl {
 
     /**
      * Call aroundInvoke implementation
-     * 
+     *
      * @param ctx
      *            invocation context
      * @throws DevFailed
