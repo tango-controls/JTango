@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -17,7 +17,7 @@ import fr.soleil.tango.clientapi.util.TypeConversionUtil;
 
 /**
  * Manage a connection to a tango command
- * 
+ *
  * @author ABEILLE
  */
 public final class TangoCommand {
@@ -27,7 +27,7 @@ public final class TangoCommand {
 
     /**
      * Build a mock command.
-     * 
+     *
      * @param command
      *            The mock commandbehavior. Default behavior may be changed by using a mock library like
      *            http://mockito.org
@@ -39,7 +39,7 @@ public final class TangoCommand {
 
     /**
      * Build a mock command with parameter and return value
-     * 
+     *
      * @param commandName
      * @param parameterMockValue
      *            the parameter default value
@@ -54,7 +54,7 @@ public final class TangoCommand {
 
     /**
      * Build a mock command with parameter or return value
-     * 
+     *
      * @param commandName
      * @param isParameterVoid
      *            true: parameter is void. false: return is void
@@ -69,7 +69,7 @@ public final class TangoCommand {
 
     /**
      * Build a connection to a tango command
-     * 
+     *
      * @param commandName
      * @param isMock
      *            true if is mocked. Mock command will be void-void.
@@ -110,7 +110,7 @@ public final class TangoCommand {
     /**
      * Execute the command on a single device or on a group If group is used the return data is not managed for the
      * moment.
-     * 
+     *
      * @throws DevFailed
      */
     public void execute() throws DevFailed {
@@ -179,7 +179,7 @@ public final class TangoCommand {
 
     /**
      * Execute a command with argin which is a single value
-     * 
+     *
      * @param <T>
      * @param clazz
      * @param value
@@ -193,7 +193,7 @@ public final class TangoCommand {
 
     /**
      * Execute a command with argin which is an array
-     * 
+     *
      * @param <T>
      * @param clazz
      * @param value
@@ -251,7 +251,7 @@ public final class TangoCommand {
 
     /**
      * Get Num part of DEVVASXSTRINGARRAY and convert to string
-     * 
+     *
      * @return
      * @throws DevFailed
      *             3 juin 2005

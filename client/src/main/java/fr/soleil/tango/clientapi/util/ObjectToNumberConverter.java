@@ -9,15 +9,15 @@ import net.entropysoft.transmorph.ConverterException;
 import net.entropysoft.transmorph.IConverter;
 import net.entropysoft.transmorph.type.TypeReference;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * convert an object to any number. Force conversion for all types (eg double to int)
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ObjectToNumberConverter implements IConverter {
 

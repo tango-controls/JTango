@@ -2,7 +2,7 @@ package fr.soleil.tango.clientapi.attribute;
 
 import java.lang.reflect.Array;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 

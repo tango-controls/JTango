@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -26,7 +26,7 @@ import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 /**
  * Tentative to manage group of Attributes.
- * 
+ *
  * @author ABEILLE
  */
 public final class AttributeGroup {
@@ -66,7 +66,7 @@ public final class AttributeGroup {
 
     /**
      * No more used. The exception is now set
-     * 
+     *
      * @param throwExceptions
      * @param attributes
      * @throws DevFailed
@@ -82,7 +82,7 @@ public final class AttributeGroup {
 
     /**
      * Add a list of devices in the group or add a list of patterns
-     * 
+     *
      * @param attributes
      *            The attribute list
      * @throws DevFailed
@@ -137,7 +137,7 @@ public final class AttributeGroup {
             if (devElement != null) {
                 try {
                     final int rid = devElement.read_attribute_asynch(attributeNames.toArray(new String[attributeNames
-                            .size()]));
+                                                                                                       .size()]));
                     readAnswersIDs.put(deviceName, rid);
                 } catch (final DevFailed e) {
                     logger.error("error", e);
@@ -206,7 +206,7 @@ public final class AttributeGroup {
             DevError[] allErrors = null;
             for (final DevError[] errors : errorsMap.values()) {
                 for (final DevError error : errors) {
-                    allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
+                    allErrors = ArrayUtils.add(allErrors, error);
                 }
             }
             throw new DevFailed(allErrors);
@@ -291,7 +291,7 @@ public final class AttributeGroup {
                 DevError[] allErrors = null;
                 for (final DevError[] errors : errorsMap.values()) {
                     for (final DevError error : errors) {
-                        allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
+                        allErrors = ArrayUtils.add(allErrors, error);
                     }
                 }
                 throw new DevFailed(allErrors);
@@ -302,7 +302,7 @@ public final class AttributeGroup {
 
     /**
      * write a list of values on attributes
-     * 
+     *
      * @param value
      * @return
      * @throws DevFailed
@@ -313,7 +313,7 @@ public final class AttributeGroup {
 
     /**
      * write a list of values on attributes
-     * 
+     *
      * @param value
      * @return
      * @throws DevFailed
@@ -345,7 +345,7 @@ public final class AttributeGroup {
                     logger.error(DevFailedUtils.toString(e));
                     final DevError[] errors = e.errors;
                     for (final DevError error : errors) {
-                        allErrors = (DevError[]) ArrayUtils.add(allErrors, error);
+                        allErrors = ArrayUtils.add(allErrors, error);
                     }
                     for (final String attribute : attributeNames) {
                         errorsMap.put(deviceName + "/" + attribute, errors);
@@ -380,7 +380,7 @@ public final class AttributeGroup {
 
     /**
      * Get last occured error
-     * 
+     *
      * @return a map with the attribute name as a key and its error as value
      */
     public synchronized Map<String, DevError[]> getErrors() {

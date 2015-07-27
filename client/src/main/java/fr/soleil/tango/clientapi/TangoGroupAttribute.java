@@ -3,7 +3,7 @@ package fr.soleil.tango.clientapi;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevError;
@@ -21,7 +21,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Build the group and read attributes
-     * 
+     *
      * @param attributeNames
      * @throws DevFailed
      */
@@ -32,8 +32,8 @@ public final class TangoGroupAttribute {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param throwExceptions
      * @param attributeNames
      * @throws DevFailed
@@ -71,7 +71,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Write a value on several attributes
-     * 
+     *
      * @param value
      *            Can be an array
      * @throws DevFailed
@@ -102,7 +102,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Write a value on several attribute
-     * 
+     *
      * @param value
      *            Can be an array
      * @throws DevFailed
@@ -132,7 +132,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Read all attributes of the group. WARN: does not throw errors. It will be thrown at extraction on DeviceAttribute
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -142,7 +142,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Read attributes and extract their values
-     * 
+     *
      * @return an array of objects. Same size as the number of attributes. Contains READ and WRITE parts
      * @throws DevFailed
      */
@@ -162,7 +162,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Launch read asynchronously. Get replies with {@link TangoGroupAttribute#getAsyncReplies()}
-     * 
+     *
      * @throws DevFailed
      */
     public void readAync() throws DevFailed {
@@ -171,7 +171,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Get replies of last call to {@link TangoGroupAttribute#readAync()}
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -189,7 +189,7 @@ public final class TangoGroupAttribute {
 
     /**
      * Get last occured error
-     * 
+     *
      * @return a map with the attribute name as a key and its error as value
      */
     public Map<String, DevError[]> getErrors() {

@@ -6,8 +6,8 @@ package org.tango.script.evalution;
 
 import java.lang.ref.SoftReference;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.TangoConst;
@@ -15,9 +15,9 @@ import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
  * Implementation of IContextVariable which gets its value from AttributeProxy.
- * 
+ *
  * Use SoftReference
- * 
+ *
  * @author HARDION
  * @version 1.0
  */
@@ -31,7 +31,7 @@ public final class AttributeProxyVariable implements IContextVariable {
 
     /**
      * Build a variable with an AttributeProxy
-     * 
+     *
      * @param name
      *            name of the variable
      * @param attributeName
@@ -39,48 +39,50 @@ public final class AttributeProxyVariable implements IContextVariable {
      * @throws ContextException
      */
     public AttributeProxyVariable(final String name, final String attributeName) throws DevFailed {
-	super();
-	this.name = name;
-	this.attributeName = attributeName;
-	softProxy = new SoftReference<TangoAttribute>(new TangoAttribute(attributeName));
+        super();
+        this.name = name;
+        this.attributeName = attributeName;
+        softProxy = new SoftReference<TangoAttribute>(new TangoAttribute(attributeName));
     }
 
+    @Override
     public String getName() {
-	return name;
+        return name;
     }
 
+    @Override
     public Object getValue() throws DevFailed {
-	TangoAttribute proxy = softProxy.get();
-	// Check if Soft reference still contains proxy reference
-	if (proxy == null) {
-	    proxy = new TangoAttribute(attributeName);
-	    softProxy = new SoftReference<TangoAttribute>(proxy);
+        TangoAttribute proxy = softProxy.get();
+        // Check if Soft reference still contains proxy reference
+        if (proxy == null) {
+            proxy = new TangoAttribute(attributeName);
+            softProxy = new SoftReference<TangoAttribute>(proxy);
 
-	}
-	// read SCALAR value from device
-	final Object result;
-	if (proxy.getDataType() == TangoConst.Tango_DEV_STATE) {
-	    // convert tango state to string
-	    result = proxy.read(String.class);
-	} else {
-	    result = proxy.read();
-	}
+        }
+        // read SCALAR value from device
+        final Object result;
+        if (proxy.getDataType() == TangoConst.Tango_DEV_STATE) {
+            // convert tango state to string
+            result = proxy.read(String.class);
+        } else {
+            result = proxy.read();
+        }
 
-	return result;
+        return result;
     }
 
     /**
      * @return the attributeName
      */
     public String getAttributeName() {
-	return attributeName;
+        return attributeName;
     }
 
     @Override
     public String toString() {
-	final ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	sb.append("name", name);
-	sb.append("attributeName", attributeName);
-	return sb.toString();
+        final ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        sb.append("name", name);
+        sb.append("attributeName", attributeName);
+        return sb.toString();
     }
 }
