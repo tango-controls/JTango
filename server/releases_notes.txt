@@ -1,3 +1,10 @@
+9.0.4 (july 2015)
+-----
+- upgrade commons-lang from 2.6 to 3.4
+- fix attribute property name for memorization (__value instead of __Value)
+- case insensitivity when loading properties from tango db
+- implements admin command EventConfirmSubscription (only used by C++ client API)
+
 9.0.3 (may 2015)
 -----
 - minor fixes on forwarded attributes
