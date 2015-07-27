@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
@@ -16,9 +16,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage tango db properties within a file
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class FileTangoDB implements ITangoDB {
 

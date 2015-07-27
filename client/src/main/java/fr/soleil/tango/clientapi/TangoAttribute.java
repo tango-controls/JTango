@@ -1,6 +1,6 @@
 package fr.soleil.tango.clientapi;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
@@ -18,7 +18,7 @@ import fr.soleil.tango.clientapi.attribute.RealAttribute;
 
 /**
  * Manage access to a tango attribute.
- * 
+ *
  * @author ABEILLE
  */
 public final class TangoAttribute {
@@ -33,7 +33,7 @@ public final class TangoAttribute {
 
     /**
      * Build a <b>mock</b> connection to a tango attribute.
-     * 
+     *
      * @param name
      *            the attribute name
      * @param mockValue
@@ -46,7 +46,7 @@ public final class TangoAttribute {
 
     /**
      * Build a <b>mock</b> connection to a tango attribute.
-     * 
+     *
      * @param attribute
      *            The mock attribute behavior. Default behavior may be changed
      *            by using a mock library like http://mockito.org
@@ -58,7 +58,7 @@ public final class TangoAttribute {
 
     /**
      * Build a connection to a tango attribute.
-     * 
+     *
      * @param name
      *            the attribute name The full name of the attribute
      */
@@ -87,7 +87,7 @@ public final class TangoAttribute {
 
     /**
      * Get the value on the attribute
-     * 
+     *
      * @throws DevFailed
      */
     public void update() throws DevFailed {
@@ -96,7 +96,7 @@ public final class TangoAttribute {
 
     /**
      * Read the tango attribute with SCALAR format and convert it
-     * 
+     *
      * @param <T>
      * @param type
      *            The requested output type
@@ -121,7 +121,7 @@ public final class TangoAttribute {
     /**
      * Read the tango attribute with SCALAR format, but does not convert it.
      * Does not works for String and Boolean
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -132,7 +132,7 @@ public final class TangoAttribute {
 
     /**
      * Read attribute and return result as array.
-     * 
+     *
      * @param type
      *            The requested output type, is the component type (double,
      *            Double...).
@@ -151,7 +151,7 @@ public final class TangoAttribute {
 
     /**
      * Read written value of attribute
-     * 
+     *
      * @param <T>
      * @param type
      *            The requested output type
@@ -165,7 +165,7 @@ public final class TangoAttribute {
 
     /**
      * Read the written part of attribute without any conversion
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -181,7 +181,7 @@ public final class TangoAttribute {
 
     /**
      * Read attribute with format SPECTRUM or IMAGE
-     * 
+     *
      * @param <T>
      * @param type
      * @return
@@ -195,7 +195,7 @@ public final class TangoAttribute {
     /**
      * Read the tango attribute with SPECTRUM and IMAGE format, but does not
      * convert it. Does not works for String and Boolean
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -216,7 +216,7 @@ public final class TangoAttribute {
 
     /**
      * Read attribute and convert it to a String with separators
-     * 
+     *
      * @param separator
      *            between each value (for SPECTRUM and IMAGE only)
      * @param endSeparator
@@ -232,7 +232,7 @@ public final class TangoAttribute {
     /**
      * Insert scalar, spectrum or image. spectrum can be arrays of Objects or
      * primitives. image can be 2D arrays of Objects or primitives
-     * 
+     *
      * @param value
      * @throws DevFailed
      */
@@ -272,7 +272,7 @@ public final class TangoAttribute {
 
     /**
      * Extract value in a Number without conversion
-     * 
+     *
      * @return
      * @throws DevFailed
      */
@@ -363,7 +363,7 @@ public final class TangoAttribute {
      * Extract data and format it as followed :\n SCALAR: ex: 1 SPECTRUM: one
      * line separated by separator. \n ex: 1 3 5 IMAGE: x lines and y colums
      * separated by endSeparator.\n ex: 3 5 8 5 6 9
-     * 
+     *
      * @param separator
      * @param endSeparator
      * @return
