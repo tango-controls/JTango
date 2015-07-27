@@ -24,15 +24,15 @@
  */
 package org.tango.server;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.DeviceState;
 
 /**
  * An object of a device (attribute or command)
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public abstract class DeviceBehaviorObject {
     /**
@@ -42,60 +42,60 @@ public abstract class DeviceBehaviorObject {
 
     /**
      * Check if a state is allowed
-     * 
+     *
      * @param state
      *            a state
      * @return true is state is allowed
      */
     public final boolean isAllowed(final DeviceState state) {
-	return stateMachine.isAllowed(state);
+        return stateMachine.isAllowed(state);
     }
 
     /**
      * Get denied states
-     * 
+     *
      * @return the denied states
      */
     public final DeviceState[] getDeniedStates() {
-	return stateMachine.getDeniedStates();
+        return stateMachine.getDeniedStates();
     }
 
     /**
      * Set denied states
-     * 
+     *
      * @param deniedStates
      */
     public final void setDeniedStates(final DeviceState... deniedStates) {
-	stateMachine.setDeniedStates(deniedStates);
+        stateMachine.setDeniedStates(deniedStates);
     }
 
     /**
      * Get end state
-     * 
+     *
      * @return the end state
      */
     public final DeviceState getEndState() {
-	return stateMachine.getEndState();
+        return stateMachine.getEndState();
     }
 
     /**
      * Set end state
-     * 
+     *
      * @param endState
      */
     public final void setEndState(final DeviceState endState) {
-	stateMachine.setEndState(endState);
+        stateMachine.setEndState(endState);
     }
 
     /**
      * Set a state machine
-     * 
+     *
      * @param stateMachine
      */
     public final void setStateMachine(final StateMachineBehavior stateMachine) {
-	if (stateMachine != null) {
-	    this.stateMachine = stateMachine;
-	}
+        if (stateMachine != null) {
+            this.stateMachine = stateMachine;
+        }
     }
 
     /**
@@ -103,6 +103,6 @@ public abstract class DeviceBehaviorObject {
      */
     @Override
     public String toString() {
-	return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 }

@@ -24,8 +24,8 @@
  */
 package org.tango.server.device;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
@@ -46,9 +46,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Global info and tool for a device. Injected with {@link DeviceManagement}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class DeviceManager {
 
@@ -59,7 +59,7 @@ public final class DeviceManager {
 
     /**
      * Ctr
-     * 
+     *
      * @param device
      */
     public DeviceManager(final DeviceImpl device) {
@@ -70,7 +70,7 @@ public final class DeviceManager {
     }
 
     /**
-     * 
+     *
      * @return name of the device
      */
     public String getName() {
@@ -78,7 +78,7 @@ public final class DeviceManager {
     }
 
     /**
-     * 
+     *
      * @return class of the device, as defined in tango db
      */
     public String getClassName() {
@@ -86,7 +86,7 @@ public final class DeviceManager {
     }
 
     /**
-     * 
+     *
      * @return admin device name
      */
     public String getAdminName() {
@@ -95,7 +95,7 @@ public final class DeviceManager {
 
     /**
      * Get an attribute's properties
-     * 
+     *
      * @param attributeName
      *            the attribute name
      * @return its properties
@@ -108,7 +108,7 @@ public final class DeviceManager {
 
     /**
      * Configure an attribute's properties
-     * 
+     *
      * @param attributeName
      *            the attribute name
      * @param properties
@@ -123,7 +123,7 @@ public final class DeviceManager {
 
     /**
      * Remove an attribute's properties
-     * 
+     *
      * @param attributeName
      *            the attribute name
      * @throws DevFailed
@@ -135,7 +135,7 @@ public final class DeviceManager {
 
     /**
      * Check if an attribute or an command is polled
-     * 
+     *
      * @param polledObject
      *            The name of the polled object (attribute or command)
      * @return true if polled
@@ -151,7 +151,7 @@ public final class DeviceManager {
 
     /**
      * Get polling period of an attribute or a command
-     * 
+     *
      * @param polledObject
      *            The name of the polled object (attribute or command)
      * @return The polling period
@@ -167,7 +167,7 @@ public final class DeviceManager {
 
     /**
      * Configure polling of an attribute or a command and start it
-     * 
+     *
      * @param polledObject The name of the polled object (attribute or command)
      * @param pollingPeriod The polling period
      * @throws DevFailed
@@ -204,7 +204,7 @@ public final class DeviceManager {
 
     /**
      * Update polling cache. Works only if polling period is zero.
-     * 
+     *
      * @param polledObject
      *            The name of the polled object (attribute or command)
      * @throws DevFailed
@@ -216,7 +216,7 @@ public final class DeviceManager {
     /**
      * Push an event if some client had register it. The method will perform a read on the requested attribute before
      * sending the event
-     * 
+     *
      * @param attributeName The attribute name
      * @param eventType The type of event to fire
      * @throws DevFailed
@@ -244,7 +244,7 @@ public final class DeviceManager {
 
     /**
      * Push an event if some client had register it.
-     * 
+     *
      * @param attributeName The attribute name
      * @param eventType The type of event to fire
      * @throws DevFailed
@@ -273,7 +273,7 @@ public final class DeviceManager {
 
     /**
      * Push a DATA_READY event if some client had registered it
-     * 
+     *
      * @param attributeName The attribute name
      * @param counter
      * @throws DevFailed
@@ -284,7 +284,7 @@ public final class DeviceManager {
 
     /**
      * Push a PIPE EVENT event if some client had registered it
-     * 
+     *
      * @param pipeName The pipe name
      * @param blob The pipe data
      * @throws DevFailed
@@ -306,7 +306,7 @@ public final class DeviceManager {
     /**
      * Get the client identity of the current request. WARNING: works only if the client is of version IDL4 and for
      * these requests: read_attribute(s), write_attribute(s), write_read_attribute(s), command_inout.
-     * 
+     *
      * @return the client identity
      */
     public ClntIdent getClientIdentity() {
@@ -315,7 +315,7 @@ public final class DeviceManager {
 
     /**
      * Get the client host name of the current request
-     * 
+     *
      * @return
      */
     public String getClientHostName() {

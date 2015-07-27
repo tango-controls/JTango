@@ -29,8 +29,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -44,10 +44,10 @@ import fr.esrf.Tango.DevState;
 
 /**
  * Manage the state of the device
- * 
+ *
  * @see State
  * @author ABEILLE
- * 
+ *
  */
 public final class StateImpl {
     private final Logger logger = LoggerFactory.getLogger(StateImpl.class);
@@ -60,7 +60,7 @@ public final class StateImpl {
 
     /**
      * Ctr
-     * 
+     *
      * @param businessObject
      * @param getStateMethod
      * @param setStateMethod
@@ -73,7 +73,7 @@ public final class StateImpl {
 
     /**
      * If the state is not defined by user, will be a default state
-     * 
+     *
      * @return true if a default state
      */
     public boolean isDefaultState() {
@@ -82,7 +82,7 @@ public final class StateImpl {
 
     /**
      * get the state from the device
-     * 
+     *
      * @return the state
      * @throws DevFailed
      */
@@ -111,9 +111,9 @@ public final class StateImpl {
                 }
             }
         }
-//	if (!attributeAlarm.isEmpty()) {
-//	    state = DevState.ALARM;
-//	}
+        //	if (!attributeAlarm.isEmpty()) {
+        //	    state = DevState.ALARM;
+        //	}
         xlogger.exit();
         return state;
     }
@@ -129,7 +129,7 @@ public final class StateImpl {
 
     /**
      * change state of the device
-     * 
+     *
      * @param state
      * @throws DevFailed
      */

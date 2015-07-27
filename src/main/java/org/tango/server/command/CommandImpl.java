@@ -24,8 +24,8 @@
  */
 package org.tango.server.command;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.command.CommandTangoType;
@@ -98,7 +98,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     /**
      * Return the command name.
-     * 
+     *
      * @return The command name
      */
     @Override
@@ -108,7 +108,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     /**
      * Return the input parameter type.
-     * 
+     *
      * @return The input parameter type
      */
 
@@ -126,7 +126,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     /**
      * Return the output parameter type.
-     * 
+     *
      * @return The output parameter type
      */
 
@@ -140,7 +140,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     /**
      * Return the input parameter description.
-     * 
+     *
      * @return The input parameter description
      */
 
@@ -150,7 +150,7 @@ public final class CommandImpl extends DeviceBehaviorObject implements Comparabl
 
     /**
      * Return the output parameter description.
-     * 
+     *
      * @return The output parameter description
      */
 

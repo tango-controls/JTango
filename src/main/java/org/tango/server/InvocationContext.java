@@ -26,8 +26,8 @@ package org.tango.server;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.server.annotation.AroundInvoke;
 
 import fr.esrf.Tango.DevSource;
@@ -35,14 +35,14 @@ import fr.esrf.Tango.DevSource;
 /**
  * @see AroundInvoke
  * @author ABEILLE
- * 
+ *
  */
 public final class InvocationContext {
     /**
      * Define the possible invoke contextes.
-     * 
+     *
      * @author ABEILLE
-     * 
+     *
      */
     public enum ContextType {
         /**
@@ -89,9 +89,9 @@ public final class InvocationContext {
 
     /**
      * Describe how the value retrieval is performed
-     * 
+     *
      * @author ABEILLE
-     * 
+     *
      */
     public enum CallType {
         /**
@@ -139,7 +139,7 @@ public final class InvocationContext {
 
     /**
      * Ctr
-     * 
+     *
      * @param context
      *            {@link ContextType}
      * @param names
@@ -153,19 +153,19 @@ public final class InvocationContext {
 
     /**
      * Command names or attributes names
-     * 
+     *
      * @return Command names or attributes names
      */
     public String[] getNames() {
         return Arrays.copyOf(names, names.length);
     }
 
-//    public void setNames(final String... names) {
-//        this.names = names;
-//    }
+    //    public void setNames(final String... names) {
+    //        this.names = names;
+    //    }
     /**
      * {@link CallType}
-     * 
+     *
      * @return The call type
      */
     public CallType getCallType() {
@@ -174,16 +174,16 @@ public final class InvocationContext {
 
     /**
      * {@link ContextType}
-     * 
+     *
      * @return The context
      */
     public ContextType getContext() {
         return context;
     }
 
-//    public void setContext(final ContextType context) {
-//        this.context = context;
-//    }
+    //    public void setContext(final ContextType context) {
+    //        this.context = context;
+    //    }
 
     @Override
     public String toString() {

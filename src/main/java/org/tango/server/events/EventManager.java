@@ -129,8 +129,7 @@ public final class EventManager {
 
         try {
             context = new ZContext();
-            System.out.println("====================== ZMQ (" + EventUtilities.getZmqVersion()
-                    + ") SERVER event system started =======================");
+            logger.info("ZMQ ({}) SERVER event system started", EventUtilities.getZmqVersion());
         } catch (final Throwable e) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
                     "ZMQ classes not found. Event system is not available: " + e.getMessage());

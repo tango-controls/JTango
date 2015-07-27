@@ -35,8 +35,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
@@ -49,10 +49,10 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Managed the initialization of a device.
- * 
+ *
  * @see Init
  * @author ABEILLE
- * 
+ *
  */
 public final class InitImpl extends DeviceBehaviorObject {
 
@@ -87,7 +87,7 @@ public final class InitImpl extends DeviceBehaviorObject {
 
     /**
      * Ctr
-     * 
+     *
      * @param initMethod
      * @param isLazy
      * @param businessObject
@@ -104,7 +104,7 @@ public final class InitImpl extends DeviceBehaviorObject {
 
     /**
      * Execute the init
-     * 
+     *
      * @param stateImpl
      * @param statusImpl
      * @throws DevFailed
@@ -129,7 +129,7 @@ public final class InitImpl extends DeviceBehaviorObject {
 
     /**
      * Get the init progress
-     * 
+     *
      * @return true if init is in progress
      */
     public synchronized boolean isInitInProgress() {
@@ -142,7 +142,7 @@ public final class InitImpl extends DeviceBehaviorObject {
 
     /**
      * Get the init result
-     * 
+     *
      * @return true if init was done without errors
      */
     public boolean isInitDoneCorrectly() {
@@ -150,7 +150,7 @@ public final class InitImpl extends DeviceBehaviorObject {
     }
 
     /**
-     * 
+     *
      * @param stateImpl
      * @param statusImpl
      * @param finishedHandler
