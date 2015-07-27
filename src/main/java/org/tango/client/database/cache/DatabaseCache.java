@@ -8,16 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DeviceExportInfo;
 import org.tango.client.database.DeviceImportInfo;
+import org.tango.utils.CaseInsensitiveMap;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeProxy;
 import fr.esrf.TangoApi.Connection;
 
 /**
- * 
- * 
+ *
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class DatabaseCache implements ICachableDatabase {
     private static final String RELEASE_1_X = "release 1\\.[7-9]";
@@ -161,7 +162,7 @@ public final class DatabaseCache implements ICachableDatabase {
     @Override
     public Map<String, String[]> getAttributeProperties(final String deviceName, final String attributeName)
             throws DevFailed {
-        Map<String, String[]> result = new HashMap<String, String[]>();
+        Map<String, String[]> result = new CaseInsensitiveMap<String[]>();
         if (serverCache == null) {
             result = dbDevice.getAttributeProperties(deviceName, attributeName);
         } else {

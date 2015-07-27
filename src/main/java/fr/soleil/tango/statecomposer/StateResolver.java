@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +15,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.tango.utils.CaseInsensitiveMap;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -28,13 +28,13 @@ import fr.esrf.TangoApi.Group.GroupCmdReplyList;
 
 /**
  * Compose several states with a priority between states synchronoulsy or not
- * 
+ *
  * @author ABEILLE
  */
 public final class StateResolver {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    private final Map<String, String> errorReportMap = Collections.synchronizedMap(new HashMap<String, String>());
+    private final Map<String, String> errorReportMap = Collections.synchronizedMap(new CaseInsensitiveMap<String>());
     private Group group;
     private final PriorityStateManager priorityStateManager;
 
@@ -75,7 +75,7 @@ public final class StateResolver {
 
     /**
      * Configure the state priorities
-     * 
+     *
      * @param priorities
      *            array of String. eg, STATE,priorityValue
      */
@@ -122,14 +122,14 @@ public final class StateResolver {
             for (final String element : deviceNameList) {
                 deviceNameSet.add(element.trim());
             }
-//	    for (final String deviceName : deviceNameSet) {
-//		// check if device exists and is alive
-//		// ProxyFactory.getInstance().createDeviceProxy(deviceName).ping();
-//		new DeviceProxy(deviceName).ping();
-//	    }
+            // for (final String deviceName : deviceNameSet) {
+            // // check if device exists and is alive
+            // // ProxyFactory.getInstance().createDeviceProxy(deviceName).ping();
+            // new DeviceProxy(deviceName).ping();
+            // }
             // Create the group
-//            group = ProxyFactory.getInstance().createGroup("statecomposer",
-//                    deviceNameSet.toArray(new String[deviceNameSet.size()]));
+            // group = ProxyFactory.getInstance().createGroup("statecomposer",
+            // deviceNameSet.toArray(new String[deviceNameSet.size()]));
             group = new Group("statecomposer");
             group.add(deviceNameSet.toArray(new String[deviceNameSet.size()]));
             try {
@@ -158,9 +158,9 @@ public final class StateResolver {
         if (priorityStateManager.getDeviceStateNumberArray().length == 0) {
             isStarted = false;
         }
-//        if (!isSynchronous && future != null) {
-//            isStarted = !future.isDone();
-//        }
+        // if (!isSynchronous && future != null) {
+        // isStarted = !future.isDone();
+        // }
         return isStarted;
 
     }
@@ -173,7 +173,7 @@ public final class StateResolver {
     }
 
     public Map<String, String> getErrorReportMap() {
-        return new HashMap<String, String>(errorReportMap);
+        return new CaseInsensitiveMap<String>(errorReportMap);
     }
 
     public DevState getState() {
