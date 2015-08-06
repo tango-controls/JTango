@@ -47,8 +47,8 @@
 	</scm>
 
 	<modules>
-		<module>dao</module>
 		<module>common</module>
+		<module>dao</module>
 	</modules>
 
 
