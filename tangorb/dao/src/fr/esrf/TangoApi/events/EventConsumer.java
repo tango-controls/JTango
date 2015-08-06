@@ -390,6 +390,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                                 return;
                             }
                             catch (DevFailed e2) {
+								//TODO use DevFailedUtils#printDevFailed from JTangoCommons
                                System.err.println(e2.errors[0].desc);
                                 //  reset if both have failed
                                 eventCallBackStruct.consumer = null;
@@ -413,6 +414,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         return;
                     }
                     catch (DevFailed e) {
+						//TODO use DevFailedUtils#printDevFailed from JTangoCommons
                         System.err.println(e.errors[0].desc);
                         //	Send error to callback
                         sendErrorToCallback(eventCallBackStruct, callbackKey, e);
