@@ -79,29 +79,31 @@ public final class TangoDataTypes {
         CLASSES.put(long[].class, SpectrumTangoDataTypes.LONG_ARR);
         CLASSES.put(float[].class, SpectrumTangoDataTypes.FLOAT_ARR);
         CLASSES.put(double[].class, SpectrumTangoDataTypes.DOUBLE_ARR);
+        CLASSES.put(boolean[].class, SpectrumTangoDataTypes.BOOL_ARR);
         //TODO others
     }
 
     private static final Map<String, TangoDataType<?>> STRINGS = new HashMap<String, TangoDataType<?>>();
 
     static {
-        STRINGS.put("DevString", ScalarTangoDataTypes.STRING);
-        STRINGS.put("DevDouble", ScalarTangoDataTypes.DOUBLE);
-        STRINGS.put("DevFloat", ScalarTangoDataTypes.FLOAT);
-        STRINGS.put("DevLong64", ScalarTangoDataTypes.LONG);
-        STRINGS.put("DevLong", ScalarTangoDataTypes.INT);
-        STRINGS.put("DevShort", ScalarTangoDataTypes.SHORT);
-        STRINGS.put("DevUShort", ScalarTangoDataTypes.U_SHORT);
-        STRINGS.put("DevULong", ScalarTangoDataTypes.U_INT);
-        STRINGS.put("DevUChar", ScalarTangoDataTypes.U_CHAR);
-        STRINGS.put("DevVarStringArr", SpectrumTangoDataTypes.STRING_ARR);
-        STRINGS.put("DevVarDoubleArr", SpectrumTangoDataTypes.DOUBLE_ARR);
-        STRINGS.put("DevVarFloatArr", SpectrumTangoDataTypes.FLOAT_ARR);
-        STRINGS.put("DevVarLong64Arr", SpectrumTangoDataTypes.LONG_ARR);
-        STRINGS.put("DevVarLongArr", SpectrumTangoDataTypes.INT_ARR);
-        STRINGS.put("DevVarShortArr", SpectrumTangoDataTypes.SHORT_ARR);
-        STRINGS.put("DevVarUShortArr", SpectrumTangoDataTypes.USHORT_ARR);
-        STRINGS.put("DevVarULongArr", SpectrumTangoDataTypes.ULONG_ARR);
+        STRINGS.put(ScalarTangoDataTypes.DEV_STRING, ScalarTangoDataTypes.STRING);
+        STRINGS.put(ScalarTangoDataTypes.DEV_DOUBLE, ScalarTangoDataTypes.DOUBLE);
+        STRINGS.put(ScalarTangoDataTypes.DEV_FLOAT, ScalarTangoDataTypes.FLOAT);
+        STRINGS.put(ScalarTangoDataTypes.DEV_LONG64, ScalarTangoDataTypes.LONG);
+        STRINGS.put(ScalarTangoDataTypes.DEV_LONG, ScalarTangoDataTypes.INT);
+        STRINGS.put(ScalarTangoDataTypes.DEV_SHORT, ScalarTangoDataTypes.SHORT);
+        STRINGS.put(ScalarTangoDataTypes.DEV_USHORT, ScalarTangoDataTypes.U_SHORT);
+        STRINGS.put(ScalarTangoDataTypes.DEV_ULONG, ScalarTangoDataTypes.U_INT);
+        STRINGS.put(ScalarTangoDataTypes.DEV_UCHAR, ScalarTangoDataTypes.U_CHAR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_STRING_ARR, SpectrumTangoDataTypes.STRING_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_DOUBLE_ARR, SpectrumTangoDataTypes.DOUBLE_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_FLOAT_ARR, SpectrumTangoDataTypes.FLOAT_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_LONG64_ARR, SpectrumTangoDataTypes.LONG_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_LONG_ARR, SpectrumTangoDataTypes.INT_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_SHORT_ARR, SpectrumTangoDataTypes.SHORT_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_USHORT_ARR, SpectrumTangoDataTypes.USHORT_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_ULONG_ARR, SpectrumTangoDataTypes.ULONG_ARR);
+        STRINGS.put(SpectrumTangoDataTypes.DEV_VAR_BOOLEAN_ARR, SpectrumTangoDataTypes.BOOL_ARR);
         //TODO etc
     }
 
@@ -117,6 +119,8 @@ public final class TangoDataTypes {
     }
 
     public static <T> TangoDataType<T> forTangoDevDataType(int tangoDevDataType) throws UnknownTangoDataType {
+        if (tangoDevDataType == SpectrumTangoDataTypes.TANGO_DEV_BOOL_ARR)
+            return (TangoDataType<T>) SpectrumTangoDataTypes.BOOL_ARR;
         TangoDataType<T> type = (TangoDataType<T>) TYPES[tangoDevDataType];
         if (type == null)
             throw new UnknownTangoDataType("Can not find TangoDataType for type id = " + tangoDevDataType);
