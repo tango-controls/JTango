@@ -130,6 +130,16 @@ public class PipeBlobBuilder {
         return this;
     }
 
+	/**
+	 * Adds a generic array to this PipeBlob
+	 *
+	 * @throws IllegalArgumentException if value is not an array
+	 */
+    public PipeBlobBuilder add(String name, Object value){
+        elements.add(PipeDataElement.newInstance(name, value));
+        return this;
+    }
+
     public PipeBlob build(){
         PipeBlob blob = new PipeBlob(blobName);
         blob.addAll(elements);
