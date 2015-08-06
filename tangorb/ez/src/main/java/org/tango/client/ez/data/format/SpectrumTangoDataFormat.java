@@ -38,6 +38,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import fr.esrf.TangoDs.TangoConst;
+import org.tango.client.ez.data.type.SpectrumTangoDataTypes;
 import org.tango.client.ez.data.type.TangoDataType;
 import org.tango.client.ez.data.type.TangoDataTypes;
 import org.tango.client.ez.data.type.UnknownTangoDataType;
@@ -64,6 +65,7 @@ public final class SpectrumTangoDataFormat<T> extends TangoDataFormat<T> {
         typesMapping.put(TangoConst.Tango_DEV_USHORT, TangoConst.Tango_DEVVAR_USHORTARRAY);
         typesMapping.put(TangoConst.Tango_DEV_ULONG, TangoConst.Tango_DEVVAR_ULONGARRAY);
         typesMapping.put(TangoConst.Tango_DEV_ULONG64, TangoConst.Tango_DEVVAR_ULONG64ARRAY);
+        typesMapping.put(TangoConst.Tango_DEV_BOOLEAN, SpectrumTangoDataTypes.TANGO_DEV_BOOL_ARR);
         //TODO other
     }
 

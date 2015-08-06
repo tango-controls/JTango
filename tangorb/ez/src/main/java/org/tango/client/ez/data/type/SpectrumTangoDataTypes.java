@@ -52,11 +52,9 @@ import java.util.Collection;
  * @since 04.06.12
  */
 public class SpectrumTangoDataTypes {
-    private SpectrumTangoDataTypes() {
-    }
-
+    public static final String DEV_VAR_STRING_ARR = "DevVarStringArr";
     public static final TangoDataType<String[]> STRING_ARR = new SpectrumTangoDataType<String[]>(
-            TangoConst.Tango_DEVVAR_STRINGARRAY, "DevVarStringArr", String[].class,
+            TangoConst.Tango_DEVVAR_STRINGARRAY, DEV_VAR_STRING_ARR, String[].class,
             new ValueExtracter<String[]>() {
                 @Override
                 public String[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -74,9 +72,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_DOUBLE_ARR = "DevVarDoubleArr";
     public static final TangoDataType<double[]> DOUBLE_ARR = new SpectrumTangoDataType<double[]>(
-            TangoConst.Tango_DEVVAR_DOUBLEARRAY, "DevVarDoubleArr", double[].class,
+            TangoConst.Tango_DEVVAR_DOUBLEARRAY, DEV_VAR_DOUBLE_ARR, double[].class,
             new ValueExtracter<double[]>() {
                 @Override
                 public double[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -94,9 +92,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_FLOAT_ARR = "DevVarFloatArr";
     public static final TangoDataType<float[]> FLOAT_ARR = new SpectrumTangoDataType<float[]>(
-            TangoConst.Tango_DEVVAR_FLOATARRAY, "DevVarFloatArr", float[].class,
+            TangoConst.Tango_DEVVAR_FLOATARRAY, DEV_VAR_FLOAT_ARR, float[].class,
             new ValueExtracter<float[]>() {
                 @Override
                 public float[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -114,9 +112,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_SHORT_ARR = "DevVarShortArr";
     public static final TangoDataType<short[]> SHORT_ARR = new SpectrumTangoDataType<short[]>(
-            TangoConst.Tango_DEVVAR_SHORTARRAY, "DevVarShortArr", short[].class,
+            TangoConst.Tango_DEVVAR_SHORTARRAY, DEV_VAR_SHORT_ARR, short[].class,
             new ValueExtracter<short[]>() {
                 @Override
                 public short[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -134,9 +132,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_LONG_ARR = "DevVarLongArr";
     public static final TangoDataType<int[]> INT_ARR = new SpectrumTangoDataType<int[]>(
-            TangoConst.Tango_DEVVAR_LONGARRAY, "DevVarLongArr", int[].class,
+            TangoConst.Tango_DEVVAR_LONGARRAY, DEV_VAR_LONG_ARR, int[].class,
             new ValueExtracter<int[]>() {
                 @Override
                 public int[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -154,9 +152,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_LONG64_ARR = "DevVarLong64Arr";
     public static final TangoDataType<long[]> LONG_ARR = new SpectrumTangoDataType<long[]>(
-            TangoConst.Tango_DEVVAR_LONG64ARRAY, "DevVarLong64Arr", long[].class,
+            TangoConst.Tango_DEVVAR_LONG64ARRAY, DEV_VAR_LONG64_ARR, long[].class,
             new ValueExtracter<long[]>() {
                 @Override
                 public long[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -177,8 +175,9 @@ public class SpectrumTangoDataTypes {
 
 
     public static final String UTF_8 = "UTF-8";
+    public static final String DEV_VAR_CHAR_ARR = "DevVarCharArr";
     public static final TangoDataType<char[]> CHAR_ARR = new SpectrumTangoDataType<char[]>(
-            TangoConst.Tango_DEVVAR_CHARARRAY, "DevVarCharArr", char[].class,
+            TangoConst.Tango_DEVVAR_CHARARRAY, DEV_VAR_CHAR_ARR, char[].class,
             new ValueExtracter<char[]>() {
                 @Override
                 public char[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -204,9 +203,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_USHORT_ARR = "DevVarUShortArr";
     public static final TangoDataType<int[]> USHORT_ARR = new SpectrumTangoDataType<int[]>(
-            TangoConst.Tango_DEVVAR_USHORTARRAY, "DevVarUShortArr", int[].class,
+            TangoConst.Tango_DEVVAR_USHORTARRAY, DEV_VAR_USHORT_ARR, int[].class,
             new ValueExtracter<int[]>() {
                 @Override
                 public int[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -224,9 +223,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_ULONG_ARR = "DevVarULongArr";
     public static final TangoDataType<long[]> UINT_ARR = new SpectrumTangoDataType<long[]>(
-            TangoConst.Tango_DEVVAR_ULONGARRAY, "DevVarULongArr", long[].class,
+            TangoConst.Tango_DEVVAR_ULONGARRAY, DEV_VAR_ULONG_ARR, long[].class,
             new ValueExtracter<long[]>() {
                 @Override
                 public long[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -244,9 +243,9 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
-
+    public static final String DEV_VAR_U_LONG_64_ARR = "DevVarULong64Arr";
     public static final TangoDataType<long[]> ULONG_ARR = new SpectrumTangoDataType<long[]>(
-            TangoConst.Tango_DEVVAR_ULONG64ARRAY, "DevVarULong64Arr", long[].class,
+            TangoConst.Tango_DEVVAR_ULONG64ARRAY, DEV_VAR_U_LONG_64_ARR, long[].class,
             new ValueExtracter<long[]>() {
                 @Override
                 public long[] extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -264,7 +263,27 @@ public class SpectrumTangoDataTypes {
                 }
             }
     );
+    public static final int TANGO_DEV_BOOL_ARR = 99;
+    public static final String DEV_VAR_BOOLEAN_ARR = "DevVarBooleanArr";
+    public static final TangoDataType<boolean[]> BOOL_ARR = new SpectrumTangoDataType<boolean[]>(
+            TANGO_DEV_BOOL_ARR, DEV_VAR_BOOLEAN_ARR, boolean[].class, new ValueExtracter<boolean[]>() {
+        @Override
+        public boolean[] extract(TangoDataWrapper data) throws ValueExtractionException {
+            try {
+                return data.extractBooleanArray();
+            } catch (DevFailed devFailed) {
+                throw new ValueExtractionException(TangoUtils.convertDevFailedToException(devFailed));
+            }
+        }
+    }, new ValueInserter<boolean[]>() {
+        @Override
+        public void insert(TangoDataWrapper data, boolean[] value, int dimX, int dimY) throws ValueInsertionException {
+            data.insert(value);
+        }
+    });
 
+    private SpectrumTangoDataTypes() {
+    }
 
     static Collection<? extends TangoDataType<?>> values() {
         return Sets.newHashSet(STRING_ARR, DOUBLE_ARR, FLOAT_ARR, SHORT_ARR, INT_ARR, LONG_ARR, CHAR_ARR, USHORT_ARR, UINT_ARR, ULONG_ARR);
