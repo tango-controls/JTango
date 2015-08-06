@@ -35,6 +35,10 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
+import fr.esrf.utils.ArrayUtils;
+
+import java.lang.reflect.Array;
+
 
 /**
  * This class defined an elementary element of a pipe blob.
@@ -338,7 +342,69 @@ public class  PipeDataElement{
     // ===================================================================
     // ===================================================================
 
+    /**
+     * Create from an array of values
+     * <p/>
+     * If data contains array values, i.e. an array of arrays, resulting element will contain PipeBlobs wrapping each array
+     * <p/>
+     * <pre>
+     * int[][]{int[1,2], int[3,4,5]} ->
+     *    PipeDataElement[
+     *         PipeBlob[
+     *             PipeDataElement[int[1,2]], PipeDataElement[int[3,4,5]]]
+     * </pre>
+     *
+     * @param name data element name
+     * @param data an array of data element values
+     * @throws IllegalArgumentException if data is not an array
+     * @throws IllegalArgumentException if data is empty
+     * @throws IllegalArgumentException if data's componentType is not one of [String,DevState,DevEncoded,boolean,short,int,long,float,double]. Note wrappers are supported, i.e. Long
+     */
+    public static PipeDataElement newInstance(String name, Object data) {
+        if (!data.getClass().isArray()) throw new IllegalArgumentException("data is expected to be an array!");
+        if (Array.getLength(data) == 0) throw new IllegalArgumentException("data can not be empty!");
 
+        Class<?> componentType = data.getClass().getComponentType();
+
+        if (componentType == Object.class) throw new IllegalArgumentException("Can not create PipeBlob from Object[]");
+
+        if (componentType == Boolean.class || componentType == Short.class ||
+                componentType == Integer.class || componentType == Long.class ||
+                componentType == Float.class || componentType == Double.class) {
+            return newInstance(name, ArrayUtils.toPrimitiveArray(data, componentType));
+        }
+
+        if (componentType.isArray()) {
+            PipeBlobBuilder arrayBlob = new PipeBlobBuilder("array");
+            for (int i = 0, size = Array.getLength(data); i < size; ++i) {
+                arrayBlob.add(Integer.toString(i), Array.get(data, i));
+            }
+
+            return new PipeDataElement(name, arrayBlob.build());
+        }
+
+        if (componentType == String.class) {
+            return new PipeDataElement(name, (String[]) data);
+        } else if (componentType == DevState.class) {
+            return new PipeDataElement(name, (DevState[]) data);
+        } else if (componentType == DevEncoded.class) {
+            return new PipeDataElement(name, (DevEncoded[]) data);
+        } else if (componentType == boolean.class) {
+            return new PipeDataElement(name, (boolean[]) data);
+        } else if (componentType == short.class) {
+            return new PipeDataElement(name, (short[]) data);
+        } else if (componentType == int.class) {
+            return new PipeDataElement(name, (int[]) data);
+        } else if (componentType == long.class) {
+            return new PipeDataElement(name, (long[]) data);
+        } else if (componentType == float.class) {
+            return new PipeDataElement(name, (float[]) data);
+        } else if (componentType == double.class) {
+            return new PipeDataElement(name, (double[]) data);
+        } else {
+            throw new IllegalArgumentException("An array of ComponentType is not supported: " + componentType.getSimpleName());
+        }
+    }
 
     // ===================================================================
     /*
@@ -347,209 +413,6 @@ public class  PipeDataElement{
     // ===================================================================
 
     // ===================================================================
-    /**
-     * @return the name of data element at index
-     */
-    // ===================================================================
-    public String getName(){
-        return element.name;
-    }
-    // ===================================================================
-    /**
-     * @return type of data element at specified index.
-     */
-    // ===================================================================
-    public int getType() throws DevFailed {
-        return getType(element);
-    }
-    // ===================================================================
-    // ===================================================================
-    DevPipeDataElt getDevPipeDataEltObject() {
-        return element;
-    }
-    // ===================================================================
-    // ===================================================================
-
-
-
-
-
-    
-    // ===================================================================
-    /*
-     *  Extract methods
-     */
-    // ===================================================================
-
-    // ===========================================
-    /**
-     * extract method for a boolean Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public boolean[] extractBooleanArray() {
-        return element.value.bool_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for an unsigned char Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public short[] extractUCharArray() {
-        final byte[] argOut = element.value.uchar_att_value();
-        final short[] val = new short[argOut.length];
-        final short mask = 0xFF;
-        for (int i = 0; i < argOut.length; i++) {
-            val[i] = (short) (mask & argOut[i]);
-        }
-        return val;
-    }
-    // ===========================================
-    /**
-     * extract method for an unsigned char Array as a char array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public byte[] extractCharArray() {
-        return element.value.uchar_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a short Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public short[] extractShortArray() {
-        return element.value.short_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for an unsigned short Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public int[] extractUShortArray() {
-        final short[] argOut = element.value.ushort_att_value();
-        final int[] val = new int[argOut.length];
-        for (int i = 0; i < argOut.length; i++) {
-            val[i] = 0xFFFF & argOut[i];
-        }
-        return val;
-    }
-    // ===========================================
-    /**
-     * extract method for a long Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public int[] extractLongArray() {
-        return element.value.long_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a unsigned long.array
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public long[] extractULongArray() {
-        final int[] array = element.value.ulong_att_value();
-        long mask = 0x7fffffff;
-        mask += (long) 1 << 31;
-        final long[] result = new long[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[i] = mask & array[i];
-        }
-        return result;
-    }
-    // ===========================================
-    /**
-     * extract method for a long Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public long[] extractLong64Array() {
-        return element.value.long64_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a long Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public long[] extractULong64Array() {
-        return element.value.ulong64_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a float Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public float[] extractFloatArray() {
-        return element.value.float_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a double Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public double[] extractDoubleArray() {
-        return element.value.double_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a double Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public String[] extractStringArray() {
-        return element.value.string_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for an DevState Array.
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public DevState[] extractDevStateArray() throws DevFailed {
-        return element.value.state_att_value();
-    }
-    // ===========================================
-    /**
-     * extract method for a DevEncoded[]
-     *
-     * @return the extracted value.
-     */
-    // ===========================================
-    public DevEncoded[] extractDevEncodedArray() {
-        return element.value.encoded_att_value();
-    }
-    // ===================================================================
-    // ===================================================================
-    public PipeBlob extractPipeBlob() {
-        return new PipeBlob(element.inner_blob_name, element.inner_blob);
-    }
-    // ===================================================================
-    // ===================================================================
-
-
-
-
 
     // ===================================================================
     // ===================================================================
@@ -557,7 +420,7 @@ public class  PipeDataElement{
         int type = -1;
         try {
             //  Check if contains a inner blob
-            if (element.inner_blob!=null && element.inner_blob.length>0) {
+            if (element.inner_blob != null && element.inner_blob.length > 0) {
                 return TangoConst.Tango_DEV_PIPE_BLOB;
             }
 
@@ -616,6 +479,223 @@ public class  PipeDataElement{
             Except.throw_exception("Api_TypeCodePackage.BadKind", "Bad or unknown type ");
         }
         return type;
+    }
+    // ===================================================================
+
+    /**
+     * @return the name of data element at index
+     */
+    // ===================================================================
+    public String getName() {
+        return element.name;
+    }
+
+    /**
+     * @return type of data element at specified index.
+     */
+    // ===================================================================
+    public int getType() throws DevFailed {
+        return getType(element);
+    }
+    // ===================================================================
+    // ===================================================================
+
+
+
+
+
+    
+    // ===================================================================
+    /*
+     *  Extract methods
+     */
+    // ===================================================================
+
+    // ===========================================
+
+    // ===================================================================
+    // ===================================================================
+    DevPipeDataElt getDevPipeDataEltObject() {
+        return element;
+    }
+    // ===========================================
+
+    /**
+     * extract method for a boolean Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public boolean[] extractBooleanArray() {
+        return element.value.bool_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for an unsigned char Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public short[] extractUCharArray() {
+        final byte[] argOut = element.value.uchar_att_value();
+        final short[] val = new short[argOut.length];
+        final short mask = 0xFF;
+        for (int i = 0; i < argOut.length; i++) {
+            val[i] = (short) (mask & argOut[i]);
+        }
+        return val;
+    }
+    // ===========================================
+
+    /**
+     * extract method for an unsigned char Array as a char array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public byte[] extractCharArray() {
+        return element.value.uchar_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a short Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public short[] extractShortArray() {
+        return element.value.short_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for an unsigned short Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public int[] extractUShortArray() {
+        final short[] argOut = element.value.ushort_att_value();
+        final int[] val = new int[argOut.length];
+        for (int i = 0; i < argOut.length; i++) {
+            val[i] = 0xFFFF & argOut[i];
+        }
+        return val;
+    }
+    // ===========================================
+
+    /**
+     * extract method for a long Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public int[] extractLongArray() {
+        return element.value.long_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a unsigned long.array
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public long[] extractULongArray() {
+        final int[] array = element.value.ulong_att_value();
+        long mask = 0x7fffffff;
+        mask += (long) 1 << 31;
+        final long[] result = new long[array.length];
+        for (int i = 0; i < array.length; i++) {
+            result[i] = mask & array[i];
+        }
+        return result;
+    }
+    // ===========================================
+
+    /**
+     * extract method for a long Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public long[] extractLong64Array() {
+        return element.value.long64_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a long Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public long[] extractULong64Array() {
+        return element.value.ulong64_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a float Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public float[] extractFloatArray() {
+        return element.value.float_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a double Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public double[] extractDoubleArray() {
+        return element.value.double_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for a double Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public String[] extractStringArray() {
+        return element.value.string_att_value();
+    }
+    // ===========================================
+
+    /**
+     * extract method for an DevState Array.
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public DevState[] extractDevStateArray() throws DevFailed {
+        return element.value.state_att_value();
+    }
+
+    /**
+     * extract method for a DevEncoded[]
+     *
+     * @return the extracted value.
+     */
+    // ===========================================
+    public DevEncoded[] extractDevEncodedArray() {
+        return element.value.encoded_att_value();
+    }
+    // ===================================================================
+    // ===================================================================
+
+    // ===================================================================
+    // ===================================================================
+    public PipeBlob extractPipeBlob() {
+        return new PipeBlob(element.inner_blob_name, element.inner_blob);
     }
     // ===================================================================
     // ===================================================================

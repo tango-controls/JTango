@@ -106,16 +106,16 @@ public interface PipeScanner {
     /**
      * Increments inner counter
      */
-    void move();
+    PipeScanner move();
 
     /**
      * Increments inner counter by value
      *
      * @param steps
      */
-    void advance(int steps);
+    PipeScanner advance(int steps);
     /**
      * Resets inner counter so nextXXX method should be called as this Scanner is just created
      */
-    void reset();
+    PipeScanner reset();
 }
