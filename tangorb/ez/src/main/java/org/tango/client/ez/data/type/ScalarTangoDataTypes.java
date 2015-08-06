@@ -56,10 +56,9 @@ import java.util.Collection;
  * @since 04.06.12
  */
 public class ScalarTangoDataTypes {
-    private ScalarTangoDataTypes() {
-    }
-
-    public static final TangoDataType<DevVarLongStringArray> DEV_VAR_LONG_STRING_ARRAY = new ScalarTangoDataType<DevVarLongStringArray>(TangoConst.Tango_DEVVAR_LONGSTRINGARRAY, "DevVarLongStringArray", DevVarLongStringArray.class,
+    public static final String DEV_VAR_LONG_STRING_ARRAY1 = "DevVarLongStringArray";
+    public static final TangoDataType<DevVarLongStringArray> DEV_VAR_LONG_STRING_ARRAY = new ScalarTangoDataType<DevVarLongStringArray>(
+            TangoConst.Tango_DEVVAR_LONGSTRINGARRAY, DEV_VAR_LONG_STRING_ARRAY1, DevVarLongStringArray.class,
             new ValueExtracter<DevVarLongStringArray>() {
                 @Override
                 public DevVarLongStringArray extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -80,8 +79,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
-    public static final TangoDataType<DevVarDoubleStringArray> DEV_VAR_DOUBLE_STRING_ARRAY = new ScalarTangoDataType<DevVarDoubleStringArray>(TangoConst.Tango_DEVVAR_DOUBLESTRINGARRAY, "DevVarDoubleStringArray", DevVarDoubleStringArray.class,
+    public static final String DEV_VAR_DOUBLE_STRING_ARRAY1 = "DevVarDoubleStringArray";
+    public static final TangoDataType<DevVarDoubleStringArray> DEV_VAR_DOUBLE_STRING_ARRAY = new ScalarTangoDataType<DevVarDoubleStringArray>(
+            TangoConst.Tango_DEVVAR_DOUBLESTRINGARRAY, DEV_VAR_DOUBLE_STRING_ARRAY1, DevVarDoubleStringArray.class,
             new ValueExtracter<DevVarDoubleStringArray>() {
                 @Override
                 public DevVarDoubleStringArray extract(TangoDataWrapper data) throws ValueExtractionException {
@@ -102,8 +102,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
-    public static final TangoDataType<EnumDevState> DEV_STATE = new ScalarTangoDataType<EnumDevState>(TangoConst.Tango_DEV_STATE, "DevState", EnumDevState.class, new ValueExtracter<EnumDevState>() {
+    public static final String DEV_STATE = "DevState";
+    public static final TangoDataType<EnumDevState> STATE = new ScalarTangoDataType<EnumDevState>(
+            TangoConst.Tango_DEV_STATE, DEV_STATE, EnumDevState.class, new ValueExtracter<EnumDevState>() {
         @Override
         public EnumDevState extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -120,8 +121,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
-    public static final TangoDataType<Void> VOID = new ScalarTangoDataType<Void>(TangoConst.Tango_DEV_VOID, "DevVoid", Void.class, new ValueExtracter<Void>() {
+    public static final String DEV_VOID = "DevVoid";
+    public static final TangoDataType<Void> VOID = new ScalarTangoDataType<Void>(
+            TangoConst.Tango_DEV_VOID, DEV_VOID, Void.class, new ValueExtracter<Void>() {
         @Override
         public Void extract(TangoDataWrapper data) throws ValueExtractionException {
             return null;
@@ -132,8 +134,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
-    public static final TangoDataType<Boolean> BOOLEAN = new ScalarTangoDataType<Boolean>(TangoConst.Tango_DEV_BOOLEAN, "DevBoolean", Boolean.class, new ValueExtracter<Boolean>() {
+    public static final String DEV_BOOLEAN = "DevBoolean";
+    public static final TangoDataType<Boolean> BOOLEAN = new ScalarTangoDataType<Boolean>(
+            TangoConst.Tango_DEV_BOOLEAN, DEV_BOOLEAN, Boolean.class, new ValueExtracter<Boolean>() {
         @Override
         public Boolean extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -149,7 +152,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Double> DOUBLE = new ScalarTangoDataType<Double>(TangoConst.Tango_DEV_DOUBLE, "DevDouble", Double.class, new ValueExtracter<Double>() {
+    public static final String DEV_DOUBLE = "DevDouble";
+    public static final TangoDataType<Double> DOUBLE = new ScalarTangoDataType<Double>(
+            TangoConst.Tango_DEV_DOUBLE, DEV_DOUBLE, Double.class, new ValueExtracter<Double>() {
         @Override
         public Double extract(TangoDataWrapper input) throws ValueExtractionException {
             try {
@@ -165,7 +170,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Float> FLOAT = new ScalarTangoDataType<Float>(TangoConst.Tango_DEV_FLOAT, "DevFloat", Float.class, new ValueExtracter<Float>() {
+    public static final String DEV_FLOAT = "DevFloat";
+    public static final TangoDataType<Float> FLOAT = new ScalarTangoDataType<Float>(
+            TangoConst.Tango_DEV_FLOAT, DEV_FLOAT, Float.class, new ValueExtracter<Float>() {
         @Override
         public Float extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -181,7 +188,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Short> SHORT = new ScalarTangoDataType<Short>(TangoConst.Tango_DEV_SHORT, "DevShort", Short.class, new ValueExtracter<Short>() {
+    public static final String DEV_SHORT = "DevShort";
+    public static final TangoDataType<Short> SHORT = new ScalarTangoDataType<Short>(
+            TangoConst.Tango_DEV_SHORT, DEV_SHORT, Short.class, new ValueExtracter<Short>() {
         @Override
         public Short extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -197,7 +206,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Integer> U_SHORT = new ScalarTangoDataType<Integer>(TangoConst.Tango_DEV_USHORT, "DevUShort", Integer.class, new ValueExtracter<Integer>() {
+    public static final String DEV_USHORT = "DevUShort";
+    public static final TangoDataType<Integer> U_SHORT = new ScalarTangoDataType<Integer>(
+            TangoConst.Tango_DEV_USHORT, DEV_USHORT, Integer.class, new ValueExtracter<Integer>() {
         @Override
         public Integer extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -213,7 +224,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Integer> INT = new ScalarTangoDataType<Integer>(TangoConst.Tango_DEV_LONG, "DevLong", Integer.class, new ValueExtracter<Integer>() {
+    public static final String DEV_LONG = "DevLong";
+    public static final TangoDataType<Integer> INT = new ScalarTangoDataType<Integer>(
+            TangoConst.Tango_DEV_LONG, DEV_LONG, Integer.class, new ValueExtracter<Integer>() {
         @Override
         public Integer extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -229,7 +242,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Long> U_INT = new ScalarTangoDataType<Long>(TangoConst.Tango_DEV_ULONG, "DevULong", Long.class, new ValueExtracter<Long>() {
+    public static final String DEV_ULONG = "DevULong";
+    public static final TangoDataType<Long> U_INT = new ScalarTangoDataType<Long>(
+            TangoConst.Tango_DEV_ULONG, DEV_ULONG, Long.class, new ValueExtracter<Long>() {
         @Override
         public Long extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -245,7 +260,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Long> LONG = new ScalarTangoDataType<Long>(TangoConst.Tango_DEV_LONG64, "DevLong64", Long.class, new ValueExtracter<Long>() {
+    public static final String DEV_LONG64 = "DevLong64";
+    public static final TangoDataType<Long> LONG = new ScalarTangoDataType<Long>(
+            TangoConst.Tango_DEV_LONG64, DEV_LONG64, Long.class, new ValueExtracter<Long>() {
         @Override
         public Long extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -261,7 +278,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<Long> U_LONG = new ScalarTangoDataType<Long>(TangoConst.Tango_DEV_ULONG64, "DevULong64", Long.class, new ValueExtracter<Long>() {
+    public static final String DEV_ULONG64 = "DevULong64";
+    public static final TangoDataType<Long> U_LONG = new ScalarTangoDataType<Long>(
+            TangoConst.Tango_DEV_ULONG64, DEV_ULONG64, Long.class, new ValueExtracter<Long>() {
         @Override
         public Long extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -277,7 +296,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-    public static final TangoDataType<String> STRING = new ScalarTangoDataType<String>(TangoConst.Tango_DEV_STRING, "DevString", String.class, new ValueExtracter<String>() {
+    public static final String DEV_STRING = "DevString";
+    public static final TangoDataType<String> STRING = new ScalarTangoDataType<String>(
+            TangoConst.Tango_DEV_STRING, DEV_STRING, String.class, new ValueExtracter<String>() {
         @Override
         public String extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -293,8 +314,9 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
-    public static final TangoDataType<Character> U_CHAR = new ScalarTangoDataType<Character>(TangoConst.Tango_DEV_UCHAR, "DevUChar", Character.class, new ValueExtracter<Character>() {
+    public static final String DEV_UCHAR = "DevUChar";
+    public static final TangoDataType<Character> U_CHAR = new ScalarTangoDataType<Character>(
+            TangoConst.Tango_DEV_UCHAR, DEV_UCHAR, Character.class, new ValueExtracter<Character>() {
         @Override
         public Character extract(TangoDataWrapper data) throws ValueExtractionException {
             try {
@@ -310,11 +332,12 @@ public class ScalarTangoDataTypes {
         }
     }
     );
-
+    public static final String DEV_ENCODED = "DevEncoded";
     /**
      * This only supports JPEG_GRAY8 format, i.e. use BufferedImage.TYPE_BYTE_GRAY and read images as jpeg to extract data
      */
-    public static final TangoDataType<BufferedImage> DEV_ENCODED = new TangoDataType<BufferedImage>(TangoConst.Tango_DEV_ENCODED, "DevEncoded", BufferedImage.class, null, null) {
+    public static final TangoDataType<BufferedImage> ENCODED = new TangoDataType<BufferedImage>(
+            TangoConst.Tango_DEV_ENCODED, DEV_ENCODED, BufferedImage.class, null, null) {
         public static final String ENCODED_FORMAT = "JPEG_GRAY8";
 
         @Override
@@ -349,9 +372,12 @@ public class ScalarTangoDataTypes {
         }
     };
 
+    private ScalarTangoDataTypes() {
+    }
+
     static Collection<? extends TangoDataType<?>> values() {
         //TODO remove warning
-        return Sets.newHashSet(DEV_ENCODED, DEV_STATE, VOID, BOOLEAN, STRING, SHORT, U_SHORT, U_CHAR, INT, U_INT, LONG, U_LONG, FLOAT, DOUBLE, DEV_VAR_LONG_STRING_ARRAY, DEV_VAR_DOUBLE_STRING_ARRAY);
+        return Sets.newHashSet(ENCODED, STATE, VOID, BOOLEAN, STRING, SHORT, U_SHORT, U_CHAR, INT, U_INT, LONG, U_LONG, FLOAT, DOUBLE, DEV_VAR_LONG_STRING_ARRAY, DEV_VAR_DOUBLE_STRING_ARRAY);
     }
 
     public final static class ScalarTangoDataType<T> extends TangoDataType<T> {
