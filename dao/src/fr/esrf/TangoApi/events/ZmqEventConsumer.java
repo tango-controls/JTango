@@ -393,7 +393,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
         DeviceProxy adminDevice = new DeviceProxy(cs.channelName);
-        cs.channelName = adminDevice.fullName().toLowerCase();    //  Update name with tango host
+        cs.channelName = adminDevice.fullName();    //  Update name with tango host
 
         DevVarLongStringArray   lsa = cs.deviceData.extractLongStringArray();
         ApiUtil.printTrace("connect_event_channel for " + cs.channelName);

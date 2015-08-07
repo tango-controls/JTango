@@ -42,8 +42,6 @@ import org.omg.CORBA.SystemException;
 
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class Description: This class manage device connection for Tango objects. It
@@ -1317,8 +1315,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    return db.isCommandAllowed(connection.get_class_name(), cmd);
     }
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionDAODefaultImpl.class);
-
     // ==========================================================================
     // ==========================================================================
     protected void manageExceptionReconnection(final Connection deviceProxy, final int retries,
@@ -1327,8 +1323,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (i==0
 			&& (e.toString().contains("org.omg.CORBA.TRANSIENT") ||
 				e.toString().contains("org.omg.CORBA.OBJECT_NOT_EXIST") ||
-                e.toString().contains("org.omg.CORBA.COMM_FAILURE") ||
-				e.toString().contains("org.omg.CORBA.TIMEOUT"))) {
+                e.toString().contains("org.omg.CORBA.COMM_FAILURE"))) {
 	    	deviceProxy.device = null;
 	    	deviceProxy.device_2 = null;
 	    	deviceProxy.device_3 = null;
@@ -1340,8 +1335,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 	    	if (i == retries - 1) {
 			    throw_dev_failed(deviceProxy, e, origin, false);
 	    	}
-
-			LOGGER.warn("Reconnected due to an exception: ",e);
 		} else {
 	    	throw_dev_failed(deviceProxy, e, origin, false);
 		}

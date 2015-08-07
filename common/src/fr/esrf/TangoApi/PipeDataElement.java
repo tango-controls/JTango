@@ -35,9 +35,6 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import fr.esrf.utils.ArrayUtils;
-import java.lang.reflect.Array;
-
 
 /**
  * This class defined an elementary element of a pipe blob.
@@ -341,60 +338,7 @@ public class  PipeDataElement{
     // ===================================================================
     // ===================================================================
 
-    /**
-     * Create from an array of values
-     *
-     * @param name data element name
-     * @param data an array of data element values
-     * @throws IllegalArgumentException if data is not an array
-     * @throws IllegalArgumentException if data is empty
-     * @throws AssertionError if data's componentType is not one of [String,DevState,DevEncoded,boolean,short,int,long,float,double]. Note wrappers are supported, e.g. Long
-     */
-    public static PipeDataElement newInstance(String name, Object data){
-        if(!data.getClass().isArray()) throw new IllegalArgumentException("data is expected to be an array!");
-        if(Array.getLength(data) == 0) throw new IllegalArgumentException("data can not be empty!");
 
-        Class<?> componentType = data.getClass().getComponentType();
-
-        if(componentType == Object.class) throw new IllegalArgumentException("Can not create PipeBlob from Object[]");
-
-        if(componentType == Boolean.class || componentType == Short.class ||
-                componentType == Integer.class || componentType == Long.class ||
-                componentType == Float.class || componentType == Double.class) {
-            return newInstance(name, ArrayUtils.toPrimitiveArray(data, componentType));
-        }
-
-        if(componentType.isArray()){
-            PipeBlobBuilder arrayBlob = new PipeBlobBuilder("array");
-            for(int i = 0, size = Array.getLength(data); i < size; ++i){
-                arrayBlob.add(Integer.toString(i), Array.get(data,i));
-            }
-
-            return new PipeDataElement(name, arrayBlob.build());
-        }
-
-        if(componentType == String.class) {
-            return new PipeDataElement(name, (String[]) data);
-        } else if (componentType == DevState.class){
-            return new PipeDataElement(name, (DevState[]) data);
-        } else if(componentType == DevEncoded.class) {
-            return new PipeDataElement(name, (DevEncoded[]) data);
-        } else if(componentType == boolean.class){
-            return new PipeDataElement(name, (boolean[]) data);
-        } else if(componentType == short.class){
-            return new PipeDataElement(name, (short[]) data);
-        } else if(componentType == int.class){
-            return new PipeDataElement(name, (int[]) data);
-        } else if(componentType == long.class){
-            return new PipeDataElement(name, (long[]) data);
-        } else if(componentType == float.class){
-            return new PipeDataElement(name, (float[]) data);
-        } else if(componentType == double.class){
-            return new PipeDataElement(name, (double[]) data);
-        } else {
-            throw new AssertionError("Should not happen! ComponentType is not supported: " + componentType.getSimpleName());
-        }
-    }
 
     // ===================================================================
     /*

@@ -66,5 +66,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<version>9.0.1_hzg</version>
+	<version>9.0.1</version>
 </project>
