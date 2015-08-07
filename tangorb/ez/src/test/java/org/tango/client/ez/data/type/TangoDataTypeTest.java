@@ -100,7 +100,7 @@ public class TangoDataTypeTest {
         TangoDataFormat<byte[]> format = TangoDataFormat.createForAttrDataFormat(AttrDataFormat.SCALAR);
         TangoDataType<byte[]> type = format.getDataType(TangoConst.Tango_DEV_ENCODED);
 
-        assertSame(ScalarTangoDataTypes.DEV_ENCODED, type);
+        assertSame(ScalarTangoDataTypes.ENCODED, type);
     }
 
     @Test(expected = UnknownTangoDataType.class)
