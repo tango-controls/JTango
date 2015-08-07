@@ -1296,7 +1296,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		if (i == 0
 			&& (e.toString().contains("org.omg.CORBA.TRANSIENT") ||
 				e.toString().contains("org.omg.CORBA.OBJECT_NOT_EXIST") ||
-                e.toString().contains("org.omg.CORBA.COMM_FAILURE"))) {
+				e.toString().contains("org.omg.CORBA.COMM_FAILURE") ||
+				e.toString().contains("org.omg.CORBA.TIMEOUT"))) {
 	    	deviceProxy.device = null;
 	    	deviceProxy.device_2 = null;
 	    	deviceProxy.device_3 = null;
