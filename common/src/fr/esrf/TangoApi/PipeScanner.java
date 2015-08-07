@@ -60,8 +60,40 @@ public interface PipeScanner {
     DevEncoded nextEncoded() throws DevFailed;
     PipeScanner nextScanner() throws DevFailed;
 
+    /**
+     * @return a reference to underlying array
+     * @throws DevFailed if next element is not an array
+     */
+    Object nextArray() throws DevFailed;
+
+    /**
+     * @param type
+     * @param <T>  component type
+     * @return a reference to underlying array casted to T[]
+     * @throws DevFailed if type is not an array type
+     * @throws DevFailed if next element is not an array
+     * @throws DevFailed if next array's component type does not match T
+     */
+    <T> T nextArray(Class<T> type) throws DevFailed;
+
+    /**
+     * Copies underlying array (src) to target of specified type
+     *
+     * @param target
+     * @param size
+     * @param <T>
+     * @throws DevFailed if src and trg sizes do not match
+     * @throws DevFailed if src and trg component types do not match
+     */
     <T> void nextArray(T[] target, int size) throws DevFailed;
 
+    /**
+     * Copies underlying array to target
+     *
+     * @param target
+     * @param size
+     * @throws DevFailed if src and trg sizes do not match
+     */
     //TODO replace this with explicit methods, i.e. nextArray(float[])?
     void nextArray(Object target, int size) throws DevFailed;
     //convenience methods
@@ -74,16 +106,16 @@ public interface PipeScanner {
     /**
      * Increments inner counter
      */
-    void move();
+    PipeScanner move();
 
     /**
      * Increments inner counter by value
      *
      * @param steps
      */
-    void advance(int steps);
+    PipeScanner advance(int steps);
     /**
      * Resets inner counter so nextXXX method should be called as this Scanner is just created
      */
-    void reset();
+    PipeScanner reset();
 }
