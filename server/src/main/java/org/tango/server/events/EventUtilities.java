@@ -80,33 +80,32 @@ class EventUtilities {
         } else {
             fullName += DOT + eventType.getString();
         }
-        return fullName;
+        return fullName.toLowerCase(Locale.ENGLISH);
     }
 
     static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, attributeName);
         fullName += DOT + EventManager.IDL_LATEST + eventType.getString();
-        return fullName;
+        return fullName.toLowerCase(Locale.ENGLISH);
     }
 
     static String buildPipeEventName(final String deviceName, final String pipename) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, null);
-        fullName += TangoUtil.DEVICE_SEPARATOR + pipename.toLowerCase(Locale.ENGLISH) + "."
-                + EventType.PIPE_EVENT.getString();
-        return fullName;
+        fullName += TangoUtil.DEVICE_SEPARATOR + pipename + "." + EventType.PIPE_EVENT.getString();
+        return fullName.toLowerCase(Locale.ENGLISH);
     }
 
     static String buildHeartBeatEventName(final String deviceName) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, null);
         fullName += HEARTBEAT;
-        return fullName;
+        return fullName.toLowerCase(Locale.ENGLISH);
     }
 
     static String buildDeviceEventName(final String deviceName, final EventType eventType) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, null);
         fullName += DOT + eventType.getString();
-        return fullName;
+        return fullName.toLowerCase(Locale.ENGLISH);
     }
 
     private static String buildEventNameBeginning(final String deviceName, final String attributeName) throws DevFailed {
