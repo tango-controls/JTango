@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.client.database.DatabaseFactory;
+import org.tango.orb.ORBManager;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.ServerManager;
@@ -194,12 +195,15 @@ public final class EventManager {
      */
     private void setEndpoints(final SocketType socketType) throws DevFailed {
         xlogger.entry();
-
         String ipAddress;
-        try {
-            ipAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (final UnknownHostException e1) {
-            throw DevFailedUtils.newDevFailed(e1);
+        if (ORBManager.OAI_ADDR != null && !ORBManager.OAI_ADDR.isEmpty()) {
+            ipAddress = ORBManager.OAI_ADDR;
+        } else {
+            try {
+                ipAddress = InetAddress.getLocalHost().getHostAddress();
+            } catch (final UnknownHostException e1) {
+                throw DevFailedUtils.newDevFailed(e1);
+            }
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
