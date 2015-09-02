@@ -424,9 +424,14 @@ public final class ServerManager {
         if (splitted.length > 1) {
             pid = splitted[0];
         }
-        // hostName = splitted[1];
+
         try {
-            final InetAddress addr = InetAddress.getLocalHost();
+            final InetAddress addr;
+            if (ORBManager.OAI_ADDR != null && !ORBManager.OAI_ADDR.isEmpty()) {
+                addr = InetAddress.getByName(ORBManager.OAI_ADDR);
+            } else {
+                addr = InetAddress.getLocalHost();
+            }
             hostName = addr.getCanonicalHostName();
         } catch (final UnknownHostException e) {
             DevFailedUtils.throwDevFailed(e);

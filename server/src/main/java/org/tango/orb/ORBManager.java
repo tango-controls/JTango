@@ -68,9 +68,9 @@ import fr.esrf.Tango.Device_5Helper;
 
 /**
  * Initialize, shutdown the ORB
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ORBManager {
 
@@ -85,6 +85,10 @@ public final class ORBManager {
      * impl name for nodb device
      */
     public static final String SERVER_IMPL_NAME = "nodb.device";
+    /**
+     * A jacorb system property for IP address on multi-homed host
+     */
+    public static final String OAI_ADDR = System.getProperty("OAIAddr");
     private static ORB orb;
     private static POA poa;
     private static ExecutorService orbStart;
@@ -94,7 +98,7 @@ public final class ORBManager {
 
     /**
      * Initialise the ORB
-     * 
+     *
      * @param useDb
      *            is using tango db
      * @param adminDeviceName
@@ -185,7 +189,7 @@ public final class ORBManager {
 
     /**
      * Create an {@link Any}
-     * 
+     *
      * @return a Any
      * @throws DevFailed
      */
@@ -195,7 +199,7 @@ public final class ORBManager {
 
     /**
      * Check the server is already running
-     * 
+     *
      * @param importInfo
      * @param toBeImported
      * @throws DevFailed
@@ -384,7 +388,7 @@ public final class ORBManager {
     private static String checkORBgiopMaxMsgSize() {
         /*
          * JacORB definition (see jacorb.properties file):
-         * 
+         *
          * This is NOT the maximum buffer size that can be used, but just the
          * largest size of buffers that will be kept and managed. This value
          * will be added to an internal constant of 5, so the real value in
@@ -434,7 +438,7 @@ public final class ORBManager {
 
     /**
      * Get the ORB
-     * 
+     *
      * @return the ORB
      * @throws DevFailed
      */
@@ -447,7 +451,7 @@ public final class ORBManager {
 
     /**
      * Get the POA
-     * 
+     *
      * @return the POA
      * @throws DevFailed
      */
