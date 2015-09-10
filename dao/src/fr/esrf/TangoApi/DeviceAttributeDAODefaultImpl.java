@@ -1933,7 +1933,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public TimeVal getTimeVal() throws DevFailed {
-		manageExceptions("getTimeVal");
+		manageExceptions("getTimeVal", false);
 		return attributeValue_5.time;
    	}
 
@@ -1945,7 +1945,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public long getTimeValSec() throws DevFailed {
-		manageExceptions("getTimeValSec");
+		manageExceptions("getTimeValSec", false);
 		return attributeValue_5.time.tv_sec;
     }
 
@@ -1957,7 +1957,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
-		manageExceptions("getTimeValMillisSec");
+		manageExceptions("getTimeValMillisSec", false);
 		return attributeValue_5.time.tv_sec * 1000L + attributeValue_5.time.tv_usec / 1000L;
     }
 
@@ -2117,7 +2117,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
      */
     // ===========================================
     public long getTime() throws DevFailed {
-		manageExceptions("getTime");
+		manageExceptions("getTime", false);
 		return (long) attributeValue_5.time.tv_sec * 1000 + attributeValue_5.time.tv_usec / 1000;
     }
 
