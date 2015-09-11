@@ -161,8 +161,8 @@ public class HistoryTest {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
             }
-            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
+            // final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            // rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum");
             // get its history
             final DeviceProxy dev = new DeviceProxy(deviceName);
             final DeviceDataHistory[] hist = dev.attribute_history("stateSpectrum");
@@ -203,8 +203,8 @@ public class HistoryTest {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
             }
-            final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-            rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
+            // final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
+            // rem.execute(deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum");
             // get its history
             final DeviceProxy dev = new DeviceProxy(deviceName);
             final DeviceDataHistory[] hist = dev.attribute_history("pollSpectrum");
