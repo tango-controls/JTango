@@ -68,6 +68,7 @@ import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
+import org.tango.server.cache.PollingManager;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
 import org.tango.server.device.AroundInvokeImpl;
@@ -277,6 +278,10 @@ public final class DeviceImpl extends Device_5POA {
     private PollingManager pollingManager;
 
     private DeviceInterfaceChangedSender interfaceChangeSender;
+    /**
+     * device property, default polling ring depth for attributes and commands
+     */
+    private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
 
     /**
      * Ctr
@@ -327,8 +332,13 @@ public final class DeviceImpl extends Device_5POA {
             // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
+            // poll_ring_depth
+            final DevicePropertyImpl property10 = new DevicePropertyImpl(Constants.POLL_RING_DEPTH,
+                    "default poll ring depth", this.getClass().getMethod("setPollRingDepth", int.class), this, name,
+                    className, false, Constants.POLL_RING_DEPTH);
+            addDeviceProperty(property10);
             // cmd_poll_ring_depth
             final DevicePropertyImpl property5 = new DevicePropertyImpl(Constants.CMD_POLL_RING_DEPTH,
                     "command poll ring depth", this.getClass().getMethod("setCmdPollRingDepth", String[].class), this,
@@ -378,6 +388,9 @@ public final class DeviceImpl extends Device_5POA {
                         Integer.parseInt(pollAttributes[i + 1]));
             }
         }
+        if (pollingManager != null) {
+            pollingManager.setPollAttributes(this.pollAttributes);
+        }
     }
 
     public void setMinCommandPolling(final String[] minCommandPolling) {
@@ -416,6 +429,15 @@ public final class DeviceImpl extends Device_5POA {
             if (i + 1 < attrPollRingDepth.length) {
                 this.attrPollRingDepth.put(attrPollRingDepth[i].toLowerCase(Locale.ENGLISH),
                         Integer.parseInt(attrPollRingDepth[i + 1]));
+            }
+        }
+    }
+
+    public void setPollRingDepth(final int pollRingDepth) {
+        if (pollRingDepth > 0) {
+            this.pollRingDepth = pollRingDepth;
+            if (pollingManager != null) {
+                pollingManager.setPollRingDepth(pollRingDepth);
             }
         }
     }
@@ -509,8 +531,11 @@ public final class DeviceImpl extends Device_5POA {
         }
         if (result == null) {
             attributeList.add(attribute);
+            // set default polling configuration
             if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
                 attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
+            } else {
+                attribute.setPollRingDepth(pollRingDepth);
             }
         }
     }
@@ -937,6 +962,9 @@ public final class DeviceImpl extends Device_5POA {
         DevAttrHistory_4 result = null;
         try {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+            if (!attr.isPolled()) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, attr.getName() + " is not polled");
+            }
             result = attr.getHistory().getAttrHistory4(maxSize);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
@@ -1163,7 +1191,6 @@ public final class DeviceImpl extends Device_5POA {
             // profiler.start("get value");
             result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock);
-
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1263,7 +1290,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-    DevFailed {
+            DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -2006,8 +2033,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                        "It's not supported to change enumeration labels number from outside the Tango device class code");
+                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                                "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }
@@ -2128,8 +2155,11 @@ public final class DeviceImpl extends Device_5POA {
         }
         if (result == null) {
             commandList.add(command);
+            // set default polling configuration
             if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
                 command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
+            } else {
+                command.setPollRingDepth(pollRingDepth);
             }
         }
     }
@@ -2320,7 +2350,7 @@ public final class DeviceImpl extends Device_5POA {
     public void setAroundInvokeImpl(final AroundInvokeImpl aroundInvokeImpl) {
         this.aroundInvokeImpl = aroundInvokeImpl;
         final TangoCacheManager cacheManager = new TangoCacheManager(name, deviceLock, aroundInvokeImpl);
-        pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling, pollAttributes,
+        pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling,
                 minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
         if (init != null) {
             init.setPollingManager(pollingManager);
@@ -2339,7 +2369,7 @@ public final class DeviceImpl extends Device_5POA {
         if (pollingManager == null) {
             final TangoCacheManager cacheManager = new TangoCacheManager(name, deviceLock, aroundInvokeImpl);
             pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling,
-                    pollAttributes, minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
+                    minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
         }
         init = new InitImpl(name, initMethod, isLazy, businessObject, pollingManager);
         return init;
@@ -2534,6 +2564,10 @@ public final class DeviceImpl extends Device_5POA {
                 final ForwardedAttribute fwdAttr = (ForwardedAttribute) attr.getBehavior();
                 result = fwdAttr.getAttributeHistory(maxSize);
             } else {
+                if (!attr.isPolled()) {
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, attr.getName()
+                            + " is not polled");
+                }
                 result = attr.getHistory().getAttrHistory5(maxSize);
             }
         } catch (final Exception e) {

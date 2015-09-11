@@ -31,7 +31,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.tango.command.CommandTangoType;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.IPollable;
-import org.tango.server.PollingUtils;
+import org.tango.server.cache.PollingUtils;
 import org.tango.server.properties.AttributePropertiesManager;
 
 import fr.esrf.Tango.DevError;

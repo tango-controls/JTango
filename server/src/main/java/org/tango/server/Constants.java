@@ -39,6 +39,7 @@ public final class Constants {
     // default device properties
     public static final String STATE_CHECK_ATTR_ALARM = "StateCheckAttrAlarm";
     public static final String POLLED_ATTR = "polled_attr";
+    public static final String POLL_RING_DEPTH = "poll_ring_depth";
     public static final String ATTR_POLL_RING_DEPTH = "attr_poll_ring_depth";
     public static final String CMD_POLL_RING_DEPTH = "cmd_poll_ring_depth";
     public static final String CMD_MIN_POLL_PERIOD = "cmd_min_poll_period";
@@ -92,6 +93,7 @@ public final class Constants {
     public static final String PERIOD_1000 = "1000";
 
     public static final int QUEUE_CAPACITY = 100;
+    public static final int DEFAULT_POLL_DEPTH = 10;
 
     public static final String POLLED_OBJECT = "Polled object ";
     public static final String MIN_POLLING_PERIOD_IS = "min polling period is ";

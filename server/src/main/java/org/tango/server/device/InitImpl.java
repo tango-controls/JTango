@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Init;
-import org.tango.server.servant.PollingManager;
+import org.tango.server.cache.PollingManager;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
