@@ -45,6 +45,7 @@ import org.tango.server.ServerManager;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.ForwardedAttribute;
+import org.tango.server.cache.PollingManager;
 import org.tango.server.device.AroundInvokeImpl;
 import org.tango.server.device.DeviceLocker;
 import org.tango.server.device.StateImpl;
@@ -100,7 +101,7 @@ public final class AttributeGetterSetter {
                 final AttributeImpl att = getAttribute(name, attributeList);
                 // Call the always executed method
                 aroundInvoke
-                        .aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN, name));
+                .aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN, name));
 
                 // Check if the attribute is allowed
                 final DevState s = stateImpl.updateState();
@@ -163,11 +164,11 @@ public final class AttributeGetterSetter {
     static AttributeValue_5[] getAttributesValues5(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
             final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
-//        final Profiler profiler = new Profiler("get value time");
+        // final Profiler profiler = new Profiler("get value time");
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
         final AttributeValue_5[] back = new AttributeValue_5[names.length];
-//        profiler.start(Arrays.toString(names));
+        // profiler.start(Arrays.toString(names));
         // sort attributes with cache
         final Map<Integer, AttributeImpl> cacheAttributes = new HashMap<Integer, AttributeImpl>();
         final Map<Integer, AttributeImpl> notCacheAttributes = new HashMap<Integer, AttributeImpl>();
@@ -208,8 +209,8 @@ public final class AttributeGetterSetter {
             final int i = attribute.getKey();
             try {
                 LOGGER.debug("read from CACHE {}", att.getName());
-//                aroundInvoke
-//                        .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
+                // aroundInvoke
+                // .aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att.getName()));
                 // profiler.start("get cache");
                 final AttributeValue readValue = cacheManager.getAttributeCacheElement(att);
                 // profiler.start("to idl 5");

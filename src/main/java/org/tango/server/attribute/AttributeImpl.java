@@ -42,7 +42,7 @@ import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.IReadableWritable;
-import org.tango.server.PollingUtils;
+import org.tango.server.cache.PollingUtils;
 import org.tango.server.events.EventManager;
 import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.server.properties.AttributePropertiesManager;
@@ -64,7 +64,7 @@ import fr.esrf.Tango.DispLevel;
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-IReadableWritable<AttributeValue> {
+        IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
@@ -238,7 +238,7 @@ IReadableWritable<AttributeValue> {
             }
             updateDefaultWritePart();
         } catch (final DevFailed e) {
-            readValue.setQuality(AttrQuality.ATTR_INVALID);
+            // readValue.setQuality(AttrQuality.ATTR_INVALID);
             readValue.setXDim(0);
             readValue.setYDim(0);
             lastError = e;
@@ -597,6 +597,7 @@ IReadableWritable<AttributeValue> {
 
     @Override
     public boolean isPolled() {
+        System.out.println("is polled " + name);
         return config.isPolled();
     }
 

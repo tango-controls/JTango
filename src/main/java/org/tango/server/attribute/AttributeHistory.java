@@ -46,7 +46,7 @@ public final class AttributeHistory {
     private final Deque<HistoryItem> valueHistory = new ArrayDeque<HistoryItem>(Constants.QUEUE_CAPACITY);
     private final boolean isReadWrite;
     private final int tangoType;
-    private int maxSize = 10;
+    private int maxSize = Constants.DEFAULT_POLL_DEPTH;
     private final AttrDataFormat format;
 
     public AttributeHistory(final String attributeName, final boolean isReadWrite, final int tangoType,
