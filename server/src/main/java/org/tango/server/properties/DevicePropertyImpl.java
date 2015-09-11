@@ -45,7 +45,7 @@ public final class DevicePropertyImpl {
     private final boolean isMandatory;
 
     public DevicePropertyImpl(final String propertyName, final String description, final Method propertyMethod,
-            final Object businessObject, final String deviceName, final String className, boolean isMandatory,
+            final Object businessObject, final String deviceName, final String className, final boolean isMandatory,
             final String... defaultValue) throws DevFailed {
         this.description = description;
         name = propertyName;

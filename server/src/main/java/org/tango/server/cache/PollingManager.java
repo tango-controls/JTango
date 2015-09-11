@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.tango.server.servant;
+package org.tango.server.cache;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -44,17 +44,19 @@ import org.tango.server.IPollable;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.ForwardedAttribute;
-import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
+import org.tango.server.servant.AttributeGetterSetter;
+import org.tango.server.servant.CommandGetter;
+import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage all polling stuff of a device
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class PollingManager {
 
@@ -65,12 +67,13 @@ public final class PollingManager {
      */
     private final TangoCacheManager cacheManager;
 
-    private final Map<String, Integer> pollAttributes;
+    private Map<String, Integer> pollAttributes = new HashMap<String, Integer>();
     private final Map<String, Integer> minCommandPolling;
     private final int minPolling;
     private final Map<String, Integer> minAttributePolling;
     private final Map<String, Integer> cmdPollRingDepth;
     private final Map<String, Integer> attrPollRingDepth;
+    private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
 
     private final String deviceName;
 
@@ -80,15 +83,13 @@ public final class PollingManager {
 
     public PollingManager(final String deviceName, final TangoCacheManager cacheManager,
             final List<AttributeImpl> attributeList, final List<CommandImpl> commandList, final int minPolling,
-            final Map<String, Integer> pollAttributes, final Map<String, Integer> minCommandPolling,
-            final Map<String, Integer> minAttributePolling, final Map<String, Integer> cmdPollRingDepth,
-            final Map<String, Integer> attrPollRingDepth) {
+            final Map<String, Integer> minCommandPolling, final Map<String, Integer> minAttributePolling,
+            final Map<String, Integer> cmdPollRingDepth, final Map<String, Integer> attrPollRingDepth) {
         this.deviceName = deviceName;
         this.cacheManager = cacheManager;
         this.attributeList = attributeList;
         this.commandList = commandList;
         this.minPolling = minPolling;
-        this.pollAttributes = pollAttributes;
         this.minCommandPolling = minCommandPolling;
         this.minAttributePolling = minAttributePolling;
         this.cmdPollRingDepth = cmdPollRingDepth;
@@ -101,12 +102,10 @@ public final class PollingManager {
             attribute.configureAttributePropFromDb();
             configurePolling(attribute);
         }
-
         for (final CommandImpl command : commandList) {
             command.updatePollingConfigFromDB();
             configurePolling(command);
         }
-
     }
 
     public void configurePolling(final CommandImpl command) throws DevFailed {
@@ -122,6 +121,8 @@ public final class PollingManager {
         }
         if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
             command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
+        } else {
+            command.setPollRingDepth(pollRingDepth);
         }
     }
 
@@ -144,6 +145,8 @@ public final class PollingManager {
         }
         if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
             attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
+        } else {
+            attribute.setPollRingDepth(pollRingDepth);
         }
     }
 
@@ -166,7 +169,7 @@ public final class PollingManager {
 
     /**
      * Update polling cache
-     * 
+     *
      * @param objectName
      *            The command or attribute to update
      * @throws DevFailed
@@ -226,7 +229,7 @@ public final class PollingManager {
     /**
      * Add command polling. Init command cannot be polled. Only command with
      * parameter void can be polled
-     * 
+     *
      * @param commandName
      *            the command to poll
      * @param pollingPeriod
@@ -282,7 +285,7 @@ public final class PollingManager {
 
     /**
      * Add attribute polling
-     * 
+     *
      * @param attributeName
      *            the attribute to poll
      * @param pollingPeriod
@@ -312,7 +315,7 @@ public final class PollingManager {
 
     /**
      * Remove attribute polling
-     * 
+     *
      * @param attributeName
      *            the attribute
      * @throws DevFailed
@@ -334,7 +337,7 @@ public final class PollingManager {
 
     /**
      * Remove command polling
-     * 
+     *
      * @param commandName
      *            the command
      * @throws DevFailed
@@ -381,5 +384,13 @@ public final class PollingManager {
     public AttributeValue getAttributeCacheElement(final AttributeImpl att) throws CacheException {
         final Element element = cacheManager.getAttributeCache(att).get(att.getName().toLowerCase(Locale.ENGLISH));
         return (AttributeValue) element.getValue();
+    }
+
+    public void setPollRingDepth(final int pollRingDepth) {
+        this.pollRingDepth = pollRingDepth;
+    }
+
+    public void setPollAttributes(final Map<String, Integer> pollAttributes) {
+        this.pollAttributes = pollAttributes;
     }
 }

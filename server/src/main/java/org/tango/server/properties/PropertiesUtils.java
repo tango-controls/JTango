@@ -142,7 +142,7 @@ public final class PropertiesUtils {
 
     /**
      * Ignore case on property name
-     * 
+     *
      * @param prop
      * @param propertyName
      * @return The property value
@@ -245,7 +245,7 @@ public final class PropertiesUtils {
                         + valueToInject + " to " + paramType.getCanonicalName();
                 // ignore error for default value
                 if (property[0].isEmpty()) {
-                    LOGGER.error(errorMsg);
+                    LOGGER.debug("{} is empty", propertyName);
                 } else {
                     DevFailedUtils.throwDevFailed("PROPERTY_ERROR", errorMsg);
                 }
@@ -268,7 +268,7 @@ public final class PropertiesUtils {
 
     /**
      * Set pipe device properties in db
-     * 
+     *
      * @param deviceName
      * @param pipeName
      * @param properties
