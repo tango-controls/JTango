@@ -175,10 +175,8 @@ public final class LoggingManager {
     public void addDeviceAppender(final String deviceTargetName, final Class<?> deviceClassName,
             final String loggingDeviceName) throws DevFailed {
         if (rootLoggerBack != null) {
-            System.out.println("add device appender" + deviceTargetName + "-" + loggingDeviceName);
             logger.debug("add device appender {} on {}", deviceTargetName, loggingDeviceName);
-            final DeviceAppender appender = new DeviceAppender(deviceTargetName, deviceClassName.getName(),
-                    loggingDeviceName);
+            final DeviceAppender appender = new DeviceAppender(deviceTargetName, loggingDeviceName);
             deviceAppenders.put(loggingDeviceName.toLowerCase(Locale.ENGLISH), appender);
             rootLoggerBack.addAppender(appender);
             // debug level by default

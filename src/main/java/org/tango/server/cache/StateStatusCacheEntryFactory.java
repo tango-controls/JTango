@@ -62,8 +62,8 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
         Object result = null;
         final Object lock = deviceLock.getAttributeLock();
         synchronized (lock != null ? lock : new Object()) {
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, attribute
-                    .getName()));
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, null,
+                    attribute.getName()));
             try {
                 synchronized (attribute) {
                     final long time1 = System.nanoTime();
@@ -88,7 +88,7 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
                 throw e;
             } finally {
                 aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
-                        attribute.getName()));
+                        null, attribute.getName()));
             }
         }// synchronized
         return result;

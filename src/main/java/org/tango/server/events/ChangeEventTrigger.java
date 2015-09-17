@@ -105,7 +105,7 @@ public class ChangeEventTrigger implements IEventTrigger {
                 previousError = error;
                 previousValue = value;
                 previousInitialized = true;
-                hasChanged = false;
+                hasChanged = true;
             } else {
                 if (previousError != null && error == null) {
                     // there was an error before
@@ -150,7 +150,6 @@ public class ChangeEventTrigger implements IEventTrigger {
                 }
             }
         }
-
         logger.debug("CHANGE event for {} must send: {}", attribute.getName(), hasChanged);
         xlogger.exit();
         return hasChanged;
@@ -298,9 +297,9 @@ public class ChangeEventTrigger implements IEventTrigger {
         if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
                 && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
             DevFailedUtils
-            .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                    "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
-                    + " are not set");
+                    .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                            "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                                    + " are not set");
         }
     }
 
