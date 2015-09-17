@@ -61,7 +61,7 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
         Object result = null;
         final Object lock = deviceLock.getCommandLock();
         synchronized (lock != null ? lock : new Object()) {
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, command
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, CallType.POLLING, null, command
                     .getName()));
             try {
                 final long time1 = System.nanoTime();
@@ -77,8 +77,8 @@ public final class CommandCacheEntryFactory implements CacheEntryFactory {
                 command.addErrorToHistory(e);
                 throw e;
             } finally {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, CallType.POLLING, command
-                        .getName()));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, CallType.POLLING, null,
+                        command.getName()));
             }
         }// synchronized
         return result;

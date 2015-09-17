@@ -33,9 +33,9 @@ import ch.qos.logback.core.AppenderBase;
 
 /**
  * Manage logging to an attribute
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
 
@@ -44,27 +44,31 @@ public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
     private int currentPosition;
     private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yy.MM.dd '-' HH:mm:ss ");
 
+    public AttributeAppender() {
+        this(1000);
+    }
+
     public AttributeAppender(final int depth) {
-	this.depth = depth;
-	log = new String[depth][3];
-	for (int i = 0; i < depth; i++) {
-	    Arrays.fill(log[i], "");
-	}
-	currentPosition = 0;
+        this.depth = depth;
+        log = new String[depth][3];
+        for (int i = 0; i < depth; i++) {
+            Arrays.fill(log[i], "");
+        }
+        currentPosition = 0;
     }
 
     @Override
     protected void append(final ILoggingEvent eventObject) {
-	log[currentPosition][0] = DATE_FORMAT.format(new Date(eventObject.getTimeStamp()));
-	log[currentPosition][1] = eventObject.getLevel().toString();
-	log[currentPosition][2] = eventObject.getFormattedMessage();
-	currentPosition++;
-	if (currentPosition >= depth) {
-	    currentPosition = 0;
-	}
+        log[currentPosition][0] = DATE_FORMAT.format(new Date(eventObject.getTimeStamp()));
+        log[currentPosition][1] = eventObject.getLevel().toString();
+        log[currentPosition][2] = eventObject.getFormattedMessage();
+        currentPosition++;
+        if (currentPosition >= depth) {
+            currentPosition = 0;
+        }
     }
 
     public String[][] getLog() {
-	return log;
+        return log;
     }
 }

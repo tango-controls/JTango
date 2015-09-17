@@ -332,7 +332,7 @@ public final class DeviceImpl extends Device_5POA {
             // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
             // poll_ring_depth
             final DevicePropertyImpl property10 = new DevicePropertyImpl(Constants.POLL_RING_DEPTH,
@@ -1002,7 +1002,7 @@ public final class DeviceImpl extends Device_5POA {
         AttributeValue[] result = null;
         try {
             result = AttributeGetterSetter.getAttributesValues(name, attributeNames, pollingManager, attributeList,
-                    aroundInvokeImpl, DevSource.CACHE_DEV, deviceLock);
+                    aroundInvokeImpl, DevSource.CACHE_DEV, deviceLock, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1042,7 +1042,7 @@ public final class DeviceImpl extends Device_5POA {
         AttributeValue[] result = null;
         try {
             result = AttributeGetterSetter.getAttributesValues(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source, deviceLock);
+                    aroundInvokeImpl, source, deviceLock, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1083,7 +1083,7 @@ public final class DeviceImpl extends Device_5POA {
         AttributeValue_3[] result = null;
         try {
             result = AttributeGetterSetter.getAttributesValues3(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source, deviceLock);
+                    aroundInvokeImpl, source, deviceLock, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1134,7 +1134,7 @@ public final class DeviceImpl extends Device_5POA {
         AttributeValue_4[] result = null;
         try {
             result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source, deviceLock);
+                    aroundInvokeImpl, source, deviceLock, clIdent);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1190,7 +1190,7 @@ public final class DeviceImpl extends Device_5POA {
         try {
             // profiler.start("get value");
             result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
-                    aroundInvokeImpl, source, deviceLock);
+                    aroundInvokeImpl, source, deviceLock, clIdent);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1228,7 +1228,7 @@ public final class DeviceImpl extends Device_5POA {
         final Object lock = deviceLock.getAttributeLock();
         try {
             synchronized (lock != null ? lock : new Object()) {
-                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
@@ -1264,7 +1264,7 @@ public final class DeviceImpl extends Device_5POA {
         final Object lock = deviceLock.getAttributeLock();
         try {
             synchronized (lock != null ? lock : new Object()) {
-                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl);
+                AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
@@ -1290,7 +1290,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-            DevFailed {
+    DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -1307,7 +1307,7 @@ public final class DeviceImpl extends Device_5POA {
         final Object lock = deviceLock.getAttributeLock();
         try {
             synchronized (lock != null ? lock : new Object()) {
-                AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl);
+                AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, clIdent);
             }
         } catch (final Exception e) {
             if (e instanceof MultiDevFailed) {
@@ -1397,18 +1397,19 @@ public final class DeviceImpl extends Device_5POA {
         try {
             synchronized (lock != null ? lock : new Object()) {
                 aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES,
-                        CallType.CACHE_DEV, name));
+                        CallType.CACHE_DEV, clIdent, name));
                 // write attributes
                 try {
-                    AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl);
+                    AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl,
+                            clIdent);
                 } catch (final MultiDevFailed e) {
                     throw new DevFailed(e.errors[0].err_list);
                 }
                 // read attributes
                 resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager,
-                        attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock);
+                        attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock, clIdent);
                 aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
-                        CallType.CACHE_DEV, name));
+                        CallType.CACHE_DEV, clIdent, name));
             }
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
@@ -1429,9 +1430,9 @@ public final class DeviceImpl extends Device_5POA {
      */
     private AttributeValue_4[] writeRead(final AttributeValue_4[] values) throws DevFailed {
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
-                name));
+                null, name));
         try {
-            AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl);
+            AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, null);
         } catch (final MultiDevFailed e) {
             throw new DevFailed(e.errors[0].err_list);
         }
@@ -1440,9 +1441,9 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
         }
         final AttributeValue_4[] resultValues = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager,
-                attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock);
+                attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock, null);
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
-                name));
+                null, name));
         return resultValues;
     }
 
@@ -1781,10 +1782,12 @@ public final class DeviceImpl extends Device_5POA {
             logger.debug("execute command {} from DEVICE", cmd.getName());
             final Object lock = deviceLock.getCommandLock();
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, commandName));
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, null,
+                        commandName));
                 final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
                 ret = cmd.execute(input);
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, commandName));
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, null,
+                        commandName));
             }
         }
         stateImpl.stateMachine(cmd.getEndState());
@@ -2033,8 +2036,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                                "It's not supported to change enumeration labels number from outside the Tango device class code");
+                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                        "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }

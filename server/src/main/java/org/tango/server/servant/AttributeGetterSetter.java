@@ -58,6 +58,7 @@ import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttributeValue_3;
 import fr.esrf.Tango.AttributeValue_4;
 import fr.esrf.Tango.AttributeValue_5;
+import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevSource;
 import fr.esrf.Tango.DevState;
@@ -91,7 +92,8 @@ public final class AttributeGetterSetter {
     }
 
     static void setAttributeValue4(final AttributeValue_4[] values, final List<AttributeImpl> attributeList,
-            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke) throws MultiDevFailed {
+            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID)
+            throws MultiDevFailed {
         XLOGGER.entry();
         final List<NamedDevError> errors = new ArrayList<NamedDevError>();
         int i = 0;
@@ -100,8 +102,8 @@ public final class AttributeGetterSetter {
             try {
                 final AttributeImpl att = getAttribute(name, attributeList);
                 // Call the always executed method
-                aroundInvoke
-                .aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN, name));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN,
+                        clientID, name));
 
                 // Check if the attribute is allowed
                 final DevState s = stateImpl.updateState();
@@ -118,7 +120,7 @@ public final class AttributeGetterSetter {
                 // state machine
                 stateImpl.stateMachine(att.getEndState());
                 aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_ATTRIBUTE, CallType.UNKNOWN,
-                        name));
+                        clientID, name));
             } catch (final DevFailed e) {
                 errors.add(new NamedDevError(name, i, e.errors));
             }
@@ -131,7 +133,7 @@ public final class AttributeGetterSetter {
     }
 
     static void setAttributeValue(final fr.esrf.Tango.AttributeValue[] values, final List<AttributeImpl> attributeList,
-            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke) throws DevFailed {
+            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID) throws DevFailed {
         XLOGGER.entry();
 
         for (final fr.esrf.Tango.AttributeValue value3 : values) {
@@ -141,7 +143,8 @@ public final class AttributeGetterSetter {
                 DevFailedUtils.throwDevFailed("write only supported for SCALAR attributes");
             }
             // Call the always executed method
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN, name));
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN,
+                    clientID, name));
 
             // Check if the attribute is allowed
             final DevState s = stateImpl.updateState();
@@ -156,14 +159,16 @@ public final class AttributeGetterSetter {
             }
             // state machine
             stateImpl.stateMachine(att.getEndState());
-            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_ATTRIBUTE, CallType.UNKNOWN, name));
+            aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_ATTRIBUTE, CallType.UNKNOWN,
+                    clientID, name));
         }
         XLOGGER.exit();
     }
 
     static AttributeValue_5[] getAttributesValues5(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+            final ClntIdent clientID) throws DevFailed {
         // final Profiler profiler = new Profiler("get value time");
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
@@ -236,13 +241,14 @@ public final class AttributeGetterSetter {
             final Object lock = locker.getAttributeLock();
             // lock if necessary
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, clientID,
+                        names));
                 for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
                     final AttributeImpl att = attribute.getValue();
                     final int i = attribute.getKey();
                     LOGGER.debug("read from DEVICE {} ", att.getName());
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
+                            att.getName()));
                     try {
 
                         synchronized (att) {
@@ -261,10 +267,11 @@ public final class AttributeGetterSetter {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
                                 att.getTangoType(), e);
                     }
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
+                            clientID, att.getName()));
                 } // for
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, clientID,
+                        names));
             } // synchronized
         }
 
@@ -281,7 +288,8 @@ public final class AttributeGetterSetter {
 
     static AttributeValue_4[] getAttributesValues4(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+            final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
         final AttributeValue_4[] back = new AttributeValue_4[names.length];
@@ -342,13 +350,14 @@ public final class AttributeGetterSetter {
             final Object lock = locker.getAttributeLock();
             // lock if necessary
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, clientID,
+                        names));
                 for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
                     final AttributeImpl att = attribute.getValue();
                     final int i = attribute.getKey();
                     LOGGER.debug("read from DEVICE {} ", att.getName());
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
+                            att.getName()));
                     try {
                         synchronized (att) {
                             att.updateValue();
@@ -358,10 +367,11 @@ public final class AttributeGetterSetter {
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], att.getFormat(), e);
                     }
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
+                            clientID, att.getName()));
                 } // for
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, clientID,
+                        names));
             } // synchronized
         }
 
@@ -370,7 +380,8 @@ public final class AttributeGetterSetter {
 
     static AttributeValue_3[] getAttributesValues3(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+            final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
         final AttributeValue_3[] back = new AttributeValue_3[names.length];
@@ -428,13 +439,14 @@ public final class AttributeGetterSetter {
             final Object lock = locker.getAttributeLock();
             // lock if necessary
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, clientID,
+                        names));
                 for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
                     final AttributeImpl att = attribute.getValue();
                     final int i = attribute.getKey();
                     LOGGER.debug("read from DEVICE {} ", att.getName());
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
+                            att.getName()));
                     try {
                         synchronized (att) {
                             att.updateValue();
@@ -444,10 +456,11 @@ public final class AttributeGetterSetter {
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i], e);
                     }
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
+                            clientID, att.getName()));
                 } // for
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, clientID,
+                        names));
             } // synchronized
         }
         return back;
@@ -455,7 +468,8 @@ public final class AttributeGetterSetter {
 
     static fr.esrf.Tango.AttributeValue[] getAttributesValues(final String deviceName, final String[] names,
             final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker) throws DevFailed {
+            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+            final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
 
@@ -504,21 +518,23 @@ public final class AttributeGetterSetter {
             final Object lock = locker.getAttributeLock();
             // lock if necessary
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTES, callType, clientID,
+                        names));
                 for (final Entry<Integer, AttributeImpl> attribute : notCacheAttributes.entrySet()) {
                     final AttributeImpl att = attribute.getValue();
                     final int i = attribute.getKey();
                     LOGGER.debug("read from DEVICE {} ", att.getName());
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
+                            att.getName()));
                     synchronized (att) {
                         att.updateValue();
                         back[i] = TangoIDLAttributeUtil.toAttributeValue(att, att.getReadValue());
                     }
-                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType, att
-                            .getName()));
+                    aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
+                            clientID, att.getName()));
                 } // for
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, names));
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTES, callType, clientID,
+                        names));
             } // synchronized
         }
         return back;
