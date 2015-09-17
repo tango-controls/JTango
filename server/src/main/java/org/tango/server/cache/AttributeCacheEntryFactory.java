@@ -46,7 +46,7 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
     private final Logger logger = LoggerFactory.getLogger(AttributeCacheEntryFactory.class);
 
     private final AttributeImpl attribute;
-//    private Profiler profilerPeriod = new Profiler("period");
+    // private Profiler profilerPeriod = new Profiler("period");
     private final DeviceLocker deviceLock;
     private long lastUpdateTime;
 
@@ -68,21 +68,21 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
         logger.debug("Creating entry for key = {} , attribute {}/{} ",
                 new Object[] { key, deviceName, attribute.getName() });
 
-//        profilerPeriod.stop().print();
-//        profilerPeriod = new Profiler("period");
-//        profilerPeriod.start(attribute.getName());
-//        if (element != null) {
-//            logger.debug("{} hint {}", element.getHitCount());
-//            System.out.println(element.getExpirationTime());
-//        }
-//        final Profiler profiler = new Profiler("read time");
-//        profiler.start(attribute.getName());
+        // profilerPeriod.stop().print();
+        // profilerPeriod = new Profiler("period");
+        // profilerPeriod.start(attribute.getName());
+        // if (element != null) {
+        // logger.debug("{} hint {}", element.getHitCount());
+        // System.out.println(element.getExpirationTime());
+        // }
+        // final Profiler profiler = new Profiler("read time");
+        // profiler.start(attribute.getName());
         Object result = null;
 
         if (key.equals(attribute.getName().toLowerCase(Locale.ENGLISH))) {
             final Object lock = deviceLock.getAttributeLock();
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING,
+                aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, CallType.POLLING, null,
                         attribute.getName()));
                 try {
                     synchronized (attribute) {
@@ -105,12 +105,12 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                     throw e;
                 } finally {
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, CallType.POLLING,
-                            attribute.getName()));
+                            null, attribute.getName()));
                 }
             }// synchronized
         }
 
-//        profiler.stop().print();
+        // profiler.stop().print();
 
         return result;
     }

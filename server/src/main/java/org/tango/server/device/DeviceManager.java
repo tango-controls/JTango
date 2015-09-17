@@ -290,7 +290,6 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void pushPipeEvent(final String pipeName, final PipeValue blob) throws DevFailed {
-
         // set attribute value
         final PipeImpl pipe = DeviceImpl.getPipe(pipeName, device.getPipeList());
         try {
@@ -300,7 +299,6 @@ public final class DeviceManager {
         } catch (final DevFailed e) {
             EventManager.getInstance().pushPipeEvent(name, pipeName, e);
         }
-
     }
 
     /**
@@ -309,6 +307,7 @@ public final class DeviceManager {
      *
      * @return the client identity
      */
+    @Deprecated
     public ClntIdent getClientIdentity() {
         return ClientIDUtil.copyClntIdent(device.getClientIdentity());
     }

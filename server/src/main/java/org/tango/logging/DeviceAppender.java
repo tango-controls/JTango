@@ -38,9 +38,9 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 /**
  * Manage logging to another device
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements ITangoAppender {
 
@@ -49,14 +49,11 @@ public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements
     private final DeviceProxy loggerDevice;
     private final String loggingDeviceName;
     private Level level;
-    private final String deviceClassName;
     private final String deviceName;
 
-    public DeviceAppender(final String deviceTargetName, final String deviceClassName, final String deviceName)
-            throws DevFailed {
+    public DeviceAppender(final String deviceTargetName, final String deviceName) throws DevFailed {
         loggerDevice = new DeviceProxy(deviceTargetName);
         this.loggingDeviceName = deviceTargetName;
-        this.deviceClassName = deviceClassName;
         this.deviceName = deviceName;
         level = Level.DEBUG;
     }
@@ -64,7 +61,6 @@ public final class DeviceAppender extends AppenderBase<ILoggingEvent> implements
     @Override
     protected void append(final ILoggingEvent eventObject) {
         if (eventObject.getMDCPropertyMap().get(DeviceImpl.MDC_KEY).equalsIgnoreCase(deviceName)
-                && eventObject.getLoggerName().equalsIgnoreCase(deviceClassName)
                 && eventObject.getLevel().isGreaterOrEqual(level)) {
             try {
                 final String[] dvsa = new String[ARGIN_SIZE];

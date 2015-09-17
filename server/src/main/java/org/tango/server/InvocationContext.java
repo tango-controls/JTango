@@ -29,7 +29,9 @@ import java.util.Arrays;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.server.annotation.AroundInvoke;
+import org.tango.utils.ClientIDUtil;
 
+import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevSource;
 
 /**
@@ -136,6 +138,7 @@ public final class InvocationContext {
     private final CallType callType;
 
     private final String[] names;
+    private final ClntIdent clientID;
 
     /**
      * Ctr
@@ -145,10 +148,12 @@ public final class InvocationContext {
      * @param names
      *            Command name or attributes names
      */
-    public InvocationContext(final ContextType context, final CallType callType, final String... names) {
+    public InvocationContext(final ContextType context, final CallType callType, final ClntIdent clientID,
+            final String... names) {
         this.context = context;
         this.callType = callType;
         this.names = names;
+        this.clientID = clientID;
     }
 
     /**
@@ -160,9 +165,6 @@ public final class InvocationContext {
         return Arrays.copyOf(names, names.length);
     }
 
-    //    public void setNames(final String... names) {
-    //        this.names = names;
-    //    }
     /**
      * {@link CallType}
      *
@@ -181,16 +183,23 @@ public final class InvocationContext {
         return context;
     }
 
-    //    public void setContext(final ContextType context) {
-    //        this.context = context;
-    //    }
-
     @Override
     public String toString() {
         final ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
         builder.append("context", context);
         builder.append("callType", callType);
+        builder.append("clientID", ClientIDUtil.toString(clientID));
         builder.append("names", Arrays.toString(names));
         return builder.toString();
+    }
+
+    /**
+     * client ID. Works only for read_attribute(s), write_attribute(s), write_read_attribute(s), command_inout and IDL
+     * >=4 and when request is not performed by the polling threads.
+     *
+     * @return the client id
+     */
+    public ClntIdent getClientID() {
+        return clientID;
     }
 }

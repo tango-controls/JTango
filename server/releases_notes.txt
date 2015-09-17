@@ -1,3 +1,11 @@
+9.0.5 (sep 2015)
+-----
+- add management of jacorb system property OAIAddr to retrieve ip address for events
+- use toLowerCase on all event name (https://sourceforge.net/p/tango-cs/bugs/730/)
+- manage device property poll_ring_depth
+- add ClntIdent in InvocationContext. DeviceManager#getClientIdentity is deprecated.
+- fix bug for change event. First event was not sent (https://sourceforge.net/p/tango-cs/bugs/708/).
+
 9.0.4 (july 2015)
 -----
 - upgrade commons-lang from 2.6 to 3.4
