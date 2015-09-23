@@ -55,19 +55,21 @@ public interface TangoProxy {
 
     boolean hasAttribute(String attrName) throws TangoProxyException;
 
-    TangoAttributeInfoWrapper getAttributeInfo(String attrName) throws TangoProxyException;
+    TangoAttributeInfoWrapper getAttributeInfo(String attrName) throws TangoProxyException, NoSuchAttributeException;
 
-    <T> T readAttribute(String attrName) throws TangoProxyException;
+    <T> T readAttribute(String attrName) throws TangoProxyException, NoSuchAttributeException;
 
-    <T> Map.Entry<T, Long> readAttributeValueAndTime(String attrName) throws TangoProxyException;
+    <T> Map.Entry<T, Long> readAttributeValueAndTime(String attrName) throws TangoProxyException, NoSuchAttributeException;
 
-    <T> Triplet<T, Long, Quality> readAttributeValueTimeQuality(String attrName) throws TangoProxyException;
+    <T> Triplet<T, Long, Quality> readAttributeValueTimeQuality(String attrName) throws TangoProxyException, NoSuchAttributeException;
 
-    <T> void writeAttribute(String attrName, T value) throws TangoProxyException;
+    <T> void writeAttribute(String attrName, T value) throws TangoProxyException, NoSuchAttributeException;
 
-    <T, V> V executeCommand(String cmd, T value) throws TangoProxyException;
+    <V> V executeCommand(String cmd) throws TangoProxyException, NoSuchCommandException;
 
-    void subscribeToEvent(String attrName, TangoEvent event) throws TangoProxyException;
+    <T, V> V executeCommand(String cmd, T value) throws TangoProxyException, NoSuchCommandException;
+
+    void subscribeToEvent(String attrName, TangoEvent event) throws TangoProxyException, NoSuchAttributeException;
 
     /**
      * Before calling this method make sure that client is already subscribed to the attribute.
@@ -81,11 +83,11 @@ public interface TangoProxy {
      * @param <T>
      * @throws NullPointerException
      */
-    <T> void addEventListener(String attrName, TangoEvent event, TangoEventListener<T> listener);
+    <T> void addEventListener(String attrName, TangoEvent event, TangoEventListener<T> listener) throws TangoProxyException;
 
     public void unsubscribeFromEvent(String attrName, TangoEvent event) throws TangoProxyException;
 
-    TangoCommandInfoWrapper getCommandInfo(String cmdName) throws TangoProxyException;
+    TangoCommandInfoWrapper getCommandInfo(String cmdName) throws TangoProxyException, NoSuchCommandException;
 
     boolean hasCommand(String name) throws TangoProxyException;
 

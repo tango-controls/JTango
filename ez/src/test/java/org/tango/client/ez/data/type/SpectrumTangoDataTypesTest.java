@@ -38,7 +38,9 @@ import fr.esrf.TangoApi.DeviceAttribute;
 import org.junit.Test;
 import org.tango.client.ez.data.TangoDataWrapper;
 
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
@@ -92,5 +94,21 @@ public class SpectrumTangoDataTypesTest {
         char[] result = instance.extract(data);
 
         assertArrayEquals(new char[]{'a', 'b', 'c', 'd'}, result);
+    }
+
+    @Test
+    public void testBooleanArr() throws Exception {
+        TangoDataType<boolean[]> instance = SpectrumTangoDataTypes.BOOL_ARR;
+
+        boolean[] values = {true, false, false, true, true};
+        DeviceAttribute attribute = new DeviceAttribute("test", values, values.length, 0);
+        TangoDataWrapper data = TangoDataWrapper.create(attribute);
+        boolean[] result = instance.extract(data);
+
+        assertTrue(result[0]);
+        assertFalse(result[1]);
+        assertFalse(result[2]);
+        assertTrue(result[3]);
+        assertTrue(result[4]);
     }
 }

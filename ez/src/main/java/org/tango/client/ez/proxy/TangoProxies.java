@@ -34,8 +34,6 @@
 
 package org.tango.client.ez.proxy;
 
-import hzg.wpn.util.ReflectionUtils;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -52,7 +50,7 @@ public class TangoProxies {
         return new DeviceProxyWrapper(url);
     }
 
-    public static <T extends TangoProxy> T newTangoProxy(final String device, Class<T> clazz) throws TangoProxyException {
+    public static <T> T newTangoProxy(final String device, Class<T> clazz) throws TangoProxyException {
         //TODO check device and interface compatibility, i.e. clazz is the class of the device
 
         InvocationHandler handler = new InvocationHandler() {
@@ -60,13 +58,9 @@ public class TangoProxies {
 
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws TangoProxyException {
-                //if the method is from TangoProxy interface invoke it
-                if (ReflectionUtils.hasMethod(tangoProxy.getClass(), method.getName(), method.getParameterTypes()))
-                    return ReflectionUtils.invoke(method, tangoProxy, args, TangoProxyException.class);
-
-                //otherwise delegate method execution to read/writeAttribute or executeCommand
                 String methodName = method.getName();
 
+                try {
                 if (tangoProxy.hasCommand(methodName))
                     return tangoProxy.executeCommand(methodName, args != null ? args[0] : null);
                 else if (methodName.startsWith("get"))
@@ -76,7 +70,12 @@ public class TangoProxies {
                 else if (methodName.startsWith("set"))
                     tangoProxy.writeAttribute(methodName.substring(3), args != null ? args[0] : null);
                 else
-                    throw new TangoProxyException("unknown method " + methodName);
+                        throw new TangoProxyException(tangoProxy.getName(), "Has neither command nor attribute " + methodName);
+                } catch (NoSuchCommandException e) {
+                    throw new AssertionError(e);
+                } catch (NoSuchAttributeException e) {
+                    throw new AssertionError(e);
+                }
 
                 return null;
             }
