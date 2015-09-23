@@ -36,14 +36,18 @@ package org.tango.client.ez.data;
 
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.TangoApi.DeviceAttribute;
+import fr.esrf.TangoDs.TangoConst;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tango.client.ez.data.format.TangoDataFormat;
+import org.tango.client.ez.data.type.TangoDataType;
+import org.tango.client.ez.data.type.TangoDataTypes;
 
 import java.lang.reflect.Array;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
@@ -70,6 +74,27 @@ public class TangoDataFormatTest {
         double[] result = instance.extract(data);
 
         assertArrayEquals(new double[]{0.1D, 0.9D, 0.8D, 0.4D}, result, 0.0);
+    }
+
+    @Test
+    public void testExtract_BoolArr() throws Exception {
+        TangoDataFormat<boolean[]> instance = TangoDataFormat.createForAttrDataFormat(AttrDataFormat.SPECTRUM);
+
+        DeviceAttribute attribute = new DeviceAttribute("test", new boolean[]{true, false, false, true}, 4, 0);
+        TangoDataWrapper data = TangoDataWrapper.create(attribute);
+        boolean[] result = instance.extract(data);
+
+        assertTrue(result[0]);
+        assertFalse(result[1]);
+        assertFalse(result[2]);
+        assertTrue(result[3]);
+    }
+
+    @Test
+    public void testGetDataTypeForBoolArr() throws Exception {
+        TangoDataFormat<?> format = TangoDataFormat.createForAttrDataFormat(AttrDataFormat.SPECTRUM);
+        TangoDataType<?> type = TangoDataTypes.forTangoDevDataType(TangoConst.Tango_DEV_BOOLEAN);
+        assertSame(boolean[].class, format.getDataType(type.getAlias()).getDataType());
     }
 
     @Test
