@@ -352,14 +352,14 @@ public interface TangoConst {
  * Constant for the TANGO State type
  */
 	public static final int	Tango_DEV_STATE	=			19;
-/**
- * Constant for the TANGO  char type
- */
-	public static final int	Tango_DEV_CHAR	=			21;
-/**
- * Constant for the TANGO  const string  type
- */
+	/**
+	 * Constant for the TANGO  const string  type
+	 */
 	public static final int	Tango_CONST_DEV_STRING	=	20;
+	/**
+ 	* Constant for the TANGO  char type
+ 	*/
+	public static final int	Tango_DEV_CHAR	=			21;
 /**
  * Constant for the TANGO unsigned char type
  */
@@ -397,6 +397,10 @@ public interface TangoConst {
  * Constant for the TANGO pipe blob
  */
 	public static final int	Tango_DEV_PIPE_BLOB	   =    30;
+	/**
+	 * Constant for the TANGO bool array
+	 */
+	int Tango_DEVVAR_BOOLEANARRAY = 31;
 /**
  * Array with TANGO data type name. To get the type name for type Tango_DEV_LONG, 
  * use Tango_CmdArgTypeName[Tango_DEV_LONG]
@@ -433,6 +437,7 @@ public interface TangoConst {
 		"DevEncoded",
 		"DevEnum",
 		"DevPipeBlob",
+		"DevVarBooleanArray"
 	};
 
 //-------------------------------------------------------------------------
