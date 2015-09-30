@@ -406,26 +406,32 @@ public class ZmqMainThread extends Thread {
                 Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
                 EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
                 if (eventChannelStruct!=null) {
-                    //  Needs idl version
-                    int idl = eventChannelStruct.getIdlVersion();
+                    try {
+                        //  Needs idl version to de marshall
+                        int idl = callBackStruct.device.get_idl_version();
 
-                    //  Else check event type
-                    switch (ZMQutils.getEventType(eventName)) {
-                        case TangoConst.ATT_CONF_EVENT:
-                            attributeConfig =
-                                    ZMQutils.deMarshallAttributeConfig(recData, littleEndian, idl);
-                            break;
-                        case TangoConst.PIPE_EVENT:
-                            devicePipe = ZMQutils.deMarshallPipe(recData, littleEndian, idl);
-                            break;
-                        case TangoConst.DATA_READY_EVENT:
-                            dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
-                            break;
-                        case TangoConst.INTERFACE_CHANGE:
-                            deviceInterface = ZMQutils.deMarshallAttInterfaceChange(recData, littleEndian);
-                            break;
-                        default:
-                            attributeValue = ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
+                        //  Else check event type
+                        switch (ZMQutils.getEventType(eventName)) {
+                            case TangoConst.ATT_CONF_EVENT:
+                                attributeConfig =
+                                        ZMQutils.deMarshallAttributeConfig(recData, littleEndian, idl);
+                                break;
+                            case TangoConst.PIPE_EVENT:
+                                devicePipe = ZMQutils.deMarshallPipe(recData, littleEndian, idl);
+                                break;
+                            case TangoConst.DATA_READY_EVENT:
+                                dataReady = ZMQutils.deMarshallAttDataReady(recData, littleEndian);
+                                break;
+                            case TangoConst.INTERFACE_CHANGE:
+                                deviceInterface = ZMQutils.deMarshallAttInterfaceChange(recData, littleEndian);
+                                break;
+                            default:
+                                attributeValue = ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
+                         }
+                    }
+                    catch(DevFailed e) {
+                        //  convert de marshall
+                        devErrorList = e.errors;
                     }
                 }
             }
@@ -738,7 +744,7 @@ public class ZmqMainThread extends Thread {
             if (increase) {
                 zmqSubscribeCounter++;
                 action = "subscribe";
-            }  else {
+            } else {
                 zmqSubscribeCounter--;
                 action = "unsubscribe";
             }
