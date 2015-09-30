@@ -193,14 +193,14 @@ public class ZmqEventConsumer extends EventConsumer implements
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
         //	Check if a new event or a re-trying one
-        int evnt_id;
+        int eventId;
         EventCallBackStruct failed_struct = failed_event_callback_map.get(callback_key);
         if (failed_struct == null) {
             //	It is a new one
             subscribe_event_id++;
-            evnt_id = subscribe_event_id;
+            eventId = subscribe_event_id;
         } else
-            evnt_id = failed_struct.id;
+            eventId = failed_struct.id;
 
         //	Build Event CallBack Structure if any
         EventCallBackStruct new_event_callback_struct =
@@ -209,7 +209,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                         channelName,
                         callback,
                         max_size,
-                        evnt_id,
+                        eventId,
                         event,
                         true);
         new_event_callback_struct.consumer  = this;
@@ -230,7 +230,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                 (event == ATT_CONF_EVENT)) {
             new PushAttrValueLater(new_event_callback_struct).start();
         }
-        return evnt_id;
+        return eventId;
     }
     //===============================================================
     //===============================================================
@@ -245,17 +245,17 @@ public class ZmqEventConsumer extends EventConsumer implements
                 eventType,
                 Integer.toString(device.get_idl_version())
         };
-        DeviceData argin = new DeviceData();
-        argin.insert(info);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(info);
         String cmdName = getEventSubscriptionCommandName();
         ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
                 cmdName + "\") for " + device_name + eventType);
-        DeviceData argout =
-                device.get_adm_dev().command_inout(cmdName, argin);
+        DeviceData argOut =
+                device.get_adm_dev().command_inout(cmdName, argIn);
         ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
-        checkDeviceConnection(device, null, argout, eventType);
+        checkDeviceConnection(device, null, argOut, eventType);
     }
    //===============================================================
    //===============================================================
@@ -375,7 +375,6 @@ public class ZmqEventConsumer extends EventConsumer implements
             if (isEndpointAvailable(endpoint)) {
                 lsa.svalue[0] = lsa.svalue[i];
                 lsa.svalue[1] = lsa.svalue[i+1];
-                //System.out.println(endpoint + " Connected !!!!");
                 return deviceData;
             }
         }
