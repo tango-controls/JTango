@@ -147,12 +147,12 @@
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb-omgapi</artifactId>
-				<version>3.6</version>
+				<version>3.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb</artifactId>
-				<version>3.6</version>
+				<version>3.4</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
