@@ -6,7 +6,7 @@
 
 	<groupId>org.tango</groupId>
 	<artifactId>JTangoParent</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 
 	<name>JTango Parent</name>
 	<description>JTango common build parameters</description>
