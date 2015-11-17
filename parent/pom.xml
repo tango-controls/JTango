@@ -167,7 +167,7 @@
 			<dependency>
 				<groupId>org.jacorb</groupId>
 				<artifactId>jacorb-services</artifactId>
-				<version>3.5</version>
+				<version>3.4</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
