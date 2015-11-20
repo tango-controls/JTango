@@ -10,6 +10,7 @@
 		<version>1.0.3</version>
 	</parent>
 	
+	<groupId>org.tango</groupId>
 	<artifactId>JavaAPI</artifactId>
 	<packaging>pom</packaging>
 	<name>Java Tango API</name>
