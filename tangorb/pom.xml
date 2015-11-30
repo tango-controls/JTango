@@ -44,7 +44,7 @@
 	<scm>
 		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/client/tangorb/trunk</connection>
 		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/client/tangorb/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/tango-ds/code/api/java/client/tangorb/trunk</url>
+		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/client/tangorb/trunk</url>
 	</scm>
 
 	<modules>
