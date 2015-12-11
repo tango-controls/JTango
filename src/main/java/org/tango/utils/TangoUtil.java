@@ -54,6 +54,7 @@ public final class TangoUtil {
         tempList.add(TangoConst.Tango_DEV_ULONG64);
         tempList.add(TangoConst.Tango_DEV_LONG64);
         tempList.add(TangoConst.Tango_DEV_ENCODED);
+        tempList.add(TangoConst.Tango_DEV_STATE);
         SCALARS = Collections.unmodifiableList(tempList);
     }
 
