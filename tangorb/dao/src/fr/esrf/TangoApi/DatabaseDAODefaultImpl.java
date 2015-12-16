@@ -2625,4 +2625,24 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData  argOut = database.command_inout("DbGetClassPipePropertyHist", argIn);
         return convertPropertyHistory(argOut.extractStringArray(), true);
     }
+    // ===================================================================
+    /**
+     * Query database to get a list of device using the specified device as
+     * 		as root for forwarded attributes
+     * @param deviceName the specified device
+     * @return a list of device using the specified device as as root for forwarded attributes
+     * @throws DevFailed
+     */
+    // ===================================================================
+    public  List<String[]> getForwardedAttributeDataForDevice(Database database, String deviceName) throws DevFailed {
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        DeviceData argOut = database.command_inout("DbGetForwardedAttributeListForDevice", argIn);
+        String[] array = argOut.extractStringArray();
+        ArrayList<String[]> list = new ArrayList<String[]>();
+        for (int i=0 ; i<array.length/3 ; i++) {
+            list.add(new String[] { array[3*i], array[3*i+1], array[3*i+2] });
+        }
+        return list;
+    }
 }
