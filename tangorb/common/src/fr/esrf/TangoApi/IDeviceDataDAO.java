@@ -502,6 +502,12 @@ public interface IDeviceDataDAO {
 
 	//===========================================
 	/**
+	 *	extract method for a boolean Array.
+	 */
+	boolean[] extractBooleanArray(DeviceData deviceData);
+
+	//===========================================
+	/**
 	 *	extract method for a DevVarLongStringArray.
 	 */
 	DevVarLongStringArray extractLongStringArray(DeviceData deviceData);

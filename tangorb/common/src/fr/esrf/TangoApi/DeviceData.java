@@ -775,6 +775,15 @@ public class DeviceData implements TangoConst {
 
 	//===========================================
 	/**
+	 * extract method for a boolean.
+	 */
+	//===========================================
+	public boolean[] extractBooleanArray() {
+		return devicedataDAO.extractBooleanArray(this);
+	}
+
+	//===========================================
+	/**
 	 * extract method for a DevVarLongStringArray.
 	 */
 	//===========================================
