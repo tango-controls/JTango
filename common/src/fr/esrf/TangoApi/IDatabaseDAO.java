@@ -1339,4 +1339,16 @@ public interface IDatabaseDAO extends IConnectionDAO{
     // ===================================================================
     public List<DbHistory> getClassPipePropertyHistory(Database database, String className,
                                                        String pipeName, String propertyName) throws DevFailed;
+
+
+	// ===================================================================
+	/**
+	 * Query database to get a list of device using the specified device as
+	 * 		as root for forwarded attributes
+	 * @param deviceName the specified device
+	 * @return a list of device using the specified device as as root for forwarded attributes
+	 * @throws DevFailed
+	 */
+	// ===================================================================
+	public  List<String[]> getForwardedAttributeDataForDevice(Database database, String deviceName) throws DevFailed;
 }

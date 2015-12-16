@@ -65,11 +65,12 @@ public class DbDevice implements java.io.Serializable {
     private String deviceName;
 
     //===================================================================
+
     /**
      * DbDevice constructor.
      * It will make a connection to the TANGO database.
      *
-     * @param    deviceName        Name of the device to be imported.
+     * @param deviceName Name of the device to be imported.
      */
     //===================================================================
     public DbDevice(String deviceName) throws DevFailed {
@@ -85,13 +86,14 @@ public class DbDevice implements java.io.Serializable {
         this.deviceName = deviceName;
     }
     //===================================================================
+
     /**
      * DbDevice constructor.
      * It will make a connection to the TANGO database.
      *
-     * @param    deviceName        Name of the device to be imported.
-     * @param    host    host where database is running.
-     * @param    port    port for database connection.
+     * @param deviceName Name of the device to be imported.
+     * @param host       host where database is running.
+     * @param port       port for database connection.
      */
     //===================================================================
     public DbDevice(String deviceName, String host, String port) throws DevFailed {
@@ -104,6 +106,7 @@ public class DbDevice implements java.io.Serializable {
         this.deviceName = deviceName;
     }
     //==========================================================================
+
     /**
      * Query the database for the info of this device.
      *
@@ -115,6 +118,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_info(deviceName);
     }
     //==========================================================================
+
     /**
      * Query the database for the export info of this device.
      *
@@ -126,6 +130,7 @@ public class DbDevice implements java.io.Serializable {
         return database.import_device(deviceName);
     }
     //==========================================================================
+
     /**
      * Update the export info for this device in the database.
      *
@@ -137,6 +142,7 @@ public class DbDevice implements java.io.Serializable {
         database.export_device(devinfo);
     }
     //==========================================================================
+
     /**
      * Un export the divice in database.
      */
@@ -145,6 +151,7 @@ public class DbDevice implements java.io.Serializable {
         database.unexport_device(deviceName);
     }
     //==========================================================================
+
     /**
      * Add/update this device to the database
      *
@@ -155,6 +162,7 @@ public class DbDevice implements java.io.Serializable {
         database.add_device(devinfo);
     }
     //==========================================================================
+
     /**
      * Delete this device from the database
      */
@@ -175,6 +183,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_class_inheritance_for_device(deviceName);
     }
     //==========================================================================
+
     /**
      * Set an alias for a device name
      *
@@ -186,6 +195,7 @@ public class DbDevice implements java.io.Serializable {
         database.put_device_alias(deviceName, aliasName);
     }
     //==========================================================================
+
     /**
      * Get an alias for a device name
      */
@@ -201,6 +211,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_alias_from_device(deviceName);
     }
     //==========================================================================
+
     /**
      * Query the database for a list of device
      * properties for the pecified object.
@@ -214,6 +225,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_property_list(deviceName, wildcard);
     }
     //==========================================================================
+
     /**
      * Query the database for a list of device properties for this device.
      *
@@ -226,6 +238,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_property(deviceName, propertyNames);
     }
     //==========================================================================
+
     /**
      * Query the database for a device property for this device.
      *
@@ -238,6 +251,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_property(deviceName, propertyName);
     }
     //==========================================================================
+
     /**
      * Query the database for a list of device properties for this device.
      * The property names are specified by the DbDatum array objects.
@@ -252,6 +266,7 @@ public class DbDevice implements java.io.Serializable {
     }
 
     //==========================================================================
+
     /**
      * Insert or update a list of properties for this device
      * The property names and their values are specified by the DbDatum array.
@@ -264,6 +279,7 @@ public class DbDevice implements java.io.Serializable {
         database.put_device_property(deviceName, properties);
     }
     //==========================================================================
+
     /**
      * Delete a list of properties for this device.
      *
@@ -275,6 +291,7 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_property(deviceName, propnames);
     }
     //==========================================================================
+
     /**
      * Delete a property for this device.
      *
@@ -286,6 +303,7 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_property(deviceName, propertyName);
     }
     //==========================================================================
+
     /**
      * Delete a list of properties for this device.
      *
@@ -302,6 +320,7 @@ public class DbDevice implements java.io.Serializable {
     //============================================
 
     //==========================================================================
+
     /**
      * Insert or update a list of attribute properties for this device.
      * The property names and their values are specified by the DbAttribute array.
@@ -314,6 +333,7 @@ public class DbDevice implements java.io.Serializable {
         database.put_device_attribute_property(deviceName, attr);
     }
     //==========================================================================
+
     /**
      * Insert or update an attribute properties for this device.
      * The property names and their values are specified by the DbAttribute array.
@@ -326,6 +346,7 @@ public class DbDevice implements java.io.Serializable {
         database.put_device_attribute_property(deviceName, attr);
     }
     //==========================================================================
+
     /**
      * Delete a list of properties for this object.
      *
@@ -338,6 +359,7 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_attribute_property(deviceName, attname, propnames);
     }
     //==========================================================================
+
     /**
      * Delete a property for this object.
      *
@@ -350,10 +372,11 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_attribute_property(deviceName, attname, propname);
     }
     //==========================================================================
+
     /**
      * Delete a list of properties for this object.
      *
-     * @param    attr    specified attribute
+     * @param attr specified attribute
      */
     //==========================================================================
     public void delete_attribute_property(DbAttribute attr)
@@ -361,10 +384,11 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_attribute_property(deviceName, attr);
     }
     //==========================================================================
+
     /**
      * Delete a list of properties for this object.
      *
-     * @param    attr    specified attributes
+     * @param attr specified attributes
      */
     //==========================================================================
     public void delete_attribute_property(DbAttribute[] attr)
@@ -373,6 +397,7 @@ public class DbDevice implements java.io.Serializable {
     }
 
     //==========================================================================
+
     /**
      * Query the database for a list of device attributes
      *
@@ -384,6 +409,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_attribute_list(deviceName);
     }
     //==========================================================================
+
     /**
      * Query the database for a list of device attribute
      * properties for this device.
@@ -397,6 +423,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_attribute_property(deviceName, attributeNames);
     }
     //==========================================================================
+
     /**
      * Query the database for a device attribute
      * property for this device.
@@ -410,6 +437,7 @@ public class DbDevice implements java.io.Serializable {
         return database.get_device_attribute_property(deviceName, attributeNames);
     }
     //==========================================================================
+
     /**
      * Delete an attribute for this object.
      *
@@ -421,6 +449,7 @@ public class DbDevice implements java.io.Serializable {
         database.delete_device_attribute(deviceName, attributeNames);
     }
     //==========================================================================
+
     /**
      * Returns the polling period (in ms) for specified attribute.
      *
@@ -431,6 +460,7 @@ public class DbDevice implements java.io.Serializable {
         return get_polling_period(attributeNames, TangoConst.ATTRIBUTE);
     }
     //==========================================================================
+
     /**
      * Returns the polling period (in ms) for specified command.
      *
@@ -491,6 +521,7 @@ public class DbDevice implements java.io.Serializable {
 
 
     //===========================================================
+
     /**
      * return the device name.
      */
@@ -499,6 +530,7 @@ public class DbDevice implements java.io.Serializable {
         return deviceName;
     }
     //===========================================================
+
     /**
      * return the device name.
      */
@@ -516,6 +548,7 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Query the database for a list of device pipe properties
      * for the specified pipe.
+     *
      * @param pipeName specified pipe.
      * @return a list of device pipe properties.
      * @throws DevFailed in case of database access failed
@@ -528,7 +561,8 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Query the database for a device pipe property
      * for the specified pipe.
-     * @param pipeName specified pipe.
+     *
+     * @param pipeName     specified pipe.
      * @param propertyName specified property.
      * @return device pipe property.
      * @throws DevFailed in case of database access failed
@@ -570,6 +604,7 @@ public class DbDevice implements java.io.Serializable {
     // ===================================================================
     /**
      * Query database for a list of pipes for specified device.
+     *
      * @return a list of pipes defined in database for specified device.
      * @throws DevFailed in case of database access failed
      */
@@ -580,6 +615,7 @@ public class DbDevice implements java.io.Serializable {
     // ===================================================================
     /**
      * Query database for a list of pipes for specified device and specified wildcard.
+     *
      * @param wildcard specified wildcard.
      * @return a list of pipes defined in database for specified device and specified wildcard.
      * @throws DevFailed in case of database access failed
@@ -592,7 +628,7 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Delete a pipe property for the specified device.
      *
-     * @param pipeName pipe name
+     * @param pipeName     pipe name
      * @param propertyName property name
      * @throws DevFailed in case of database access failed
      */
@@ -606,13 +642,13 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Delete a pipe property for the specified device.
      *
-     * @param pipeName pipe name
+     * @param pipeName      pipe name
      * @param propertyNames property names
      * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperties(String pipeName, String[] propertyNames) throws DevFailed {
-        ArrayList<String>   list = new ArrayList<String>(propertyNames.length);
+        ArrayList<String> list = new ArrayList<String>(propertyNames.length);
         Collections.addAll(list, propertyNames);
         deletePipeProperties(pipeName, list);
     }
@@ -620,7 +656,7 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Delete a pipe property for the specified device.
      *
-     * @param pipeName pipe name
+     * @param pipeName      pipe name
      * @param propertyNames property names
      * @throws DevFailed in case of database access failed
      */
@@ -631,7 +667,8 @@ public class DbDevice implements java.io.Serializable {
     // ===================================================================
     /**
      * Delete specified pipe for specified device.
-     * @param pipeName      pipe name
+     *
+     * @param pipeName pipe name
      * @throws DevFailed in case of database access failed
      */
     // ===================================================================
@@ -641,32 +678,35 @@ public class DbDevice implements java.io.Serializable {
     // ===================================================================
     /**
      * Delete all properties for specified pipe
-     * @param pipeName      pipe name
-     * @throws DevFailed  in case of database access failed
+     *
+     * @param pipeName pipe name
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(String pipeName) throws DevFailed {
-        ArrayList<String>   list = new ArrayList<String>(1);
+        ArrayList<String> list = new ArrayList<String>(1);
         list.add(pipeName);
         deleteAllPipeProperty(list);
     }
     // ===================================================================
     /**
      * Delete all properties for specified pipes
-     * @param pipeNames     pipe names
-     * @throws DevFailed  in case of database access failed
+     *
+     * @param pipeNames pipe names
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(String[] pipeNames) throws DevFailed {
-        ArrayList<String>   list = new ArrayList<String>(pipeNames.length);
+        ArrayList<String> list = new ArrayList<String>(pipeNames.length);
         Collections.addAll(list, pipeNames);
         deleteAllPipeProperty(list);
     }
     // ===================================================================
     /**
      * Delete all properties for specified pipes
-     * @param pipeNames     pipe names
-     * @throws DevFailed  in case of database access failed
+     *
+     * @param pipeNames pipe names
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(List<String> pipeNames) throws DevFailed {
@@ -675,13 +715,26 @@ public class DbDevice implements java.io.Serializable {
     // ===================================================================
     /**
      * Returns the property history for specified pipe.
-     * @param pipeName      pipe name
-     * @param propertyName  property Name
+     *
+     * @param pipeName     pipe name
+     * @param propertyName property Name
      * @return the property history for specified pipe.
-     * @throws DevFailed  in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getPipePropertyHistory(String pipeName, String propertyName) throws DevFailed {
         return database.getDevicePipePropertyHistory(deviceName, pipeName, propertyName);
+    }
+    // ===================================================================
+    /**
+     * Query database to get a list of device using the specified device as
+     * as root for forwarded attributes
+     *
+     * @return a list of device using the specified device as as root for forwarded attributes
+     * @throws DevFailed
+     */
+    // ===================================================================
+    public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice() throws DevFailed {
+        return database.getForwardedAttributeInfoForDevice(deviceName);
     }
 }
