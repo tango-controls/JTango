@@ -1997,7 +1997,25 @@ public class Database extends Connection {
         return databaseDAO.getClassPipePropertyHistory(this, className, pipeName, propertyName);
     }
     // ===================================================================
+	/**
+	 * Query database to get a list of device using the specified device as
+	 * 		as root for forwarded attributes
+	 * @param deviceName the specified device
+	 * @return a list of device using the specified device as as root for forwarded attributes
+	 * @throws DevFailed
+	 */
     // ===================================================================
+    public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice(String deviceName) throws DevFailed {
+		List<String[]> data = databaseDAO.getForwardedAttributeDataForDevice(this, deviceName);
+		List<ForwardedAttributeDatum> info = new ArrayList<ForwardedAttributeDatum>();
+		for (String[] datum : data) {
+			info.add(new ForwardedAttributeDatum(datum[0],datum[1],datum[2]));
+		}
+		return info;
+	}
+    // ===================================================================
+    // ===================================================================
+
 
 
 	/*

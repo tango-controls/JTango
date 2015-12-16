@@ -83,7 +83,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     static final private boolean check_idl = false;
 
     /**
-     * DbDevice object to make an agregat..
+     * DbDevice object to make an agregate..
      */
     private DbDevice db_dev;
 
@@ -1534,7 +1534,19 @@ public class DeviceProxy extends Connection implements ApiDefs {
     public int get_rpc_protocol() throws DevFailed {
         return deviceProxyDAO.get_rpc_protocol(this);
     }
-
+    // ===================================================================
+    /**
+     * Query database to get a list of device using the specified device as
+     * 		as root for forwarded attributes
+     * @return a list of device using the specified device as as root for forwarded attributes
+     * @throws DevFailed
+     */
+    // ===================================================================
+    public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice() throws DevFailed {
+        if (db_dev==null)
+            db_dev = new DbDevice(name());
+        return db_dev.getForwardedAttributeInfoForDevice();
+    }
 
 
 
