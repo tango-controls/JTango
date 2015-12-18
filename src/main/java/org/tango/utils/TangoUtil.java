@@ -184,7 +184,7 @@ public final class TangoUtil {
 
             final boolean noDb = matcher.group(NO_DB_INDEX) != null;
             if (noDb) {
-                // TODO cas device alias qui marche à soleil
+                // TODO cas device alias qui marche soleil
                 if (matcher.group(DEVICE_NAME_INDEX) != null && matcher.group(ENTITY_INDEX) != null) {
                     final String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
                     final String entityGroup = matcher.group(ENTITY_INDEX);
