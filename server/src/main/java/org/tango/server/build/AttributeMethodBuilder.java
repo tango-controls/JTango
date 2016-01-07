@@ -44,9 +44,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Build an {@link Attribute}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 final class AttributeMethodBuilder {
 
@@ -55,7 +55,7 @@ final class AttributeMethodBuilder {
 
     /**
      * Create a Tango attribute {@link Attribute}
-     * 
+     *
      * @param device
      * @param businessObject
      * @param method
@@ -100,7 +100,7 @@ final class AttributeMethodBuilder {
             fieldName = removedGet.substring(0, 1).toLowerCase(Locale.ENGLISH) + removedGet.substring(1);
             if (method.getParameterTypes().length != 1) {
                 throw DevFailedUtils
-                        .newDevFailed(BuilderUtils.INIT_ERROR, setterName + " must have only one parameter");
+                .newDevFailed(BuilderUtils.INIT_ERROR, setterName + " must have only one parameter");
             }
             type = method.getParameterTypes()[0];
             final Class<?> attrType = AttributeTangoType.getTypeFromClass(type).getType();
@@ -123,7 +123,8 @@ final class AttributeMethodBuilder {
 
         final AttributeConfiguration config = BuilderUtils.getAttributeConfiguration(type, getter, setter, annot,
                 attributeName);
-        AttributePropertiesImpl props = BuilderUtils.getAttributeProperties(method, attributeName);
+        AttributePropertiesImpl props = BuilderUtils.getAttributeProperties(method, attributeName,
+                config.getScalarType());
         props = BuilderUtils.setEnumLabelProperty(type, props);
         config.setAttributeProperties(props);
 
