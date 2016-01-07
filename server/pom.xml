@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>JTangoParent</artifactId>
 		<groupId>org.tango</groupId>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
 	<version>9.0.6-SNAPSHOT</version>
@@ -28,9 +28,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>${scm.connection.svn.tango-cs}:api/java/server/JTangoServer/trunk</connection>
-		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/server/JTangoServer/trunk</developerConnection>
-		<url>${scm.url.svn.tango-cs}/api/java/server/JTangoServer/trunk</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</connection>
+		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</url>
 	</scm>
 	<build>
 		<plugins>
@@ -182,7 +182,7 @@
 			<artifactId>quartz</artifactId>
 			<version>2.2.1</version>
 		</dependency>
-		<dependency>
+	 <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.2</version>
