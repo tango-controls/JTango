@@ -44,9 +44,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Build a {@link Attribute}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 final class AttributeFieldBuilder {
     private final Logger logger = LoggerFactory.getLogger(AttributeFieldBuilder.class);
@@ -115,13 +115,13 @@ final class AttributeFieldBuilder {
                 attributeName);
 
         // add default attr properties
-        AttributePropertiesImpl props = BuilderUtils.getAttributeProperties(field, attributeName);
+        AttributePropertiesImpl props = BuilderUtils.getAttributeProperties(field, attributeName,
+                config.getScalarType());
         props = BuilderUtils.setEnumLabelProperty(type, props);
         config.setAttributeProperties(props);
 
         final AttributeImpl attr = new AttributeImpl(new ReflectAttributeBehavior(config, target, getter, setter),
                 device.getName());
-
         logger.debug("Has an attribute: {} {}", attr.getName(), attr.getFormat().value());
         BuilderUtils.setStateMachine(field, attr);
         device.addAttribute(attr);
