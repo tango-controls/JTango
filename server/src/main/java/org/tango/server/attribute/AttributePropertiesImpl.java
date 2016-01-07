@@ -208,12 +208,7 @@ public final class AttributePropertiesImpl {
     }
 
     public void setFormat(final String format) {
-        if (format.isEmpty() || format.equalsIgnoreCase(Constants.NOT_SPECIFIED)
-                || format.equalsIgnoreCase(Constants.NONE)) {
-            this.format = Constants.FORMAT_6_2F;
-        } else {
-            this.format = format;
-        }
+        this.format = format;
     }
 
     public String getMinValue() {

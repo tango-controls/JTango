@@ -40,7 +40,7 @@ import org.tango.server.Constants;
  * &#064;Attribute
  * &#064;AttributeProperties(format = "%6.3f")
  * private double myAttribute;
- * 
+ *
  * public double getMyAttribute(){..};
  * </pre>
  *
@@ -61,7 +61,7 @@ public @interface AttributeProperties {
 
     String displayUnit() default Constants.NO_DIPLAY_UNIT;
 
-    String format() default Constants.FORMAT_6_2F;
+    String format() default "";
 
     String minValue() default Constants.NOT_SPECIFIED;
 

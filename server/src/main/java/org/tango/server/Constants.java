@@ -83,13 +83,15 @@ public final class Constants {
 
     // default values
     public static final String NOT_SPECIFIED = "Not specified";
+    public static final String FORMAT_6_2F = "%6.2f";
+    public static final String FORMAT_S = "%s";
+    public static final String FORMAT_D = "%d";
     public static final String NO_UNIT = "No unit";
     public static final String NO_STD_UNIT = "No standard unit";
     public static final String NO_DIPLAY_UNIT = "No display unit";
     public static final String NO_DESCRIPTION = "No description";
     public static final String NONE = "None";
     public static final String NAN = "NAN";
-    public static final String FORMAT_6_2F = "%6.2f";
     public static final String PERIOD_1000 = "1000";
 
     public static final int QUEUE_CAPACITY = 100;

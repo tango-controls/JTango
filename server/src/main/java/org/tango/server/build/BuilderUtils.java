@@ -31,6 +31,7 @@ import java.lang.reflect.Modifier;
 
 import org.tango.DeviceState;
 import org.tango.attribute.AttributeTangoType;
+import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Attribute;
 import org.tango.server.annotation.AttributeProperties;
@@ -43,14 +44,15 @@ import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DispLevel;
 import fr.esrf.Tango.PipeWriteType;
 
 /**
  * Tools to build a tango device from a class with annotations {@link org.tango.server.annotation}
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 final class BuilderUtils {
 
@@ -67,7 +69,7 @@ final class BuilderUtils {
 
     /**
      * Get attribute name from annotation {@link Attribute}
-     * 
+     *
      * @param fieldName
      * @param annot
      * @return
@@ -84,7 +86,7 @@ final class BuilderUtils {
 
     /**
      * Get pipe name from annotation {@link Pipe}
-     * 
+     *
      * @param fieldName
      * @param annot
      * @return
@@ -101,7 +103,7 @@ final class BuilderUtils {
 
     /**
      * Check if a field is static
-     * 
+     *
      * @param field
      * @throws DevFailed
      *             if static
@@ -166,7 +168,7 @@ final class BuilderUtils {
 
     /**
      * Set enum label for Enum types
-     * 
+     *
      * @param type
      * @param props
      * @throws DevFailed
@@ -186,8 +188,8 @@ final class BuilderUtils {
         return props;
     }
 
-    static AttributePropertiesImpl getAttributeProperties(final AccessibleObject method, final String attributeName)
-            throws DevFailed {
+    static AttributePropertiesImpl getAttributeProperties(final AccessibleObject method, final String attributeName,
+            final Class<?> attributeScalarType) throws DevFailed {
         // add default attr properties
         final AttributePropertiesImpl props = new AttributePropertiesImpl();
         if (method.isAnnotationPresent(AttributeProperties.class)) {
@@ -201,7 +203,13 @@ final class BuilderUtils {
             props.setDisplayUnit(annotProp.displayUnit());
             props.setUnit(annotProp.unit());
             props.setStandardUnit(annotProp.standardUnit());
-            props.setFormat(annotProp.format());
+            // set default format by attribute type
+            final String annotFormat = annotProp.format();
+            if (annotFormat.isEmpty()) {
+                setDefaultFormat(attributeScalarType, props);
+            } else {
+                props.setFormat(annotProp.format());
+            }
             props.setMaxAlarm(annotProp.maxAlarm());
             props.setMinAlarm(annotProp.minAlarm());
             props.setMaxValue(annotProp.maxValue());
@@ -220,8 +228,25 @@ final class BuilderUtils {
             props.setRootAttribute(annotProp.rootAttribute());
         } else {
             props.setLabel(attributeName);
+            setDefaultFormat(attributeScalarType, props);
         }
         return props;
+    }
+
+    private static void setDefaultFormat(final Class<?> attributeScalarType, final AttributePropertiesImpl props) {
+        if (String.class.isAssignableFrom(attributeScalarType)) {
+            props.setFormat(Constants.FORMAT_S);
+        } else if (double.class.isAssignableFrom(attributeScalarType)
+                || float.class.isAssignableFrom(attributeScalarType)) {
+            props.setFormat(Constants.FORMAT_6_2F);
+        } else if (boolean.class.isAssignableFrom(attributeScalarType)
+                || DeviceState.class.isAssignableFrom(attributeScalarType)
+                || DevState.class.isAssignableFrom(attributeScalarType)) {
+            props.setFormat(Constants.NOT_SPECIFIED);
+        } else {
+            // integer, long, ...
+            props.setFormat(Constants.FORMAT_D);
+        }
     }
 
     static void setStateMachine(final AccessibleObject annotatedObject, final DeviceBehaviorObject behavior) {
