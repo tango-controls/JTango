@@ -43,7 +43,7 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
-public class AlarmTest extends NoDBDeviceManager {
+public class AlarmQualityTest extends NoDBDeviceManager {
 
     @BeforeClass
     public static void before() throws DevFailed {
@@ -145,8 +145,23 @@ public class AlarmTest extends NoDBDeviceManager {
         // System.out.println(DeviceState.toString(dev.state()));
         // System.out.println(dev.status());
         assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_INVALID.value()));
-//        assertThat(dev.state(), equalTo(DevState.ALARM));
-//        assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
+        //        assertThat(dev.state(), equalTo(DevState.ALARM));
+        //        assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
+
+    }
+
+    @Test
+    public void testInvalid2() throws DevFailed {
+        final String attrName = "invalidQuality2";
+        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        try {
+            ta.read();
+        } catch (final DevFailed e) {
+            // ignore exception with quality invalid
+
+        }
+
+        assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_INVALID.value()));
 
     }
 
