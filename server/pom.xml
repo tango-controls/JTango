@@ -9,7 +9,7 @@
 		<version>1.0.3</version>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
-	<version>9.0.6-SNAPSHOT</version>
+	<version>9.0.6</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>9.0.4</version>
+			<version>9.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -182,7 +182,7 @@
 			<artifactId>quartz</artifactId>
 			<version>2.2.1</version>
 		</dependency>
-	 <dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.2</version>
