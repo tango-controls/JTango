@@ -23,77 +23,108 @@ public enum CommandTangoType {
      *
      */
     DEVBOOLEAN(TangoConst.Tango_DEV_BOOLEAN, boolean.class),
-    // DEVVARBOOLEANARRAY(TangoConst.Tango_DEVVAR_BOOLEANARRAY,
-    // boolean[].class),
     /**
      *
      */
-    DEVLONG64(TangoConst.Tango_DEV_LONG64, long.class), DEVVARLONG64ARRAY(TangoConst.Tango_DEVVAR_LONG64ARRAY,
-            long[].class),
-            /**
-             *
-             */
-            DEVULONG64(TangoConst.Tango_DEV_ULONG64, long.class), DEVVARULONG64ARRAY(TangoConst.Tango_DEVVAR_ULONG64ARRAY,
-            long[].class),
-                    /**
-                     *
-                     */
-                    DEVSHORT(TangoConst.Tango_DEV_SHORT, short.class), DEVVARSHORTARRAY(TangoConst.Tango_DEVVAR_SHORTARRAY,
-            short[].class),
-                            /**
-                             *
-                             */
-                            DEVUSHORT(TangoConst.Tango_DEV_USHORT, short.class), DEVVARUSHORTARRAY(TangoConst.Tango_DEVVAR_USHORTARRAY,
-            short[].class),
-                                    /**
-                                     *
-                                     */
-                                    DEVLONG(TangoConst.Tango_DEV_LONG, int.class), DEVVARLONGARRAY(TangoConst.Tango_DEVVAR_LONGARRAY, int[].class),
-                                    /**
-                                     *
-                                     */
-                                    DEVULONG(TangoConst.Tango_DEV_ULONG, int.class), DEVVARULONGARRAY(TangoConst.Tango_DEVVAR_ULONGARRAY, int[].class),
-                                    /**
-                                     *
-                                     */
-                                    DEVFLOAT(TangoConst.Tango_DEV_FLOAT, float.class), DEVVARFLOATARRAY(TangoConst.Tango_DEVVAR_FLOATARRAY,
-            float[].class),
-                                            /**
-                                             *
-                                             */
-                                            DEVDOUBLE(TangoConst.Tango_DEV_DOUBLE, double.class), DEVVARDOUBLEARRAY(TangoConst.Tango_DEVVAR_DOUBLEARRAY,
-            double[].class),
-                                                    /**
-                                                     *
-                                                     */
-                                                    DEVSTRING(TangoConst.Tango_DEV_STRING, String.class), DEVVARSTRINGARRAY(TangoConst.Tango_DEVVAR_STRINGARRAY,
-            String[].class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            DEVSTATE(TangoConst.Tango_DEV_STATE, DevState.class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            // DevChar(TangoConst.Tango_DEV_CHAR, byte.class), -> no DevCharHelper in
-                                                            // IDL
-                                                            DEVVARCHARARRAY(TangoConst.Tango_DEVVAR_CHARARRAY, byte[].class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            DEVUCHAR(TangoConst.Tango_DEV_UCHAR, byte.class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            DEVENCONDED(TangoConst.Tango_DEV_ENCODED, DevEncoded.class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            DEVVARLONGSTRINGARRAY(TangoConst.Tango_DEVVAR_LONGSTRINGARRAY, DevVarLongStringArray.class),
-                                                            /**
-                                                             *
-                                                             */
-                                                            DEVVARDOUBLESTRINGARRAY(TangoConst.Tango_DEVVAR_DOUBLESTRINGARRAY, DevVarDoubleStringArray.class);
+    DEVVARBOOLEANARRAY(TangoConst.Tango_DEVVAR_BOOLEANARRAY, boolean[].class),
+    /**
+     *
+     */
+    DEVLONG64(TangoConst.Tango_DEV_LONG64, long.class),
+    /**
+     *
+     */
+    DEVVARLONG64ARRAY(TangoConst.Tango_DEVVAR_LONG64ARRAY, long[].class),
+    /**
+     *
+     */
+    DEVULONG64(TangoConst.Tango_DEV_ULONG64, long.class),
+    /**
+     *
+     */
+    DEVVARULONG64ARRAY(TangoConst.Tango_DEVVAR_ULONG64ARRAY, long[].class),
+    /**
+     *
+     */
+    DEVSHORT(TangoConst.Tango_DEV_SHORT, short.class),
+    /**
+     *
+     */
+    DEVVARSHORTARRAY(TangoConst.Tango_DEVVAR_SHORTARRAY, short[].class),
+    /**
+     *
+     */
+    DEVUSHORT(TangoConst.Tango_DEV_USHORT, short.class),
+    /**
+     *
+     */
+    DEVVARUSHORTARRAY(TangoConst.Tango_DEVVAR_USHORTARRAY, short[].class),
+    /**
+     *
+     */
+    DEVLONG(TangoConst.Tango_DEV_LONG, int.class),
+    /**
+     *
+     */
+    DEVVARLONGARRAY(TangoConst.Tango_DEVVAR_LONGARRAY, int[].class),
+    /**
+     *
+     */
+    DEVULONG(TangoConst.Tango_DEV_ULONG, int.class),
+    /**
+     *
+     */
+    DEVVARULONGARRAY(TangoConst.Tango_DEVVAR_ULONGARRAY, int[].class),
+    /**
+     *
+     */
+    DEVFLOAT(TangoConst.Tango_DEV_FLOAT, float.class),
+    /**
+     *
+     */
+    DEVVARFLOATARRAY(TangoConst.Tango_DEVVAR_FLOATARRAY, float[].class),
+    /**
+     *
+     */
+    DEVDOUBLE(TangoConst.Tango_DEV_DOUBLE, double.class),
+    /**
+     *
+     */
+    DEVVARDOUBLEARRAY(TangoConst.Tango_DEVVAR_DOUBLEARRAY, double[].class),
+    /**
+     *
+     */
+    DEVSTRING(TangoConst.Tango_DEV_STRING, String.class),
+    /**
+     *
+     */
+    DEVVARSTRINGARRAY(TangoConst.Tango_DEVVAR_STRINGARRAY, String[].class),
+    /**
+     *
+     */
+    DEVSTATE(TangoConst.Tango_DEV_STATE, DevState.class),
+    /**
+     *
+     */
+    // DevChar(TangoConst.Tango_DEV_CHAR, byte.class), -> no DevCharHelper in
+    // IDL
+    DEVVARCHARARRAY(TangoConst.Tango_DEVVAR_CHARARRAY, byte[].class),
+    /**
+     *
+     */
+    DEVUCHAR(TangoConst.Tango_DEV_UCHAR, byte.class),
+    /**
+     *
+     */
+    DEVENCONDED(TangoConst.Tango_DEV_ENCODED, DevEncoded.class),
+    /**
+     *
+     */
+    DEVVARLONGSTRINGARRAY(TangoConst.Tango_DEVVAR_LONGSTRINGARRAY, DevVarLongStringArray.class),
+    /**
+     *
+     */
+    DEVVARDOUBLESTRINGARRAY(TangoConst.Tango_DEVVAR_DOUBLESTRINGARRAY, DevVarDoubleStringArray.class);
 
     private static final Map<Class<?>, CommandTangoType> CLASS_TYPE_MAP = new HashMap<Class<?>, CommandTangoType>();
     static {
@@ -102,8 +133,8 @@ public enum CommandTangoType {
         CLASS_TYPE_MAP.put(void.class, VOID);
         CLASS_TYPE_MAP.put(Boolean.class, DEVBOOLEAN);
         CLASS_TYPE_MAP.put(boolean.class, DEVBOOLEAN);
-        // classTypeMap.put(Boolean[].class, DEVVARBOOLEANARRAY);
-        // classTypeMap.put(boolean[].class, DEVVARBOOLEANARRAY);
+        CLASS_TYPE_MAP.put(Boolean[].class, DEVVARBOOLEANARRAY);
+        CLASS_TYPE_MAP.put(boolean[].class, DEVVARBOOLEANARRAY);
 
         CLASS_TYPE_MAP.put(Short.class, DEVSHORT);
         CLASS_TYPE_MAP.put(short.class, DEVSHORT);
