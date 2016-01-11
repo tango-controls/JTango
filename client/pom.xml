@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>JTangoParent</artifactId>
 		<groupId>org.tango</groupId>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	</parent>
 	<artifactId>JTangoClientLang</artifactId>
 	<version>9.0.5-SNAPSHOT</version>
@@ -26,9 +26,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>${scm.connection.svn.tango-cs}:api/java/client/JTangoClientLang/trunk</connection>
-		<developerConnection>${scm.developerConnection.svn.tango-cs}:api/java/client/JTangoClientLang/trunk</developerConnection>
-		<url>${scm.url.svn.tango-cs}/api/java/client/JTangoClientLang/trunk</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</connection>
+		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</url>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			<version>9.0.2</version>
+			<version>9.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
