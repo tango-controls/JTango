@@ -7,11 +7,12 @@
 	<parent>
 		<groupId>org.tango</groupId>
 		<artifactId>JTangoParent</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	</parent>
 
 	<artifactId>JTangoCommons</artifactId>
 	<version>9.0.3-SNAPSHOT</version>
+
 
 	<name>JTango's Commons</name>
 	<description>commons for java tango</description>
@@ -36,24 +37,14 @@
 		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</url>
 	</scm>
 
-	
+
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.tango</groupId>
 				<artifactId>TangORB</artifactId>
-				<version>9.1.0</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>log4j</artifactId>
-						<groupId>log4j</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>slf4j-log4j12</artifactId>
-						<groupId>org.slf4j</groupId>
-					</exclusion>
-				</exclusions>
+				<version>9.1.3</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
