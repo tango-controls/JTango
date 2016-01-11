@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.tango</groupId>
 		<artifactId>JavaAPI</artifactId>
-		<version>9.1.1-SNAPSHOT</version>
+		<version>9.1.3</version>
 	</parent>
 
 	<artifactId>TangORB-javacommon</artifactId>
