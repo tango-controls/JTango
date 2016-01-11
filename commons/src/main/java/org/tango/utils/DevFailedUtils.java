@@ -20,27 +20,27 @@ public final class DevFailedUtils {
 
     public static DevFailed newDevFailed(final String reason, final String desc) {
         LOGGER.error("{}, {}", reason, desc);
-        final DevFailed ex = new DevFailed(buildDevError(reason, desc, 3));
+        final DevFailed ex = new DevFailed(reason, buildDevError(reason, desc, 3));
         LOGGER.error("", ex);
         return ex;
     }
 
     public static DevFailed newDevFailed(final String msg) {
         LOGGER.error(msg);
-        final DevFailed ex = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
+        final DevFailed ex = new DevFailed(msg, buildDevError(TANGO_ERROR, msg, 3));
         LOGGER.error("", ex);
         return ex;
     }
 
     public static void throwDevFailed(final String msg) throws DevFailed {
-        final DevFailed e = new DevFailed(buildDevError(TANGO_ERROR, msg, 3));
+        final DevFailed e = new DevFailed(msg, buildDevError(TANGO_ERROR, msg, 3));
         LOGGER.error(msg);
         LOGGER.error("", e);
         throw e;
     }
 
     public static void throwDevFailed(final String reason, final String desc) throws DevFailed {
-        final DevFailed e = new DevFailed(buildDevError(reason, desc, 3));
+        final DevFailed e = new DevFailed(reason, buildDevError(reason, desc, 3));
         LOGGER.error("{}, {}", reason, desc);
         LOGGER.error("", e);
         throw e;
@@ -69,7 +69,7 @@ public final class DevFailedUtils {
         final StringWriter sw = new StringWriter();
         origin.printStackTrace(new PrintWriter(sw));
         err[0].origin = sw.toString();
-        final DevFailed e = new DevFailed(err);
+        final DevFailed e = new DevFailed(origin.getLocalizedMessage(), err);
         // DevFailedUtils.printDevFailed(e);
 
         return e;
@@ -84,15 +84,16 @@ public final class DevFailedUtils {
 
     /**
      * Convert a DevFailed to a String
-     * 
+     *
      * @param e
      * @return
      */
     public static String toString(final DevFailed e) {
         final StringBuilder buffer = new StringBuilder();
+        buffer.append("exception message is: ").append(e.getLocalizedMessage());
         if (e.errors != null) {
             for (int i = 0; i < e.errors.length; i++) {
-                buffer.append("Error Level ").append(i).append(":\n");
+                buffer.append("\nError Level ").append(i).append(":\n");
                 buffer.append("\t - desc: ").append(e.errors[i].desc).append("\n");
                 buffer.append("\t - origin: ").append(e.errors[i].origin).append("\n");
                 buffer.append("\t - reason: ").append(e.errors[i].reason).append("\n");
@@ -114,7 +115,7 @@ public final class DevFailedUtils {
 
     /**
      * Convert a DevFailed to a String
-     * 
+     *
      * @param e
      * @return
      */
