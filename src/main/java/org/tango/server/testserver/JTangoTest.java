@@ -64,9 +64,9 @@ import fr.esrf.Tango.DevVarLongStringArray;
 
 /**
  * Tango device to test all commands and attributes
- * 
+ *
  * @author FOURNEAU
- * 
+ *
  */
 @Device(transactionType = TransactionType.NONE)
 public final class JTangoTest {
@@ -331,7 +331,7 @@ public final class JTangoTest {
 
     /**
      * Automatically called when device ends
-     * 
+     *
      * @throws DevFailed
      */
     @Delete
@@ -341,7 +341,7 @@ public final class JTangoTest {
 
     // SHORT
     /**
-     * 
+     *
      * @return shortScalar attribute
      */
     @Attribute
@@ -350,7 +350,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @param shortScalar
      *            scalar
      */
@@ -360,7 +360,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @return shortSpectrum attribute
      */
     // public short[] getShortSpectrum() {
@@ -368,7 +368,7 @@ public final class JTangoTest {
     // }
 
     /**
-     * 
+     *
      * @param shortSpectrum
      *            spectrum
      */
@@ -378,7 +378,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @return Image of short
      */
     public short[][] getShortImage() {
@@ -386,7 +386,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @param shortImage
      *            image
      */
@@ -606,8 +606,19 @@ public final class JTangoTest {
         return new AttributeValue(invalidQuality, AttrQuality.ATTR_INVALID);
     }
 
+    @Attribute
+    @AttributeProperties(minAlarm = "2")
+    private final double invalidQuality2 = 0;
+
+    public AttributeValue getInvalidQuality2() throws DevFailed {
+        final AttributeValue value = new AttributeValue();
+        value.setQuality(AttrQuality.ATTR_INVALID);
+        value.setValue(invalidQuality2);
+        return value;
+    }
+
     /*
-     * 
+     *
      * COMMAND
      */
     @Command(outTypeDesc = "do nothing")
@@ -748,7 +759,7 @@ public final class JTangoTest {
     /**
      * Start a device with tango database. The server must be declared in tango
      * db.
-     * 
+     *
      * @throws DevFailed
      */
     public static void start() throws DevFailed {
@@ -781,7 +792,7 @@ public final class JTangoTest {
                 e.printStackTrace();
             }
         } else {
-          //  System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+            // System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
             ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
             ServerManager.getInstance().start(new String[] { "1" }, SERVER_NAME);
         }
@@ -793,7 +804,7 @@ public final class JTangoTest {
 
     // PROPERTIES
     /**
-     * 
+     *
      * @param myProp
      *            String []
      */
@@ -802,7 +813,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @param myClassProp
      *            String []
      */
@@ -819,7 +830,7 @@ public final class JTangoTest {
     }
 
     /**
-     * 
+     *
      * @return class property myClassProp
      */
     @Command
