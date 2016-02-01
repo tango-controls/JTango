@@ -190,6 +190,10 @@ public final class StateResolver {
         return priorityStateManager.getDeviceStateNumberArray();
     }
 
+    public Map<String, DevState> getDeviceStates() {
+        return priorityStateManager.getDeviceStateMap();
+    }
+
     public String[] getDeviceStateArray() {
         return priorityStateManager.getDeviceStateArray();
     }
