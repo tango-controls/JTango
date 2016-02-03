@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.tango.DeviceState;
 import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.properties.AttributePropertiesManager;
@@ -43,6 +44,7 @@ import org.tango.utils.DevFailedUtils;
 import fr.esrf.Tango.ArchiveEventProp;
 import fr.esrf.Tango.ChangeEventProp;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.EventProperties;
 import fr.esrf.Tango.PeriodicEventProp;
 
@@ -59,7 +61,7 @@ public final class AttributePropertiesImpl {
     private String unit = Constants.NO_UNIT;
     private String standardUnit = Constants.NO_STD_UNIT;
     private String displayUnit = Constants.NO_DIPLAY_UNIT;
-    private String format = Constants.FORMAT_6_2F;
+    private String format = Constants.NOT_SPECIFIED;
     private String minValue = Constants.NOT_SPECIFIED;
     private double minValueDouble = -Double.MAX_VALUE;
     private String maxValue = Constants.NOT_SPECIFIED;
@@ -507,6 +509,22 @@ public final class AttributePropertiesImpl {
                 "sysExtensions", "minValueDouble", "maxValueDouble", "minAlarmDouble", "maxAlarmDouble",
                 "minWarningDouble", "maxWarningDouble", "writableAttrName", "deltaTLong", "deltaValDouble" });
         return reflectionToStringBuilder.toString();
+    }
+
+    public void setDefaultFormat(final Class<?> attributeScalarType) {
+        if (String.class.isAssignableFrom(attributeScalarType)) {
+            setFormat(Constants.FORMAT_S);
+        } else if (double.class.isAssignableFrom(attributeScalarType)
+                || float.class.isAssignableFrom(attributeScalarType)) {
+            setFormat(Constants.FORMAT_6_2F);
+        } else if (boolean.class.isAssignableFrom(attributeScalarType)
+                || DeviceState.class.isAssignableFrom(attributeScalarType)
+                || DevState.class.isAssignableFrom(attributeScalarType)) {
+            setFormat(Constants.NOT_SPECIFIED);
+        } else {
+            // integer, long, ...
+            setFormat(Constants.FORMAT_D);
+        }
     }
 
     public long getDeltaTLong() {

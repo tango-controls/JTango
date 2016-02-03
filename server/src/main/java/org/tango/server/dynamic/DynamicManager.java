@@ -38,7 +38,9 @@ import org.tango.server.ExceptionMessages;
 import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
+import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributeImpl;
+import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.server.command.CommandImpl;
@@ -98,7 +100,6 @@ public final class DynamicManager {
         if (behavior instanceof ForwardedAttribute) {
             // init attribute with either the attribute property value, or the value defined in its constructor
             final ForwardedAttribute att = (ForwardedAttribute) behavior;
-
             final String deviceName = deviceImpl.getName();
             final String rootAttributeName = behavior.getConfiguration().getAttributeProperties()
                     .loadAttributeRootName(deviceName, attributeName);
@@ -107,7 +108,7 @@ public final class DynamicManager {
                 att.init(deviceName);
                 // persist root attribute name in tango db
                 behavior.getConfiguration().getAttributeProperties()
-                        .persistAttributeRootName(deviceName, attributeName);
+                .persistAttributeRootName(deviceName, attributeName);
             } else {
                 // use attribute property
                 att.init(deviceName, rootAttributeName);
@@ -119,6 +120,16 @@ public final class DynamicManager {
                         "root attribute already used in this device");
             } else {
                 forwardedAttributes.add(lower);
+            }
+        } else {
+            // set default properties
+            final AttributeConfiguration config = behavior.getConfiguration();
+            final AttributePropertiesImpl prop = config.getAttributeProperties();
+            if (prop.getLabel().isEmpty()) {
+                prop.setLabel(config.getName());
+            }
+            if (prop.getFormat().equals(Constants.NOT_SPECIFIED)) {
+                prop.setDefaultFormat(config.getScalarType());
             }
         }
         final AttributeImpl attrImpl = new AttributeImpl(behavior, deviceImpl.getName());
