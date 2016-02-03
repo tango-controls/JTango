@@ -253,7 +253,8 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * client info of lastest command. Used for locking device from client
      */
-    private ClntIdent clientIdentity;
+    // private volatile ClntIdent clientIdentity;
+    private ThreadLocal<ClntIdent> clientIdentity = new ThreadLocal<ClntIdent>();
 
     /**
      * Recreating a device does not delete locking object. So maintain a
@@ -577,7 +578,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * remove pipe of the device. Not possible to remove State or Status
      *
-     * @param attribute
+     * @param pipe
      * @throws DevFailed
      */
     public synchronized void removePipe(final PipeImpl pipe) throws DevFailed {
@@ -1123,7 +1124,7 @@ public final class DeviceImpl extends Device_5POA {
         }
 
         blackBox.insertInblackBox("read_attributes_4 " + Arrays.toString(names), source, clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1177,7 +1178,7 @@ public final class DeviceImpl extends Device_5POA {
 
         blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
         // profiler.start("locking");
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1300,7 +1301,7 @@ public final class DeviceImpl extends Device_5POA {
         }
         logger.debug("writing {}", Arrays.toString(names));
         blackBox.insertInblackBox("write_attributes_4 " + Arrays.toString(names), clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
         }
@@ -1343,7 +1344,7 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
         }
         blackBox.insertInblackBox("write_read_attributes_4 " + Arrays.toString(names), clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         AttributeValue_4[] val = null;
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
@@ -1382,7 +1383,7 @@ public final class DeviceImpl extends Device_5POA {
     public AttributeValue_5[] write_read_attributes_5(final AttributeValue_4[] writeValues, final String[] readNames,
             final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
         blackBox.insertInblackBox("write_read_attributes_5 ", clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         final String[] names = new String[writeValues.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = writeValues[i].name;
@@ -1582,7 +1583,7 @@ public final class DeviceImpl extends Device_5POA {
         clientIdentity = null;
         Any argout = null;
         try {
-            argout = commandHandler(command, argin, DevSource.CACHE_DEV);
+            argout = commandHandler(command, argin, DevSource.CACHE_DEV, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1619,7 +1620,7 @@ public final class DeviceImpl extends Device_5POA {
         clientIdentity = null;
         Any argout = null;
         try {
-            argout = commandHandler(command, argin, source);
+            argout = commandHandler(command, argin, source, null);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1657,13 +1658,13 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("Operation command_inout_4 (cmd = " + commandName + ")", source, clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         Any argout = null;
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, commandName);
         }
         try {
-            argout = commandHandler(commandName, argin, source);
+            argout = commandHandler(commandName, argin, source, clIdent);
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -1746,11 +1747,12 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * @param commandName
      * @param inAny
-     * @param fromCache
+     * @param clntIdent
      * @return The command result
      * @throws DevFailed
      */
-    private Any commandHandler(final String commandName, final Any inAny, final DevSource source) throws DevFailed {
+    private Any commandHandler(final String commandName, final Any inAny, final DevSource source,
+            final ClntIdent clntIdent) throws DevFailed {
         xlogger.entry();
         boolean fromCache = false;
         if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
@@ -1782,11 +1784,11 @@ public final class DeviceImpl extends Device_5POA {
             logger.debug("execute command {} from DEVICE", cmd.getName());
             final Object lock = deviceLock.getCommandLock();
             synchronized (lock != null ? lock : new Object()) {
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, null,
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_COMMAND, callType, clntIdent,
                         commandName));
                 final Object input = CleverAnyCommand.get(inAny, cmd.getInTangoType(), !cmd.isArginPrimitive());
                 ret = cmd.execute(input);
-                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, null,
+                aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_COMMAND, callType, clntIdent,
                         commandName));
             }
         }
@@ -2009,13 +2011,11 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent);
         }
 
-        // TODO The root attribute informs the forwarded attribute of eventual
-        // configuration change by events
         blackBox.insertInblackBox("set_attribute_config_5", clIdent);
         for (final AttributeConfig_5 attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
@@ -2058,7 +2058,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent);
         }
@@ -2537,7 +2537,7 @@ public final class DeviceImpl extends Device_5POA {
     }
 
     public ClntIdent getClientIdentity() {
-        return clientIdentity;
+        return clientIdentity.get();
     }
 
     public void setDeviceScheduler(final Set<Method> methodList) {
@@ -2624,7 +2624,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
 
         blackBox.insertInblackBox("set_pipe_config_5", clIdent);
         for (final PipeConfig config : newConf) {
@@ -2655,11 +2655,15 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         blackBox.insertInblackBox("read_pipe_5 " + name, clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         DevPipeData result = null;
         try {
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_READ, CallType.UNKNOWN, clIdent,
+                    pipe.getName()));
             pipe.updateValue();
             result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_READ, CallType.UNKNOWN, clIdent,
+                    pipe.getName()));
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -2679,9 +2683,13 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry(value.name);
         final PipeImpl pipe = getPipe(value.name, pipeList);
         blackBox.insertInblackBox("write_pipe_5 " + value.name, clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         try {
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_WRITE, CallType.UNKNOWN, clIdent,
+                    pipe.getName()));
             pipe.setValue(TangoIDLUtil.toPipeValue(value));
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE, CallType.UNKNOWN, clIdent,
+                    pipe.getName()));
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
@@ -2700,12 +2708,16 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         blackBox.insertInblackBox("write_read_pipe_5 " + name, clIdent);
-        clientIdentity = clIdent;
+        clientIdentity.set(clIdent);
         DevPipeData result = null;
         try {
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_WRITE_READ, CallType.UNKNOWN,
+                    clIdent, pipe.getName()));
             pipe.setValue(TangoIDLUtil.toPipeValue(value));
             pipe.updateValue();
             result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
+            aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE_READ, CallType.UNKNOWN,
+                    clIdent, pipe.getName()));
         } catch (final Exception e) {
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
