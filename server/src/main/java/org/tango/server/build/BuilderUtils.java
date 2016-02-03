@@ -31,7 +31,6 @@ import java.lang.reflect.Modifier;
 
 import org.tango.DeviceState;
 import org.tango.attribute.AttributeTangoType;
-import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Attribute;
 import org.tango.server.annotation.AttributeProperties;
@@ -44,7 +43,6 @@ import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DispLevel;
 import fr.esrf.Tango.PipeWriteType;
 
@@ -206,7 +204,7 @@ final class BuilderUtils {
             // set default format by attribute type
             final String annotFormat = annotProp.format();
             if (annotFormat.isEmpty()) {
-                setDefaultFormat(attributeScalarType, props);
+                props.setDefaultFormat(attributeScalarType);
             } else {
                 props.setFormat(annotProp.format());
             }
@@ -228,25 +226,9 @@ final class BuilderUtils {
             props.setRootAttribute(annotProp.rootAttribute());
         } else {
             props.setLabel(attributeName);
-            setDefaultFormat(attributeScalarType, props);
+            props.setDefaultFormat(attributeScalarType);
         }
         return props;
-    }
-
-    private static void setDefaultFormat(final Class<?> attributeScalarType, final AttributePropertiesImpl props) {
-        if (String.class.isAssignableFrom(attributeScalarType)) {
-            props.setFormat(Constants.FORMAT_S);
-        } else if (double.class.isAssignableFrom(attributeScalarType)
-                || float.class.isAssignableFrom(attributeScalarType)) {
-            props.setFormat(Constants.FORMAT_6_2F);
-        } else if (boolean.class.isAssignableFrom(attributeScalarType)
-                || DeviceState.class.isAssignableFrom(attributeScalarType)
-                || DevState.class.isAssignableFrom(attributeScalarType)) {
-            props.setFormat(Constants.NOT_SPECIFIED);
-        } else {
-            // integer, long, ...
-            props.setFormat(Constants.FORMAT_D);
-        }
     }
 
     static void setStateMachine(final AccessibleObject annotatedObject, final DeviceBehaviorObject behavior) {
