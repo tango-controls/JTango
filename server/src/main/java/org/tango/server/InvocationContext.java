@@ -83,7 +83,7 @@ public final class InvocationContext {
          * Before a write_read request
          */
         PRE_WRITE_READ_ATTRIBUTES,
-        /**
+        PRE_PIPE_WRITE, POST_PIPE_WRITE, PRE_PIPE_READ, POST_PIPE_READ, PRE_PIPE_WRITE_READ, POST_PIPE_WRITE_READ, /**
          * Before a write_read request
          */
         POST_WRITE_READ_ATTRIBUTES
