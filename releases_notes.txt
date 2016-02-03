@@ -1,3 +1,15 @@
+9.0.7 (jan 2016)
+-----
+- integration of tangorb 9.2.0 that better manage pipes with scalar and arrays
+- InvocationContext was missing pipes
+- try to fix threading issues to retrieve clientId in invocation context.
+ Occurs when TransactionMode=NONE and several client requests at the same time
+
+
+9.0.6 (dec 2015)
+-----
+- set default attribute properties format in function of the attribute type
+
 9.0.5 (sep 2015)
 -----
 - add management of jacorb system property OAIAddr to retrieve ip address for events
