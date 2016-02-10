@@ -37,21 +37,23 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A CORBA Server Interceptor to retrieve the identity of clients
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject implements
-        org.omg.PortableInterceptor.ServerRequestInterceptor {
+org.omg.PortableInterceptor.ServerRequestInterceptor {
+    private static final String GIOP_TCP = "giop:tcp:";
+
     private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
-    private String clientHostName = "";
-    private String giopHostAddress;
-    private String clientIPAddress;
+    private final ThreadLocal<String> clientHostName = new ThreadLocal<String>();
+    private volatile ThreadLocal<String> giopHostAddress = new ThreadLocal<String>();
+    private volatile ThreadLocal<String> clientIPAddress = new ThreadLocal<String>();
     private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
 
     private ServerRequestInterceptor() {
@@ -78,19 +80,18 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
                         // final int localPort = sock.getLocalPort();
 
                         // remote informations
-                        clientIPAddress = sock.getInetAddress().getHostAddress();
+                        clientIPAddress.set(sock.getInetAddress().getHostAddress());
                         final int remotePort = sock.getPort();
-
-                        clientHostName = InetAddress.getByName(clientIPAddress).getCanonicalHostName();
-                        giopHostAddress = "giop:tcp:" + clientIPAddress + ":" + remotePort;
+                        clientHostName.set(InetAddress.getByName(clientIPAddress.get()).getCanonicalHostName());
+                        giopHostAddress.set(GIOP_TCP + clientIPAddress + ":" + remotePort);
                     }
                 } else {
                     // when client is in the same process as the server, connection instance of
                     // org.jacorb.orb.iiop.IIOPListener$LoopbackAcceptor
                     final InetAddress addr = InetAddress.getLocalHost();
-                    clientIPAddress = addr.getHostAddress();
-                    clientHostName = addr.getCanonicalHostName();
-                    giopHostAddress = "giop:tcp:" + clientIPAddress;
+                    clientIPAddress.set(addr.getHostAddress());
+                    clientHostName.set(addr.getCanonicalHostName());
+                    giopHostAddress.set(GIOP_TCP + clientIPAddress);
                 }
             }
         } catch (final Exception e) {
@@ -121,15 +122,15 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
     }
 
     public String getClientHostName() {
-        return clientHostName;
+        return clientHostName.get();
     }
 
     public String getClientIPAddress() {
-        return clientIPAddress;
+        return clientIPAddress.get();
     }
 
     public String getGiopHostAddress() {
-        return giopHostAddress;
+        return giopHostAddress.get();
     }
 
     public static ServerRequestInterceptor getInstance() {
