@@ -28,6 +28,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.AroundInvoke;
 import org.tango.utils.ClientIDUtil;
 
@@ -83,7 +84,31 @@ public final class InvocationContext {
          * Before a write_read request
          */
         PRE_WRITE_READ_ATTRIBUTES,
-        PRE_PIPE_WRITE, POST_PIPE_WRITE, PRE_PIPE_READ, POST_PIPE_READ, PRE_PIPE_WRITE_READ, POST_PIPE_WRITE_READ, /**
+        /**
+         *
+         */
+        PRE_PIPE_WRITE,
+        /**
+         *
+         */
+        POST_PIPE_WRITE,
+        /**
+         *
+         */
+        PRE_PIPE_READ,
+        /**
+         *
+         */
+        POST_PIPE_READ,
+        /**
+         *
+         */
+        PRE_PIPE_WRITE_READ,
+        /**
+         *
+         */
+        POST_PIPE_WRITE_READ,
+        /**
          * Before a write_read request
          */
         POST_WRITE_READ_ATTRIBUTES
@@ -139,6 +164,7 @@ public final class InvocationContext {
 
     private final String[] names;
     private final ClntIdent clientID;
+    private final String clientHostName;
 
     /**
      * Ctr
@@ -154,6 +180,7 @@ public final class InvocationContext {
         this.callType = callType;
         this.names = names;
         this.clientID = clientID;
+        this.clientHostName = ServerRequestInterceptor.getInstance().getClientHostName();
     }
 
     /**
@@ -201,5 +228,14 @@ public final class InvocationContext {
      */
     public ClntIdent getClientID() {
         return clientID;
+    }
+
+    /**
+     * Get the client host name
+     *
+     * @return
+     */
+    public String getClientHostName() {
+        return clientHostName;
     }
 }
