@@ -317,6 +317,7 @@ public final class DeviceManager {
      *
      * @return
      */
+    @Deprecated
     public String getClientHostName() {
         return ServerRequestInterceptor.getInstance().getClientHostName();
     }
