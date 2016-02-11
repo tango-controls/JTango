@@ -64,7 +64,7 @@ import fr.esrf.Tango.DispLevel;
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-IReadableWritable<AttributeValue> {
+        IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
@@ -181,7 +181,10 @@ IReadableWritable<AttributeValue> {
     public void updateValue() throws DevFailed {
         xlogger.entry(getName());
         // invoke on device
+        // final Profiler profilerPeriod = new Profiler("read attribute " + name);
+        // profilerPeriod.start("invoke");
         final AttributeValue returnedValue = behavior.getValue();
+        // profilerPeriod.stop().print();
         this.updateValue(returnedValue);
         xlogger.exit(getName());
     }
@@ -194,6 +197,8 @@ IReadableWritable<AttributeValue> {
     @Override
     public void updateValue(final AttributeValue inValue) throws DevFailed {
         xlogger.entry(getName());
+        // final Profiler profilerPeriod = new Profiler("read attribute " + name);
+        // profilerPeriod.start("in");
         if (inValue == null) {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
                     + " read value has not been updated");
@@ -202,19 +207,23 @@ IReadableWritable<AttributeValue> {
         if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
             updateQuality(inValue);
         }
+        // profilerPeriod.start("clone");
         try {
             // copy value
             readValue = (AttributeValue) inValue.clone();
         } catch (final CloneNotSupportedException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
-
+        // profilerPeriod.stop().print();
         try {
             if (inValue.getValue() != null) {
+                // profilerPeriod.start("checkUpdateErrors");
                 checkUpdateErrors(inValue);
+                // profilerPeriod.start("from2DArrayToArray");
                 // get as array if necessary (for image)
                 readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
                 // force conversion to check types
+                // profilerPeriod.start("toAttributeValue5");
                 TangoIDLAttributeUtil.toAttributeValue5(this, readValue, null);
                 if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
                     // write value is managed by the user
@@ -236,7 +245,10 @@ IReadableWritable<AttributeValue> {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
                         + " read value has not been updated");
             }
+            // profilerPeriod.start("updateDefaultWritePart");
             updateDefaultWritePart();
+            // profilerPeriod.stop().print();
+
         } catch (final DevFailed e) {
             // readValue.setQuality(AttrQuality.ATTR_INVALID);
             readValue.setXDim(0);
@@ -415,25 +427,27 @@ IReadableWritable<AttributeValue> {
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
         if (!config.getWritable().equals(AttrWriteType.READ)) {
+            // final Profiler profilerPeriod = new Profiler("write attribute " + name);
+            // profilerPeriod.start("check");
             checkSetErrors(value);
+            // profilerPeriod.start("clone");
             // copy value for safety and transform it to 2D array if necessary
             try {
                 writeValue = (AttributeValue) value.clone();
             } catch (final CloneNotSupportedException e) {
                 throw DevFailedUtils.newDevFailed(e);
             }
-
+            // profilerPeriod.start("after clone");
             checkMinMaxValue();
             writtenTimestamp = writeValue.getTime();
-            final AttributeValue value2D = new AttributeValue();
             int dimY = writeValue.getYDim();
             if (config.getFormat().equals(AttrDataFormat.IMAGE) && dimY == 0) {
                 // force at least 1 to obtain a real 2D array with [][]
                 dimY = 1;
             }
-            value2D.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY));
-            behavior.setValue(value2D);
-
+            // profilerPeriod.start("convert image");
+            value.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY));
+            behavior.setValue(value);
             if (isMemorized() && getFormat().equals(AttrDataFormat.SCALAR)) {
                 // TODO: refactoring to manage performance issues for spectrum and
                 // images
@@ -446,6 +460,7 @@ IReadableWritable<AttributeValue> {
                 // Integer.toString(value4.w_dim.dim_y));
                 // }
             }
+            //            profilerPeriod.stop().print();
         } else {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_WRITABLE, name + " is not writable");
         }
@@ -461,16 +476,19 @@ IReadableWritable<AttributeValue> {
                     throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
                             "value is outside allowed range: " + min + "<" + max);
                 }
-            } else {
-                final String[] array = ArrayUtils.toStringArray(writeValue.getValue());
-                for (final String element : array) {
-                    final double val = Double.parseDouble(element);
-                    if (val > max || val < min) {
-                        throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
-                                "value is outside allowed range: " + min + "<" + max);
-                    }
-                }
             }
+            // XXX removed for performance issue
+            // else {
+            //
+            // final String[] array = ArrayUtils.toStringArray(writeValue.getValue());
+            // for (final String element : array) {
+            // final double val = Double.parseDouble(element);
+            // if (val > max || val < min) {
+            // throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
+            // "value is outside allowed range: " + min + "<" + max);
+            // }
+            // }
+            // }
         }
     }
 

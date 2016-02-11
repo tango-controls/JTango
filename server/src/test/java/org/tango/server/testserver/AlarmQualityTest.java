@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.client.database.DatabaseFactory;
 import org.tango.client.database.ITangoDB;
@@ -145,8 +146,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
         // System.out.println(DeviceState.toString(dev.state()));
         // System.out.println(dev.status());
         assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_INVALID.value()));
-        //        assertThat(dev.state(), equalTo(DevState.ALARM));
-        //        assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
+        // assertThat(dev.state(), equalTo(DevState.ALARM));
+        // assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
 
     }
 
@@ -165,6 +166,7 @@ public class AlarmQualityTest extends NoDBDeviceManager {
 
     }
 
+    @Ignore("min max on big array is not performant, fonctionnality removed")
     @Test(expected = DevFailed.class)
     public void testMaxValueSpectrum() throws DevFailed {
         final String attrName = "longSpectrum";
