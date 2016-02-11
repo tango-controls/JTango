@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb</artifactId>
-		<!-- 	<version>3.7</version> -->
+			<!-- <version>3.7</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.jacorb</groupId>
@@ -165,12 +165,12 @@
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb-services</artifactId>
-		<!-- 	<version>3.7</version> -->
+			<!-- <version>3.7</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>9.0.6</version>
+			<version>9.0.7-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
