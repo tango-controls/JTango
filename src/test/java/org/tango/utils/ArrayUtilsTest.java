@@ -25,4 +25,13 @@ public class ArrayUtilsTest {
         assertThat(result, equalTo(expected));
     }
 
+    @Test
+    public void testDeepCopy() throws DevFailed {
+        final float[][] insert = new float[][] { { 10.0F, 15.2F }, { 10.0F, 15.2F } };
+        final float[][] result = (float[][]) ArrayUtils.deepCopyOf(insert);
+        insert[0][0] = 5.3F;
+        final float[][] expected = new float[][] { { 10.0F, 15.2F }, { 10.0F, 15.2F } };
+        assertThat(result, equalTo(expected));
+    }
+
 }
