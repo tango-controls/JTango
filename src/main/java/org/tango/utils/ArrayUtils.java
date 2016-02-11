@@ -1,10 +1,5 @@
 package org.tango.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
@@ -275,8 +270,8 @@ public final class ArrayUtils {
 
     public static Object fromArrayTo2DArray(final Object array, final int dimX, final int dimY) throws DevFailed {
         Object array2D = null;
-        //        final Profiler profilerPeriod = new Profiler("fromArrayTo2DArray");
-        //        profilerPeriod.start("fromArrayTo2DArray");
+        // final Profiler profilerPeriod = new Profiler("fromArrayTo2DArray");
+        // profilerPeriod.start("fromArrayTo2DArray");
         if (array.getClass().isArray()) {
             if (dimY > 0) {// to a 2D Array
                 array2D = Array.newInstance(array.getClass().getComponentType(), dimY, dimX);
@@ -292,27 +287,8 @@ public final class ArrayUtils {
         } else {
             array2D = array;
         }
-        //        profilerPeriod.stop().print();
+        // profilerPeriod.stop().print();
         return array2D;
-    }
-
-    /**
-     * Make a deep copy of any object assuming everything in the tree is serializable.
-     *
-     * @param src
-     *            The object to copy.
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public static Object deepCopy(final Object src) throws IOException, ClassNotFoundException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(src);
-        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final ObjectInputStream ois = new ObjectInputStream(bais);
-        final Object deepCopy = ois.readObject();
-        return deepCopy;
     }
 
     /**
@@ -480,7 +456,42 @@ public final class ArrayUtils {
             System.arraycopy(nums[i], 0, member, 0, nums[i].length);
             copy[i] = member;
         }
-
         return copy;
     }
+
+    public static Object deepCopyOf(final Object array) {
+        Object result = array;
+        int lengthX = 0;
+        if (array != null && array.getClass().isArray()) {
+            final int lengthY = Array.getLength(array);
+            if (lengthY > 0) {
+                final Object firtLine = Array.get(array, 0);
+                if (firtLine.getClass().isArray()) {
+                    lengthX = Array.getLength(firtLine);
+                    result = Array.newInstance(firtLine.getClass().getComponentType(), lengthY, lengthX);
+                } else {
+                    result = Array.newInstance(array.getClass().getComponentType(), lengthY);
+                }
+            }
+            deepCopy(array, result);
+        }
+        return result;
+    }
+
+    private static void deepCopy(final Object source, final Object dest) {
+        if (source != null) {
+            final int length = Array.getLength(source);
+            if (length > 0) {
+                final Object firstline = Array.get(source, 0);
+                if (firstline.getClass().isArray()) {
+                    for (int i = 0; i < length; i++) {
+                        deepCopy(Array.get(source, i), Array.get(dest, i));
+                    }
+                } else {
+                    System.arraycopy(source, 0, dest, 0, length);
+                }
+            }
+        }
+    }
+
 }
