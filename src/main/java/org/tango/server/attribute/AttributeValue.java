@@ -24,7 +24,6 @@
  */
 package org.tango.server.attribute;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 
@@ -32,6 +31,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
 import org.tango.server.IValue;
+import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrQuality;
@@ -126,18 +126,21 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
                 setXDim(Array.getLength(value));
                 setYDim(0);
             } else { // IMAGE
-                final int y = Array.getLength(value);
-                setYDim(y);
+                int y = Array.getLength(value);
                 if (y > 0) {
                     final Object xArray = Array.get(value, 0);
-                    // check if this value can be an attribute value
-                    if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(xArray.getClass().getComponentType())) {
+                    final int x = Array.getLength(xArray);
+                    if (x == 0) {
+                        y = 0;
+                        // check if this value can be an attribute value
+                    } else if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(xArray.getClass().getComponentType())) {
                         DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
                     }
-                    setXDim(Array.getLength(xArray));
+                    setXDim(x);
                 } else {
                     setXDim(0);
                 }
+                setYDim(y);
             }
             this.value = value;
         } else {
@@ -221,13 +224,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
     public Object clone() throws CloneNotSupportedException {
         final AttributeValue newValue = (AttributeValue) super.clone();
         newValue.quality = AttrQuality.from_int(quality.value());
-        try {
-            newValue.value = org.tango.utils.ArrayUtils.deepCopy(value);
-        } catch (final IOException e) {
-            throw new CloneNotSupportedException(e.getMessage());
-        } catch (final ClassNotFoundException e) {
-            throw new CloneNotSupportedException(e.getMessage());
-        }
+        newValue.value = ArrayUtils.deepCopyOf(value);
         return newValue;
     }
 
