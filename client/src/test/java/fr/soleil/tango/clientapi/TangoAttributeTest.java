@@ -86,7 +86,7 @@ public class TangoAttributeTest {
                 if (format.equals(AttrDataFormat.IMAGE)) {
                     if (writeType == AttrWriteType.READ_WRITE || writeType == AttrWriteType.WRITE) {
                         ta.write(new String[][] { { "1", "2.3", "3" }, { "4", "3", "0" } });
-                        ta.writeImage(2, 2, 1.0, 2.3, 3.0, 4.0);
+                        ta.writeImage(2, 2, new double[] { 1.0, 2.3, 3.0, 4.0 });
                     }
                     ta.update();
                     // long time1 = System.nanoTime();
@@ -182,12 +182,6 @@ public class TangoAttributeTest {
         ta2.write();
         ta2.update();
         System.out.println(ta2.extractToString(",", "\n"));
-
-        ta2.insertSpectrum(s);
-        ta2.write();
-        ta2.update();
-        System.out.println(ta2.extractToString(",", "\n"));
-
     }
 
     @Ignore(value = "a tangotest must be started automatically")
