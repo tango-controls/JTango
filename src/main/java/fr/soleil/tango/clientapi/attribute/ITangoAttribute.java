@@ -37,24 +37,17 @@ public interface ITangoAttribute {
 
     /**
      * Get the value on the attribute
-     * 
+     *
      * @throws DevFailed
      */
     void update() throws DevFailed;
 
-    /**
-     * 
-     * @param values
-     *            The values to insert
-     */
-    void insertSpectrum(final Object... values) throws DevFailed;
-
-    void insertImage(final int dimX, final int dimY, final Object... values) throws DevFailed;
+    void insertImage(final int dimX, final int dimY, final Object values) throws DevFailed;
 
     /**
      * Extract data and format it as followed :\n SCALAR: ex: 1 SPECTRUM: one line separated by separator. \n ex: 1 3 5
      * IMAGE: x lines and y colums separated by endSeparator.\n ex: 3 5 8 5 6 9
-     * 
+     *
      * @param separator
      * @param endSeparator
      * @return

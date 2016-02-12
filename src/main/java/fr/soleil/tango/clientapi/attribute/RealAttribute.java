@@ -3,6 +3,8 @@ package fr.soleil.tango.clientapi.attribute;
 import java.lang.reflect.Array;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
@@ -23,7 +25,9 @@ import fr.soleil.tango.errorstrategy.Task;
 public final class RealAttribute implements ITangoAttribute {
 
     private static final String TANGO_WRONG_DATA_ERROR = "TANGO_WRONG_DATA_ERROR";
+    private final Logger logger = LoggerFactory.getLogger(RealAttribute.class);
     private AttributeProxy attributeProxy;
+
     private DeviceAttribute deviceAttribute = null;
     private int dataType;
     private AttrDataFormat dataFormat;
@@ -73,8 +77,9 @@ public final class RealAttribute implements ITangoAttribute {
         final Task<Void> task = new Task<Void>() {
             @Override
             public Void call() throws DevFailed {
-
+                logger.debug("writing on {}", attributeName);
                 attributeProxy.write(deviceAttribute);
+                logger.debug("writing {} DONE", attributeName);
                 return null;
             }
         };
@@ -100,12 +105,7 @@ public final class RealAttribute implements ITangoAttribute {
     }
 
     @Override
-    public void insertSpectrum(final Object... values) throws DevFailed {
-        InsertExtractUtils.insert(deviceAttribute, values);
-    }
-
-    @Override
-    public void insertImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
+    public void insertImage(final int dimX, final int dimY, final Object values) throws DevFailed {
         if (!dataFormat.equals(AttrDataFormat.IMAGE)) {
             DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "this attribute is spectrum");
         }

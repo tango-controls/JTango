@@ -56,12 +56,7 @@ public final class MockAttribute implements ITangoAttribute {
     }
 
     @Override
-    public void insertSpectrum(final Object... values) throws DevFailed {
-        mockValue = TypeConversionUtil.castToType(mockType, values);
-    }
-
-    @Override
-    public void insertImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
+    public void insertImage(final int dimX, final int dimY, final Object values) throws DevFailed {
         mockValue = TypeConversionUtil.castToType(mockType, values);
     }
 
