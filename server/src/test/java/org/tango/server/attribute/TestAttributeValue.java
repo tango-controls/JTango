@@ -85,6 +85,17 @@ public class TestAttributeValue {
     }
 
     @Test
+    public void testDevStateScalar() throws DevFailed, CloneNotSupportedException {
+        final AttributeValue value = new AttributeValue();
+        DevState array = DevState.ON;
+        value.setValue(array);
+        final AttributeValue newValue = (AttributeValue) value.clone();
+        array = DevState.FAULT;
+        final DevState newArray = (DevState) newValue.getValue();
+        assertThat(newArray, not(array));
+    }
+
+    @Test
     public void testDeviceState() throws DevFailed, CloneNotSupportedException {
         final AttributeValue value = new AttributeValue();
         final DeviceState[] array = new DeviceState[] { DeviceState.ON, DeviceState.OFF };
