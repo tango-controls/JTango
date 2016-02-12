@@ -75,12 +75,7 @@ public final class TangoAttribute {
         this.write();
     }
 
-    public void writeSpectrum(final Object... values) throws DevFailed {
-        insertSpectrum(values);
-        this.write();
-    }
-
-    public <T> void writeImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
+    public <T> void writeImage(final int dimX, final int dimY, final Object values) throws DevFailed {
         insertImage(dimX, dimY, values);
         this.write();
     }
@@ -241,16 +236,7 @@ public final class TangoAttribute {
         attributeImpl.insert(value);
     }
 
-    /**
-     * @param values
-     *            The values to insert
-     */
-    public void insertSpectrum(final Object... values) throws DevFailed {
-        logger.debug(LOG_INSERTING, this);
-        attributeImpl.insertSpectrum(values);
-    }
-
-    public void insertImage(final int dimX, final int dimY, final Object... values) throws DevFailed {
+    public void insertImage(final int dimX, final int dimY, final Object values) throws DevFailed {
         logger.debug(LOG_INSERTING, this);
         attributeImpl.insertImage(dimX, dimY, values);
     }
