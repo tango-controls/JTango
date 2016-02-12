@@ -1,3 +1,7 @@
+9.0.8 (jan 2016)
+-----
+- fix performance issue for big spectrum and image attributes
+
 9.0.7 (jan 2016)
 -----
 - integration of tangorb 9.2.0 that better manage pipes with scalar and arrays
