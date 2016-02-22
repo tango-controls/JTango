@@ -64,7 +64,7 @@ import fr.esrf.Tango.DispLevel;
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-        IReadableWritable<AttributeValue> {
+IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
@@ -183,9 +183,18 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         // invoke on device
         // final Profiler profilerPeriod = new Profiler("read attribute " + name);
         // profilerPeriod.start("invoke");
-        final AttributeValue returnedValue = behavior.getValue();
-        // profilerPeriod.stop().print();
+        final AttributeValue returnedValue;
+        if (config.getWritable().equals(AttrWriteType.WRITE)) {
+            if (writeValue == null) {
+                returnedValue = new AttributeValue(AttributeTangoType.getDefaultValue(config.getType()));
+            } else {
+                returnedValue = writeValue;
+            }
+        } else {
+            returnedValue = behavior.getValue();
+        }
         this.updateValue(returnedValue);
+        // profilerPeriod.stop().print();
         xlogger.exit(getName());
     }
 
@@ -203,25 +212,28 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
             throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
                     + " read value has not been updated");
         }
-        // update quality if necessary
-        if (inValue.getValue() != null && !inValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
-            updateQuality(inValue);
-        }
-        // profilerPeriod.start("clone");
+
         try {
             // copy value
             readValue = (AttributeValue) inValue.clone();
         } catch (final CloneNotSupportedException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
+
+        // update quality if necessary
+        if (readValue.getValue() != null && !readValue.getQuality().equals(AttrQuality.ATTR_INVALID)) {
+            updateQuality(readValue);
+        }
+        // profilerPeriod.start("clone");
+
         // profilerPeriod.stop().print();
         try {
-            if (inValue.getValue() != null) {
+            if (readValue.getValue() != null) {
                 // profilerPeriod.start("checkUpdateErrors");
-                checkUpdateErrors(inValue);
+                checkUpdateErrors(readValue);
                 // profilerPeriod.start("from2DArrayToArray");
                 // get as array if necessary (for image)
-                readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(inValue.getValue()));
+                readValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(readValue.getValue()));
                 // force conversion to check types
                 // profilerPeriod.start("toAttributeValue5");
                 TangoIDLAttributeUtil.toAttributeValue5(this, readValue, null);
@@ -460,7 +472,7 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 // Integer.toString(value4.w_dim.dim_y));
                 // }
             }
-            //            profilerPeriod.stop().print();
+            // profilerPeriod.stop().print();
         } else {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_WRITABLE, name + " is not writable");
         }
