@@ -42,7 +42,7 @@ public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
     private final int depth;
     private volatile String[][] log;
     private int currentPosition;
-    private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yy.MM.dd '-' HH:mm:ss ");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yy.MM.dd '-' HH:mm:ss ");
 
     public AttributeAppender() {
         this(1000);
@@ -59,7 +59,7 @@ public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     protected void append(final ILoggingEvent eventObject) {
-        log[currentPosition][0] = DATE_FORMAT.format(new Date(eventObject.getTimeStamp()));
+        log[currentPosition][0] = dateFormat.format(new Date(eventObject.getTimeStamp()));
         log[currentPosition][1] = eventObject.getLevel().toString();
         log[currentPosition][2] = eventObject.getFormattedMessage();
         currentPosition++;
