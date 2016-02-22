@@ -55,9 +55,9 @@ import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage cache for attributes/commands of a Tango device
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class TangoCacheManager {
 
@@ -67,7 +67,7 @@ public final class TangoCacheManager {
 
     private static final int POOL_SIZE = 1;
 
-    private static ScheduledExecutorService pollingPool = new ScheduledThreadPoolExecutor(POOL_SIZE,
+    private static volatile ScheduledExecutorService POLLING_POOL = new ScheduledThreadPoolExecutor(POOL_SIZE,
             new TangoCacheThreadFactory());
 
     private final Map<AttributeImpl, AttributeCache> attributeCacheMap = new HashMap<AttributeImpl, AttributeCache>();
@@ -85,7 +85,7 @@ public final class TangoCacheManager {
     private StateStatusCache stateCache;
     private StateStatusCache statusCache;
 
-    private static CacheManager MANAGER;
+    private volatile static CacheManager MANAGER;
     private final DeviceLocker deviceLock;
 
     private final String deviceName;
@@ -122,16 +122,16 @@ public final class TangoCacheManager {
             MANAGER.shutdown();
             MANAGER = null;
         }
-        if (pollingPool != null) {
-            pollingPool.shutdownNow();
-            pollingPool = null;
+        if (POLLING_POOL != null) {
+            POLLING_POOL.shutdownNow();
+            POLLING_POOL = null;
         }
     }
 
     /**
      * Add the current device in polled list and persist it as device property of admin device. This property is not
      * used. Just here to have the same behavior as C++ Tango API.
-     * 
+     *
      * @throws DevFailed
      */
     private void updatePoolConf() throws DevFailed {
@@ -146,7 +146,7 @@ public final class TangoCacheManager {
 
     /**
      * Retrieve the ordered list of polled devices
-     * 
+     *
      * @throws DevFailed
      */
     public static void initPoolConf() throws DevFailed {
@@ -170,10 +170,10 @@ public final class TangoCacheManager {
             for (final TangoCacheManager cache : cacheList.values()) {
                 cache.stop();
             }
-            if (pollingPool != null) {
-                pollingPool.shutdownNow();
+            if (POLLING_POOL != null) {
+                POLLING_POOL.shutdownNow();
             }
-            pollingPool = new ScheduledThreadPoolExecutor(poolSize, new TangoCacheThreadFactory());
+            POLLING_POOL = new ScheduledThreadPoolExecutor(poolSize, new TangoCacheThreadFactory());
             for (final TangoCacheManager cache : cacheList.values()) {
                 cache.start();
             }
@@ -191,7 +191,7 @@ public final class TangoCacheManager {
             }
             stateCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock, aroundInvoke);
             if (command.getPollingPeriod() != 0) {
-                stateCache.startRefresh(pollingPool);
+                stateCache.startRefresh(POLLING_POOL);
             }
         } else if (command.getName().equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             if (statusCache != null) {
@@ -199,14 +199,14 @@ public final class TangoCacheManager {
             }
             statusCache = new StateStatusCache(MANAGER, command, attribute, deviceName, deviceLock, aroundInvoke);
             if (command.getPollingPeriod() != 0) {
-                statusCache.startRefresh(pollingPool);
+                statusCache.startRefresh(POLLING_POOL);
             }
         }
     }
 
     /**
      * Start command polling
-     * 
+     *
      * @param command
      *            The command to poll
      * @throws DevFailed
@@ -215,13 +215,13 @@ public final class TangoCacheManager {
         addCommandPolling(command);
         LOGGER.debug("starting command {} for polling on device {}", command.getName(), deviceName);
         if (command.getPollingPeriod() != 0) {
-            commandCacheMap.get(command).startRefresh(pollingPool);
+            commandCacheMap.get(command).startRefresh(POLLING_POOL);
         }
     }
 
     /**
      * Add command as polled
-     * 
+     *
      * @param command
      * @throws DevFailed
      */
@@ -241,7 +241,7 @@ public final class TangoCacheManager {
 
     /**
      * Start attribute polling
-     * 
+     *
      * @param attr
      *            The attribute to poll
      * @throws DevFailed
@@ -250,13 +250,13 @@ public final class TangoCacheManager {
         addAttributePolling(attr);
         LOGGER.debug("starting attribute {} for polling on device {}", attr.getName(), deviceName);
         if (attr.getPollingPeriod() != 0) {
-            attributeCacheMap.get(attr).startRefresh(pollingPool);
+            attributeCacheMap.get(attr).startRefresh(POLLING_POOL);
         }
     }
 
     /**
      * Add attribute as polled
-     * 
+     *
      * @param attr
      * @throws DevFailed
      */
@@ -276,7 +276,7 @@ public final class TangoCacheManager {
 
     /**
      * Remove polling of an attribute
-     * 
+     *
      * @param attr
      * @throws DevFailed
      */
@@ -323,7 +323,7 @@ public final class TangoCacheManager {
 
     /**
      * Remove polling of a command
-     * 
+     *
      * @param command
      * @throws DevFailed
      */
@@ -348,16 +348,16 @@ public final class TangoCacheManager {
      */
     public synchronized void start() {
         for (final AttributeCache cache : attributeCacheMap.values()) {
-            cache.startRefresh(pollingPool);
+            cache.startRefresh(POLLING_POOL);
         }
         for (final CommandCache cache : commandCacheMap.values()) {
-            cache.startRefresh(pollingPool);
+            cache.startRefresh(POLLING_POOL);
         }
         if (stateCache != null) {
-            stateCache.startRefresh(pollingPool);
+            stateCache.startRefresh(POLLING_POOL);
         }
         if (statusCache != null) {
-            statusCache.startRefresh(pollingPool);
+            statusCache.startRefresh(POLLING_POOL);
         }
     }
 
@@ -377,15 +377,15 @@ public final class TangoCacheManager {
         if (statusCache != null) {
             statusCache.stopRefresh();
         }
-        if (pollingPool != null) {
-            pollingPool.shutdownNow();
-            pollingPool = new ScheduledThreadPoolExecutor(poolSize, new TangoCacheThreadFactory());
+        if (POLLING_POOL != null) {
+            POLLING_POOL.shutdownNow();
+            POLLING_POOL = new ScheduledThreadPoolExecutor(poolSize, new TangoCacheThreadFactory());
         }
     }
 
     /**
      * Get cache of an attribute
-     * 
+     *
      * @param attr
      *            the attribute
      * @return the attribute cache
@@ -408,7 +408,7 @@ public final class TangoCacheManager {
 
     /**
      * Get cache of a command
-     * 
+     *
      * @param cmd
      *            The command
      * @return The command cache

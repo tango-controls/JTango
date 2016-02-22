@@ -471,14 +471,13 @@ public final class AttributePropertiesImpl {
     }
 
     private void setEnumLabelsPrivate(final String[] enumLabels) throws DevFailed {
-        if (enumLabels.length == 1) {
-            if (enumLabels[0].isEmpty() || enumLabels[0].equalsIgnoreCase(Constants.NAN)
-                    || enumLabels[0].equalsIgnoreCase(Constants.NONE)) {
-                enumLabels[0] = Constants.NOT_SPECIFIED;
-            }
-        }
-
         if (enumLabels != null && enumLabels.length > 0) {
+            if (enumLabels.length == 1) {
+                if (enumLabels[0].isEmpty() || enumLabels[0].equalsIgnoreCase(Constants.NAN)
+                        || enumLabels[0].equalsIgnoreCase(Constants.NONE)) {
+                    enumLabels[0] = Constants.NOT_SPECIFIED;
+                }
+            }
             // find duplicate values
             final List<String> inputList = Arrays.asList(enumLabels);
             final Set<String> inputSet = new HashSet<String>(inputList);

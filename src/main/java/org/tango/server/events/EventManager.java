@@ -73,11 +73,11 @@ public final class EventManager {
     public static final int MINIMUM_IDL_VERSION = 4;
     public static final String IDL_REGEX = "idl[0-9]_[a-z]*";
     public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
-    private static ZMQ.Socket heartbeatSocket;
-    private static ZMQ.Socket eventSocket;
-    private static boolean isInitialized = false;
-    private static String heartbeatEndpoint = null;
-    private static String eventEndpoint = null;
+    private ZMQ.Socket heartbeatSocket;
+    private ZMQ.Socket eventSocket;
+    private boolean isInitialized = false;
+    private String heartbeatEndpoint = null;
+    private String eventEndpoint = null;
     private final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
 

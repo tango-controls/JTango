@@ -58,7 +58,7 @@ public final class DeviceScheduler {
     // private final String timeZone;
     private final Object businessObject;
     // private final String activationProperty;
-    private static Scheduler quartz;
+    private Scheduler quartz;
     private final String deviceName;
     private final String className;
     private static int poolSize = Math.min(10, Runtime.getRuntime().availableProcessors());

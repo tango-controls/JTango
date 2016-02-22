@@ -155,7 +155,7 @@ public final class DynamicManager {
             forwardedAttributes.remove(lower);
         }
         deviceImpl.removeAttribute(toRemove);
-        dynamicAttributes.remove(toRemove);
+        dynamicAttributes.remove(attributeName);
         deviceImpl.pushInterfaceChangeEvent(false);
     }
 
@@ -269,7 +269,7 @@ public final class DynamicManager {
     public void removeCommand(final String commandName) throws DevFailed {
         final CommandImpl toRemove = dynamicCommands.get(commandName.toLowerCase(Locale.ENGLISH));
         deviceImpl.removeCommand(toRemove);
-        dynamicCommands.remove(toRemove);
+        dynamicCommands.remove(commandName);
         deviceImpl.pushInterfaceChangeEvent(false);
     }
 
