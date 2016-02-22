@@ -54,7 +54,7 @@ import fr.soleil.tango.clientapi.InsertExtractUtils;
 public final class GroupCommand implements ICommandBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupCommand.class);
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     private final CommandConfiguration config = new CommandConfiguration();
     private final Group group;
     private final Map<String, String> errorReportMap = Collections.synchronizedMap(new HashMap<String, String>());
@@ -132,7 +132,7 @@ public final class GroupCommand implements ICommandBehavior {
                 hasFailed = true;
                 errors.add(e.errors);
                 size = +e.errors.length;
-                errorReportMap.put(tmpReplyName, DATE_FORMAT.format(new Date()) + " : " + name + " result "
+                errorReportMap.put(tmpReplyName, dateFormat.format(new Date()) + " : " + name + " result "
                         + DevFailedUtils.toString(e));
 
             }
