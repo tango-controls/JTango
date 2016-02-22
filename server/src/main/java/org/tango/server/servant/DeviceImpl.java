@@ -2387,15 +2387,17 @@ public final class DeviceImpl extends Device_5POA {
     public DevState getState() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
+        state = stateImpl.updateState();
         if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
-            state = stateImpl.updateState();
+            // state = stateImpl.updateState();
             // read all attributes to check alarms only if on
             if (state == DevState.ON && stateCheckAttrAlarm) {
                 checkAlarms();
             }
-        } else {
-            state = stateImpl.getState();
         }
+        //        else {
+        // state = stateImpl.getState();
+        // }
         return state;
     }
 
@@ -2443,11 +2445,11 @@ public final class DeviceImpl extends Device_5POA {
     public String getStatus() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
-            status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
-        } else {
-            status = statusImpl.getStatus();
-        }
+        //        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
+        status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
+        //        } else {
+        //            status = statusImpl.getStatus();
+        //        }
 
         return status;
     }
