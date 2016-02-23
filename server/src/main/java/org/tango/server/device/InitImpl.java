@@ -40,6 +40,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
+import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
 import org.tango.server.annotation.Init;
 import org.tango.server.cache.PollingManager;
@@ -56,7 +57,6 @@ import fr.esrf.Tango.DevFailed;
  */
 public final class InitImpl extends DeviceBehaviorObject {
 
-    private static final String INIT_FAILED = "Init failed";
     private final Logger logger = LoggerFactory.getLogger(InitImpl.class);
 
     private final Method initMethod;
@@ -160,7 +160,7 @@ public final class InitImpl extends DeviceBehaviorObject {
         try {
             if (initMethod != null) {
                 stateImpl.stateMachine(DeviceState.INIT);
-                statusImpl.statusMachine("Init in progress", DeviceState.INIT);
+                statusImpl.statusMachine(Constants.INIT_IN_PROGRESS, DeviceState.INIT);
                 initMethod.invoke(businessObject);
                 if (getEndState() != null) {
                     // state changed by @StateMachine
@@ -178,7 +178,7 @@ public final class InitImpl extends DeviceBehaviorObject {
         } catch (final InvocationTargetException e) {
             manageInitError(stateImpl, statusImpl, e);
         } catch (final DevFailed e) {
-            logger.error(INIT_FAILED, e);
+            logger.error(Constants.INIT_FAILED, e);
             try {
                 stateImpl.stateMachine(DeviceState.FAULT);
                 statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
@@ -191,7 +191,7 @@ public final class InitImpl extends DeviceBehaviorObject {
     private void manageInitError(final StateImpl stateImpl, final StatusImpl statusImpl,
             final InvocationTargetException e) {
         try {
-            logger.error(INIT_FAILED, e.getCause());
+            logger.error(Constants.INIT_FAILED, e.getCause());
             stateImpl.stateMachine(DeviceState.FAULT);
             if (e.getCause() instanceof DevFailed) {
                 logger.error("Tango error at Init: {}", DevFailedUtils.toString((DevFailed) e.getCause()));
