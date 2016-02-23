@@ -26,6 +26,9 @@ package org.tango.server;
 
 public final class Constants {
 
+    public static final String INIT_IN_PROGRESS = "Init in progress";
+    public static final String INIT_FAILED = "Init failed";
+
     private Constants() {
 
     }

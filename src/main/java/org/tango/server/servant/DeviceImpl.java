@@ -160,7 +160,7 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * to init the device
      */
-    private InitImpl init;
+    private InitImpl initImpl;
     /**
      * The implementation of the device
      */
@@ -333,7 +333,7 @@ public final class DeviceImpl extends Device_5POA {
             // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
             // poll_ring_depth
             final DevicePropertyImpl property10 = new DevicePropertyImpl(Constants.POLL_RING_DEPTH,
@@ -669,7 +669,7 @@ public final class DeviceImpl extends Device_5POA {
             for (final PipeImpl pipe : pipeList) {
                 pipe.loadConfiguration();
             }
-            init.execute(stateImpl, statusImpl);
+            initImpl.execute(stateImpl, statusImpl);
             isCorrectlyInit.set(true);
         } catch (final DevFailed e) {
             isCorrectlyInit.set(false);
@@ -707,7 +707,7 @@ public final class DeviceImpl extends Device_5POA {
         if (statusImpl == null) {
             statusImpl = new StatusImpl(businessObject, null, null);
         }
-        if (init == null) {
+        if (initImpl == null) {
             buildInit(null, false);
         }
         doInit();
@@ -774,8 +774,8 @@ public final class DeviceImpl extends Device_5POA {
      * @throws DevFailed if init is init progress
      */
     private synchronized void checkInitialization() throws DevFailed {
-        if (init != null) {
-            isInitializing = init.isInitInProgress();
+        if (initImpl != null) {
+            isInitializing = initImpl.isInitInProgress();
         } else {
             isInitializing = false;
         }
@@ -1291,7 +1291,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-    DevFailed {
+            DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -2036,8 +2036,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                        "It's not supported to change enumeration labels number from outside the Tango device class code");
+                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                                "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }
@@ -2355,8 +2355,8 @@ public final class DeviceImpl extends Device_5POA {
         final TangoCacheManager cacheManager = new TangoCacheManager(name, deviceLock, aroundInvokeImpl);
         pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling,
                 minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
-        if (init != null) {
-            init.setPollingManager(pollingManager);
+        if (initImpl != null) {
+            initImpl.setPollingManager(pollingManager);
         }
     }
 
@@ -2374,8 +2374,8 @@ public final class DeviceImpl extends Device_5POA {
             pollingManager = new PollingManager(name, cacheManager, attributeList, commandList, minPolling,
                     minCommandPolling, minAttributePolling, cmdPollRingDepth, attrPollRingDepth);
         }
-        init = new InitImpl(name, initMethod, isLazy, businessObject, pollingManager);
-        return init;
+        initImpl = new InitImpl(name, initMethod, isLazy, businessObject, pollingManager);
+        return initImpl;
     }
 
     /**
@@ -2387,17 +2387,15 @@ public final class DeviceImpl extends Device_5POA {
     public DevState getState() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        state = stateImpl.updateState();
-        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
-            // state = stateImpl.updateState();
+        if (isCorrectlyInit.get() && initImpl.isInitDoneCorrectly()) {
+            state = stateImpl.updateState();
             // read all attributes to check alarms only if on
             if (state == DevState.ON && stateCheckAttrAlarm) {
                 checkAlarms();
             }
+        } else {
+            state = stateImpl.getState();
         }
-        //        else {
-        // state = stateImpl.getState();
-        // }
         return state;
     }
 
@@ -2445,11 +2443,22 @@ public final class DeviceImpl extends Device_5POA {
     public String getStatus() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        //        if (isCorrectlyInit.get() && init.isInitDoneCorrectly()) {
-        status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
-        //        } else {
-        //            status = statusImpl.getStatus();
-        //        }
+
+        if (initImpl.isInitInProgress()) {
+            // set status while init is in progress
+            final String tmp = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
+            if (tmp.equals(Constants.INIT_IN_PROGRESS)) {
+                status = tmp;
+            } else {
+                status = Constants.INIT_IN_PROGRESS + System.getProperty("line.separator") + tmp;
+            }
+        } else if (isCorrectlyInit.get() && initImpl.isInitDoneCorrectly()) {
+            // init finished
+            status = statusImpl.updateStatus(DeviceState.getDeviceState(getState()));
+        } else {
+            // init failed
+            status = statusImpl.getStatus();
+        }
 
         return status;
     }
