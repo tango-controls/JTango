@@ -34,4 +34,49 @@ public class ArrayUtilsTest {
         assertThat(result, equalTo(expected));
     }
 
+    @Test
+    public void testDeepCopyArray() throws DevFailed {
+        final float[] insert = new float[] { 10.0F, 15.2F };
+        final float[] result = (float[]) ArrayUtils.deepCopyOf(insert);
+        insert[0] = 5.3F;
+        final float[] expected = new float[] { 10.0F, 15.2F };
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test
+    public void testDeepCopyStringNullArray() throws DevFailed {
+        final String[] insert = new String[] { null };
+        final String[] result = (String[]) ArrayUtils.deepCopyOf(insert);
+        insert[0] = "5.3F";
+        final String[] expected = new String[] { null };
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test
+    public void testDeepCopyStringNull2Array() throws DevFailed {
+        final String[] insert = new String[] { null, "a" };
+        final String[] result = (String[]) ArrayUtils.deepCopyOf(insert);
+        insert[0] = "5.3F";
+        final String[] expected = new String[] { null, "a" };
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test
+    public void testDeepCopyEmpty() throws DevFailed {
+        float[] insert = new float[] {};
+        final float[] result = (float[]) ArrayUtils.deepCopyOf(insert);
+        insert = new float[] { 5.3F };
+        final float[] expected = new float[] {};
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test
+    public void testDeepCopyNull() throws DevFailed {
+        float[] insert = null;
+        final float[] result = (float[]) ArrayUtils.deepCopyOf(insert);
+        insert = new float[] { 5.3F };
+        final float[] expected = null;
+        assertThat(result, equalTo(expected));
+    }
+
 }
