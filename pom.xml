@@ -9,7 +9,7 @@
 		<version>1.0.3</version>
 	</parent>
 	<artifactId>JTangoClientLang</artifactId>
-	<version>9.0.7-SNAPSHOT</version>
+	<version>9.0.8</version>
 	<name>JTango Client Lang</name>
 	<description>Tango client utilities</description>
 	<developers>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			<version>9.0.4</version>
+			<version>9.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
