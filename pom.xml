@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>JTangoCommons</artifactId>
-	<version>9.0.4-SNAPSHOT</version>
+	<version>9.0.6-SNAPSHOT</version>
 
 
 	<name>JTango's Commons</name>
