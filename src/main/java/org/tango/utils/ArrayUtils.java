@@ -466,7 +466,7 @@ public final class ArrayUtils {
             final int lengthY = Array.getLength(array);
             if (lengthY > 0) {
                 final Object firtLine = Array.get(array, 0);
-                if (firtLine.getClass().isArray()) {
+                if (firtLine != null && firtLine.getClass().isArray()) {
                     lengthX = Array.getLength(firtLine);
                     result = Array.newInstance(firtLine.getClass().getComponentType(), lengthY, lengthX);
                 } else {
@@ -483,7 +483,7 @@ public final class ArrayUtils {
             final int length = Array.getLength(source);
             if (length > 0) {
                 final Object firstline = Array.get(source, 0);
-                if (firstline.getClass().isArray()) {
+                if (firstline != null && firstline.getClass().isArray()) {
                     for (int i = 0; i < length; i++) {
                         deepCopy(Array.get(source, i), Array.get(dest, i));
                     }
