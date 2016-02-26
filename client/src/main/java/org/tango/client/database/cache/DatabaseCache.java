@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.tango.client.database.DeviceExportInfo;
 import org.tango.client.database.DeviceImportInfo;
 import org.tango.utils.CaseInsensitiveMap;
+import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeProxy;
@@ -54,7 +55,7 @@ public final class DatabaseCache implements ICachableDatabase {
             } catch (final DevFailed e) {
                 serverCache = null;
                 logger.error("Failed to load cache for server {} on host {}", serverName, hostName);
-                logger.error("Failed to load cache, do not use it", e);
+                DevFailedUtils.logDevFailed(e, logger);
             } catch (final Throwable e) {
                 serverCache = null;
                 logger.error("Failed to load cache, do not use it", e);
