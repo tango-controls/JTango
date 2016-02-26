@@ -1,3 +1,7 @@
+9.0.9 (jan 2016)
+-----
+- allow to retrieve device status will init with lazyloading
+
 9.0.8 (jan 2016)
 -----
 - fix performance issue for big spectrum and image attributes
