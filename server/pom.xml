@@ -9,7 +9,7 @@
 		<version>1.0.3</version>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
-	<version>9.0.8</version>
+	<version>9.0.9</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
@@ -170,7 +170,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			<version>9.0.7</version>
+			 <version>9.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
