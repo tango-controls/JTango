@@ -1689,6 +1689,29 @@ public class DeviceProxy extends Connection implements ApiDefs {
         deviceProxyDAO.writePipe(this, devicePipe);
     }
     // ===================================================================
+    /**
+     * Write and Read data in specified pipe
+     * @param pipeName pipe name
+     * @param pipeBlob data to be written
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe writeReadPipe(String pipeName, PipeBlob pipeBlob) throws DevFailed {
+        return writeReadPipe(new DevicePipe(pipeName, pipeBlob));
+    }
+    // ===================================================================
+    /**
+     * Write and Read data in specified pipe
+     * @param devicePipe data to be written (contains the pipe name)
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe writeReadPipe(DevicePipe devicePipe) throws DevFailed {
+        return deviceProxyDAO.writeReadPipe(this, devicePipe);
+    }
+    // ===================================================================
     // ===================================================================
 
 
@@ -2109,18 +2132,18 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     //==========================================================================
     public static void main(String args[]) {
-        String devname = null;
-        String cmdname = null;
+        String deviceName = null;
+        String commandName = null;
         try {
-            cmdname = args[0];
-            devname = args[1];
+            commandName = args[0];
+            deviceName = args[1];
         } catch (final Exception e) {
-            if (cmdname==null) {
+            if (commandName==null) {
                 System.out.println("Usage :");
-                System.out.println("fr.esrf.TangoApi.DeviceProxy  cmdname devname");
+                System.out.println("fr.esrf.TangoApi.DeviceProxy  commandName deviceName");
                 System.out.println("	- info : Display device info.");
-                System.out.println("	- cmdname : command name (ping, state, status, unexport...)");
-                System.out.println("	- devname : device name to send command.");
+                System.out.println("	- commandName : command name (ping, state, status, unexport...)");
+                System.out.println("	- deviceName : device name to send command.");
             } else {
                 System.out.println("Device name ?");
             }
@@ -2130,11 +2153,11 @@ public class DeviceProxy extends Connection implements ApiDefs {
             // Check if wildcard
             String[] devnames;
             DeviceProxy[] deviceProxies;
-            if (!devname.contains("*")) {
+            if (!deviceName.contains("*")) {
                 devnames = new String[1];
-                devnames[0] = devname;
+                devnames[0] = deviceName;
             } else {
-                devnames = ApiUtil.get_db_obj().getDevices(devname);
+                devnames = ApiUtil.get_db_obj().getDevices(deviceName);
             }
 
             // Create DeviceProxy Objects
@@ -2143,62 +2166,68 @@ public class DeviceProxy extends Connection implements ApiDefs {
                 deviceProxies[i] = new DeviceProxy(devnames[i]);
             }
 
-            if (cmdname.equals("info")) {
-                for (DeviceProxy deviceProxy : deviceProxies) {
-                    System.out.println(deviceProxy + "\n");
-                }
-            } else if (cmdname.equals("ping")) {
-                // noinspection InfiniteLoopStatement
-                while (true) {
-                    for (int i=0 ; i<deviceProxies.length ; i++) {
+            switch (commandName) {
+                case "info":
+                    for (DeviceProxy deviceProxy : deviceProxies) {
+                        System.out.println(deviceProxy + "\n");
+                    }
+                    break;
+                case "ping":
+                    // noinspection InfiniteLoopStatement
+                    while (true) {
+                        for (int i = 0 ; i<deviceProxies.length ; i++) {
+                            try {
+                                final long t = deviceProxies[i].ping();
+                                System.out.println(devnames[i] + " is alive  (" + t / 1000 + " ms)");
+                            } catch (final DevFailed e) {
+                                System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                            }
+                        }
+                        if (deviceProxies.length>1) {
+                            System.out.println();
+                        }
                         try {
-                            final long t = deviceProxies[i].ping();
-                            System.out.println(devnames[i] + " is alive  (" + t / 1000 + " ms)");
+                            Thread.sleep(1000);
+                        } catch (final InterruptedException e) { /* */ }
+                    }
+                case "status":
+                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+                        try {
+                            System.out.println(devnames[i] + " - " + deviceProxies[i].status());
                         } catch (final DevFailed e) {
                             System.out.println(devnames[i] + "  " + e.errors[0].desc);
                         }
                     }
-                    if (deviceProxies.length>1) {
-                        System.out.println();
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (final InterruptedException e) { /* */ }
-                }
-            } else if (cmdname.equals("status")) {
-                for (int i=0 ; i<deviceProxies.length ; i++) {
-                    try {
-                        System.out.println(devnames[i] + " - " + deviceProxies[i].status());
-                    } catch (final DevFailed e) {
-                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
-                    }
-                }
-            } else if (cmdname.equals("state")) {
-                for (int i=0 ; i<deviceProxies.length ; i++) {
-                    try {
-                        System.out
-                                .println(devnames[i] + " is " + ApiUtil.stateName(deviceProxies[i].state()));
+                    break;
+                case "state":
+                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+                        try {
+                            System.out
+                                    .println(devnames[i] + " is " + ApiUtil.stateName(deviceProxies[i].state()));
                         /*
                         * DeviceAttribute da = dev[i].read_attribute("State");
                         * DevState st = da.extractDevStateArray()[0];
                         * System.out.println(devnames[i] + " is " +
                         * ApiUtil.stateName(st));
                         */
-                    } catch (final DevFailed e) {
-                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                        } catch (final DevFailed e) {
+                            System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                        }
                     }
-                }
-            } else if (cmdname.equals("unexport")) {
-                for (int i = 0 ; i<deviceProxies.length ; i++) {
-                    try {
-                        deviceProxies[i].unexport_device();
-                        System.out.println(devnames[i] + " unexported !");
-                    } catch (final DevFailed e) {
-                        System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                    break;
+                case "unexport":
+                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+                        try {
+                            deviceProxies[i].unexport_device();
+                            System.out.println(devnames[i] + " unexported !");
+                        } catch (final DevFailed e) {
+                            System.out.println(devnames[i] + "  " + e.errors[0].desc);
+                        }
                     }
-                }
-            } else {
-                System.out.println(cmdname + " ?   Unknow command !");
+                    break;
+                default:
+                    System.out.println(commandName + " ?   Unknow command !");
+                    break;
             }
         } catch (final DevFailed e) {
             Except.print_exception(e);
