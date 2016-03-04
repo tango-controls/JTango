@@ -62,7 +62,7 @@ import java.util.*;
 
 public class ApiUtil {
     public static String revNumber =
-            "9.1.0  -  Wed Jun 24 14:15:07 CEST 2015";
+            "9.2.1  -  Fri Mar 04 16:05:40 CET 2016";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
