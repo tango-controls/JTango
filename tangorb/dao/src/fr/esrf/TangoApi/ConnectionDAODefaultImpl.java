@@ -902,26 +902,27 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
                     received = connection.device.command_inout(command, argin.extractAny());
                 }
                 done = true;
-            } catch (final DevFailed e) {
-            final String reason = "TangoApi_CANNOT_EXECUTE_COMMAND";
-            final String desc = "Cannot execute command " + command + " on "
-                + connection.devname;
-            final String origin = "Connection.command_inout()";
-
-            // Check if (from database) DeviceNotDefined exception
-            // then add witch database in the existing DevFailed.
-            if (e.errors[0].reason.equals("DB_DeviceNotDefined")) {
-                String d = e.errors[0].desc;
-                final int idx = d.lastIndexOf("!");
-                if (idx > 0) {
-                    d = d.substring(0, idx);
-                }
-                d += "  " + connection.url.host + ":" + connection.url.port + " !";
-                e.errors[0].desc = d;
             }
-            Except.throw_connection_failed(e, reason, desc, origin);
-        } catch (final Exception e) {
-				manageExceptionReconnection(connection, retries, i, e,
+			catch (final DevFailed e) {
+            	final String reason = "TangoApi_CANNOT_EXECUTE_COMMAND";
+            	final String desc = "Cannot execute command " + command + " on "
+                	+ connection.devname;
+            	final String origin = "Connection.command_inout()";
+
+            	// Check if (from database) DeviceNotDefined exception
+            	// then add witch database in the existing DevFailed.
+            	if (e.errors[0].reason.equals("DB_DeviceNotDefined")) {
+                	String d = e.errors[0].desc;
+                	final int idx = d.lastIndexOf("!");
+                	if (idx > 0) {
+                    	d = d.substring(0, idx);
+                	}
+                	d += "  " + connection.url.host + ":" + connection.url.port + " !";
+                	e.errors[0].desc = d;
+            	}
+            	Except.throw_connection_failed(e, reason, desc, origin);
+        	} catch (final Exception e) {
+					manageExceptionReconnection(connection, retries, i, e,
 						 this.getClass() + ".command_inout");
 	    	}
 		}
