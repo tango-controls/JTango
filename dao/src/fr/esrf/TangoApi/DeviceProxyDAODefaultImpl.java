@@ -552,12 +552,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Query the database for a list of device properties for this device.
      * 
-     * @param propnames list of property names.
+     * @param propertyNames list of property names.
      * @return properties in DbDatum objects.
      */
     // ==========================================================================
-    public DbDatum[] get_property(final DeviceProxy deviceProxy, final String[] propnames)
-	    throws DevFailed {
+    public DbDatum[] get_property(final DeviceProxy deviceProxy,
+                                  final String[] propertyNames) throws DevFailed {
 		if (deviceProxy.url.protocol == TANGO) {
 	    	checkIfUseDb(deviceProxy, "get_property()");
 
@@ -565,12 +565,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 			deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
 				deviceProxy.url.strPort));
 	    	}
-	    	return deviceProxy.getDb_dev().get_property(propnames);
+	    	return deviceProxy.getDb_dev().get_property(propertyNames);
 		} else {
 			if (deviceProxy.taco_device == null && deviceProxy.devname != null) {
 	    		build_connection(deviceProxy);
 			}
-	    	return deviceProxy.taco_device.get_property(propnames);
+	    	return deviceProxy.taco_device.get_property(propertyNames);
 		}
     }
 
@@ -3376,6 +3376,32 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                         this.getClass() + ".DeviceProxy.writePipe");
             }
         }
+    }
+    // ===================================================================
+    // ===================================================================
+    public DevicePipe writeReadPipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed {
+        //  ToDo
+        build_connection(deviceProxy);
+        if (deviceProxy.idl_version<5)
+            Except.throw_exception("TangoApi_NOT_SUPPORTED",
+                    "Pipe not supported in IDL " + deviceProxy.idl_version);
+        boolean done = false;
+        final int retries = deviceProxy.transparent_reconnection ? 2 : 1;
+        for (int tr = 0 ; tr<retries && !done ; tr++) {
+            try {
+                DevPipeData writePipeData = devicePipe.getDevPipeDataObject();
+                DevPipeData readPipeData = deviceProxy.device_5.write_read_pipe_5(
+                        writePipeData, DevLockManager.getInstance().getClntIdent());
+                done = true;
+                return new DevicePipe(readPipeData);
+            } catch (final DevFailed e) {
+                throw e;
+            } catch (final Exception e) {
+                manageExceptionReconnection(deviceProxy, retries, tr, e,
+                        this.getClass() + ".DeviceProxy.writePipe");
+            }
+        }
+        return null;    //  cannot occur
     }
     // ===================================================================
     // ===================================================================
