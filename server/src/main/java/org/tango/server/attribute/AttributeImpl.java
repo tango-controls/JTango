@@ -183,17 +183,19 @@ IReadableWritable<AttributeValue> {
         // invoke on device
         // final Profiler profilerPeriod = new Profiler("read attribute " + name);
         // profilerPeriod.start("invoke");
-        final AttributeValue returnedValue;
         if (config.getWritable().equals(AttrWriteType.WRITE)) {
             if (writeValue == null) {
-                returnedValue = new AttributeValue(AttributeTangoType.getDefaultValue(config.getType()));
+                readValue = new AttributeValue();
+                readValue.setValue(AttributeTangoType.getDefaultValue(config.getType()));
             } else {
-                returnedValue = writeValue;
+                readValue = writeValue;
             }
         } else {
-            returnedValue = behavior.getValue();
+            // attribute with a read part
+            final AttributeValue returnedValue = behavior.getValue();
+            this.updateValue(returnedValue);
         }
-        this.updateValue(returnedValue);
+
         // profilerPeriod.stop().print();
         xlogger.exit(getName());
     }
@@ -246,12 +248,6 @@ IReadableWritable<AttributeValue> {
                     } catch (final CloneNotSupportedException e) {
                         throw DevFailedUtils.newDevFailed(e);
                     }
-                }
-            } else if (config.getWritable().equals(AttrWriteType.WRITE)) {
-                if (writeValue == null) {
-                    readValue.setValue(AttributeTangoType.getDefaultValue(config.getType()));
-                } else {
-                    readValue = writeValue;
                 }
             } else {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
