@@ -78,46 +78,11 @@ public final class PublisherAttribute implements IAttributeBehavior {
         JAVA_TYPES_MAP.put("devencoded[][]", DevEncoded[][].class);
     }
 
-    private static final Map<Class<?>, Object> RESULTS_MAP = new HashMap<Class<?>, Object>();
-    static {
-        RESULTS_MAP.put(boolean.class, false);
-        RESULTS_MAP.put(short.class, (short) 0);
-        RESULTS_MAP.put(int.class, 0);
-        RESULTS_MAP.put(byte.class, (byte) 0);
-        RESULTS_MAP.put(float.class, 0.0F);
-        RESULTS_MAP.put(long.class, 0L);
-        RESULTS_MAP.put(double.class, 0.0);
-        RESULTS_MAP.put(String.class, "");
-        RESULTS_MAP.put(DeviceState.class, DeviceState.ON);
-        RESULTS_MAP.put(DevEncoded.class, new DevEncoded());
-        RESULTS_MAP.put(short[].class, new short[] {});
-        RESULTS_MAP.put(int[].class, new int[] {});
-        RESULTS_MAP.put(byte[].class, new byte[] {});
-        RESULTS_MAP.put(float[].class, new float[] {});
-        RESULTS_MAP.put(double[].class, new double[] {});
-        RESULTS_MAP.put(long[].class, new long[] {});
-        RESULTS_MAP.put(String[].class, new String[] {});
-        RESULTS_MAP.put(boolean[].class, new boolean[] {});
-        RESULTS_MAP.put(DeviceState[].class, new DeviceState[] {});
-        RESULTS_MAP.put(DevEncoded[].class, new DevEncoded[] {});
-        RESULTS_MAP.put(short[][].class, new short[][] { {} });
-        RESULTS_MAP.put(int[][].class, new int[][] { {} });
-        RESULTS_MAP.put(byte[][].class, new byte[][] { {} });
-        RESULTS_MAP.put(float[][].class, new float[][] { {} });
-        RESULTS_MAP.put(double[][].class, new double[][] { {} });
-        RESULTS_MAP.put(long[][].class, new long[][] { {} });
-        RESULTS_MAP.put(String[][].class, new String[][] { {} });
-        RESULTS_MAP.put(boolean[][].class, new boolean[][] { {} });
-        RESULTS_MAP.put(DeviceState[][].class, new DeviceState[][] { {} });
-        RESULTS_MAP.put(DevEncoded[][].class, new DevEncoded[][] { {} });
-    }
-
-    private AttributeValue readValue;
     private final AttributeConfiguration configAttr = new AttributeConfiguration();
 
     /**
      * Create a dynamic attribute publisher
-     * 
+     *
      * @param config
      *            config[0] attribute name; config[1] type (ie. double, double[], double[][])
      * @throws ClassNotFoundException
@@ -154,9 +119,6 @@ public final class PublisherAttribute implements IAttributeBehavior {
         } else {
             DevFailedUtils.throwDevFailed("DEVICE_PROP_ERROR", "unknown attribute config: " + config[1]);
         }
-
-        readValue = new AttributeValue();
-        readValue.setValue(RESULTS_MAP.get(configAttr.getType()));
     }
 
     @Override
@@ -171,14 +133,11 @@ public final class PublisherAttribute implements IAttributeBehavior {
 
     @Override
     public AttributeValue getValue() throws DevFailed {
-        // update timestamp
-        readValue.setTime(System.currentTimeMillis());
-        return readValue;
+        return null;
     }
 
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
-        readValue = value;
     }
 
     @Override
