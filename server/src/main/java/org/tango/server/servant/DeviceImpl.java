@@ -254,7 +254,7 @@ public final class DeviceImpl extends Device_5POA {
      * client info of lastest command. Used for locking device from client
      */
     // private volatile ClntIdent clientIdentity;
-    private ThreadLocal<ClntIdent> clientIdentity = new ThreadLocal<ClntIdent>();
+    private final ThreadLocal<ClntIdent> clientIdentity = new ThreadLocal<ClntIdent>();
 
     /**
      * Recreating a device does not delete locking object. So maintain a
@@ -996,7 +996,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("read_attributes");
-        clientIdentity = null;
+        clientIdentity.set(null);
         if (attributeNames.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1035,7 +1035,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("read_attributes_2", source);
-        clientIdentity = null;
+        clientIdentity.set(null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1077,7 +1077,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("read_attributes_3", source);
-        clientIdentity = null;
+        clientIdentity.set(null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
@@ -1220,7 +1220,7 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("write_attributes");
-        clientIdentity = null;
+        clientIdentity.set(null);
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
@@ -1256,7 +1256,7 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry();
         checkInitialization();
         blackBox.insertInblackBox("write_attributes_3");
-        clientIdentity = null;
+        clientIdentity.set(null);
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
@@ -1580,7 +1580,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("command_inout " + command);
-        clientIdentity = null;
+        clientIdentity.set(null);
         Any argout = null;
         try {
             argout = commandHandler(command, argin, DevSource.CACHE_DEV, null);
@@ -1617,7 +1617,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         blackBox.insertInblackBox("command_inout_2 " + command, source);
-        clientIdentity = null;
+        clientIdentity.set(null);
         Any argout = null;
         try {
             argout = commandHandler(command, argin, source, null);
