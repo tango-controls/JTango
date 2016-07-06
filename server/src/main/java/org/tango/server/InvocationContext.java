@@ -179,7 +179,7 @@ public final class InvocationContext {
         this.context = context;
         this.callType = callType;
         this.names = names;
-        this.clientID = clientID;
+        this.clientID = ClientIDUtil.copyClntIdent(clientID);
         this.clientHostName = ServerRequestInterceptor.getInstance().getClientHostName();
     }
 
