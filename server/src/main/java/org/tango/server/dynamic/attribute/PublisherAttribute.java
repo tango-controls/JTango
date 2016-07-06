@@ -33,6 +33,7 @@ import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.IAttributeBehavior;
+import org.tango.server.attribute.ISetValueUpdater;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrDataFormat;
@@ -40,7 +41,7 @@ import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevEncoded;
 import fr.esrf.Tango.DevFailed;
 
-public final class PublisherAttribute implements IAttributeBehavior {
+public final class PublisherAttribute implements IAttributeBehavior, ISetValueUpdater {
     private static final Map<String, Class<?>> JAVA_TYPES_MAP = new HashMap<String, Class<?>>();
     static {
         JAVA_TYPES_MAP.put("int", int.class);
@@ -79,6 +80,7 @@ public final class PublisherAttribute implements IAttributeBehavior {
     }
 
     private final AttributeConfiguration configAttr = new AttributeConfiguration();
+    private AttributeValue value;
 
     /**
      * Create a dynamic attribute publisher
@@ -138,11 +140,20 @@ public final class PublisherAttribute implements IAttributeBehavior {
 
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
+        this.value = value;
     }
 
     @Override
     public StateMachineBehavior getStateMachine() {
         return null;
+    }
+
+    @Override
+    public AttributeValue getSetValue() throws DevFailed {
+        if (value != null) {
+            value.setTime(System.currentTimeMillis());
+        }
+        return value;
     }
 
 }
