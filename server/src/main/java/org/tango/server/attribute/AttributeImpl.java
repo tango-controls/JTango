@@ -1,11 +1,11 @@
 /**
- * Copyright (C) :     2012
+ * Copyright (C) : 2012
  *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
  *
  * This file is part of Tango.
  *
@@ -16,11 +16,11 @@
  *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
@@ -64,7 +64,7 @@ import fr.esrf.Tango.DispLevel;
  * @author ABEILLE
  */
 public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-IReadableWritable<AttributeValue> {
+        IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
@@ -183,6 +183,16 @@ IReadableWritable<AttributeValue> {
         // invoke on device
         // final Profiler profilerPeriod = new Profiler("read attribute " + name);
         // profilerPeriod.start("invoke");
+        if (!config.getWritable().equals(AttrWriteType.READ) && behavior instanceof ISetValueUpdater) {
+            // write value is managed by the user
+            try {
+                writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
+                // get as array if necessary (for image)
+                writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(writeValue.getValue()));
+            } catch (final CloneNotSupportedException e) {
+                throw DevFailedUtils.newDevFailed(e);
+            }
+        }
         if (config.getWritable().equals(AttrWriteType.WRITE)) {
             if (writeValue == null) {
                 readValue = new AttributeValue();
@@ -239,16 +249,6 @@ IReadableWritable<AttributeValue> {
                 // force conversion to check types
                 // profilerPeriod.start("toAttributeValue5");
                 TangoIDLAttributeUtil.toAttributeValue5(this, readValue, null);
-                if (config.getWritable().equals(AttrWriteType.READ_WRITE) && behavior instanceof ISetValueUpdater) {
-                    // write value is managed by the user
-                    try {
-                        writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
-                        // get as array if necessary (for image)
-                        writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(writeValue.getValue()));
-                    } catch (final CloneNotSupportedException e) {
-                        throw DevFailedUtils.newDevFailed(e);
-                    }
-                }
             } else {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
                         + " read value has not been updated");
@@ -454,7 +454,8 @@ IReadableWritable<AttributeValue> {
                 dimY = 1;
             }
             // profilerPeriod.start("convert image");
-            value.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY));
+            value.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY),
+                    writtenTimestamp);
             behavior.setValue(value);
             if (isMemorized() && getFormat().equals(AttrDataFormat.SCALAR)) {
                 // TODO: refactoring to manage performance issues for spectrum and
