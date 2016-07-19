@@ -1,11 +1,11 @@
 /**
- * Copyright (C) :     2012
+ * Copyright (C) : 2012
  *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
  *
  * This file is part of Tango.
  *
@@ -16,11 +16,11 @@
  *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
  * To change this template, choose Tools | Templates
@@ -32,6 +32,7 @@ import org.tango.server.StateMachineBehavior;
 import org.tango.server.attribute.AttributeConfiguration;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.attribute.IAttributeBehavior;
+import org.tango.server.attribute.ISetValueUpdater;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.AttrDataFormat;
@@ -43,11 +44,11 @@ import fr.soleil.tango.clientapi.TangoAttribute;
 /**
  * Dynamic attribute that connects to another tango attribute. For performance issues, this attribute may be read from a
  * MultiAttributeProxy
- * 
+ *
  * @see MultiAttributeProxy
  * @author hardion
  */
-public final class ProxyAttribute implements IAttributeBehavior {
+public final class ProxyAttribute implements IAttributeBehavior, ISetValueUpdater {
 
     // Configuration of attribute from the targeted attribute proxy
     private final StateMachineBehavior smb = new StateMachineBehavior();
@@ -59,7 +60,7 @@ public final class ProxyAttribute implements IAttributeBehavior {
     private boolean autoUpdate = true;
 
     /**
-     * 
+     *
      * @param attributeName
      *            The name of this attribute
      * @param attributeProxyName
@@ -83,7 +84,7 @@ public final class ProxyAttribute implements IAttributeBehavior {
         } else if (type == TangoConst.Tango_DEV_ULONG) {
             ac.setTangoType(TangoConst.Tango_DEV_LONG64, format);
         }
-        ac.getAttributeProperties().setDescription("proxied from " + attributeProxyName);
+        ac.getAttributeProperties().setDescription("Proxied from " + attributeProxyName);
         ac.setName(attributeName);
         if (isReadyOnly) {
             ac.setWritable(AttrWriteType.READ);
@@ -92,7 +93,7 @@ public final class ProxyAttribute implements IAttributeBehavior {
 
     /**
      * see {@link #ProxyAttribute(String, String, boolean)}
-     * 
+     *
      * @param autoUpdate
      *            getValue will not read value from proxy. The value will be feeded with
      *            {@link #setReadValue(AttributeValue)}
@@ -134,10 +135,18 @@ public final class ProxyAttribute implements IAttributeBehavior {
 
     /**
      * Update the read value
-     * 
+     *
      * @param readValue
      */
     public void setReadValue(final AttributeValue readValue) {
         this.readValue = readValue;
+    }
+
+    @Override
+    public AttributeValue getSetValue() throws DevFailed {
+        final AttributeValue value = new AttributeValue();
+        proxy.update();
+        value.setValue(proxy.extractWritten());
+        return getValue();
     }
 }
