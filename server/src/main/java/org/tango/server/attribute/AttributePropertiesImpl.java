@@ -553,9 +553,55 @@ public final class AttributePropertiesImpl {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(alarmExtensions);
+        result = prime * result + (deltaT == null ? 0 : deltaT.hashCode());
+        result = prime * result + (int) (deltaTLong ^ deltaTLong >>> 32);
+        result = prime * result + (deltaVal == null ? 0 : deltaVal.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(deltaValDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (displayUnit == null ? 0 : displayUnit.hashCode());
+        result = prime * result + Arrays.hashCode(enumLabels);
+        result = prime * result + (eventProp == null ? 0 : eventProp.hashCode());
+        result = prime * result + Arrays.hashCode(extensions);
+        result = prime * result + (format == null ? 0 : format.hashCode());
+        result = prime * result + (isEnumMutable ? 1231 : 1237);
+        result = prime * result + (isFwdAttribute ? 1231 : 1237);
+        result = prime * result + (label == null ? 0 : label.hashCode());
+        result = prime * result + (maxAlarm == null ? 0 : maxAlarm.hashCode());
+        temp = Double.doubleToLongBits(maxAlarmDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (maxValue == null ? 0 : maxValue.hashCode());
+        temp = Double.doubleToLongBits(maxValueDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (maxWarning == null ? 0 : maxWarning.hashCode());
+        temp = Double.doubleToLongBits(maxWarningDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (minAlarm == null ? 0 : minAlarm.hashCode());
+        temp = Double.doubleToLongBits(minAlarmDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (minValue == null ? 0 : minValue.hashCode());
+        temp = Double.doubleToLongBits(minValueDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (minWarning == null ? 0 : minWarning.hashCode());
+        temp = Double.doubleToLongBits(minWarningDouble);
+        result = prime * result + (int) (temp ^ temp >>> 32);
+        result = prime * result + (rootAttribute == null ? 0 : rootAttribute.hashCode());
+        result = prime * result + (standardUnit == null ? 0 : standardUnit.hashCode());
+        result = prime * result + Arrays.hashCode(sysExtensions);
+        result = prime * result + (unit == null ? 0 : unit.hashCode());
+        result = prime * result + (writableAttrName == null ? 0 : writableAttrName.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .toString();
+        .toString();
         final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
         boolean isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
         if (isEqual) {
