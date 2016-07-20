@@ -1,6 +1,15 @@
+9.0.10 (july 2016)
+-----
+29984	20/07/2016 14:38	add new dynamic command for async command
+29972	19/07/2016 18:23	proxy attribute: update write part from proxied attribute
+29934	06/07/2016 16:11	timetamp for write only attributes is write time
+29874	27/06/2016 16:14	avoid NPE occuring when  IDL<4 clients request attributes or commands.
+29488	16/03/2016 16:24	write only attribute: optimize read. publisher attribute: is write only and does nothing on the read part, no need to maintain a local value.
+
+
 9.0.9 (jan 2016)
 -----
-- allow to retrieve device status will init with lazyloading
+- allow to retrieve device status while init with lazyloading
 
 9.0.8 (jan 2016)
 -----
