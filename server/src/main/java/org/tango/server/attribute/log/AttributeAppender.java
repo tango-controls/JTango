@@ -25,8 +25,12 @@
 package org.tango.server.attribute.log;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.Queue;
+
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
@@ -40,9 +44,8 @@ import ch.qos.logback.core.AppenderBase;
 public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
 
     private final int depth;
-    private volatile String[][] log;
-    private int currentPosition;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yy.MM.dd '-' HH:mm:ss ");
+    private Queue<Triple<String, String, String>> log = new ArrayDeque<Triple<String, String, String>>();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yy.MM.dd '-' HH:mm:ss");
 
     public AttributeAppender() {
         this(1000);
@@ -50,25 +53,29 @@ public final class AttributeAppender extends AppenderBase<ILoggingEvent> {
 
     public AttributeAppender(final int depth) {
         this.depth = depth;
-        log = new String[depth][3];
-        for (int i = 0; i < depth; i++) {
-            Arrays.fill(log[i], "");
-        }
-        currentPosition = 0;
+        log = new ArrayDeque<Triple<String, String, String>>(depth);
     }
 
     @Override
     protected void append(final ILoggingEvent eventObject) {
-        log[currentPosition][0] = dateFormat.format(new Date(eventObject.getTimeStamp()));
-        log[currentPosition][1] = eventObject.getLevel().toString();
-        log[currentPosition][2] = eventObject.getFormattedMessage();
-        currentPosition++;
-        if (currentPosition >= depth) {
-            currentPosition = 0;
+        while (log.size() >= depth) {
+            log.poll();
         }
+        final Triple<String, String, String> event = new ImmutableTriple<String, String, String>(
+                dateFormat.format(new Date(eventObject.getTimeStamp())), eventObject.getLevel().toString(),
+                eventObject.getFormattedMessage());
+        log.offer(event);
     }
 
     public String[][] getLog() {
-        return log;
+        final String[][] result = new String[log.size()][3];
+        int i = 0;
+        for (final Triple<String, String, String> triple : log) {
+            result[i][0] = triple.getLeft();
+            result[i][1] = triple.getMiddle();
+            result[i][2] = triple.getRight();
+            i++;
+        }
+        return result;
     }
 }
