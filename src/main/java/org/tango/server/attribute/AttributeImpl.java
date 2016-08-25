@@ -26,10 +26,6 @@ package org.tango.server.attribute;
 
 import java.lang.reflect.Array;
 
-import net.entropysoft.transmorph.ConverterException;
-import net.entropysoft.transmorph.DefaultConverters;
-import net.entropysoft.transmorph.Transmorph;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -57,14 +53,17 @@ import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DispLevel;
+import net.entropysoft.transmorph.ConverterException;
+import net.entropysoft.transmorph.DefaultConverters;
+import net.entropysoft.transmorph.Transmorph;
 
 /**
  * Tango attribute
  *
  * @author ABEILLE
  */
-public final class AttributeImpl extends DeviceBehaviorObject implements Comparable<AttributeImpl>, IPollable,
-        IReadableWritable<AttributeValue> {
+public final class AttributeImpl extends DeviceBehaviorObject
+        implements Comparable<AttributeImpl>, IPollable, IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(AttributeImpl.class);
@@ -104,8 +103,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     }
 
     private Object getMemorizedValue() throws DevFailed {
-        final String value = attributePropertiesManager
-                .getAttributePropertyFromDB(getName(), Constants.MEMORIZED_VALUE);
+        final String value = attributePropertiesManager.getAttributePropertyFromDB(getName(),
+                Constants.MEMORIZED_VALUE);
         Object obj = null;
         if (value != null && !value.isEmpty() && config.getFormat().equals(AttrDataFormat.SCALAR)) {
             final Transmorph transmorph = new Transmorph(new DefaultConverters());
@@ -186,9 +185,14 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         if (!config.getWritable().equals(AttrWriteType.READ) && behavior instanceof ISetValueUpdater) {
             // write value is managed by the user
             try {
-                writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
-                // get as array if necessary (for image)
-                writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(writeValue.getValue()));
+                final AttributeValue setValue = ((ISetValueUpdater) behavior).getSetValue();
+                if (setValue != null) {
+                    writeValue = (AttributeValue) ((ISetValueUpdater) behavior).getSetValue().clone();
+                    // get as array if necessary (for image)
+                    writeValue.setValueWithoutDim(ArrayUtils.from2DArrayToArray(writeValue.getValue()));
+                } else {
+                    writeValue = null;
+                }
             } catch (final CloneNotSupportedException e) {
                 throw DevFailedUtils.newDevFailed(e);
             }
@@ -221,8 +225,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
         // final Profiler profilerPeriod = new Profiler("read attribute " + name);
         // profilerPeriod.start("in");
         if (inValue == null) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
-                    + " read value has not been updated");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET,
+                    name + " read value has not been updated");
         }
 
         try {
@@ -250,8 +254,8 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
                 // profilerPeriod.start("toAttributeValue5");
                 TangoIDLAttributeUtil.toAttributeValue5(this, readValue, null);
             } else {
-                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET, name
-                        + " read value has not been updated");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_VALUE_NOT_SET,
+                        name + " read value has not been updated");
             }
             // profilerPeriod.start("updateDefaultWritePart");
             updateDefaultWritePart();
@@ -270,12 +274,12 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
     private void checkUpdateErrors(final AttributeValue returnedValue) throws DevFailed {
         if (config.getFormat().equals(AttrDataFormat.SCALAR) && returnedValue.getXDim() != 1
                 && returnedValue.getYDim() != 0) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "Data size for attribute " + name
-                    + " exceeds given limit");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP,
+                    "Data size for attribute " + name + " exceeds given limit");
         }
         if (!ArrayUtils.checkDimensions(returnedValue.getValue(), returnedValue.getXDim(), returnedValue.getYDim())) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "Data size for attribute " + name
-                    + " exceeds given limit");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP,
+                    "Data size for attribute " + name + " exceeds given limit");
         }
     }
 
@@ -503,16 +507,16 @@ public final class AttributeImpl extends DeviceBehaviorObject implements Compara
 
     private void checkSetErrors(final AttributeValue value) throws DevFailed {
         if (!ArrayUtils.checkDimensions(value.getValue(), value.getXDim(), value.getYDim())) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_INCORRECT_DATA_NUMBER, name
-                    + "data size does not correspond to dimensions");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_INCORRECT_DATA_NUMBER,
+                    name + "data size does not correspond to dimensions");
         }
         if (getFormat().equals(AttrDataFormat.SPECTRUM) && value.getXDim() > getMaxX()) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, "value has a max size of "
-                    + getMaxX());
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
+                    "value has a max size of " + getMaxX());
         } else if (getFormat().equals(AttrDataFormat.IMAGE)
                 && (value.getXDim() > getMaxX() || value.getYDim() > getMaxY())) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT, name + " value has a max size of "
-                    + getMaxX() + "*" + getMaxY());
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WATTR_OUTSIDE_LIMIT,
+                    name + " value has a max size of " + getMaxX() + "*" + getMaxY());
         }
     }
 
