@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			<version>9.0.5</version>
+			<version>9.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
