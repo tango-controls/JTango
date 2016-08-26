@@ -1,11 +1,11 @@
 /**
- * Copyright (C) :     2012
+ * Copyright (C) : 2012
  *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
  *
  * This file is part of Tango.
  *
@@ -16,11 +16,11 @@
  *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.dynamic;
 
@@ -108,7 +108,7 @@ public final class DynamicManager {
                 att.init(deviceName);
                 // persist root attribute name in tango db
                 behavior.getConfiguration().getAttributeProperties()
-                .persistAttributeRootName(deviceName, attributeName);
+                        .persistAttributeRootName(deviceName, attributeName);
             } else {
                 // use attribute property
                 att.init(deviceName, rootAttributeName);
@@ -184,10 +184,13 @@ public final class DynamicManager {
         for (int i = 0; i < toExclude.length; i++) {
             toExclude[i] = exclude[i].toLowerCase(Locale.ENGLISH);
         }
+        final List<String> toRemove = new ArrayList<String>();
         for (final String attributeName : dynamicAttributes.keySet()) {
             if (!ArrayUtils.contains(toExclude, attributeName)) {
-                removeAttribute(attributeName);
             }
+        }
+        for (final String attributeName : toRemove) {
+            removeAttribute(attributeName);
         }
     }
 
