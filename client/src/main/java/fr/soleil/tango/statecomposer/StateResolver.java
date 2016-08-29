@@ -114,6 +114,10 @@ public final class StateResolver {
         priorityStateManager.putStatePriority(state, priority);
     }
 
+    public void setMonitoredDevicesGroup(final Group group) {
+        this.group = group;
+    }
+
     public void setMonitoredDevices(final int timeout, final String... deviceNameList) throws DevFailed {
         if (deviceNameList.length > 0 && !deviceNameList[0].equals("")) {
             // remove the double entries thanks to a Set
