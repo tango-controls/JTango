@@ -32,6 +32,7 @@ import fr.esrf.TangoDs.TangoConst;
 public final class TangoUtil {
 
     public static final String DEVICE_SEPARATOR = "/";
+    public static final int FULL_NAME_NR_SEPARATOR = 3;
     public static final String DEVICE_PATTERN = "*";
     private static final String DBASE_NO = "#dbase=no";
 
@@ -123,9 +124,9 @@ public final class TangoUtil {
 
     /*
      * http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node13.html
-     * 
-     * [protocol://][host:port/]device_name[/attribute][->property][#dbase=xx] 
-     * 
+     *
+     * [protocol://][host:port/]device_name[/attribute][->property][#dbase=xx]
+     *
      * From the naming schema described above, the reserved characters are :,#,/ and the reserved string is : ->.
      */
 
@@ -168,7 +169,7 @@ public final class TangoUtil {
 
     /**
      * Splits an entity name into full device name and attribute name. Aliases will be resolved against tango db first.
-     * 
+     *
      * @param entityName the entity name to split. It can contain aliases for device or attribute
      * @return a Map.Entry containing the full device name as key and the attribute name as value, or null if split was
      *         not possible
@@ -185,7 +186,7 @@ public final class TangoUtil {
 
             final boolean noDb = matcher.group(NO_DB_INDEX) != null;
             if (noDb) {
-                // TODO cas device alias qui marche  soleil
+                // TODO cas device alias qui marche soleil
                 if (matcher.group(DEVICE_NAME_INDEX) != null && matcher.group(ENTITY_INDEX) != null) {
                     final String deviceNameGroup = matcher.group(DEVICE_NAME_INDEX);
                     final String entityGroup = matcher.group(ENTITY_INDEX);
@@ -224,7 +225,7 @@ public final class TangoUtil {
 
     /**
      * Splits a collection of entity names and group attributes by device.
-     * 
+     *
      * @param entityNames a list of entity names to split
      * @return a map containing a list of attributes for each device.
      */
@@ -258,7 +259,7 @@ public final class TangoUtil {
 
     /**
      * Get the full device name for an attribute
-     * 
+     *
      * @param attributeName
      * @return
      * @throws DevFailed
@@ -285,7 +286,7 @@ public final class TangoUtil {
 
     /**
      * Get the full attribute name
-     * 
+     *
      * @param attributeName
      * @return
      * @throws DevFailed
@@ -316,7 +317,7 @@ public final class TangoUtil {
 
     /**
      * Get the full device name
-     * 
+     *
      * @param deviceName
      * @return
      * @throws DevFailed
@@ -341,7 +342,7 @@ public final class TangoUtil {
 
     /**
      * Get the list of device names which matches the pattern p
-     * 
+     *
      * @param deviceNamePattern
      *            The pattern. The wild char is *
      * @return A list of device names
@@ -365,7 +366,7 @@ public final class TangoUtil {
 
     /**
      * Get the list of device names which matches the pattern p
-     * 
+     *
      * @param deviceNamePattern
      *            The pattern. The wild char is *
      * @param boolean to get the exported device
@@ -395,7 +396,7 @@ public final class TangoUtil {
     /**
      * Return the attribute name part without device name
      * It is able to resolve attribute alias before
-     * 
+     *
      * @param fullname
      * @return
      * @throws DevFailed
