@@ -4,8 +4,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.tango.utils.DevFailedUtils;
+import org.tango.utils.TangoUtil;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
@@ -91,6 +93,9 @@ public final class TangoCommand {
      * @throws DevFailed
      */
     public TangoCommand(final String deviceName, final String commandName) throws DevFailed {
+        if (StringUtils.countMatches(commandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
+            throw DevFailedUtils.newDevFailed(commandName + " command must contains 4 fields");
+        }
         command = new RealCommand(deviceName, commandName);
     }
 
@@ -100,6 +105,9 @@ public final class TangoCommand {
      * @throws DevFailed
      */
     public TangoCommand(final String commandName) throws DevFailed {
+        if (StringUtils.countMatches(commandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
+            throw DevFailedUtils.newDevFailed(commandName + " command must contains 4 fields");
+        }
         command = new RealCommand(commandName);
     }
 
