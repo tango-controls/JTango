@@ -32,7 +32,7 @@ public final class RealCommand implements ITangoCommand {
     private final int retries;
 
     /**
-     * 
+     *
      * @param deviceName
      *            The device tango (e.g. domain/family/member)
      * @param commandName
@@ -57,14 +57,14 @@ public final class RealCommand implements ITangoCommand {
     }
 
     /**
-     * 
+     *
      * @param commandName
      *            The device and command name in 4 fields (e.g. domain/family/member/commandName)
      * @throws DevFailed
      */
     public RealCommand(final String commandName) throws DevFailed {
-        this(commandName.substring(0, commandName.lastIndexOf('/')), commandName
-                .substring(commandName.lastIndexOf('/') + 1));
+        this(commandName.substring(0, commandName.lastIndexOf(TangoUtil.DEVICE_SEPARATOR)), commandName
+                .substring(commandName.lastIndexOf(TangoUtil.DEVICE_SEPARATOR) + 1));
     }
 
     @Override
