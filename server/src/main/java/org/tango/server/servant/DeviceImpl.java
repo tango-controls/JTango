@@ -77,11 +77,11 @@ import org.tango.server.device.InitImpl;
 import org.tango.server.device.StateImpl;
 import org.tango.server.device.StatusImpl;
 import org.tango.server.events.DeviceInterfaceChangedSender;
-import org.tango.server.history.DeviceBlackBox;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.server.idl.TangoIDLUtil;
 import org.tango.server.lock.ClientLocking;
+import org.tango.server.monitoring.DeviceMonitoring;
 import org.tango.server.pipe.PipeImpl;
 import org.tango.server.properties.ClassPropertyImpl;
 import org.tango.server.properties.DevicePropertiesImpl;
@@ -233,7 +233,8 @@ public final class DeviceImpl extends Device_5POA {
     /**
      * Black box. History of all client requests
      */
-    private final DeviceBlackBox blackBox = new DeviceBlackBox();
+    // private final DeviceBlackBox blackBox = new DeviceBlackBox();
+    private final DeviceMonitoring deviceMonitoring;
     /**
      * The class name as defined in tango db
      */
@@ -302,6 +303,7 @@ public final class DeviceImpl extends Device_5POA {
         name = deviceName;
         this.className = className;
         this.deviceType = deviceType;
+        deviceMonitoring = new DeviceMonitoring(deviceName);
         deviceLock = new DeviceLocker(txType, businessObject.getClass());
 
         this.businessObject = businessObject;
@@ -672,6 +674,7 @@ public final class DeviceImpl extends Device_5POA {
             initImpl.execute(stateImpl, statusImpl);
             isCorrectlyInit.set(true);
         } catch (final DevFailed e) {
+            deviceMonitoring.addError();
             isCorrectlyInit.set(false);
             // ignore error so that server always starts
             try {
@@ -794,6 +797,7 @@ public final class DeviceImpl extends Device_5POA {
     public DevInfo info() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
+        deviceMonitoring.startRequest("Operation info");
         final DevInfo info = new DevInfo();
         info.dev_class = className;
         info.doc_url = "Doc URL = http://www.tango-controls.org";
@@ -814,6 +818,7 @@ public final class DeviceImpl extends Device_5POA {
     public DevInfo_3 info_3() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
+        deviceMonitoring.startRequest("Operation info_3");
         final DevInfo_3 info3 = new DevInfo_3();
         final DevInfo info = info();
         info3.dev_class = info.dev_class;
@@ -835,7 +840,7 @@ public final class DeviceImpl extends Device_5POA {
     public void ping() throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        blackBox.insertInblackBox("Operation ping");
+        deviceMonitoring.startRequest("Operation ping");
         xlogger.exit();
     }
 
@@ -846,7 +851,7 @@ public final class DeviceImpl extends Device_5POA {
     public String adm_name() {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        blackBox.insertInblackBox("Attribute adm_name");
+        deviceMonitoring.startRequest("Attribute adm_name");
         xlogger.exit();
         return getAdminDeviceName();
     }
@@ -866,12 +871,12 @@ public final class DeviceImpl extends Device_5POA {
     public String[] black_box(final int maxSize) throws DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        // blackBox.insertInblackBox("black_box");
+        // deviceMonitoring.addRequest("black_box");
         if (maxSize <= 0) {
             DevFailedUtils.throwDevFailed(ExceptionMessages.BLACK_BOX_ARG, maxSize + " is not a good size");
         }
         xlogger.exit();
-        return blackBox.toArray(maxSize);
+        return deviceMonitoring.getBlackBox(maxSize);
     }
 
     /**
@@ -883,7 +888,7 @@ public final class DeviceImpl extends Device_5POA {
     public String description() {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
-        blackBox.insertInblackBox("Attribute description requested ");
+        deviceMonitoring.startRequest("Attribute description requested ");
         String desc = "A TANGO device";
         if (name.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
             desc = "A device server device !!";
@@ -899,7 +904,7 @@ public final class DeviceImpl extends Device_5POA {
     @Override
     public String name() {
         MDC.put(MDC_KEY, name);
-        blackBox.insertInblackBox("Device name");
+        deviceMonitoring.startRequest("Device name");
         xlogger.entry();
         return name;
     }
@@ -919,7 +924,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("read_attribute_history_2");
+        deviceMonitoring.startRequest("read_attribute_history_2");
         // TODO read_attribute_history_2
         return new DevAttrHistory[0];
     }
@@ -940,7 +945,7 @@ public final class DeviceImpl extends Device_5POA {
         xlogger.entry();
         // TODO read_attribute_history_3
         checkInitialization();
-        blackBox.insertInblackBox("read_attribute_history_3");
+        deviceMonitoring.startRequest("read_attribute_history_3");
         return new DevAttrHistory_3[0];
     }
 
@@ -959,7 +964,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("read_attribute_history_4");
+        deviceMonitoring.startRequest("read_attribute_history_4");
         DevAttrHistory_4 result = null;
         try {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
@@ -968,6 +973,7 @@ public final class DeviceImpl extends Device_5POA {
             }
             result = attr.getHistory().getAttrHistory4(maxSize);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -995,7 +1001,7 @@ public final class DeviceImpl extends Device_5POA {
                 && !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("read_attributes");
+        deviceMonitoring.startRequest("read_attributes");
         clientIdentity.set(null);
         if (attributeNames.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1005,6 +1011,7 @@ public final class DeviceImpl extends Device_5POA {
             result = AttributeGetterSetter.getAttributesValues(name, attributeNames, pollingManager, attributeList,
                     aroundInvokeImpl, DevSource.CACHE_DEV, deviceLock, null);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1034,7 +1041,7 @@ public final class DeviceImpl extends Device_5POA {
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("read_attributes_2", source);
+        deviceMonitoring.startRequest("read_attributes_2", source);
         clientIdentity.set(null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1045,6 +1052,7 @@ public final class DeviceImpl extends Device_5POA {
             result = AttributeGetterSetter.getAttributesValues(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, null);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1076,7 +1084,7 @@ public final class DeviceImpl extends Device_5POA {
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("read_attributes_3", source);
+        deviceMonitoring.startRequest("read_attributes_3", source);
         clientIdentity.set(null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1086,6 +1094,7 @@ public final class DeviceImpl extends Device_5POA {
             result = AttributeGetterSetter.getAttributesValues3(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, null);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1123,7 +1132,7 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
 
-        blackBox.insertInblackBox("read_attributes_4 " + Arrays.toString(names), source, clIdent);
+        deviceMonitoring.startRequest("read_attributes_4 " + Arrays.toString(names), source, clIdent);
         clientIdentity.set(clIdent);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
@@ -1137,6 +1146,7 @@ public final class DeviceImpl extends Device_5POA {
             result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, clIdent);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1175,8 +1185,8 @@ public final class DeviceImpl extends Device_5POA {
             checkInitialization();
         }
         // profiler.start("blackbox");
-
-        blackBox.insertInblackBox("read_attributes_5 " + Arrays.toString(names), source, clIdent);
+        final long request = deviceMonitoring.startRequest("read_attributes_5 " + Arrays.toString(names), source,
+                clIdent);
         // profiler.start("locking");
         clientIdentity.set(clIdent);
         if (names.length == 0) {
@@ -1192,7 +1202,10 @@ public final class DeviceImpl extends Device_5POA {
             // profiler.start("get value");
             result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, clIdent);
+            throw DevFailedUtils.newDevFailed("test");
         } catch (final Exception e) {
+            System.out.println("read error");
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1200,6 +1213,8 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
+        } finally {
+            deviceMonitoring.endRequest(request);
         }
 
         // profiler.stop().print();
@@ -1219,7 +1234,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("write_attributes");
+        deviceMonitoring.startRequest("write_attributes");
         clientIdentity.set(null);
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
@@ -1232,6 +1247,7 @@ public final class DeviceImpl extends Device_5POA {
                 AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1255,7 +1271,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("write_attributes_3");
+        deviceMonitoring.startRequest("write_attributes_3");
         clientIdentity.set(null);
         final String[] names = new String[values.length];
         for (int i = 0; i < names.length; i++) {
@@ -1268,6 +1284,7 @@ public final class DeviceImpl extends Device_5POA {
                 AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1277,7 +1294,6 @@ public final class DeviceImpl extends Device_5POA {
             }
         }
         xlogger.exit();
-
     }
 
     /**
@@ -1300,7 +1316,7 @@ public final class DeviceImpl extends Device_5POA {
             names[i] = values[i].name;
         }
         logger.debug("writing {}", Arrays.toString(names));
-        blackBox.insertInblackBox("write_attributes_4 " + Arrays.toString(names), clIdent);
+        deviceMonitoring.startRequest("write_attributes_4 " + Arrays.toString(names), clIdent);
         clientIdentity.set(clIdent);
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent, names);
@@ -1311,6 +1327,7 @@ public final class DeviceImpl extends Device_5POA {
                 AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, clIdent);
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof MultiDevFailed) {
                 throw (MultiDevFailed) e;
             } else {
@@ -1319,7 +1336,6 @@ public final class DeviceImpl extends Device_5POA {
                 DevFailedUtils.throwDevFailed(e);
             }
         }
-
         xlogger.exit();
     }
 
@@ -1343,7 +1359,7 @@ public final class DeviceImpl extends Device_5POA {
         for (int i = 0; i < names.length; i++) {
             names[i] = values[i].name;
         }
-        blackBox.insertInblackBox("write_read_attributes_4 " + Arrays.toString(names), clIdent);
+        deviceMonitoring.startRequest("write_read_attributes_4 " + Arrays.toString(names), clIdent);
         clientIdentity.set(clIdent);
         AttributeValue_4[] val = null;
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
@@ -1355,6 +1371,7 @@ public final class DeviceImpl extends Device_5POA {
                 val = writeRead(values);
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1363,7 +1380,6 @@ public final class DeviceImpl extends Device_5POA {
                 DevFailedUtils.throwDevFailed(e);
             }
         }
-
         xlogger.exit();
         return val;
     }
@@ -1382,7 +1398,7 @@ public final class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] write_read_attributes_5(final AttributeValue_4[] writeValues, final String[] readNames,
             final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
-        blackBox.insertInblackBox("write_read_attributes_5 ", clIdent);
+        deviceMonitoring.startRequest("write_read_attributes_5 ", clIdent);
         clientIdentity.set(clIdent);
         final String[] names = new String[writeValues.length];
         for (int i = 0; i < names.length; i++) {
@@ -1413,6 +1429,7 @@ public final class DeviceImpl extends Device_5POA {
                         CallType.CACHE_DEV, clIdent, name));
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1459,7 +1476,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         // checkInitialization();
-        blackBox.insertInblackBox("command_list_query");
+        deviceMonitoring.startRequest("command_list_query");
         // Retrieve number of command and allocate memory to send back info
         final List<CommandImpl> cmdList = getCommandList();
         Collections.sort(cmdList);
@@ -1490,7 +1507,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         // checkInitialization();
-        blackBox.insertInblackBox("command_list_query_2");
+        deviceMonitoring.startRequest("command_list_query_2");
         final DevCmdInfo_2[] back = new DevCmdInfo_2[commandList.size()];
         int i = 0;
         final List<CommandImpl> cmdList = getCommandList();
@@ -1524,7 +1541,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         // checkInitialization();
-        blackBox.insertInblackBox("command_query " + commandName);
+        deviceMonitoring.startRequest("command_query " + commandName);
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo tmp = new DevCmdInfo();
         tmp.cmd_name = foundCmd.getName();
@@ -1549,7 +1566,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         // checkInitialization();
-        blackBox.insertInblackBox("command_query_2 " + commandName);
+        deviceMonitoring.startRequest("command_query_2 " + commandName);
         final CommandImpl foundCmd = getCommand(commandName);
         final DevCmdInfo_2 tmp = new DevCmdInfo_2();
         tmp.cmd_name = foundCmd.getName();
@@ -1579,12 +1596,13 @@ public final class DeviceImpl extends Device_5POA {
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("command_inout " + command);
+        final long request = deviceMonitoring.startRequest("command_inout " + command);
         clientIdentity.set(null);
         Any argout = null;
         try {
             argout = commandHandler(command, argin, DevSource.CACHE_DEV, null);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1592,6 +1610,8 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
+        } finally {
+            deviceMonitoring.endRequest(request);
         }
         xlogger.exit();
         return argout;
@@ -1616,12 +1636,13 @@ public final class DeviceImpl extends Device_5POA {
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("command_inout_2 " + command, source);
+        deviceMonitoring.startRequest("command_inout_2 " + command, source);
         clientIdentity.set(null);
         Any argout = null;
         try {
             argout = commandHandler(command, argin, source, null);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1657,7 +1678,8 @@ public final class DeviceImpl extends Device_5POA {
                 && !commandName.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        blackBox.insertInblackBox("Operation command_inout_4 (cmd = " + commandName + ")", source, clIdent);
+        final long request = deviceMonitoring.startRequest("Operation command_inout_4 (cmd = " + commandName + ")",
+                source, clIdent);
         clientIdentity.set(clIdent);
         Any argout = null;
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
@@ -1666,6 +1688,7 @@ public final class DeviceImpl extends Device_5POA {
         try {
             argout = commandHandler(commandName, argin, source, clIdent);
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1673,6 +1696,8 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
+        } finally {
+            deviceMonitoring.endRequest(request);
         }
         xlogger.exit();
         return argout;
@@ -1693,7 +1718,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("command_inout_history_2 " + commandName);
+        deviceMonitoring.startRequest("command_inout_history_2 " + commandName);
         // TODO command_inout_history_2
         // returncommandHistory.get(command).toArray(n)
         return new DevCmdHistory[] {};
@@ -1714,14 +1739,14 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("command_inout_history_4 " + commandName);
+        final long request = deviceMonitoring.startRequest("command_inout_history_4 " + commandName);
         final CommandImpl command = getCommand(commandName);
 
         DevCmdHistory_4 history = null;
         try {
             history = command.getHistory().toDevCmdHistory4(maxSize);
         } catch (final Exception e) {
-            e.printStackTrace();
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -1729,6 +1754,8 @@ public final class DeviceImpl extends Device_5POA {
                 // not inserted in DevFailed.
                 DevFailedUtils.throwDevFailed(e);
             }
+        } finally {
+            deviceMonitoring.endRequest(request);
         }
         return history;
     }
@@ -1811,7 +1838,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        blackBox.insertInblackBox("get_attribute_config_5 " + Arrays.toString(attributeNames));
+        deviceMonitoring.startRequest("get_attribute_config_5 " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1864,7 +1891,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        blackBox.insertInblackBox("get_attribute_config_3 " + Arrays.toString(attributeNames));
+        deviceMonitoring.startRequest("get_attribute_config_3 " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1914,7 +1941,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        blackBox.insertInblackBox("get_attribute_config_2 " + Arrays.toString(attributeNames));
+        deviceMonitoring.startRequest("get_attribute_config_2 " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -1966,7 +1993,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         // checkInitialization();
-        blackBox.insertInblackBox("get_attribute_config " + Arrays.toString(attributeNames));
+        deviceMonitoring.startRequest("get_attribute_config " + Arrays.toString(attributeNames));
         // check if we must retrieve all attributes config
         final int length = attributeNames.length;
         boolean getAllConfig = false;
@@ -2016,7 +2043,7 @@ public final class DeviceImpl extends Device_5POA {
             clientLocking.checkClientLocking(clIdent);
         }
 
-        blackBox.insertInblackBox("set_attribute_config_5", clIdent);
+        deviceMonitoring.startRequest("set_attribute_config_5", clIdent);
         for (final AttributeConfig_5 attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
 
@@ -2062,7 +2089,7 @@ public final class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
             clientLocking.checkClientLocking(clIdent);
         }
-        blackBox.insertInblackBox("set_attribute_config_4", clIdent);
+        deviceMonitoring.startRequest("set_attribute_config_4", clIdent);
         set_attribute_config_3(newConf);
         xlogger.exit();
 
@@ -2080,7 +2107,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("set_attribute_config_3");
+        deviceMonitoring.startRequest("set_attribute_config_3");
         for (final AttributeConfig_3 attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
 
@@ -2113,7 +2140,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("set_attribute_config");
+        deviceMonitoring.startRequest("set_attribute_config");
         for (final AttributeConfig attributeConfig : newConf) {
             final String attributeName = attributeConfig.name;
             final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
@@ -2570,7 +2597,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
-        blackBox.insertInblackBox("read_attribute_history_5");
+        deviceMonitoring.startRequest("read_attribute_history_5");
         DevAttrHistory_5 result = null;
         try {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
@@ -2585,6 +2612,7 @@ public final class DeviceImpl extends Device_5POA {
                 result = attr.getHistory().getAttrHistory5(maxSize);
             }
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -2601,7 +2629,7 @@ public final class DeviceImpl extends Device_5POA {
     public PipeConfig[] get_pipe_config_5(final String[] names) throws DevFailed {
         xlogger.entry(Arrays.toString(names));
         // checkInitialization();
-        blackBox.insertInblackBox("get_pipe_config_5 " + Arrays.toString(names));
+        deviceMonitoring.startRequest("get_pipe_config_5 " + Arrays.toString(names));
         // check if we must retrieve all attributes config
         final int length = names.length;
         boolean getAllConfig = false;
@@ -2637,7 +2665,7 @@ public final class DeviceImpl extends Device_5POA {
         checkInitialization();
         clientIdentity.set(clIdent);
 
-        blackBox.insertInblackBox("set_pipe_config_5", clIdent);
+        deviceMonitoring.startRequest("set_pipe_config_5", clIdent);
         for (final PipeConfig config : newConf) {
             final String name = config.name;
             final PipeImpl pipe = getPipe(name, pipeList);
@@ -2665,7 +2693,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
-        blackBox.insertInblackBox("read_pipe_5 " + name, clIdent);
+        deviceMonitoring.startRequest("read_pipe_5 " + name, clIdent);
         clientIdentity.set(clIdent);
         DevPipeData result = null;
         try {
@@ -2676,6 +2704,7 @@ public final class DeviceImpl extends Device_5POA {
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_READ, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -2693,7 +2722,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(value.name);
         final PipeImpl pipe = getPipe(value.name, pipeList);
-        blackBox.insertInblackBox("write_pipe_5 " + value.name, clIdent);
+        deviceMonitoring.startRequest("write_pipe_5 " + value.name, clIdent);
         clientIdentity.set(clIdent);
         try {
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_WRITE, CallType.UNKNOWN, clIdent,
@@ -2702,6 +2731,7 @@ public final class DeviceImpl extends Device_5POA {
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {
@@ -2718,7 +2748,7 @@ public final class DeviceImpl extends Device_5POA {
         MDC.put(MDC_KEY, name);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
-        blackBox.insertInblackBox("write_read_pipe_5 " + name, clIdent);
+        deviceMonitoring.startRequest("write_read_pipe_5 " + name, clIdent);
         clientIdentity.set(clIdent);
         DevPipeData result = null;
         try {
@@ -2730,6 +2760,7 @@ public final class DeviceImpl extends Device_5POA {
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE_READ, CallType.UNKNOWN,
                     clIdent, pipe.getName()));
         } catch (final Exception e) {
+            deviceMonitoring.addError();
             if (e instanceof DevFailed) {
                 throw (DevFailed) e;
             } else {

@@ -26,9 +26,9 @@ package org.tango.server;
 
 /**
  * Calculate elapsed time
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 public final class Chronometer {
 
@@ -39,32 +39,47 @@ public final class Chronometer {
 
     /**
      * Start the chronometer
-     * 
+     *
      * @param duration
      *            the duration in milliseconds
      */
-    public synchronized void start(final long duration) {
+    public void start(final long duration) {
         startTime = System.currentTimeMillis();
         this.duration = duration;
         isOver = false;
     }
 
     /**
+     * Start the chronometer with infinite duration
+     *
+     */
+    public void start() {
+        startTime = System.currentTimeMillis();
+        duration = 0;
+        isOver = false;
+    }
+
+    public long getElapsedTime() {
+        final long now = System.currentTimeMillis();
+        return now - startTime;
+    }
+
+    /**
      * stop the chronometer
      */
-    public synchronized void stop() {
+    public void stop() {
         isOver = true;
     }
 
     /**
      * Check if the started duration is over
-     * 
+     *
      * @return true if over
      */
-    public synchronized boolean isOver() {
+    public boolean isOver() {
         if (!isOver) {
             final long now = System.currentTimeMillis();
-            isOver = ((now-startTime) >= duration);
+            isOver = now - startTime >= duration;
         }
         return isOver;
     }
