@@ -1,11 +1,11 @@
 /**
- * Copyright (C) : 2012
+ * Copyright (C) :     2012
  *
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
+ * 	Synchrotron Soleil
+ * 	L'Orme des merisiers
+ * 	Saint Aubin
+ * 	BP48
+ * 	91192 GIF-SUR-YVETTE CEDEX
  *
  * This file is part of Tango.
  *
@@ -16,11 +16,11 @@
  *
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Tango. If not, see <http://www.gnu.org/licenses/>.
+ * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.dynamic;
 
