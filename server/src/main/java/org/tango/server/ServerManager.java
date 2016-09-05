@@ -50,6 +50,7 @@ import org.tango.server.annotation.TransactionType;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.events.EventManager;
 import org.tango.server.export.TangoExporter;
+import org.tango.server.monitoring.MonitoringService;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
@@ -94,6 +95,7 @@ public final class ServerManager {
     private TangoExporter tangoExporter;
     private String lastClass;
     private TransactionType transactionType;
+    private MonitoringService monitoring;
 
     private ServerManager() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -219,9 +221,7 @@ public final class ServerManager {
         if (!isStarted.get()) {
             addClass(deviceClass.getSimpleName(), deviceClass);
             try {
-
                 init(args, deviceClass.getSimpleName());
-
             } catch (final DevFailed e) {
                 DevFailedUtils.printDevFailed(e);
             }
@@ -260,6 +260,9 @@ public final class ServerManager {
         tangoExporter = new TangoExporter(hostName, serverName, pid, tangoClasses);
         tangoExporter.exportAll();
 
+        // start tango monitoring
+        monitoring = new MonitoringService(serverName);
+        monitoring.start();
         logger.info("TANGO server {} started", serverName);
         // start the ORB
         ORBManager.startDetached();
@@ -281,6 +284,9 @@ public final class ServerManager {
                 }
                 TangoCacheManager.shutdown();
                 EventManager.getInstance().close();
+                if (monitoring != null) {
+                    monitoring.stop();
+                }
             }
         } finally {
             ORBManager.shutdown();
