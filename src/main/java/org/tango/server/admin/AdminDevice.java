@@ -47,6 +47,7 @@ import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
+import org.tango.server.annotation.Attribute;
 import org.tango.server.annotation.Command;
 import org.tango.server.annotation.Device;
 import org.tango.server.annotation.DeviceProperty;
@@ -62,6 +63,8 @@ import org.tango.server.command.CommandImpl;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
 import org.tango.server.export.IExporter;
+import org.tango.server.monitoring.TangoMXBean;
+import org.tango.server.monitoring.TangoStats;
 import org.tango.server.pipe.PipeImpl;
 import org.tango.server.properties.ClassPropertyImpl;
 import org.tango.server.properties.DevicePropertyImpl;
@@ -81,7 +84,7 @@ import fr.esrf.Tango.DevVarLongStringArray;
  *
  */
 @Device(transactionType = TransactionType.DEVICE)
-public final class AdminDevice {
+public final class AdminDevice implements TangoMXBean {
 
     private static final String DOES_NOT_EXISTS = " does not exists";
     private static final String DOES_NOT_EXIST = " does not exist";
@@ -102,6 +105,8 @@ public final class AdminDevice {
     private String status;
     private IExporter tangoExporter;
 
+    private TangoStats tangoStats;
+
     /**
      * Init the device
      *
@@ -115,6 +120,7 @@ public final class AdminDevice {
         // logger.debug("init admin device with quartzThreadsPoolSize = {}",
         // quartzThreadsPoolSize);
         status = "The device is ON\nThe polling is ON";
+        tangoStats = TangoStats.getInstance();
         xlogger.exit();
     }
 
@@ -1023,6 +1029,64 @@ public final class AdminDevice {
 
     public void setPollingThreadsPoolSize(final int pollingThreadsPoolSize) {
         this.pollingThreadsPoolSize = pollingThreadsPoolSize;
+    }
+
+    @Override
+    public String getServerName() {
+        return "";
+    }
+
+    @Override
+    @Attribute
+    public String getLastRequest() {
+        return tangoStats.getLastRequest();
+    }
+
+    @Override
+    @Attribute
+    public String getMaxRequest() {
+        return tangoStats.getMaxRequest();
+    }
+
+    @Override
+    @Attribute
+    public long getRequestsPerSecond() {
+        return tangoStats.getRequestsPerSecond();
+    }
+
+    @Override
+    @Attribute
+    public long getLastRequestDuration() {
+        return tangoStats.getLastRequestDuration();
+    }
+
+    @Override
+    @Attribute
+    public long getMaxRequestDuration() {
+        return tangoStats.getMaxRequestDuration();
+    }
+
+    @Override
+    @Attribute
+    public long getAverageRequestDuration() {
+        return tangoStats.getAverageRequestDuration();
+    }
+
+    @Override
+    @Attribute
+    public long getMinRequestDuration() {
+        return tangoStats.getMinRequestDuration();
+    }
+
+    @Override
+    @Command
+    public void resetStats() {
+        tangoStats.resetStats();
+    }
+
+    @Override
+    public long getErrorNr() {
+        return tangoStats.getErrorNr();
     }
 
     // public void setQuartzThreadsPoolSize(final int quartzThreadsPoolSize) {
