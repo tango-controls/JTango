@@ -335,7 +335,7 @@ public final class DeviceImpl extends Device_5POA {
             // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
             // poll_ring_depth
             final DevicePropertyImpl property10 = new DevicePropertyImpl(Constants.POLL_RING_DEPTH,
@@ -1202,7 +1202,6 @@ public final class DeviceImpl extends Device_5POA {
             // profiler.start("get value");
             result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, clIdent);
-            throw DevFailedUtils.newDevFailed("test");
         } catch (final Exception e) {
             System.out.println("read error");
             deviceMonitoring.addError();
@@ -1307,7 +1306,7 @@ public final class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
-            DevFailed {
+    DevFailed {
         MDC.put(MDC_KEY, name);
         xlogger.entry();
         checkInitialization();
@@ -2063,8 +2062,8 @@ public final class DeviceImpl extends Device_5POA {
             if (!attribute.getProperties().isEnumMutable()
                     && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
                 throw DevFailedUtils
-                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                                "It's not supported to change enumeration labels number from outside the Tango device class code");
+                .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                        "It's not supported to change enumeration labels number from outside the Tango device class code");
             }
             attribute.setProperties(props);
         }
