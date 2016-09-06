@@ -848,7 +848,7 @@ public final class AdminDevice implements TangoMXBean {
                                     if (throwError) {
                                         DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
                                                 "The polling (necessary to send events) for the attribute " + objName
-                                                + " is not started");
+                                                        + " is not started");
                                     } else {
                                         device = deviceImpl;
                                         attribute = attributeImpl;
@@ -1085,8 +1085,24 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     @Override
+    @Attribute
     public long getErrorNr() {
         return tangoStats.getErrorNr();
+    }
+
+    @Override
+    public long getMaxRequestsPerSecond() {
+        return tangoStats.getMaxRequestsPerSecond();
+    }
+
+    @Override
+    public long getAverageRequestsPerSecond() {
+        return tangoStats.getAverageRequestsPerSecond();
+    }
+
+    @Override
+    public long getMinRequestsPerSecond() {
+        return tangoStats.getMinRequestsPerSecond();
     }
 
     // public void setQuartzThreadsPoolSize(final int quartzThreadsPoolSize) {

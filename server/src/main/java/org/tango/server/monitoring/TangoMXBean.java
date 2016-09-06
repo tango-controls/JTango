@@ -37,6 +37,12 @@ public interface TangoMXBean {
 
     long getRequestsPerSecond();
 
+    long getMaxRequestsPerSecond();
+
+    long getAverageRequestsPerSecond();
+
+    long getMinRequestsPerSecond();
+
     long getLastRequestDuration();
 
     long getMaxRequestDuration();

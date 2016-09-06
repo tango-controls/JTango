@@ -44,6 +44,10 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
     private volatile long seqNumber = 0;
     private volatile String lastRequest = "";
     private volatile long requestsPerSecond = 0;
+    private volatile long minRequestsPerSecond = 0;
+    private volatile long maxRequestsPerSecond = 0;
+    private volatile long averageRequestsPerSecond = 0;
+    private volatile long totalRequestsPerSecond = 0;
     private volatile long requestsPerSecondTemp = 0;
     private volatile long lastRequestDuration = 0;
     private volatile long minRequestDuration = Long.MAX_VALUE;
@@ -67,6 +71,10 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
         seqNumber = 0;
         lastRequest = "";
         requestsPerSecond = 0;
+        minRequestsPerSecond = 0;
+        maxRequestsPerSecond = 0;
+        averageRequestsPerSecond = 0;
+        totalRequestsPerSecond = 0;
         requestsPerSecondTemp = 0;
         lastRequestDuration = 0;
         minRequestDuration = Long.MAX_VALUE;
@@ -168,6 +176,15 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
             }
             totalRequestDuration = totalRequestDuration + lastRequestDuration;
             averageRequestDuration = totalRequestDuration / getSeqNumber();
+
+            if (requestsPerSecond < minRequestsPerSecond) {
+                minRequestsPerSecond = requestsPerSecond;
+            } else if (requestsPerSecond > maxRequestsPerSecond) {
+                maxRequestsPerSecond = requestsPerSecond;
+            }
+            totalRequestsPerSecond = totalRequestsPerSecond + requestsPerSecond;
+            averageRequestsPerSecond = totalRequestsPerSecond / getSeqNumber();
+
         }
     }
 
@@ -203,6 +220,21 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
     @Override
     public long getErrorNr() {
         return errorNr;
+    }
+
+    @Override
+    public long getMaxRequestsPerSecond() {
+        return maxRequestsPerSecond;
+    }
+
+    @Override
+    public long getAverageRequestsPerSecond() {
+        return averageRequestsPerSecond;
+    }
+
+    @Override
+    public long getMinRequestsPerSecond() {
+        return minRequestsPerSecond;
     }
 
 }
