@@ -1,0 +1,122 @@
+<!-- +====================================================================== -->
+<!--   $Source$ -->
+<!-- -->
+<!--   Project:   ezTangORB -->
+<!-- -->
+<!--   Description:  java source code for the simplified TangORB API. -->
+<!-- -->
+<!--   $Author: Igor Khokhriakov <igor.khokhriakov@hzg.de> $ -->
+<!-- -->
+<!--   Copyright (C) :      2014 -->
+<!--                        Helmholtz-Zentrum Geesthacht -->
+<!--                        Max-Planck-Strasse, 1, Geesthacht 21502 -->
+<!--                        GERMANY -->
+<!--                        http://hzg.de -->
+<!-- -->
+<!--   This file is part of Tango. -->
+<!-- -->
+<!--   Tango is free software: you can redistribute it and/or modify -->
+<!--   it under the terms of the GNU Lesser General Public License as published by -->
+<!--   the Free Software Foundation, either version 3 of the License, or -->
+<!--   (at your option) any later version. -->
+<!-- -->
+<!--   Tango is distributed in the hope that it will be useful, -->
+<!--   but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the -->
+<!--   GNU Lesser General Public License for more details. -->
+<!-- -->
+<!--   You should have received a copy of the GNU Lesser General Public License -->
+<!--   along with Tango.  If not, see <http://www.gnu.org/licenses/>. -->
+<!-- -->
+<!--  $Revision: 25721 $ -->
+<!-- -->
+<!-- -====================================================================== -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Extended Tango API: proxy</title>
+</head>
+<body>
+<p>This is a proxy framework. It simplifies usage of fr.esrf.TangoApi.DeviceProxy.</p>
+
+<p>Main interface of this package is {@link org.tango.client.ez.proxy.TangoProxy}. {@link
+    org.tango.client.ez.proxy.TangoEventListener} is used in event mechanism.</p>
+
+<p>User creates an instance of {@link org.tango.client.ez.proxy.TangoProxy} using one of the {@link
+    org.tango.client.ez.proxy.TangoProxies} factory method:</p>
+<pre>TangoProxies.newDeviceProxyWrapper(String deviceName)</pre>
+<p>Internally DeviceProxyWrapper creates a {@link fr.esrf.TangoApi.DeviceProxy} and operates on it. It greatly
+    simplifies
+    the usage of DeviceProxy in client code.
+    Consider the following example: we want to read a double attribute from proxy. Usually we would need to write
+    approximately the following code:</p>
+<pre>
+    DeviceProxy proxy = new DeviceProxy("some-device");
+    DeviceAttribute attribute = proxy.read_attribute("some-attribute");
+    if(result.hasFailed()){
+        throw new Exception("Can not read attribute.");
+    }
+    int dataFormat = result.getDataFormat()
+    int dataType = result.getType()
+    double result;
+    switch(dataType){
+        case Tango_DEV_Double:
+            switch(dataFormat){
+                case _SCALAR:
+                    result = attribute.extractDouble()
+                ...
+            }
+        ...
+    }
+    ...
+</pre>
+<p>Using TangoProxy we can achieve the same result with the following code:</p>
+<pre>
+    TangoProxy proxy = TangoProxies.newDeviceProxyWrapper("some-device");
+    double result = proxy.&lt;Double>readAttribute("some-attribute");
+    ...
+</pre>
+<p>
+    TangoProxyWrapper provides high-level methods to interact with the device: command execution, event un/subscription,
+    checking attributes etc.
+    See {@link org.tango.client.ez.proxy.DeviceProxyWrapper} for more details.
+</p>
+<hr/>
+<h1>Event subscription</h1>
+
+<p>Client subscribes to the event through {@link org.tango.client.ez.proxy.TangoProxy#subscribeToEvent(String,
+    org.tango.client.ez.proxy.TangoEvent)}. TangoEventListeners defines two methods: onEvent({@link
+    org.tango.client.ez.proxy.EventData}) and onError(Throwable). Users then add listeners using {@link
+    org.tango.client.ez.proxy.TangoProxy#addEventListener(java.lang.String,
+    org.tango.client.ez.proxy.TangoEvent, org.tango.client.ez.proxy.TangoEventListener)}. EventData contains a value of
+    appropriate type and a time. Consider the following
+    example:</p>
+<pre>
+    TangoProxy proxy = TangoProxies.newDeviceProxyWrapper("some-device");
+    ...
+    proxy.subscribeToEvent("some-attribute",TangoEvent.CHANGE);
+    proxy.addListener(new TangoEventCallback&lt;Double>(){
+        public void onEvent(EventData&lt;Double> data){
+            //do something with data
+        }
+
+        public void onError(Throwable cause){
+            //handle error
+        }
+    });
+    ...
+    //now unsubscribe
+    proxy.unsubscribeFromEvent(eventId);
+    ...
+</pre>
+<p>
+    User must know which attribute of which type.
+</p>
+
+<p>
+    For more info see <a href="https://bitbucket.org/hzgwpn/tangoapi/wiki/Home">project's wiki</a>
+</p>
+</body>
+</html>
