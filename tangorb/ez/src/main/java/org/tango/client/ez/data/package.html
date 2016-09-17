@@ -1,0 +1,146 @@
+<!-- +====================================================================== -->
+<!--   $Source$ -->
+<!-- -->
+<!--   Project:   ezTangORB -->
+<!-- -->
+<!--   Description:  java source code for the simplified TangORB API. -->
+<!-- -->
+<!--   $Author: Igor Khokhriakov <igor.khokhriakov@hzg.de> $ -->
+<!-- -->
+<!--   Copyright (C) :      2014 -->
+<!--                        Helmholtz-Zentrum Geesthacht -->
+<!--                        Max-Planck-Strasse, 1, Geesthacht 21502 -->
+<!--                        GERMANY -->
+<!--                        http://hzg.de -->
+<!-- -->
+<!--   This file is part of Tango. -->
+<!-- -->
+<!--   Tango is free software: you can redistribute it and/or modify -->
+<!--   it under the terms of the GNU Lesser General Public License as published by -->
+<!--   the Free Software Foundation, either version 3 of the License, or -->
+<!--   (at your option) any later version. -->
+<!-- -->
+<!--   Tango is distributed in the hope that it will be useful, -->
+<!--   but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the -->
+<!--   GNU Lesser General Public License for more details. -->
+<!-- -->
+<!--   You should have received a copy of the GNU Lesser General Public License -->
+<!--   along with Tango.  If not, see <http://www.gnu.org/licenses/>. -->
+<!-- -->
+<!--  $Revision: 25721 $ -->
+<!-- -->
+<!-- -====================================================================== -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Extended Tango Java API: data</title>
+</head>
+<body>
+<p>This package is considered as core package of the library. As all other packages are built around this one.</p>
+
+<p>This package consists of three parts: TangoDataWrapper; TangoDataType; TangoDataFormat.</p>
+
+<h1>TangoDataWrapper</h1>
+
+<p>{@link org.tango.client.ez.data.TangoDataWrapper} is an abstract class which provides polymorphic interface to</p>
+<ul>
+    <li>fr.esrf.TangoApi.DeviceData</li>
+    <li>fr.esrf.TangoApi.DeviceAttribute</li>
+    <li>fr.esrf.TangoDs.Attribute</li>
+    <li>fr.esrf.TangoDs.WAttribute</li>
+</ul>
+<p>This interface makes it possible to develop an unified framework for
+    extraction/insertion data. For instance, both fr.esrf.TangoApi.DeviceData and fr.esrf.TangoApi.DeviceAttribute has
+    method extractBoolean which extracts boolean value from underlying source.
+    Now we can wrap any of them and pass this unified object to a client:</p>
+<pre>
+    DeviceAttribute attribute = ...
+    TangoDataWrapper wrapper = TangoDataWrapper.create(attribute);
+
+    =OR=
+
+    DeviceData data = ...
+    TangoDataWrapper wrapper = TangoDataWrapper.create(data);
+    ...
+    client.doSomething(wrapper);
+    ...
+    //within some client which wants to extract boolean from fr.esrf.TangoApi.DeviceAttribute or fr.esrf.TangoApi.DeviceData
+    public void doSomething(TangoDataWrapper wrapper){
+        boolean result = wrapper.extractBoolean();
+        ...
+    }
+</pre>
+<hr/>
+<h1>TangoDataFormat</h1>
+
+<p>{@link org.tango.client.ez.data.format.TangoDataFormat} is an abstract class from which three classes are derived:
+    Image,
+    Spectrum and Scalar.
+    Appropriate instance is created via static method TangoDataFormat.createXXX() or TangoDataFormat.createForAlias(int)
+    where alias is an int code of fr.esrf.Tango.AttrDataFormat.
+    When created format is being used by client to extract or insert data into TangoDataWrapper instance. Behind the
+    scene format uses TangoDataType to perform the operation.
+</p>
+
+<p>Consider the following situation: client receives spectrum value of doubles. Below is an example how client would
+    extract data:</p>
+<pre>
+    DeviceAttribute attribute = ...
+    int formatAlias = attribute.getDataFormat();
+    TangoDataFormat&lt;double[]> format = TangoDataFormat.create(formatAlias);
+    int typeAlias = attribute.getType();
+    TangoDataWrapper dataWrapper = TangoDataWrapper.create(attribute);
+    double[] result = format.extract(dataWrapper,typeAlias);
+    ...
+</pre>
+<p>Example above demonstrates the way how {@link org.tango.client.ez.proxy.TangoProxy#readAttribute(String)} is
+    implemented.</p>
+<hr/>
+<h1>TangoDataType</h1>
+
+<p>{@link org.tango.client.ez.data.type.TangoDataType} is an abstract class which instances represent corresponding
+    TangoConst.Tango_DEV_XXX data type (String, boolean, long, double, double[], double[][] etc)
+    Instances organized into three groups: Scalar, Spectrum, Image. Instance of each group is located in the
+    corresponding class. For instance scalar double is represented by {@link
+    org.tango.client.ez.data.type.ScalarTangoDataTypes#DOUBLE}.
+</p>
+
+<p>TangoDataType uses {@link org.tango.client.ez.data.type.ValueExtracter} and {@link
+    org.tango.client.ez.data.type.ValueInserter}. Each of them knows precisely how to extract or insert data. For
+    instance:</p>
+<pre>
+    new ValueInserter&lt;String>(){
+        public void insert(TangoDataWrapper data, String value){
+            data.insert(value);//calls TangoDataWrapper#insert(String)
+        }
+    }
+
+    =OR=
+
+    new ValueInserter&lt;Double>(){
+        public void insert(TangoDataWrapper data, Double value){
+            data.insert(value);//calls TangoDataWrapper#insert(double)
+        }
+    }
+</pre>
+<p>
+    Usage of generics makes it possible to unify the interface of data type extraction:
+</p>
+<pre>
+    {Tango Data Container} data = ...
+    int typeCode = data.getType();
+    TangoDataType&lt;T> type = TangoDataTypes.getType(typeCode);
+    T result = type.extract(data);//actual type is defined in runtime
+</pre>
+<p>
+    So every type now is represented by a single class and every type shares the same interface. This not only provides
+    cleaner way to extract data from Tango data containers, but it makes the overall architecture pure object oriented,
+    simpler to maintain and extend.
+    For more details see types.uml diagram.
+</p>
+<hr/>
+</body>
+</html>
