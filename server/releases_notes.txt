@@ -1,0 +1,111 @@
+9.1.0
+-----
+30118	05/09/2016 add stats on server published with JMX and on admin device
+30105	26/08/2016 fix ConcurrentModificationException
+
+
+9.0.11 (august 2016)
+-----
+30081	25/08/2016 fix NPE when write attribute is not initialized
+
+
+9.0.10 (july 2016)
+-----
+29984	20/07/2016 add new dynamic command for async command
+29972	19/07/2016 proxy attribute: update write part from proxied attribute
+29934	06/07/2016 timetamp for write only attributes is write time
+29874	27/06/2016 avoid NPE occuring when  IDL<4 clients request attributes or commands.
+29488	16/03/2016 write only attribute: optimize read. publisher attribute: is write only and does nothing on the read part, no need to maintain a local value.
+
+
+9.0.9 (jan 2016)
+-----
+- allow to retrieve device status while init with lazyloading
+
+9.0.8 (jan 2016)
+-----
+- fix performance issue for big spectrum and image attributes
+
+9.0.7 (jan 2016)
+-----
+- integration of tangorb 9.2.0 that better manage pipes with scalar and arrays
+- InvocationContext was missing pipes
+- try to fix threading issues to retrieve clientId in invocation context.
+ Occurs when TransactionMode=NONE and several client requests at the same time
+
+
+9.0.6 (dec 2015)
+-----
+- set default attribute properties format in function of the attribute type
+
+9.0.5 (sep 2015)
+-----
+- add management of jacorb system property OAIAddr to retrieve ip address for events
+- use toLowerCase on all event name (https://sourceforge.net/p/tango-cs/bugs/730/)
+- manage device property poll_ring_depth
+- add ClntIdent in InvocationContext. DeviceManager#getClientIdentity is deprecated.
+- fix bug for change event. First event was not sent (https://sourceforge.net/p/tango-cs/bugs/708/).
+
+9.0.4 (july 2015)
+-----
+- upgrade commons-lang from 2.6 to 3.4
+- fix attribute property name for memorization (__value instead of __Value)
+- case insensitivity when loading properties from tango db
+- implements admin command EventConfirmSubscription (only used by C++ client API)
+
+9.0.3 (may 2015)
+-----
+- minor fixes on forwarded attributes
+- allow a server without device (mainly used in jive wizard)
+
+9.0.2 (may 2015)
+-----
+- refactoring of forwarded attribute building to avoid NPE
+
+9.0.1 (may 2015)
+-----
+- http://sourceforge.net/p/tango-cs/bugs/693: calculated quality from alarms accessible from device code. 
+- http://sourceforge.net/p/tango-cs/bugs/691: alarm state calculated only if state is ON. Add system property org.tango.server.checkalarms 
+to set device property StateCheckAttrAlarm default value.
+
+9.0.0 (january 2015)
+-----
+- Add all Tango 9 features: pipes, attribute of type devenum, forwarded attributes, event interface changed
+
+1.1.7
+-----
+- fix regression in timestamp that was not changing.
+
+1.1.6
+-----
+- dynamic attribute: fix timestamp. Dynamic attr and cmd: fix bug for unsigned types.
+
+1.1.5
+-----
+- fix timestamp management. In some cases timestamp set in the device was not send to client. 
+
+1.1.4
+-----
+- logging: fix -v option.
+- logging: fix logviewer
+- add org.tango.server.ServerManager.setTransactionType(TransactionType) to set TransactionType for all server
+- insert code of JTangoServerLang in JTangoServer
+
+1.1.3
+-----
+
+- release the dependency JTangoClientLang-1.0.11: Server cache of database: skip loading cache when errors occur
+(some SQL errors are sent by database device)
+- Events fix: add marshall data on heartbeat socket
+
+1.1.2
+------
+- Migration to jacorb 3.4
+- Events: do not check criteria for boolean attributes
+- Fix Init command: it was possible to launch several init in parallel when the init is detached (@Init(lazyLoading = true)).
+- Server with several class: class startup order was not the order on insertion done with org.tango.server.ServerManager#addClass
+- No db devices: only the last added class is used.
+
+1.1.1
+-----
+Events with ZMQ
