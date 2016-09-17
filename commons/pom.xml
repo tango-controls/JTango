@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.tango</groupId>
+		<artifactId>JTangoParent</artifactId>
+		<version>1.0.3</version>
+	</parent>
+
+	<artifactId>JTangoCommons</artifactId>
+	<version>9.0.7-SNAPSHOT</version>
+
+
+	<name>JTango's Commons</name>
+	<description>commons for java tango</description>
+
+	<developers>
+		<developer>
+			<id>abeille</id>
+			<name>Gwenaëlle Abeillé</name>
+			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+			<organization>Synchrotron Soleil</organization>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</connection>
+		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</url>
+	</scm>
+
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>TangORB</artifactId>
+				<version>9.2.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>TangORB</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-ext</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
