@@ -5,12 +5,37 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.tango</groupId>
-	<artifactId>JTangoParent</artifactId>
-	<version>1.0.3</version>
+	<artifactId>JTango</artifactId>
+	<version>9.9.9-SNAPSHOT</version>
+
+	<modules>
+		<module>idl</module>
+		<module>tangorb/common</module>
+		<module>tangorb/dao</module>
+		<module>commons</module>
+		<module>client</module>
+		<module>server</module>
+
+		<!-- TODO ez -->
+	</modules>
 
 	<name>JTango Parent</name>
 	<description>JTango common build parameters</description>
 	<packaging>pom</packaging>
+
+	<developers>
+		<developer>
+			<id>abeille</id>
+			<name>Gwenaëlle Abeillé</name>
+			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+			<organization>Synchrotron Soleil</organization>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
 
 	<properties>
 		<maven.repositories.server>calypso</maven.repositories.server>
@@ -179,6 +204,31 @@
 						<groupId>xml-apis</groupId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>JTangoCommons</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>JavaTangoIDL</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>JTangoClientLang</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>TangORB</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tango</groupId>
+				<artifactId>TangORB-javacommon</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

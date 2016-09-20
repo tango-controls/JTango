@@ -4,29 +4,17 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>JTangoParent</artifactId>
+		<artifactId>JTango</artifactId>
 		<groupId>org.tango</groupId>
-		<version>1.0.3</version>
+		<version>9.9.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
-	<version>9.1.1-SNAPSHOT</version>
 
 	<name>JTango Server</name>
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
 	<inceptionYear>2012</inceptionYear>
-	<developers>
-		<developer>
-			<id>abeille</id>
-			<name>Gwenaëlle Abeillé</name>
-			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
-			<organization>Synchrotron Soleil</organization>
-			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
-			<roles>
-				<role>Java Developer</role>
-			</roles>
-			<timezone>1</timezone>
-		</developer>
-	</developers>
+
+	<!-- TODO move out of here -->
 	<scm>
 		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</connection>
 		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</developerConnection>
@@ -170,12 +158,10 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			 <version>9.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
-			 <version>9.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
