@@ -7,6 +7,7 @@ import org.junit.Test;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
 
+//TODO environment independent
 public class TestApiAsync {
     @BeforeClass
     public static void init() {
