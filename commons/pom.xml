@@ -6,12 +6,11 @@
 
 	<parent>
 		<groupId>org.tango</groupId>
-		<artifactId>JTangoParent</artifactId>
-		<version>1.0.3</version>
+		<artifactId>JTango</artifactId>
+		<version>9.9.9-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>JTangoCommons</artifactId>
-	<version>9.0.7-SNAPSHOT</version>
 
 
 	<name>JTango's Commons</name>
@@ -38,16 +37,6 @@
 	</scm>
 
 
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.tango</groupId>
-				<artifactId>TangORB</artifactId>
-				<version>9.2.0</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
