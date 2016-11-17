@@ -186,14 +186,6 @@
                     <doUpdate>false</doUpdate>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.2</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <!-- TODO fix javadoc for java 8-->
-            </plugin>
         </plugins>
 
         <!-- Filtering of resources -->
