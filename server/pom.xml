@@ -4,9 +4,10 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>JTango</artifactId>
 		<groupId>org.tango</groupId>
-		<version>9.9.9-SNAPSHOT</version>
+		<artifactId>JTangoParent</artifactId>
+		<version>9.1.2-SNAPSHOT</version>
+		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>JTangoServer</artifactId>
 
@@ -14,14 +15,17 @@
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
 	<inceptionYear>2012</inceptionYear>
 
-	<!-- TODO move out of here -->
-	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</connection>
-		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/server/JTangoServer/trunk</url>
-	</scm>
 	<build>
 		<plugins>
+            <!-- TODO migrate to travis and enable tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
@@ -143,17 +147,14 @@
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb</artifactId>
-			<!-- <version>3.7</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb-omgapi</artifactId>
-			<!-- <version>3.7</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb-services</artifactId>
-			<!-- <version>3.7</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
@@ -196,7 +197,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

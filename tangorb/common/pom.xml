@@ -5,9 +5,9 @@
 
 	<parent>
 		<groupId>org.tango</groupId>
-		<artifactId>JTango</artifactId>
-		<version>9.9.9-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<artifactId>JTangoParent</artifactId>
+		<version>9.1.2-SNAPSHOT</version>
+		<relativePath>../../parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>TangORB-javacommon</artifactId>
@@ -21,7 +21,7 @@
        <dependency>
            <groupId>junit</groupId>
            <artifactId>junit</artifactId>
-           <version>4.10</version>
+           <version>4.12</version>
            <scope>test</scope>
        </dependency>
 		<dependency>

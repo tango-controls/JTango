@@ -4,31 +4,15 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>JTango</artifactId>
 		<groupId>org.tango</groupId>
-		<version>9.9.9-SNAPSHOT</version>
+		<artifactId>JTangoParent</artifactId>
+		<version>9.1.2-SNAPSHOT</version>
+		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>JTangoClientLang</artifactId>
 	<name>JTango Client Lang</name>
 	<description>Tango client utilities</description>
-	<developers>
-		<developer>
-			<id>abeille</id>
-			<name>Gwenaëlle Abeillé</name>
-			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
-			<organization>Synchrotron Soleil</organization>
-			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
-			<roles>
-				<role>Java Developer</role>
-			</roles>
-			<timezone>1</timezone>
-		</developer>
-	</developers>
-	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</connection>
-		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/client/JTangoClientLang/trunk</url>
-	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -62,7 +46,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

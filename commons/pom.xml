@@ -6,8 +6,9 @@
 
 	<parent>
 		<groupId>org.tango</groupId>
-		<artifactId>JTango</artifactId>
-		<version>9.9.9-SNAPSHOT</version>
+		<artifactId>JTangoParent</artifactId>
+		<version>9.1.2-SNAPSHOT</version>
+		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>JTangoCommons</artifactId>
@@ -15,28 +16,6 @@
 
 	<name>JTango's Commons</name>
 	<description>commons for java tango</description>
-
-	<developers>
-		<developer>
-			<id>abeille</id>
-			<name>Gwenaëlle Abeillé</name>
-			<email>gwenaelle.abeille@synchrotron-soleil.fr</email>
-			<organization>Synchrotron Soleil</organization>
-			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
-			<roles>
-				<role>Java Developer</role>
-			</roles>
-			<timezone>1</timezone>
-		</developer>
-	</developers>
-
-	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</connection>
-		<developerConnection>scm:svn:https://abeilleg@svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/tango-cs/code/api/java/common/JTangoCommons/trunk</url>
-	</scm>
-
-
 
 	<dependencies>
 		<dependency>
@@ -51,7 +30,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
