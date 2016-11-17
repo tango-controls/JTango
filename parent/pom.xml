@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.tango</groupId>
+    <artifactId>JTangoParent</artifactId>
+    <version>9.1.2-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <properties>
+        <jacorb.version>3.8</jacorb.version>
+        <!-- TODO remove -->
+        <maven.repositories.server>calypso</maven.repositories.server>
+        <maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
+        <maven.web.server>calypso</maven.web.server>
+        <maven.web.home>/usr/Local/apache/docs</maven.web.home>
+        <sonar.jdbc.url>jdbc:mysql://sonardb.ica:3306/sonar?useUnicode=true&amp;characterEncoding=utf8</sonar.jdbc.url>
+        <sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
+        <sonar.host.url>http://calypso.synchrotron-soleil.fr/sonar</sonar.host.url>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>verdier</id>
+            <name>Pascal Verdier</name>
+            <email>verdier@esrf.fr</email>
+            <organization>ESRF</organization>
+            <organizationUrl>http://www.ersf.eu</organizationUrl>
+            <roles>
+                <role>Java Developer</role>
+            </roles>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
+            <id>abeille</id>
+            <name>Gwenaëlle Abeillé</name>
+            <email>gwenaelle.abeille@synchrotron-soleil.fr</email>
+            <organization>Synchrotron Soleil</organization>
+            <organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
+            <roles>
+                <role>integrator</role>
+            </roles>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
+            <id>ingvord</id>
+            <name>Igor Khokhriakov</name>
+            <email>mail@ingvord.ru</email>
+            <organizationUrl>http://www.ingvord.ru</organizationUrl>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+            <timezone>3</timezone>
+        </developer>
+    </developers>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jacorb</groupId>
+                <artifactId>jacorb-omgapi</artifactId>
+                <version>${jacorb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jacorb</groupId>
+                <artifactId>jacorb</artifactId>
+                <version>${jacorb.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jacorb</groupId>
+                <artifactId>jacorb-services</artifactId>
+                <version>${jacorb.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                    <!-- conflict with jdk classes -->
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.tango</groupId>
+                <artifactId>JTangoCommons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tango</groupId>
+                <artifactId>JavaTangoIDL</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tango</groupId>
+                <artifactId>JTangoClientLang</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tango</groupId>
+                <artifactId>TangORB</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tango</groupId>
+                <artifactId>TangORB-javacommon</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <distributionManagement>
+            <repository>
+                <id>bintray-tango-controls</id>
+                <url>https://api.bintray.com/maven/tango-controls/maven/${project.artifactId}/;publish=1</url>
+            </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>1.0-beta-2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>UTF-8</encoding>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.0-beta-2</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <format>{0,date,yyyy-MM-dd HH:mm:ss}</format>
+                    <items>
+                        <item>timestamp</item>
+                    </items>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <!-- <version>2.9</version> -->
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <!-- Filtering of resources -->
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+    </build>
+
+</project>
