@@ -91,7 +91,7 @@ public class PipeBlob extends ArrayList<PipeDataElement> {
     /**
      * @param index specified data element index.
      * @return the name of data element at index
-     * @throws DevFailed if index is negative or higher than data element number.
+     * @throws fr.esrf.Tango.DevFailed if index is negative or higher than data element number.
      *
     // ===================================================================
     public String getDataElementName(int index) throws DevFailed {
@@ -107,7 +107,7 @@ public class PipeBlob extends ArrayList<PipeDataElement> {
     /**
      * @param index index specified index
      * @return type of data element at specified index.
-     * @throws DevFailed if index is out of bounds.
+     * @throws fr.esrf.Tango.DevFailed if index is out of bounds.
      *
     // ===================================================================
     public int getDataElementType(int index) throws DevFailed {
@@ -124,7 +124,7 @@ public class PipeBlob extends ArrayList<PipeDataElement> {
     /**
      * @param name specified element name.
      * @return type of data element at specified name.
-     * @throws DevFailed if name not found
+     * @throws fr.esrf.Tango.DevFailed if name not found
      *
     // ===================================================================
     public int getDataElementType(String name) throws DevFailed {

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26454 $
 //
 //-======================================================================
 
@@ -47,7 +47,7 @@ import java.util.List;
  * This class manage database connection for Tango Class.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 26454 $
  */
 
 
@@ -291,7 +291,7 @@ public class DbClass implements java.io.Serializable {
      * for the specified pipe.
      * @param pipeName specified pipe.
      * @return a list of class pipe properties.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbPipe getPipeProperties(String pipeName) throws DevFailed {
@@ -304,7 +304,7 @@ public class DbClass implements java.io.Serializable {
      * @param pipeName specified pipe.
      * @param propertyName specified property.
      * @return class pipe property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbDatum getPipeProperty(String pipeName, String propertyName) throws DevFailed {
@@ -321,7 +321,7 @@ public class DbClass implements java.io.Serializable {
      * The property names and their values are specified by the DbAPipe.
      *
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putPipeProperty(DbPipe dbPipe) throws DevFailed {
@@ -333,7 +333,7 @@ public class DbClass implements java.io.Serializable {
      * The property names and their values are specified by the DbAPipe.
      *
      * @param dbPipes list of pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putPipeProperty(ArrayList<DbPipe> dbPipes) throws DevFailed {
@@ -344,7 +344,7 @@ public class DbClass implements java.io.Serializable {
     /**
      * Query database for a list of pipes for specified class.
      * @return a list of pipes defined in database for specified class.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getPipeList() throws DevFailed {
@@ -355,7 +355,7 @@ public class DbClass implements java.io.Serializable {
      * Query database for a list of pipes for specified class and specified wildcard.
      * @param wildcard specified wildcard.
      * @return a list of pipes defined in database for specified class and specified wildcard.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getPipeList(String wildcard) throws DevFailed {
@@ -367,7 +367,7 @@ public class DbClass implements java.io.Serializable {
      *
      * @param pipeName pipe name
      * @param propertyName property name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperty(String pipeName, String propertyName) throws DevFailed {
@@ -381,7 +381,7 @@ public class DbClass implements java.io.Serializable {
      *
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperties(String pipeName, String[] propertyNames) throws DevFailed {
@@ -395,7 +395,7 @@ public class DbClass implements java.io.Serializable {
      *
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperties(String pipeName, List<String> propertyNames) throws DevFailed {
@@ -405,7 +405,7 @@ public class DbClass implements java.io.Serializable {
     /**
      * Delete specified pipe for specified class.
      * @param pipeName      pipe name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public void deletePipe(String pipeName) throws DevFailed {
@@ -416,7 +416,7 @@ public class DbClass implements java.io.Serializable {
      * @param pipeName      pipe name
      * @param propertyName  property Name
      * @return the property history for specified pipe.
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getPipePropertyHistory(String pipeName,

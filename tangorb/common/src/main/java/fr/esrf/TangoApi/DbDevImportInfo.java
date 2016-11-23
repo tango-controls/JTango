@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30274 $
 //
 //-======================================================================
 
@@ -43,13 +43,13 @@ import fr.esrf.Tango.DevVarLongStringArray;
  * This class is an object containing the imported device information.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30274 $
  */
 
 
 public class DbDevImportInfo implements java.io.Serializable {
     /**
-     * The devivce name.
+     * The device name.
      */
     public String name = null;
     /**
@@ -191,7 +191,6 @@ public class DbDevImportInfo implements java.io.Serializable {
 
             } catch (DevFailed e) {
                 //	return full exception string
-                //-----------------------------------
                 StringBuilder sb = new StringBuilder(e.toString() + ":\n");
                 for (int i = 0; i < e.errors.length; i++) {
                     sb.append(e.errors[i].reason).append(" from ");

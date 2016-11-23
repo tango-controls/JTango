@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 28928 $
 //
 //-======================================================================
 
@@ -49,7 +49,7 @@ import java.util.List;
  * It is an api between user and IDL Device object.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 28928 $
  */
 
 
@@ -551,7 +551,7 @@ public class DbDevice implements java.io.Serializable {
      *
      * @param pipeName specified pipe.
      * @return a list of device pipe properties.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbPipe getPipeProperties(String pipeName) throws DevFailed {
@@ -565,7 +565,7 @@ public class DbDevice implements java.io.Serializable {
      * @param pipeName     specified pipe.
      * @param propertyName specified property.
      * @return device pipe property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbDatum getPipeProperty(String pipeName, String propertyName) throws DevFailed {
@@ -582,7 +582,7 @@ public class DbDevice implements java.io.Serializable {
      * The property names and their values are specified by the DbAPipe.
      *
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putPipeProperty(DbPipe dbPipe) throws DevFailed {
@@ -594,7 +594,7 @@ public class DbDevice implements java.io.Serializable {
      * The property names and their values are specified by the DbAPipe.
      *
      * @param dbPipes list of pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putPipeProperty(ArrayList<DbPipe> dbPipes) throws DevFailed {
@@ -606,7 +606,7 @@ public class DbDevice implements java.io.Serializable {
      * Query database for a list of pipes for specified device.
      *
      * @return a list of pipes defined in database for specified device.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getPipeList() throws DevFailed {
@@ -618,7 +618,7 @@ public class DbDevice implements java.io.Serializable {
      *
      * @param wildcard specified wildcard.
      * @return a list of pipes defined in database for specified device and specified wildcard.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getPipeList(String wildcard) throws DevFailed {
@@ -630,7 +630,7 @@ public class DbDevice implements java.io.Serializable {
      *
      * @param pipeName     pipe name
      * @param propertyName property name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperty(String pipeName, String propertyName) throws DevFailed {
@@ -644,7 +644,7 @@ public class DbDevice implements java.io.Serializable {
      *
      * @param pipeName      pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperties(String pipeName, String[] propertyNames) throws DevFailed {
@@ -658,7 +658,7 @@ public class DbDevice implements java.io.Serializable {
      *
      * @param pipeName      pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deletePipeProperties(String pipeName, List<String> propertyNames) throws DevFailed {
@@ -669,7 +669,7 @@ public class DbDevice implements java.io.Serializable {
      * Delete specified pipe for specified device.
      *
      * @param pipeName pipe name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public void deletePipe(String pipeName) throws DevFailed {
@@ -680,7 +680,7 @@ public class DbDevice implements java.io.Serializable {
      * Delete all properties for specified pipe
      *
      * @param pipeName pipe name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(String pipeName) throws DevFailed {
@@ -693,7 +693,7 @@ public class DbDevice implements java.io.Serializable {
      * Delete all properties for specified pipes
      *
      * @param pipeNames pipe names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(String[] pipeNames) throws DevFailed {
@@ -706,7 +706,7 @@ public class DbDevice implements java.io.Serializable {
      * Delete all properties for specified pipes
      *
      * @param pipeNames pipe names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteAllPipeProperty(List<String> pipeNames) throws DevFailed {
@@ -719,7 +719,7 @@ public class DbDevice implements java.io.Serializable {
      * @param pipeName     pipe name
      * @param propertyName property Name
      * @return the property history for specified pipe.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getPipePropertyHistory(String pipeName, String propertyName) throws DevFailed {
@@ -731,7 +731,7 @@ public class DbDevice implements java.io.Serializable {
      * as root for forwarded attributes
      *
      * @return a list of device using the specified device as as root for forwarded attributes
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ===================================================================
     public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice() throws DevFailed {

@@ -163,7 +163,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * Return attribute time value in seconds since EPOCH.
      *
-     * @throws DevFailed in case of read_attribute failed
+     * @throws fr.esrf.Tango.DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValSec() throws DevFailed {
@@ -173,7 +173,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * Return attribute time value in milli seconds since EPOCH.
      *
-     * @throws DevFailed in case of read_attribute failed
+     * @throws fr.esrf.Tango.DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
@@ -375,7 +375,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param index specified data element index.
      * @return the name of data element at index
-     * @throws DevFailed if index is negative or higher than data element number.
+     * @throws fr.esrf.Tango.DevFailed if index is negative or higher than data element number.
      *
     // ===================================================================
     public String getDataElementName(int index) throws DevFailed {
@@ -385,7 +385,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param index specified data element index.
      * @return the tye of DataElement at index
-     * @throws DevFailed if index is negative or higher than data element number.
+     * @throws fr.esrf.Tango.DevFailed if index is negative or higher than data element number.
      *
     // ===================================================================
     public int getDataElementType(int index) throws DevFailed {
@@ -395,7 +395,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param name specified data element name.
      * @return the tye of DataElement for specified name
-     * @throws DevFailed if name not found in data element list.
+     * @throws fr.esrf.Tango.DevFailed if name not found in data element list.
      *
     // ===================================================================
     public int getDataElementType(String name) throws DevFailed {

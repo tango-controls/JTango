@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject implements
-org.omg.PortableInterceptor.ServerRequestInterceptor {
+        org.omg.PortableInterceptor.ServerRequestInterceptor {
     private static final String GIOP_TCP = "giop:tcp:";
 
     private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
@@ -83,7 +83,7 @@ org.omg.PortableInterceptor.ServerRequestInterceptor {
                         clientIPAddress.set(sock.getInetAddress().getHostAddress());
                         final int remotePort = sock.getPort();
                         clientHostName.set(InetAddress.getByName(clientIPAddress.get()).getCanonicalHostName());
-                        giopHostAddress.set(GIOP_TCP + clientIPAddress + ":" + remotePort);
+                        giopHostAddress.set(GIOP_TCP + clientIPAddress.get() + ":" + remotePort);
                     }
                 } else {
                     // when client is in the same process as the server, connection instance of
@@ -91,7 +91,7 @@ org.omg.PortableInterceptor.ServerRequestInterceptor {
                     final InetAddress addr = InetAddress.getLocalHost();
                     clientIPAddress.set(addr.getHostAddress());
                     clientHostName.set(addr.getCanonicalHostName());
-                    giopHostAddress.set(GIOP_TCP + clientIPAddress);
+                    giopHostAddress.set(GIOP_TCP + clientIPAddress.get());
                 }
             }
         } catch (final Exception e) {

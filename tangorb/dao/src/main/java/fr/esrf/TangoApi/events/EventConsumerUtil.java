@@ -136,14 +136,14 @@ public class EventConsumerUtil {
                     System.out.println("====================== ZMQ (" + ZMQutils.getZmqVersion() +
                             ") event system is available ============================");
             	}
-            	catch(java.lang.NoClassDefFoundError error) {
+            	catch(NoClassDefFoundError error) {
                     System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
                 	System.err.println("======================================================================");
                 	zmqLoadable = false;
             	}
-            	catch(java.lang.UnsatisfiedLinkError error) {
+            	catch(UnsatisfiedLinkError error) {
                 	System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
@@ -175,7 +175,7 @@ public class EventConsumerUtil {
      * @param filters   filters (not used with zmq)
      * @param stateless stateless subscription if true
      * @return  event ID.
-     * @throws DevFailed if subscription failed
+     * @throws fr.esrf.Tango.DevFailed if subscription failed
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -199,7 +199,7 @@ public class EventConsumerUtil {
      * @param filters   filters (not used with zmq)
      * @param stateless stateless subscription if true
      * @return  event ID.
-     * @throws DevFailed if subscription failed
+     * @throws fr.esrf.Tango.DevFailed if subscription failed
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -224,7 +224,7 @@ public class EventConsumerUtil {
      * @param filters   filters (not used with zmq)
      * @param stateless stateless subscription if true
      * @return  event ID.
-     * @throws DevFailed if subscription failed
+     * @throws fr.esrf.Tango.DevFailed if subscription failed
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -281,7 +281,7 @@ public class EventConsumerUtil {
      * @param max_size  maximum size for event queue
      * @param stateless stateless subscription if true
      * @return  event ID.
-     * @throws DevFailed if subscription failed
+     * @throws fr.esrf.Tango.DevFailed if subscription failed
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -315,7 +315,7 @@ public class EventConsumerUtil {
      * @param filters   filters (not used with zmq)
      * @param stateless stateless subscription if true
      * @return  event ID.
-     * @throws DevFailed if subscription failed
+     * @throws fr.esrf.Tango.DevFailed if subscription failed
      */
     //===============================================================
     private int subscribeEventWithNotifd(DeviceProxy device,
@@ -336,7 +336,7 @@ public class EventConsumerUtil {
     /**
      * Un subscribe event
      * @param event_id  specified event ID
-     * @throws DevFailed if un subscribe failed or event not found
+     * @throws fr.esrf.Tango.DevFailed if un subscribe failed or event not found
      */
     //===============================================================
     public void unsubscribe_event(int event_id) throws DevFailed {

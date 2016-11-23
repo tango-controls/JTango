@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -153,7 +153,7 @@ public class LockerInfo
 	/**
 	 *	Returns the locker UUID if java
 	 *
-	 *	@throws	DevFailed if locker is not a java process.
+	 *	@throws	fr.esrf.Tango.DevFailed if locker is not a java process.
 	 */
 	//==========================================================================
 	public UUID getJavaUUID() throws DevFailed
@@ -168,7 +168,7 @@ public class LockerInfo
 	/**
 	 *	Returns the locker Pricess ID if Cpp
 	 *
-	 *	@throws	DevFailed if locker is not a cpp process.
+	 *	@throws	fr.esrf.Tango.DevFailed if locker is not a cpp process.
 	 */
 	//==========================================================================
 	public int getCppPID() throws DevFailed

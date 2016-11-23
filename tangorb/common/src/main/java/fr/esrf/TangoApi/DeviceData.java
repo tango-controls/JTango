@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 28928 $
 //
 //-======================================================================
 
@@ -69,7 +69,7 @@ import fr.esrf.TangoDs.TangoConst;
  * </i>
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 28928 $
  */
 
 public class DeviceData implements TangoConst {
@@ -81,7 +81,7 @@ public class DeviceData implements TangoConst {
 	/**
 	 * Constructor for the TgApi Data Object.
 	 * 
-	 * @throws DevFailed
+	 * @throws fr.esrf.Tango.DevFailed
 	 *             if TgApi class not instancied.
 	 */
 	//===========================================================
@@ -96,7 +96,7 @@ public class DeviceData implements TangoConst {
 	 * 
 	 * @param orb
 	 *            orb connection id.
-	 * @throws DevFailed
+	 * @throws fr.esrf.Tango.DevFailed
 	 *             if TgApi class not instancied.
 	 */
 	//===========================================================
@@ -111,7 +111,7 @@ public class DeviceData implements TangoConst {
 	 * 
 	 * @param any
 	 *            CORBA Any reference to be used in DeviceData.
-	 * @throws DevFailed
+	 * @throws fr.esrf.Tango.DevFailed
 	 *             if TgApi class not instancied.
 	 */
 	//===========================================================

@@ -64,7 +64,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      * Creates a new instance of EventConsumer
      *
      * @return an instance of EventConsumer object
-     * @throws DevFailed in case of database connection failed.
+     * @throws fr.esrf.Tango.DevFailed in case of database connection failed.
      */
     //===============================================================
     public static ZmqEventConsumer getInstance() throws DevFailed {
@@ -121,7 +121,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      * @param max_size  queue maximum size if use queue
      * @param stateless subscription stateless if true
      * @return the event ID
-     * @throws DevFailed if subscription failed.
+     * @throws fr.esrf.Tango.DevFailed if subscription failed.
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -365,7 +365,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      * @param deviceData    data from ZmqEventSubscriptionChange command
      * @param deviceProxy   the admin device
      * @return the endpoints after checked
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     //===============================================================
     private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{

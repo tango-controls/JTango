@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30280 $
 //
 //-======================================================================
 
@@ -57,12 +57,12 @@ import java.util.*;
  * </i>
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30280 $
  */
 
 public class ApiUtil {
     public static String revNumber =
-            "9.2.1  -  Fri Mar 04 16:05:40 CET 2016";
+            "9.1.3  -  Mon Apr 25 13:04:57 CEST 2016";
     
     private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
     private static int  hwmValue = 0;
@@ -256,7 +256,7 @@ public class ApiUtil {
     /**
      * Return the request in hash table for the id
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ==========================================================================
     public static Request get_async_request(final int id) throws DevFailed {
@@ -562,7 +562,7 @@ Str[n] = Property value n (array case)
      * @param pipeName pip name
      * @param array String array to be converted
      * @return the DbPipe created from input argument.
-     * @throws DevFailed if array is not coherent.
+     * @throws fr.esrf.Tango.DevFailed if array is not coherent.
      */
     // ==========================================================================
     public static DbPipe toDbPipe(String pipeName, final String[] array) throws DevFailed {

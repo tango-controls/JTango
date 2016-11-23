@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -57,7 +57,7 @@ import org.omg.CORBA.TypeCode;
  *	</ul></i>
  *
  * @author  verdier
- * @version  $Revision$
+ * @version  $Revision: 25297 $
  */
 
 public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
@@ -389,7 +389,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	/**
 	 *	Throws exception if err_list not null.
 	 *
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 */
 	//===========================================
 	private void manageExceptions(String method_name) throws DevFailed
@@ -512,7 +512,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	extract method for a long.
 	 *
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -529,7 +529,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	extract method for a long.
 	 *
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -595,7 +595,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	/**
 	 *	extract method for an DevState.
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -615,7 +615,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	/**
 	 *	extract method for an DevEncoded
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -735,7 +735,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	extract method for a long Array.
 	 *
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -752,7 +752,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	extract method for a long Array.
 	 *
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -810,7 +810,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	extract method for an DevState Array.
 	 *
 	 *	@return	the extracted value.
-	 *	@throws	DevFailed in case of read_attribute failed
+	 *	@throws	fr.esrf.Tango.DevFailed in case of read_attribute failed
 	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
@@ -898,7 +898,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	 *	return tru if any is an array
 	 */
 	//===========================================
-	private static boolean isArray(org.omg.CORBA.Any local_any)
+	private static boolean isArray(Any local_any)
 	{ 
 		boolean retval = true; 
 		    

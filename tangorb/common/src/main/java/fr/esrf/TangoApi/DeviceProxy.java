@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30280 $
 //
 //-======================================================================
 
@@ -73,7 +73,7 @@ import java.util.Vector;
  * </i>
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30280 $
  */
 
 public class DeviceProxy extends Connection implements ApiDefs {
@@ -1539,7 +1539,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Query database to get a list of device using the specified device as
      * 		as root for forwarded attributes
      * @return a list of device using the specified device as as root for forwarded attributes
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ===================================================================
     public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice() throws DevFailed {
@@ -1561,7 +1561,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Query device for pipe name list
      * @return  pipe name list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<String> getPipeNames() throws DevFailed {
@@ -1575,7 +1575,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Query device for pipe configuration list
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig() throws DevFailed {
@@ -1586,7 +1586,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Query device for pipe configuration list
      * @param pipeName pipe name.
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public PipeInfo getPipeConfig(String pipeName) throws DevFailed {
@@ -1603,7 +1603,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Query device for pipe configuration list
      * @param pipeNames pipe names.
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(String[] pipeNames) throws DevFailed {
@@ -1616,7 +1616,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Query device for pipe configuration list
      * @param pipeNames pipe names.
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(List<String> pipeNames) throws DevFailed {
@@ -1626,7 +1626,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Set device pipe configuration
      * @param pipeInfo info containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public void setPipeConfig(PipeInfo pipeInfo) throws DevFailed {
@@ -1638,7 +1638,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Set device pipe configuration
      * @param pipeInfoList info list containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public void setPipeConfig(PipeInfo[] pipeInfoList) throws DevFailed {
@@ -1650,7 +1650,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Set device pipe configuration
      * @param pipeInfoList info list containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public void setPipeConfig(List<PipeInfo> pipeInfoList) throws DevFailed {
@@ -1661,7 +1661,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Read specified pipe and returns read data
      * @param pipeName pipe name
      * @return data read from specified pipe.
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public DevicePipe readPipe(String pipeName) throws DevFailed {
@@ -1672,7 +1672,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Write data in specified pipe
      * @param pipeName pipe name
      * @param pipeBlob data to be written
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public void writePipe(String pipeName, PipeBlob pipeBlob) throws DevFailed {
@@ -1682,7 +1682,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     /**
      * Write data in specified pipe
      * @param devicePipe data to be written (contains the pipe name)
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public void writePipe(DevicePipe devicePipe) throws DevFailed {
@@ -1694,7 +1694,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * @param pipeName pipe name
      * @param pipeBlob data to be written
      * @return data read from specified pipe.
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public DevicePipe writeReadPipe(String pipeName, PipeBlob pipeBlob) throws DevFailed {
@@ -1705,7 +1705,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Write and Read data in specified pipe
      * @param devicePipe data to be written (contains the pipe name)
      * @return data read from specified pipe.
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public DevicePipe writeReadPipe(DevicePipe devicePipe) throws DevFailed {
@@ -1982,7 +1982,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      *
      * @param list specified list to be checked.
      * @param orig method calling this method (used for DevFailed)
-     * @throws DevFailed in case of duplication.
+     * @throws fr.esrf.Tango.DevFailed in case of duplication.
      */
     //===============================================================
     private static void checkDuplication(String[] list, String orig) throws DevFailed {
@@ -2166,16 +2166,20 @@ public class DeviceProxy extends Connection implements ApiDefs {
                 deviceProxies[i] = new DeviceProxy(devnames[i]);
             }
 
-            switch (commandName) {
-                case "info":
+//            switch (commandName) {
+//                case "info":
+                if (commandName.equals("info")) {
                     for (DeviceProxy deviceProxy : deviceProxies) {
                         System.out.println(deviceProxy + "\n");
                     }
-                    break;
-                case "ping":
+//                    break;
+//                case "ping":
+                }
+                else
+                if (commandName.equals("ping")) {
                     // noinspection InfiniteLoopStatement
                     while (true) {
-                        for (int i = 0 ; i<deviceProxies.length ; i++) {
+                        for (int i = 0; i < deviceProxies.length; i++) {
                             try {
                                 final long t = deviceProxies[i].ping();
                                 System.out.println(devnames[i] + " is alive  (" + t / 1000 + " ms)");
@@ -2183,24 +2187,31 @@ public class DeviceProxy extends Connection implements ApiDefs {
                                 System.out.println(devnames[i] + "  " + e.errors[0].desc);
                             }
                         }
-                        if (deviceProxies.length>1) {
+                        if (deviceProxies.length > 1) {
                             System.out.println();
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (final InterruptedException e) { /* */ }
                     }
-                case "status":
-                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+//                    break;
+//                case "status":
+                }
+                else
+                if (commandName.equals("status")) {
+                    for (int i = 0; i < deviceProxies.length; i++) {
                         try {
                             System.out.println(devnames[i] + " - " + deviceProxies[i].status());
                         } catch (final DevFailed e) {
                             System.out.println(devnames[i] + "  " + e.errors[0].desc);
                         }
                     }
-                    break;
-                case "state":
-                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+//                    break;
+//                case "state":
+                }
+                else
+                if (commandName.equals("state")) {
+                    for (int i = 0; i < deviceProxies.length; i++) {
                         try {
                             System.out
                                     .println(devnames[i] + " is " + ApiUtil.stateName(deviceProxies[i].state()));
@@ -2214,9 +2225,12 @@ public class DeviceProxy extends Connection implements ApiDefs {
                             System.out.println(devnames[i] + "  " + e.errors[0].desc);
                         }
                     }
-                    break;
-                case "unexport":
-                    for (int i = 0 ; i<deviceProxies.length ; i++) {
+//                    break;
+//                case "":
+                }
+                else
+                if (commandName.equals("unexport")) {
+                    for (int i = 0; i < deviceProxies.length; i++) {
                         try {
                             deviceProxies[i].unexport_device();
                             System.out.println(devnames[i] + " unexported !");
@@ -2224,11 +2238,13 @@ public class DeviceProxy extends Connection implements ApiDefs {
                             System.out.println(devnames[i] + "  " + e.errors[0].desc);
                         }
                     }
-                    break;
-                default:
+//                    break;
+//                default:
+                }
+                else
                     System.out.println(commandName + " ?   Unknow command !");
-                    break;
-            }
+//                    break;
+//            }
         } catch (final DevFailed e) {
             Except.print_exception(e);
             // e.printStackTrace();

@@ -61,7 +61,7 @@ public class DbServerStructure {
      * It will read the server structure from database.
      *
      * @param serverName the specified server (ServerName/InstanceName)
-     * @throws DevFailed  in case of read database fails.
+     * @throws fr.esrf.Tango.DevFailed  in case of read database fails.
      */
 	//===============================================================
 	public DbServerStructure(String serverName) throws DevFailed {
@@ -75,7 +75,7 @@ public class DbServerStructure {
      *
      * @param serverName the specified server (ServerName/InstanceName)
      * @param tangoHost the specified TANGO_HOST
-     * @throws DevFailed  in case of read database fails.
+     * @throws fr.esrf.Tango.DevFailed  in case of read database fails.
      */
 	//===============================================================
 	public DbServerStructure(String serverName, String tangoHost) throws DevFailed {
@@ -96,7 +96,7 @@ public class DbServerStructure {
      * @param serverName the specified server (ServerName/InstanceName)
      *	@param	host	host where database is running.
      *	@param	port	port for database connection.
-     * @throws DevFailed  in case of read database fails.
+     * @throws fr.esrf.Tango.DevFailed  in case of read database fails.
      */
 	//===============================================================
 	public DbServerStructure(String serverName, String host, String port) throws DevFailed {
@@ -152,7 +152,7 @@ public class DbServerStructure {
      * Put the DbServerStructure object in the database specified by tango host.
      *
      * @param tangoHost the specified tango host (Host:Port)
-     * @throws DevFailed in case of write database fails
+     * @throws fr.esrf.Tango.DevFailed in case of write database fails
      */
 	//===============================================================
     public void putInDatabase(String tangoHost) throws  DevFailed {
@@ -166,7 +166,7 @@ public class DbServerStructure {
      *
      * @param tangoHost the specified tango host (Host:Port)
      * @return true if serer already defined
-     * @throws DevFailed if a database read fails.
+     * @throws fr.esrf.Tango.DevFailed if a database read fails.
      */
 	//===============================================================
     public boolean alreadyExists(String tangoHost) throws DevFailed {
@@ -201,7 +201,7 @@ public class DbServerStructure {
      * Create the server in specified database
      *
      * @param database  the specified database.
-     * @throws DevFailed if a write in database fails
+     * @throws fr.esrf.Tango.DevFailed if a write in database fails
      */
 	//===============================================================
     private void createTheServer(Database database) throws DevFailed {
@@ -222,7 +222,7 @@ public class DbServerStructure {
      * put class/device/attribute properties in specified database.
      *
      * @param database the specified database.
-     * @throws DevFailed if write database fails.
+     * @throws fr.esrf.Tango.DevFailed if write database fails.
      */
 	//===============================================================
     private void putProperties(Database database) throws DevFailed {
@@ -240,7 +240,7 @@ public class DbServerStructure {
 	//===============================================================
     /**
      * Remove the server in default database
-     * @throws DevFailed if write database fails.
+     * @throws fr.esrf.Tango.DevFailed if write database fails.
      */
 	//===============================================================
     public void remove() throws DevFailed {
@@ -253,7 +253,7 @@ public class DbServerStructure {
      * Remove the server in database specified by tango host
      *
      * @param tangoHost the specified tango host (Host:Port)
-     * @throws DevFailed if write database fails.
+     * @throws fr.esrf.Tango.DevFailed if write database fails.
      */
 	//===============================================================
     public void remove(String tangoHost) throws DevFailed {
