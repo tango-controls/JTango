@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26328 $
 //
 //-======================================================================
 
@@ -45,7 +45,7 @@ import java.util.Collections;
  * This class manage device connection for Tango attribute access.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 26328 $
  */
 @SuppressWarnings("UnusedDeclaration")
 public class AttributeProxy implements ApiDefs, java.io.Serializable {
@@ -59,7 +59,7 @@ public class AttributeProxy implements ApiDefs, java.io.Serializable {
      * AttributeProxy constructor. It will import the device.
      *
      * @param    deviceName    name of the attribute or its alias.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     //===================================================================
     public AttributeProxy(String deviceName) throws DevFailed {
@@ -98,7 +98,7 @@ public class AttributeProxy implements ApiDefs, java.io.Serializable {
     /**
      * Returns the alias name for this attribute
      * @return the alias name for this attribute
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     //==========================================================================
     public String get_alias() throws DevFailed {

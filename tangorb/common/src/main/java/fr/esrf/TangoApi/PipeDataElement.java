@@ -184,7 +184,7 @@ public class  PipeDataElement{
     public PipeDataElement(String name, long value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.long64_att_value(new long[]{value});
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
     // ===================================================================
     /**
@@ -365,7 +365,6 @@ public class  PipeDataElement{
                 pipeBlob.getDevPipeBlobObject().blob_data,
                 pipeBlob.getDevPipeBlobObject().name);
     }
-    // ===================================================================
     // ===================================================================
     /**
      * Create from an array of values

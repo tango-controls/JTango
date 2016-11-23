@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -240,7 +240,7 @@ public class EventQueue {
     //==================================================================
     /**
      * @return the first event in queue.
-     * @throws DevFailed if queue is empty
+     * @throws fr.esrf.Tango.DevFailed if queue is empty
      */
     //==================================================================
     public synchronized EventData getNextEvent() throws DevFailed {
@@ -257,7 +257,7 @@ public class EventQueue {
      *
      * @param    event_type    Specified event type.
      * @return the first event in queue for specified type.
-     * @throws DevFailed if queue has no specified event
+     * @throws fr.esrf.Tango.DevFailed if queue has no specified event
      */
     //==================================================================
     public synchronized EventData getNextEvent(int event_type) throws DevFailed {
@@ -306,7 +306,7 @@ public class EventQueue {
     //==================================================================
     /**
      * @return the date of the last inserted and not yet extracted event.
-     * @throws DevFailed if queue is empty
+     * @throws fr.esrf.Tango.DevFailed if queue is empty
      */
     //==================================================================
     public synchronized long getLastEventDate() throws DevFailed {

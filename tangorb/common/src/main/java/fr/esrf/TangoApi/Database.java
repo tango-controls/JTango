@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 28928 $
 //
 //-======================================================================
 
@@ -56,7 +56,7 @@ import java.util.List;
  * simple types an arrays.
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 28928 $
  */
 
 @SuppressWarnings("UnusedDeclaration")
@@ -90,7 +90,7 @@ public class Database extends Connection {
 	/**
 	 * Database access constructor.
 	 * 
-	 * @throws DevFailed in case of environment not correctly set.
+	 * @throws fr.esrf.Tango.DevFailed in case of environment not correctly set.
 	 */
 	// ===================================================================
 	public Database() throws DevFailed {
@@ -105,7 +105,7 @@ public class Database extends Connection {
 	 * 
 	 * @param host host where database is running.
 	 * @param port port for database connection.
-	 * @throws DevFailed in case of host or port not available
+	 * @throws fr.esrf.Tango.DevFailed in case of host or port not available
 	 */
 	// ===================================================================
 	public Database(String host, String port) throws DevFailed {
@@ -121,7 +121,7 @@ public class Database extends Connection {
 	 * @param host host where database is running.
 	 * @param port port for database connection.
 	 * @param auto_reconnect do not reconnect if false.
-     * @throws DevFailed in case of host or port not available
+     * @throws fr.esrf.Tango.DevFailed in case of host or port not available
 	 */
 	// ===================================================================
 	public Database(String host, String port, boolean auto_reconnect) throws DevFailed {
@@ -135,7 +135,7 @@ public class Database extends Connection {
 	 * Database constructor. It imports the device.
 	 * 
 	 * @param devname name of the device to be imported.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===================================================================
 	public Database(String devname) throws DevFailed {
@@ -150,7 +150,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname name of the device to be imported.
 	 * @param check_access set check_access value
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===================================================================
 	public Database(String devname, boolean check_access) throws DevFailed {
@@ -166,7 +166,7 @@ public class Database extends Connection {
 	 * @param devname name of the device to be imported.
 	 * @param param String parameter to import device.
 	 * @param src Source to import device (ior, dbase...)
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===================================================================
 	public Database(String devname, String param, int src) throws DevFailed {
@@ -182,7 +182,7 @@ public class Database extends Connection {
 	 * @param devname name of the device to be imported.
 	 * @param host host where database is running.
 	 * @param port port for database connection.
-     * @throws DevFailed in case of host or port not available
+     * @throws fr.esrf.Tango.DevFailed in case of host or port not available
 	 */
 	// ===================================================================
 	public Database(String devname, String host, String port) throws DevFailed {
@@ -208,7 +208,7 @@ public class Database extends Connection {
 	 * Query the database for general info about the table in the database.
 	 * 
 	 * @return the result of the query as String.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String get_info() throws DevFailed {
@@ -220,7 +220,7 @@ public class Database extends Connection {
 	 * Query the database for a list of host registred.
 	 * 
 	 * @return the list of all hosts registred in TANGO database.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_host_list() throws DevFailed {
@@ -234,7 +234,7 @@ public class Database extends Connection {
 	 * @param wildcard Wildcard char is '*' and matches wildvcard characters.
 	 * @return the list of the hosts registred in TANGO database with the
 	 *         specified wildcard.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_host_list(String wildcard) throws DevFailed {
@@ -252,7 +252,7 @@ public class Database extends Connection {
 	 * @param servname server name and instance name (ie.: Serial/i1).
 	 * @return the list of all classes registred in TANGO database for servname
 	 *         except the DServer class (existing on all Tango device server).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_server_class_list(String servname) throws DevFailed {
@@ -264,7 +264,7 @@ public class Database extends Connection {
 	 * Query the database for a list of server names registred in the database.
 	 * 
 	 * @return the list of all server names registred in TANGO database.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_server_name_list() throws DevFailed {
@@ -277,7 +277,7 @@ public class Database extends Connection {
 	 * 
 	 * @param servname server name.
 	 * @return the list of all instance names for specified server name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_instance_name_list(String servname) throws DevFailed {
@@ -289,7 +289,7 @@ public class Database extends Connection {
 	 * Query the database for a list of servers registred in the database.
 	 * 
 	 * @return the list of all servers registred in TANGO database.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_server_list() throws DevFailed {
@@ -302,7 +302,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return the list of all servers registred in TANGO database.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_server_list(String wildcard) throws DevFailed {
@@ -315,7 +315,7 @@ public class Database extends Connection {
 	 * 
 	 * @param hostname the specified host name.
 	 * @return the list of the servers registred in TANGO database for the specified host.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_host_server_list(String hostname) throws DevFailed {
@@ -328,7 +328,7 @@ public class Database extends Connection {
 	 * 
 	 * @param servname The specified server name.
 	 * @return The information found for the specified server in a DBServInfo object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbServInfo get_server_info(String servname) throws DevFailed {
@@ -340,7 +340,7 @@ public class Database extends Connection {
 	 * Add/update server information in database.
 	 * 
 	 * @param info Server information for the specified server in a DbServInfo object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_server_info(DbServInfo info) throws DevFailed {
@@ -352,7 +352,7 @@ public class Database extends Connection {
 	 * Delete server information in database.
 	 * 
 	 * @param servname Server name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_server_info(String servname) throws DevFailed {
@@ -364,7 +364,7 @@ public class Database extends Connection {
 	 *
 	 * @param srcServerName existing server name.
 	 * @param newServerName new server name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void rename_server(String srcServerName, String newServerName) throws DevFailed {
@@ -384,7 +384,7 @@ public class Database extends Connection {
 	 * Add/update a device to the database
 	 * 
 	 * @param devinfo The device name, class and server specified in object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void add_device(DbDevInfo devinfo) throws DevFailed {
@@ -398,7 +398,7 @@ public class Database extends Connection {
 	 * @param devname The device name
 	 * @param classname The class.
 	 * @param servname The server name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void add_device(String devname, String classname, String servname) throws DevFailed {
@@ -410,7 +410,7 @@ public class Database extends Connection {
 	 * Delete the device of the specified name from the database
 	 * 
 	 * @param devname The device name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device(String devname) throws DevFailed {
@@ -423,7 +423,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname The device name.
 	 * @return the information in a DbGetDeviceInfo.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DeviceInfo get_device_info(String devname) throws DevFailed {
@@ -436,7 +436,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return The list of devices
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_list(String wildcard) throws DevFailed {
@@ -449,7 +449,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname The device name.
 	 * @return the information in a DbDevImportInfo.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDevImportInfo import_device(String devname) throws DevFailed {
@@ -461,7 +461,7 @@ public class Database extends Connection {
 	 * Mark the specified server as unexported in the database.
 	 * 
 	 * @param devname The device name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void unexport_device(String devname) throws DevFailed {
@@ -473,7 +473,7 @@ public class Database extends Connection {
 	 * Update the export info fort this device in the database.
 	 * 
 	 * @param devinfo Device information to export.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void export_device(DbDevExportInfo devinfo) throws DevFailed {
@@ -490,7 +490,7 @@ public class Database extends Connection {
 	 * @param servname The specified server name.
 	 * @return The devices and classes (e.g. "id11/motor/1", "StepperMotor",
 	 *         "id11/motor/2", "StepperMotor",....)
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_class_list(String servname) throws DevFailed {
@@ -505,7 +505,7 @@ public class Database extends Connection {
 	 * @param servname The server name.
 	 * @param classname The class name
 	 * @return the device names are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_name(String servname, String classname) throws DevFailed {
@@ -519,7 +519,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return the device domain are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_domain(String wildcard) throws DevFailed {
@@ -533,7 +533,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return the device family are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_family(String wildcard) throws DevFailed {
@@ -547,7 +547,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return the device member are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_member(String wildcard) throws DevFailed {
@@ -565,7 +565,7 @@ public class Database extends Connection {
 	 * 
 	 * @param servname Server name for these devices.
 	 * @param devinfo Devices and server information.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void add_server(String servname, DbDevInfo[] devinfo) throws DevFailed {
@@ -577,7 +577,7 @@ public class Database extends Connection {
 	 * Delete the device server and its associated devices from the database.
 	 * 
 	 * @param devname the device name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_server(String devname) throws DevFailed {
@@ -590,7 +590,7 @@ public class Database extends Connection {
 	 * Add a group of devices to the database.
 	 * 
 	 * @param devinfo Devices and server information.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void export_server(DbDevExportInfo[] devinfo) throws DevFailed {
@@ -602,7 +602,7 @@ public class Database extends Connection {
 	 * Mark all devices exported for this device server as unexported.
 	 * 
 	 * @param devname the device name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void unexport_server(String devname) throws DevFailed {
@@ -620,7 +620,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard wildcard (* matches any charactere).
 	 * @return objects for which properties are defiened list.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_object_list(String wildcard) throws DevFailed {
@@ -635,7 +635,7 @@ public class Database extends Connection {
 	 * @param objname object name.
 	 * @param wildcard wildcard (* matches any char).
 	 * @return Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_object_property_list(String objname, String wildcard) throws DevFailed {
@@ -650,7 +650,7 @@ public class Database extends Connection {
 	 * @param name Object name.
 	 * @param propnames list of property names.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_property(String name, String[] propnames) throws DevFailed {
@@ -665,7 +665,7 @@ public class Database extends Connection {
 	 * @param name Object name.
 	 * @param propname list of property names.
 	 * @return property in DbDatum object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum get_property(String name, String propname) throws DevFailed {
@@ -681,7 +681,7 @@ public class Database extends Connection {
 	 * @param propname list of property names.
 	 * @param forced force TAC if true.
      * @return property in DbDatum object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum get_property(String name, String propname, boolean forced) throws DevFailed {
@@ -697,7 +697,7 @@ public class Database extends Connection {
 	 * @param name Object name.
 	 * @param properties list of property DbDatum objects.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_property(String name, DbDatum[] properties) throws DevFailed {
@@ -711,7 +711,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Object name.
 	 * @param properties Properties names and values array.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_property(String name, DbDatum[] properties) throws DevFailed {
@@ -724,7 +724,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Object name.
 	 * @param propnames Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_property(String name, String[] propnames) throws DevFailed {
@@ -737,7 +737,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Object name.
 	 * @param propname Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_property(String name, String propname) throws DevFailed {
@@ -751,7 +751,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Object name.
 	 * @param properties Property DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_property(String name, DbDatum[] properties) throws DevFailed {
@@ -765,7 +765,7 @@ public class Database extends Connection {
 	 * @param classname device name.
 	 * @param wildcard propertie's wildcard (* matches any charactere).
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_class_property_list(String classname, String wildcard) throws DevFailed {
@@ -779,7 +779,7 @@ public class Database extends Connection {
 	 * @param devname device name.
 	 * @param wildcard propertie's wildcard (* matches any charactere).
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_property_list(String devname, String wildcard) throws DevFailed {
@@ -791,7 +791,7 @@ public class Database extends Connection {
      * Returns the class name for specified device
      * @param devname specified device name
      * @return the class name for specified device
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ==========================================================================
 	public String get_class_for_device(String devname) throws DevFailed {
@@ -803,7 +803,7 @@ public class Database extends Connection {
      * Returns the inheritance for specified device
      * @param devname specified device name
      * @return the inheritance for specified device
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ==========================================================================
 	public String[] get_class_inheritance_for_device(String devname) throws DevFailed {
@@ -821,7 +821,7 @@ public class Database extends Connection {
 	 * @param name device name.
 	 * @param propnames list of property names.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_device_property(String name, String[] propnames) throws DevFailed {
@@ -835,7 +835,7 @@ public class Database extends Connection {
 	 * @param name device name.
 	 * @param propname property name.
 	 * @return property in DbDatum object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum get_device_property(String name, String propname) throws DevFailed {
@@ -850,7 +850,7 @@ public class Database extends Connection {
 	 * @param name device name.
 	 * @param properties list of property DbDatum objects.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_device_property(String name, DbDatum[] properties) throws DevFailed {
@@ -864,7 +864,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name device name.
 	 * @param properties Properties names and values array.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_device_property(String name, DbDatum[] properties) throws DevFailed {
@@ -877,7 +877,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Device name.
 	 * @param propnames Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_property(String name, String[] propnames) throws DevFailed {
@@ -890,7 +890,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Device name.
 	 * @param propname Property name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_property(String name, String propname) throws DevFailed {
@@ -903,7 +903,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Device name.
 	 * @param properties Property DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_property(String name, DbDatum[] properties) throws DevFailed {
@@ -920,7 +920,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname device name.
 	 * @return attribute names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_attribute_list(String devname) throws DevFailed {
@@ -935,7 +935,7 @@ public class Database extends Connection {
 	 * @param devname device name.
 	 * @param attnames attribute names.
 	 * @return properties in DbAttribute objects array.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbAttribute[] get_device_attribute_property(String devname, String[] attnames) throws DevFailed {
@@ -949,7 +949,7 @@ public class Database extends Connection {
 	 * @param devname device name.
 	 * @param attname attribute name.
 	 * @return property in DbAttribute object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbAttribute get_device_attribute_property(String devname, String attname) throws DevFailed {
@@ -963,7 +963,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname device name.
 	 * @param attr attribute names, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_device_attribute_property(String devname, DbAttribute[] attr) throws DevFailed {
@@ -977,7 +977,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname device name.
 	 * @param attr attribute name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_device_attribute_property(String devname, DbAttribute attr) throws DevFailed {
@@ -990,7 +990,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname Device name.
 	 * @param attr attribute name, and properties (names).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_attribute_property(String devname, DbAttribute attr) throws DevFailed {
@@ -1003,7 +1003,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname Device name.
 	 * @param attr attribute names, and properties (names) in array.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_attribute_property(String devname, DbAttribute[] attr) throws DevFailed {
@@ -1017,7 +1017,7 @@ public class Database extends Connection {
 	 * @param devname Device name.
 	 * @param attname Attribute name.
 	 * @param propnames Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_attribute_property(String devname, String attname, String[] propnames) throws DevFailed {
@@ -1031,7 +1031,7 @@ public class Database extends Connection {
 	 * @param devname Device name.
 	 * @param attname Attribute name.
 	 * @param propname Property name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_attribute_property(String devname, String attname, String propname) throws DevFailed {
@@ -1044,7 +1044,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname Device name.
 	 * @param attname Attribute name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_attribute(String devname, String attname) throws DevFailed {
@@ -1060,7 +1060,7 @@ public class Database extends Connection {
 	 * 
 	 * @param servname server name
 	 * @return the list of all servers registred in TANGO database.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_class_list(String servname) throws DevFailed {
@@ -1075,7 +1075,7 @@ public class Database extends Connection {
 	 * @param name Class name.
 	 * @param propnames list of property names.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_class_property(String name, String[] propnames) throws DevFailed {
@@ -1089,7 +1089,7 @@ public class Database extends Connection {
 	 * @param name Class name.
 	 * @param propname list of property names.
 	 * @return property in DbDatum object.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum get_class_property(String name, String propname) throws DevFailed {
@@ -1104,7 +1104,7 @@ public class Database extends Connection {
 	 * @param name Class name.
 	 * @param properties list of property DbDatum objects.
 	 * @return properties in DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbDatum[] get_class_property(String name, DbDatum[] properties) throws DevFailed {
@@ -1118,7 +1118,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Class name.
 	 * @param properties Properties names and values array.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_class_property(String name, DbDatum[] properties) throws DevFailed {
@@ -1131,7 +1131,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Class name.
 	 * @param propnames Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_class_property(String name, String[] propnames) throws DevFailed {
@@ -1144,7 +1144,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Class name.
 	 * @param propname Property name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_class_property(String name, String propname) throws DevFailed {
@@ -1157,7 +1157,7 @@ public class Database extends Connection {
 	 * 
 	 * @param name Class name.
 	 * @param properties Property DbDatum objects.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_class_property(String name, DbDatum[] properties) throws DevFailed {
@@ -1175,7 +1175,7 @@ public class Database extends Connection {
 	 * @param classname class name.
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return attributes list for specified class
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_class_attribute_list(String classname, String wildcard) throws DevFailed {
@@ -1189,7 +1189,7 @@ public class Database extends Connection {
 	 * @param classname class name.
 	 * @param attname attribute name
 	 * @return attribute properties for specified class and attribute.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbAttribute get_class_attribute_property(String classname, String attname) throws DevFailed {
@@ -1204,7 +1204,7 @@ public class Database extends Connection {
 	 * @param classname Class name.
 	 * @param attnames list of attribute names.
 	 * @return attribute properties for specified class and attributes.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbAttribute[] get_class_attribute_property(String classname, String[] attnames) throws DevFailed {
@@ -1220,7 +1220,7 @@ public class Database extends Connection {
 	 * @param classname Class name.
 	 * @param attr DbAttribute objects containing attribute names, property names
 	 *            and property values.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_class_attribute_property(String classname, DbAttribute[] attr) throws DevFailed {
@@ -1236,7 +1236,7 @@ public class Database extends Connection {
 	 * @param classname Class name.
 	 * @param attr DbAttribute object containing attribute name, property names
 	 *            and property values.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_class_attribute_property(String classname, DbAttribute attr) throws DevFailed {
@@ -1250,7 +1250,7 @@ public class Database extends Connection {
 	 * @param name Class name.
      * @param attname attribute name
 	 * @param propname Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_class_attribute_property(String name, String attname, String propname) throws DevFailed {
@@ -1264,7 +1264,7 @@ public class Database extends Connection {
 	 * @param name Class name.
 	 * @param attname attribute name.
 	 * @param propnames Property names.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_class_attribute_property(String name, String attname, String[] propnames) throws DevFailed {
@@ -1277,7 +1277,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildvcard characters.
 	 * @return The list of exported devices
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_exported(String wildcard) throws DevFailed {
@@ -1290,7 +1290,7 @@ public class Database extends Connection {
 	 * 
 	 * @param classname class name to query the exported devices.
 	 * @return The list of exported devices
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_exported_for_class(String classname) throws DevFailed {
@@ -1307,7 +1307,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildcard characters.
 	 * @return the device aliases are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_device_alias_list(String wildcard) throws DevFailed {
@@ -1319,7 +1319,7 @@ public class Database extends Connection {
      *
      * @param deviceName device's name.
      * @return the device alias found.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public String get_alias_from_device(String deviceName) throws DevFailed {
@@ -1331,7 +1331,7 @@ public class Database extends Connection {
      *
      * @param alias alias name.
      * @return the device name found.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public String get_device_from_alias(String alias) throws DevFailed {
@@ -1344,7 +1344,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname device's name.
 	 * @return the device alias found.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      * @deprecated use get_alias_from_device
 	 */
 	// ==========================================================================
@@ -1358,7 +1358,7 @@ public class Database extends Connection {
 	 * 
 	 * @param alias The device name.alias
 	 * @return the device aliases are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      * @deprecated use get_device_from_alias
 	 */
 	// ==========================================================================
@@ -1372,7 +1372,7 @@ public class Database extends Connection {
 	 * 
 	 * @param devname device name.
 	 * @param aliasname alias name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_device_alias(String devname, String aliasname) throws DevFailed {
@@ -1384,7 +1384,7 @@ public class Database extends Connection {
 	 * Query the database to delete alias for the specified device alias.
 	 * 
 	 * @param alias device alias name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_device_alias(String alias) throws DevFailed {
@@ -1397,7 +1397,7 @@ public class Database extends Connection {
 	 * 
 	 * @param wildcard Wildcard char is '*' and matches wildvcard characters.
 	 * @return the device aliases are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public String[] get_attribute_alias_list(String wildcard) throws DevFailed {
@@ -1410,7 +1410,7 @@ public class Database extends Connection {
      *
      * @param  attName attribute name.
      * @return the alias found.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public String get_alias_from_attribute(String attName) throws DevFailed {
@@ -1422,7 +1422,7 @@ public class Database extends Connection {
      *
      * @param  alias alias name.
      * @return the attribute found.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public String get_attribute_from_alias(String alias) throws DevFailed {
@@ -1434,7 +1434,7 @@ public class Database extends Connection {
 	 * 
 	 * @param attname The attribute name.
 	 * @return the device aliases are stored in an array of strings.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      * @deprecated use get_alias_from_attribute
 	 */
 	// ==========================================================================
@@ -1448,7 +1448,7 @@ public class Database extends Connection {
 	 * 
 	 * @param attname attribute name.
 	 * @param aliasname alias name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void put_attribute_alias(String attname, String aliasname) throws DevFailed {
@@ -1460,7 +1460,7 @@ public class Database extends Connection {
 	 * Query the database to delete alias for the specified attribute alias.
 	 * 
 	 * @param alias device alias name.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public void delete_attribute_alias(String alias) throws DevFailed {
@@ -1479,7 +1479,7 @@ public class Database extends Connection {
 	 * 
 	 * @param channel_name The event name.
 	 * @return the information in a DbEventImportInfo.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbEventImportInfo import_event(String channel_name) throws DevFailed {
@@ -1493,7 +1493,7 @@ public class Database extends Connection {
 	 * @param devname Device name
 	 * @param propname Property name (can be wildcarded)
      * @return the history of the specified device property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbHistory[] get_device_property_history(String devname, String propname) throws DevFailed {
@@ -1508,7 +1508,7 @@ public class Database extends Connection {
 	 * @param attname Attribute name (can be wildcarded)
 	 * @param propname Property name (can be wildcarded)
      * @return the history of the specified device attribute property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbHistory[] get_device_attribute_property_history(String devname, String attname, String propname) throws DevFailed {
@@ -1522,7 +1522,7 @@ public class Database extends Connection {
 	 * @param classname Class name
 	 * @param propname Property name (can be wildcarded)
      * @return the history of the specified class property.
-	 * @throws DevFailed in case of failure
+	 * @throws fr.esrf.Tango.DevFailed in case of failure
 	 */
 	// ==========================================================================
 	public DbHistory[] get_class_property_history(String classname, String propname) throws DevFailed {
@@ -1537,7 +1537,7 @@ public class Database extends Connection {
 	 * @param attname Attribute name (can be wildcarded)
 	 * @param propname Property name (can be wildcarded)
      * @return the history of the specified class attribute property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbHistory[] get_class_attribute_property_history(String classname, String attname, String propname) throws DevFailed {
@@ -1551,7 +1551,7 @@ public class Database extends Connection {
 	 * @param objname Object name
 	 * @param propname Property name (can be wildcarded)
      * @return the history of the specified object property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ==========================================================================
 	public DbHistory[] get_property_history(String objname, String propname) throws DevFailed {
@@ -1565,7 +1565,7 @@ public class Database extends Connection {
 	 * @param servicename The service name.
 	 * @param instname The instance name (could be * for all instances).
 	 * @return The device names found for specified service and instance.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===================================================================
 	public String[] getServices(String servicename, String instname) throws DevFailed {
@@ -1580,7 +1580,7 @@ public class Database extends Connection {
 	 * @param serviceName Service's name
 	 * @param instanceName Instance service's name
 	 * @param devname Device's name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===============================================================
 	public void registerService(String serviceName, String instanceName, String devname) throws DevFailed {
@@ -1595,7 +1595,7 @@ public class Database extends Connection {
 	 * @param serviceName Service's name
 	 * @param instanceName Instance service's name
 	 * @param devname Device's name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===============================================================
 	public void unregisterService(String serviceName, String instanceName, String devname) throws DevFailed {
@@ -1627,7 +1627,7 @@ public class Database extends Connection {
 	 * @param classname Specified class name.
 	 * @param cmd Specified command name.
      * @return true if specified command is allowed
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
 	 */
 	// ===================================================================
 	public boolean isCommandAllowed(String classname, String cmd) throws DevFailed {
@@ -1660,7 +1660,7 @@ public class Database extends Connection {
      * @param deviceName specified device.
      * @param pipeName specified pipe.
      * @return a list of device pipe properties.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbPipe getDevicePipeProperties(String deviceName, String pipeName) throws DevFailed {
@@ -1674,7 +1674,7 @@ public class Database extends Connection {
      * @param pipeName specified pipe.
      * @param propertyName specified property.
      * @return device pipe property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbDatum getDevicePipeProperty(String deviceName, String pipeName, String propertyName) throws DevFailed {
@@ -1692,7 +1692,7 @@ public class Database extends Connection {
      * @param className specified class.
      * @param pipeName specified pipe.
      * @return a list of class pipe properties.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public DbPipe getClassPipeProperties(String className, String pipeName) throws DevFailed {
@@ -1706,7 +1706,7 @@ public class Database extends Connection {
      * @param pipeName specified pipe.
      * @param propertyName specified property.
      * @return class pipe property.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ===================================================================
     public DbDatum getClassPipeProperty(String className, String pipeName, String propertyName) throws DevFailed {
@@ -1724,7 +1724,7 @@ public class Database extends Connection {
      *
      * @param deviceName device name.
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putDevicePipeProperty(String deviceName, DbPipe dbPipe) throws DevFailed {
@@ -1737,7 +1737,7 @@ public class Database extends Connection {
      *
      * @param deviceName device name.
      * @param dbPipes    list of pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putDevicePipeProperty(String deviceName, ArrayList<DbPipe> dbPipes) throws DevFailed {
@@ -1751,7 +1751,7 @@ public class Database extends Connection {
      *
      * @param className class name.
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putClassPipeProperty(String className, DbPipe dbPipe) throws DevFailed {
@@ -1764,7 +1764,7 @@ public class Database extends Connection {
      *
      * @param className class name.
      * @param dbPipes list of pipe name, and properties (names and values).
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putClassPipeProperty(String className, ArrayList<DbPipe> dbPipes) throws DevFailed {
@@ -1776,7 +1776,7 @@ public class Database extends Connection {
      * Query database for a list of pipes for specified device.
      * @param deviceName specified device name.
      * @return a list of pipes defined in database for specified device.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public List<String> getDevicePipeList(String deviceName) throws DevFailed {
@@ -1788,7 +1788,7 @@ public class Database extends Connection {
      * @param deviceName specified device name.
      * @param wildcard specified wildcard.
      * @return a list of pipes defined in database for specified device and specified wildcard.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public List<String> getDevicePipeList(String deviceName, String wildcard) throws DevFailed {
@@ -1799,7 +1799,7 @@ public class Database extends Connection {
      * Query database for a list of pipes for specified class.
      * @param className specified class name.
      * @return a list of pipes defined in database for specified class.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public List<String> getClassPipeList(String className) throws DevFailed {
@@ -1811,7 +1811,7 @@ public class Database extends Connection {
      * @param className specified class name.
      * @param wildcard specified wildcard.
      * @return a list of pipes defined in database for specified class and specified wildcard.
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public List<String> getClassPipeList(String className, String wildcard) throws DevFailed {
@@ -1824,7 +1824,7 @@ public class Database extends Connection {
      * @param deviceName device name.
      * @param pipeName pipe name
      * @param propertyName property name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteDevicePipeProperty(String deviceName,
@@ -1840,7 +1840,7 @@ public class Database extends Connection {
      * @param deviceName Device name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteDevicePipeProperties(String deviceName,
@@ -1856,7 +1856,7 @@ public class Database extends Connection {
      * @param deviceName Device name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteDevicePipeProperties(String deviceName,
@@ -1870,7 +1870,7 @@ public class Database extends Connection {
      * @param className class name.
      * @param pipeName pipe name
      * @param propertyName property name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteClassPipeProperty(String className,
@@ -1886,7 +1886,7 @@ public class Database extends Connection {
      * @param className class name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteClassPipeProperties(String className,
@@ -1902,7 +1902,7 @@ public class Database extends Connection {
      * @param className class name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteClassPipeProperties(String className,
@@ -1914,7 +1914,7 @@ public class Database extends Connection {
      * Delete specified pipe for specified device.
      * @param deviceName    device name
      * @param pipeName      pipe name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public void deleteDevicePipe(String deviceName, String pipeName) throws DevFailed {
@@ -1925,7 +1925,7 @@ public class Database extends Connection {
      * Delete specified pipe for specified class.
      * @param className    class name
      * @param pipeName      pipe name
-     * @throws DevFailed in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed in case of database access failed
      */
 	// ===================================================================
     public void deleteClassPipe(String className, String pipeName) throws DevFailed {
@@ -1936,7 +1936,7 @@ public class Database extends Connection {
      * Delete all properties for specified pipe
      * @param deviceName    device name
      * @param pipeName      pipe name
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public void deleteAllDevicePipeProperty(String deviceName, String pipeName) throws DevFailed {
@@ -1949,7 +1949,7 @@ public class Database extends Connection {
      * Delete all properties for specified pipes
      * @param deviceName    device name
      * @param pipeNames     pipe names
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public void deleteAllDevicePipeProperty(String deviceName, String[] pipeNames) throws DevFailed {
@@ -1962,7 +1962,7 @@ public class Database extends Connection {
      * Delete all properties for specified pipes
      * @param deviceName    device name
      * @param pipeNames     pipe names
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public void deleteAllDevicePipeProperty(String deviceName, List<String> pipeNames) throws DevFailed {
@@ -1975,7 +1975,7 @@ public class Database extends Connection {
      * @param pipeName      pipe name
      * @param propertyName  property Name
      * @return the property history for specified pipe.
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getDevicePipePropertyHistory(String deviceName,String pipeName,
@@ -1989,7 +1989,7 @@ public class Database extends Connection {
      * @param pipeName      pipe name
      * @param propertyName  property Name
      * @return the property history for specified pipe.
-     * @throws DevFailed  in case of database access failed
+     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getClassPipePropertyHistory(String className,String pipeName,
@@ -2002,7 +2002,7 @@ public class Database extends Connection {
 	 * 		as root for forwarded attributes
 	 * @param deviceName the specified device
 	 * @return a list of device using the specified device as as root for forwarded attributes
-	 * @throws DevFailed
+	 * @throws fr.esrf.Tango.DevFailed
 	 */
     // ===================================================================
     public List<ForwardedAttributeDatum> getForwardedAttributeInfoForDevice(String deviceName) throws DevFailed {

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25483 $
 //
 //-======================================================================
 
@@ -50,7 +50,7 @@ import java.util.Hashtable;
  * </i>
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 25483 $
  */
 
 public class DeviceProxyFactory {
@@ -66,7 +66,7 @@ public class DeviceProxyFactory {
      *
      * @param deviceName Device name to be created or get.
      * @return the DeviceProxy object
-     * @throws DevFailed if DeviceProxy creation failed
+     * @throws fr.esrf.Tango.DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName) throws DevFailed {
@@ -93,7 +93,7 @@ public class DeviceProxyFactory {
      * @param deviceName Device name to be created or get.
      * @param tangoHost to build the url (full device name).
      * @return the DeviceProxy object
-     * @throws DevFailed if DeviceProxy creation failed
+     * @throws fr.esrf.Tango.DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName, String tangoHost) throws DevFailed {
@@ -126,7 +126,7 @@ public class DeviceProxyFactory {
      *
      * @param deviceName Device name to check if exists.
      * @return true it does already exist
-     * @throws DevFailed if url is not correct
+     * @throws fr.esrf.Tango.DevFailed if url is not correct
      */
     //===================================================================
     public static boolean exists(String deviceName) throws DevFailed {

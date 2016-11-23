@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -137,7 +137,7 @@ public interface IConnectionDAO {
 	 *	Change the timeout value for a device call.
 	 *
 	 *	@param	millis		New value of the timeout in milliseconds.
-	 *	@throws	DevFailed	if orb.create_policy throws an
+	 *	@throws	fr.esrf.Tango.DevFailed	if orb.create_policy throws an
 	 *						org.omg.CORBA.PolicyError exception.
 	 */
 	//===================================================================
@@ -169,7 +169,7 @@ public interface IConnectionDAO {
 	 *	@param command	Command name to send to the device.
 	 *	@param	argin	input command argument.
 	 *	@return the output argument of the command.
-	 *	@throws DevFailed
+	 *	@throws fr.esrf.Tango.DevFailed
 	 */
 	//===========================================================
 	public abstract DeviceData command_inout(Connection connection, String command, DeviceData argin)
@@ -181,7 +181,7 @@ public interface IConnectionDAO {
 	 *
 	 *	@param command 	Command name.
 	 *	@return the output argument of the command.
-	 *	@throws DevFailed
+	 *	@throws fr.esrf.Tango.DevFailed
 	 */
 	//===========================================================
 	public abstract DeviceData command_inout(Connection connection, String command) throws DevFailed;

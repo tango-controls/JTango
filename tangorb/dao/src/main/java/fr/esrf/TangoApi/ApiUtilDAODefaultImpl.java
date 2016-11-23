@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30265 $
 //
 //-======================================================================
 
@@ -59,7 +59,7 @@ import java.util.*;
  * </i>
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30265 $
  */
 
 public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
@@ -153,7 +153,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
 
         // Build tango_host string
-        // ---------------------------
         final String tango_host = host + ":" + port;
 
         // Search if database object already created for this host and port
@@ -232,7 +231,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     // ===================================================================
     /**
      * Create the orb object
-     * @throws DevFailed if ORB creation failed
+     * @throws fr.esrf.Tango.DevFailed if ORB creation failed
      */
     // ===================================================================
     private static synchronized void create_orb() throws DevFailed {
@@ -437,7 +436,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     /**
      * Return the request in hash table for the id
      *
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ==========================================================================
     public Request get_async_request(final int id) throws DevFailed {
@@ -489,24 +488,24 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         *****/
     }
     public static void removePendingRepliesOfRequest(final Request request) {
-        final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
+        final Delegate delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
             .target())._get_delegate();
         removePendingReplies(delegate);
     }
 
     public static void removePendingRepliesOfDevice(final Connection connection) {
-        final org.jacorb.orb.Delegate delegate;
+        final Delegate delegate;
         if (connection.device_4 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
+            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
                 ._get_delegate();
         } else if (connection.device_3 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
+            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
                 ._get_delegate();
         } else if (connection.device_2 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
+            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
                 ._get_delegate();
         } else if (connection.device != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
+            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
                 ._get_delegate();
         }
         else {

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -774,7 +774,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an DevState Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -785,7 +785,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an DevState.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -796,7 +796,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an boolean.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -807,7 +807,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an boolean Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -818,7 +818,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an unsigned char.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -829,7 +829,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an unsigned char Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -840,7 +840,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an unsigned char Array as a char array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -851,7 +851,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a short.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -862,7 +862,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a short Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -873,7 +873,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an unsigned short.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -884,7 +884,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for an unsigned short Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -895,7 +895,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -906,7 +906,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -917,7 +917,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a unsigned long.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -928,7 +928,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a unsigned long.array
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -939,7 +939,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -950,7 +950,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -961,7 +961,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -972,7 +972,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -983,7 +983,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a float.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -994,7 +994,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a float Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1005,7 +1005,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a double.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1016,7 +1016,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1027,7 +1027,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a DevState (state attribute).
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1038,7 +1038,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a String.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1049,7 +1049,7 @@ public interface IDeviceAttribute_3DAO {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1059,7 +1059,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute quality
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     AttrQuality getQuality() throws DevFailed;
@@ -1068,7 +1068,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute time value.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     TimeVal getTimeVal() throws DevFailed;
@@ -1077,7 +1077,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute time value in seconds since EPOCH.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     long getTimeValSec() throws DevFailed;
@@ -1086,7 +1086,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute time value in seconds since EPOCH.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     long getTimeValMillisSec() throws DevFailed;
@@ -1101,7 +1101,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return number of data read.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getNbRead() throws DevFailed;
@@ -1110,7 +1110,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return number of data read.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     AttributeDim getReadAttributeDim() throws DevFailed;
@@ -1119,7 +1119,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return number of data write.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     AttributeDim getWriteAttributeDim() throws DevFailed;
@@ -1128,7 +1128,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return number of data written.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getNbWritten() throws DevFailed;
@@ -1137,7 +1137,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute dim_x.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getDimX() throws DevFailed;
@@ -1146,7 +1146,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute dim_y.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getDimY() throws DevFailed;
@@ -1155,7 +1155,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute written dim_x.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getWrittenDimX() throws DevFailed;
@@ -1164,7 +1164,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * Return attribute written dim_y.
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     int getWrittenDimY() throws DevFailed;
@@ -1185,7 +1185,7 @@ public interface IDeviceAttribute_3DAO {
     /**
      * return time in milliseconds since 1/1/70
      * 
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      *             in case of read_attribute failed
      */
     long getTime() throws DevFailed;
@@ -1200,7 +1200,7 @@ public interface IDeviceAttribute_3DAO {
      * 
      * @param devatt
      *            device attribute 4 object.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // GA: was setAttributeValue(DeviceAttributeDAODefaultImpl). Changed for
     // compilation issue

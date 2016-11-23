@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30265 $
 //
 //-======================================================================
 
@@ -51,7 +51,7 @@ import java.util.List;
  * is an api between user and IDL Device object.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30265 $
  */
 
 public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implements ApiDefs,
@@ -1457,14 +1457,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Write the attribute value for the specified device.
      * 
-     * @param devattr attribute name and value.
+     * @param deviceAttribute attribute name and value.
      */
     // ==========================================================================
-    public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute devattr)
+    public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute deviceAttribute)
 	    	throws DevFailed {
 		checkIfTango(deviceProxy, "write_attribute");
 		try {
-	    	final DeviceAttribute[] array = { devattr };
+	    	final DeviceAttribute[] array = { deviceAttribute };
 	    	write_attribute(deviceProxy, array);
 		} catch (final NamedDevFailedList e) {
 	    	final NamedDevFailed namedDF = e.elementAt(0);
@@ -2063,7 +2063,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             final Any any = request.add_in_arg();
             ClntIdentHelper.insert(any, ident);
         }
-        request.set_return_type(orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_any));
+        request.set_return_type(orb.get_primitive_tc(TCKind.tk_any));
         request.exceptions().add(DevFailedHelper.type());
     }
 
@@ -2292,7 +2292,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 else
                     data = deviceProxy.command_inout(command, argin);
             }
-            catch (org.omg.CORBA.Bounds e1) {
+            catch (Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }
@@ -2414,7 +2414,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     }
                 }
             }
-        } catch (final org.omg.CORBA.Bounds e) {
+        } catch (final Bounds e) {
             return "";
         } catch (final Exception e) {
             return "";
@@ -2455,14 +2455,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
                 if (except != null) {
                     ApiUtil.remove_async_request(id);
-                    if (except instanceof org.omg.CORBA.TRANSIENT) {
+                    if (except instanceof TRANSIENT) {
                         throw_dev_failed(deviceProxy, except,
                                 deviceProxy.getFull_class_name()
                                     + "." + idl_cmd + "_reply("
                                     + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
                     }
                     else
-                    if (except instanceof org.omg.CORBA.TIMEOUT) {
+                    if (except instanceof TIMEOUT) {
                         throw_dev_failed(deviceProxy, except,
                                 deviceProxy.getFull_class_name()
                                     + "." + idl_cmd + "_reply("
@@ -2470,8 +2470,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     }
                     else
                     // Check if user exception (DevFailed).
-                    if (except instanceof org.omg.CORBA.UnknownUserException) {
-                        final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
+                    if (except instanceof UnknownUserException) {
+                        final Any any = ((UnknownUserException) except).except;
                         MultiDevFailed ex = null;
                         try {
                             //noinspection ThrowableResultOfMethodCallIgnored
@@ -2614,7 +2614,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 //  And do the synchronous read_attributes
                 data = deviceProxy.read_attribute(attributeNames);
             }
-            catch (org.omg.CORBA.Bounds e1) {
+            catch (Bounds e1) {
                 System.err.println(e1);
 				if (e instanceof DevFailed)
 	                throw (DevFailed)e;
@@ -2845,7 +2845,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 else
                     throw e;
             }
-            catch (org.omg.CORBA.Bounds e1) {
+            catch (Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }
@@ -3207,7 +3207,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Query device for pipe configuration list
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy) throws DevFailed {
@@ -3246,7 +3246,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param deviceProxy device proxy object
      * @param pipeNames pipe names.
      * @return  pipe configuration list
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy, List<String> pipeNames) throws DevFailed {
@@ -3283,7 +3283,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Set device pipe configuration
      * @param deviceProxy device proxy object
      * @param pipeInfoList info list containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
+     * @throws fr.esrf.Tango.DevFailed if device connection failed
      */
     // ===================================================================
     public void setPipeConfig(DeviceProxy deviceProxy, List<PipeInfo> pipeInfoList) throws DevFailed {
@@ -3319,7 +3319,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * @param deviceProxy device proxy object
      * @param pipeName pipe name
      * @return data read from specified pipe.
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public DevicePipe readPipe(DeviceProxy deviceProxy, String pipeName) throws DevFailed {
@@ -3351,7 +3351,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      * Write data in specified pipe
      * @param deviceProxy device proxy object
      * @param devicePipe data to be written
-     * @throws DevFailed in case of device connection failed or pipe not found.
+     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed {

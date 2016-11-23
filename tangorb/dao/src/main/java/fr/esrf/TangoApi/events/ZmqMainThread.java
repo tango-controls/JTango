@@ -312,7 +312,7 @@ public class ZmqMainThread extends Thread {
     /**
      * Manage events. Extract data and push to callback
      * @param inputs received messages
-     * @throws DevFailed if cannot extract event type or data from messages.
+     * @throws fr.esrf.Tango.DevFailed if cannot extract event type or data from messages.
      */
     //===============================================================
     private void manageEvent(byte[][] inputs) throws DevFailed {
@@ -457,7 +457,7 @@ public class ZmqMainThread extends Thread {
      * @param eventName         the event name
      * @param eventCounter    the event counter to manage
      * @return true if the event must be pushed.
-     * @throws DevFailed if at least one event has been lost
+     * @throws fr.esrf.Tango.DevFailed if at least one event has been lost
      */
     //===============================================================
     private boolean manageEventCounter(EventCallBackStruct callBackStruct,
@@ -544,7 +544,7 @@ public class ZmqMainThread extends Thread {
     /**
      * Manage heartbeat
      * @param inputs received messages
-     * @throws DevFailed if cannot get ZmqEventConsumer instance
+     * @throws fr.esrf.Tango.DevFailed if cannot get ZmqEventConsumer instance
      */
     //===============================================================
     private void manageHeartbeat(byte[][] inputs) throws DevFailed{
@@ -626,7 +626,7 @@ public class ZmqMainThread extends Thread {
     /**
      * Manage control socket messages
      * @param messageBytes received messages
-     * @throws DevFailed if cannot get ZmqEventConsumer instance or cannot decode messages
+     * @throws fr.esrf.Tango.DevFailed if cannot get ZmqEventConsumer instance or cannot decode messages
      */
     //===============================================================
     private void manageControl(byte[] messageBytes) throws DevFailed{

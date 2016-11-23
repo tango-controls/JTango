@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30281 $
 //
 //-======================================================================
 
@@ -59,7 +59,7 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 	private int		port        = -1;
 	private int		prg_number  = -1;		//	used by TACO
 	private String  deviceName = null;
-    ArrayList<NetworkConnection>    connections = new ArrayList<NetworkConnection>();
+    List<NetworkConnection>  connections = new ArrayList<NetworkConnection>();
 
 
 	public IORDumpDAODefaultImpl()
@@ -138,7 +138,7 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
                 sb.append("iiop_version:    ").append(get_iiop_version()).append("\n");
 
             sb.append("host:            ").append(get_host()).append("\n");
-            ArrayList<String> alternates = getAlternateAddresses();
+            List<String> alternates = getAlternateAddresses();
             if (alternates.size()>0) {
                 for (String add : alternates )
                     sb.append("alternate addr.: ").append(add).append("\n");
@@ -157,7 +157,7 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
      *
      * @param iORdump   IORdump instance
      * @param iorString IOR String
-     * @throws DevFailed on CORBA error
+     * @throws fr.esrf.Tango.DevFailed on CORBA error
      */
     //===============================================================
 	private void iorAnalysis(IORdump iORdump, String iorString) throws  DevFailed
@@ -194,11 +194,11 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
                     (int) p.version().minor;
 
             try {
-                //  check for multiple connections
+				//  check for multiple connections
                 connections.add(new NetworkConnection((IIOPAddress) p.getAddress()));
                 List	alternates = p.getAlternateAddresses();
-                for (Object alternate : alternates)
-                    connections.add(new NetworkConnection((IIOPAddress)alternate));
+				for (Object alternate : alternates)
+					connections.add(new NetworkConnection((IIOPAddress) alternate));
             }
             catch (Exception e) {
                 host = " (" + e + ")";
@@ -225,9 +225,36 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
             String originalHost = iiopAddress.getOriginalHost();
             InetAddress inetAddress = InetAddress.getByName(originalHost);
             address = inetAddress.getHostAddress();
-            name = inetAddress.getHostName();
+
+            //  Start a thread to get host name with timeout
+            GetHostNameThread thread = new GetHostNameThread(inetAddress);
+            thread.start();
+            try {
+                thread.join(100);
+            } catch (InterruptedException e) {
+                System.err.println(e.toString());
+            }
+            //  If host name is not, set it as address
+            if (thread.hostName != null)
+                name = thread.hostName;
+            else
+                name = address;
             port = iiopAddress.getPort();
             if (port < 0) port += 65536;
+        }
+     }
+    //===============================================================
+    /**
+     * A little thread to get host name with timeout.
+     * Sometimes getHostName() method could be quiet slow (5 sec.)
+     */
+    //===============================================================
+    private class GetHostNameThread extends Thread {
+        private InetAddress inetAddress;
+        private String hostName = null;
+        private GetHostNameThread(InetAddress inetAddress) { this.inetAddress = inetAddress; }
+        public void run() {
+            hostName = inetAddress.getHostName();
         }
     }
     //===============================================================
@@ -289,9 +316,8 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
      *	Return alternate address  list .
      */
     //===============================================================
-	public ArrayList<String> getAlternateAddresses()
-	{
-        ArrayList<String>   list = new ArrayList<String>();
+	public List<String> getAlternateAddresses() {
+        List<String>   list = new ArrayList<String>();
         for (int i=1 ; i<connections.size() ; i++) {
             NetworkConnection connection = connections.get(i);
             String  address = connection.address;

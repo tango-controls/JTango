@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 29387 $
 //
 //-======================================================================
 
@@ -48,7 +48,7 @@ import fr.esrf.TangoDs.TangoConst;
  * is an api between user and IDL Device object.
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 29387 $
  */
 
 public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
@@ -680,7 +680,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void set_obj_timeout(final Connection connection, final int millis) {
 
 		// Change Jacorb policy for timeout
-		final org.omg.CORBA.Policy p =
+		final Policy p =
 			new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
 		org.omg.CORBA.Object    obj = connection.getObj()._set_policy_override(
                 new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
@@ -714,7 +714,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * Change the timeout value for a device call.
      * 
      * @param millis  New value of the timeout in milliseconds.
-     * @throws DevFailed  if orb.create_policy throws an org.omg.CORBA.PolicyError
+     * @throws fr.esrf.Tango.DevFailed  if orb.create_policy throws an org.omg.CORBA.PolicyError
      *             exception.
      */
     // ===================================================================
@@ -842,7 +842,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * @param command Command name to send to the device.
      * @param argin input command argument.
      * @return the output argument of the command.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ===========================================================
     public DeviceData command_inout(final Connection connection, final String command,
@@ -936,7 +936,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * @param command
      *            Command name.
      * @return the output argument of the command.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     // ===========================================================
     public DeviceData command_inout(final Connection connection, final String command)

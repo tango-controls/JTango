@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,21 +27,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30275 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
-
-
-/**
- * This class manage the host information
- * - name
- * - address
- *
- * @author verdier
- */
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
@@ -51,8 +42,15 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.*;
 
+/**
+ * This class manage the host information
+ * - name
+ * - address
+ *
+ * @author verdier
+ */
 
-class HostInfo {
+public class HostInfo {
     private static String name = null;
     private static String address = null;
     private static boolean trace;
@@ -71,9 +69,19 @@ class HostInfo {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
 
                 //  To do not have 127.x.x.x
-                if (networkInterface.isLoopback())
+                if (networkInterface.isLoopback()) {
+                    if (trace) {
+                        System.out.println("----------------- " + networkInterface.getName() + " --------------------");
+                        Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                        while (inetAddresses.hasMoreElements()) {
+                            InetAddress inetAddress = inetAddresses.nextElement();
+                            System.out.println("getCanonicalHostName(): " + inetAddress.getCanonicalHostName());
+                            System.out.println("getHostName():          " + inetAddress.getHostName());
+                            System.out.println("getHostAddress():       " + inetAddress.getHostAddress());
+                        }
+                    }
                     continue;
-
+                }
                 Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
                 if (trace)
                     System.out.println("----------------- " + networkInterface.getName() + " --------------------");
@@ -139,7 +147,7 @@ class HostInfo {
 
     //===============================================================
     //===============================================================
-    static String getName() throws DevFailed {
+    public static String getName() throws DevFailed {
         if (name == null)
             new HostInfo();
         return name;
@@ -147,7 +155,7 @@ class HostInfo {
 
     //===============================================================
     //===============================================================
-    static String getAddress() throws DevFailed {
+    public static String getAddress() throws DevFailed {
         if (address == null)
             new HostInfo();
         return address;
@@ -155,7 +163,7 @@ class HostInfo {
 
     //===============================================================
     //===============================================================
-    static Vector<String> getAddresses() throws DevFailed {
+    public static Vector<String> getAddresses() throws DevFailed {
         if (address == null)
             new HostInfo();
         return addresses;

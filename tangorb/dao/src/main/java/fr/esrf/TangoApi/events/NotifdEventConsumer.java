@@ -72,7 +72,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
      * Creates a new instance of EventConsumer
      *
      * @return an instance of EventConsumer object
-     * @throws DevFailed in case of database connection failed.
+     * @throws fr.esrf.Tango.DevFailed in case of database connection failed.
      */
     //===============================================================
     public static NotifdEventConsumer create() throws DevFailed {
@@ -166,7 +166,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
     }
     //===============================================================
     //===============================================================
-    private java.lang.Object extractAttributeObject(org.omg.CosNotification.StructuredEvent notification)
+    private Object extractAttributeObject(org.omg.CosNotification.StructuredEvent notification)
             throws org.omg.CORBA.TypeCodePackage.BadKind {
         TypeCode ty = notification.remainder_of_body.type();
         if (ty.kind().equals(TCKind.tk_struct)) {
@@ -238,7 +238,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
                 DevError[] dev_err_list = null;
 
                 //	Extract CORBA object to check What kind (Value or config)
-                java.lang.Object obj = extractAttributeObject(notification);
+                Object obj = extractAttributeObject(notification);
                 if (obj instanceof AttributeInfoEx)
                     attr_config = (AttributeInfoEx) obj;
                 else if (obj instanceof AttDataReady)
@@ -382,7 +382,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
             try {
                 eventChannel = EventChannelHelper.narrow(event_channel_obj);
                 //  Set timeout on eventChannel
-                final org.omg.CORBA.Policy p =
+                final Policy p =
                         new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * 3000);
                 eventChannel._set_policy_override(
                         new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
@@ -430,7 +430,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
             Except.throw_event_system_failed("API_NotificationServiceFailed",
                     "Failed to get a push supplier due to a Timeout",
                     "EventConsumer.connect_event_channel");
-        } catch (org.omg.CosNotifyChannelAdmin.AdminLimitExceeded ex) {
+        } catch (AdminLimitExceeded ex) {
             Except.throw_event_system_failed("API_NotificationServiceFailed",
                     "Failed to get a push supplier due to AdminLimitExceeded (hint : make sure the notifd daemon is running on this host",
                     "EventConsumer.connect_event_channel");
@@ -505,7 +505,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
      * We need to serialize as this method need access the POA
      *
      * @param cs  the connection information structure
-     * @throws DevFailed if connection failed on notification service
+     * @throws fr.esrf.Tango.DevFailed if connection failed on notification service
      */
     //===============================================================
     protected synchronized void connect_event_channel(ConnectionStructure cs) throws DevFailed {
@@ -875,7 +875,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
     //===============================================================
     private void setEventChannelTimeoutMillis(EventChannel eventChannel, int millis) {
         //	Change Jacorb policy for timeout
-        org.omg.CORBA.Policy p =
+        Policy p =
                 new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
         eventChannel._set_policy_override(new Policy[]{p},
                 org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);

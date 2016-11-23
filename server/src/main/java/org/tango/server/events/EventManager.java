@@ -25,10 +25,8 @@
 package org.tango.server.events;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -60,6 +58,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevIntrChange;
 import fr.esrf.Tango.DevPipeData;
 import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.TangoApi.HostInfo;
 
 /**
  * Set of ZMQ low level utilities
@@ -160,7 +159,7 @@ public final class EventManager {
     /**
      * Returns next port to connect the heartbeatSocket or eventSocket
      *
-     * @throws DevFailed if no free port found
+     * @throws fr.esrf.Tango.DevFailed if no free port found
      */
     private int getNextAvailablePort() throws DevFailed {
 
@@ -191,7 +190,7 @@ public final class EventManager {
      * Check next port to connect the heartbeatSocket or eventSocket
      *
      * @param socketType HEARTBEAT or EVENT
-     * @throws DevFailed if no free port found
+     * @throws fr.esrf.Tango.DevFailed if no free port found
      */
     private void setEndpoints(final SocketType socketType) throws DevFailed {
         xlogger.entry();
@@ -199,11 +198,7 @@ public final class EventManager {
         if (ORBManager.OAI_ADDR != null && !ORBManager.OAI_ADDR.isEmpty()) {
             ipAddress = ORBManager.OAI_ADDR;
         } else {
-            try {
-                ipAddress = InetAddress.getLocalHost().getHostAddress();
-            } catch (final UnknownHostException e1) {
-                throw DevFailedUtils.newDevFailed(e1);
-            }
+            ipAddress = HostInfo.getAddress();
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
@@ -428,7 +423,7 @@ public final class EventManager {
      *
      * @param attributeName specified event attribute
      * @param devFailed the attribute failed error to be sent as event
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
             throws DevFailed {
@@ -447,7 +442,7 @@ public final class EventManager {
      * Check if the event must be sent and fire it if must be done
      *
      * @param attributeName specified event attribute
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
@@ -469,7 +464,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param eventType specified event type.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
@@ -490,7 +485,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param eventType specified event type.
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     public void forceAttributePushEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
@@ -509,7 +504,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param counter a counter value
-     * @throws DevFailed
+     * @throws fr.esrf.Tango.DevFailed
      */
     public void pushAttributeDataReadyEvent(final String deviceName, final String attributeName, final int counter)
             throws DevFailed {
@@ -574,7 +569,7 @@ public final class EventManager {
      *
      * @param attribute the specified attribute
      * @param eventType the specified event type
-     * @throws DevFailed if event type is change or archive and no event criteria is set.
+     * @throws fr.esrf.Tango.DevFailed if event type is change or archive and no event criteria is set.
      */
     public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
         switch (eventType) {

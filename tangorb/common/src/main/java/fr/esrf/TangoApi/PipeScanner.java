@@ -37,7 +37,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 
 /**
- * This interface provides a way for users to read from {@link DevicePipe} objects in a convenient way.
+ * This interface provides a way for users to read from {@link fr.esrf.TangoApi.DevicePipe} objects in a convenient way.
  * <p>
  * Note that this interface narrows down possible output types to the java types, i.e. if one needs to read
  * DevUShort one should invoke nextInt()[or nextLong()]
@@ -62,7 +62,7 @@ public interface PipeScanner {
 
     /**
      * @return a reference to underlying array
-     * @throws DevFailed if next element is not an array
+     * @throws fr.esrf.Tango.DevFailed if next element is not an array
      */
     Object nextArray() throws DevFailed;
 
@@ -70,9 +70,9 @@ public interface PipeScanner {
      * @param type
      * @param <T>  component type
      * @return a reference to underlying array casted to T[]
-     * @throws DevFailed if type is not an array type
-     * @throws DevFailed if next element is not an array
-     * @throws DevFailed if next array's component type does not match T
+     * @throws fr.esrf.Tango.DevFailed if type is not an array type
+     * @throws fr.esrf.Tango.DevFailed if next element is not an array
+     * @throws fr.esrf.Tango.DevFailed if next array's component type does not match T
      */
     <T> T nextArray(Class<T> type) throws DevFailed;
 
@@ -82,8 +82,8 @@ public interface PipeScanner {
      * @param target
      * @param size
      * @param <T>
-     * @throws DevFailed if src and trg sizes do not match
-     * @throws DevFailed if src and trg component types do not match
+     * @throws fr.esrf.Tango.DevFailed if src and trg sizes do not match
+     * @throws fr.esrf.Tango.DevFailed if src and trg component types do not match
      */
     <T> void nextArray(T[] target, int size) throws DevFailed;
 
@@ -92,13 +92,13 @@ public interface PipeScanner {
      *
      * @param target
      * @param size
-     * @throws DevFailed if src and trg sizes do not match
+     * @throws fr.esrf.Tango.DevFailed if src and trg sizes do not match
      */
     //TODO replace this with explicit methods, i.e. nextArray(float[])?
     void nextArray(Object target, int size) throws DevFailed;
     //convenience methods
     /**
-     * Checks whether there are still elements in the underlying {@link PipeBlob}
+     * Checks whether there are still elements in the underlying {@link fr.esrf.TangoApi.PipeBlob}
      *
      * @return true if yes, otherwise - false
      */
