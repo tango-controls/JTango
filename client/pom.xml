@@ -23,8 +23,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
-			<artifactId>javascript</artifactId>
-			<version>1.6R5</version>
+			<artifactId>rhino</artifactId>
+			<version>1.7.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.transmorph</groupId>
