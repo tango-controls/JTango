@@ -24,23 +24,21 @@
  */
 package org.tango.server.properties;
 
+import fr.esrf.Tango.DevFailed;
+import net.entropysoft.transmorph.ConverterException;
+import net.entropysoft.transmorph.DefaultConverters;
+import net.entropysoft.transmorph.Transmorph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tango.client.database.DatabaseFactory;
+import org.tango.utils.DevFailedUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import net.entropysoft.transmorph.ConverterException;
-import net.entropysoft.transmorph.DefaultConverters;
-import net.entropysoft.transmorph.Transmorph;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tango.client.database.DatabaseFactory;
-import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
 
 public final class PropertiesUtils {
 
@@ -171,9 +169,10 @@ public final class PropertiesUtils {
         } else {
             // get property from class property
             final Map<String, String[]> propClass = getClassProperties(className);
-            if (propClass.get(propertyName) != null) {
+            final String[] tempClass = getProp(propClass, propertyName);
+            if (tempClass != null) {
                 // get value
-                property = propClass.get(propertyName);
+                property = tempClass;
                 LOGGER.debug("{} class property is {}", propertyName, Arrays.toString(property));
             } else {
                 LOGGER.debug("{} property value not found in tango db", propertyName);
@@ -229,41 +228,41 @@ public final class PropertiesUtils {
         } else {
             valueToInject = property[0].trim();
         }
-        LOGGER.debug("{} inject: {}", propertyName, valueToInject);
-
-        if (Boolean.class.isAssignableFrom(paramType) || boolean.class.isAssignableFrom(paramType)) {
-            if (valueToInject.equalsIgnoreCase("false") || valueToInject.equals("0")) {
-                propConverted = false;
-            } else {
-                propConverted = true;
-            }
-        } else {
-            try {
-                propConverted = transmorph.convert(valueToInject, paramType);
-            } catch (final ConverterException e) {
-                final String errorMsg = "could not set property " + propertyName + ", error converting "
-                        + valueToInject + " to " + paramType.getCanonicalName();
-                // ignore error for default value
-                if (property[0].isEmpty()) {
-                    LOGGER.debug("{} is empty", propertyName);
+        if (!valueToInject.isEmpty()) {
+            LOGGER.debug("{} inject: {}", propertyName, valueToInject);
+            if (Boolean.class.isAssignableFrom(paramType) || boolean.class.isAssignableFrom(paramType)) {
+                if (valueToInject.equalsIgnoreCase("false") || valueToInject.equals("0")) {
+                    propConverted = false;
                 } else {
-                    DevFailedUtils.throwDevFailed("PROPERTY_ERROR", errorMsg);
+                    propConverted = true;
+                }
+            } else {
+                try {
+                    propConverted = transmorph.convert(valueToInject, paramType);
+                } catch (final ConverterException e) {
+                    final String errorMsg = "could not set property " + propertyName + ", error converting "
+                            + valueToInject + " to " + paramType.getCanonicalName();
+                    // ignore error for default value
+                    if (property[0].isEmpty()) {
+                        LOGGER.debug("{} is empty", propertyName);
+                    } else {
+                        DevFailedUtils.throwDevFailed("PROPERTY_ERROR", errorMsg);
+                    }
                 }
             }
-        }
 
-        try {
-            if (propConverted != null) {
-                propMethod.invoke(businessObject, propConverted);
+            try {
+                if (propConverted != null) {
+                    propMethod.invoke(businessObject, propConverted);
+                }
+            } catch (final IllegalArgumentException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final IllegalAccessException e) {
+                DevFailedUtils.throwDevFailed(e);
+            } catch (final InvocationTargetException e) {
+                DevFailedUtils.throwDevFailed(e);
             }
-        } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
-        } catch (final IllegalAccessException e) {
-            DevFailedUtils.throwDevFailed(e);
-        } catch (final InvocationTargetException e) {
-            DevFailedUtils.throwDevFailed(e);
         }
-
     }
 
     /**

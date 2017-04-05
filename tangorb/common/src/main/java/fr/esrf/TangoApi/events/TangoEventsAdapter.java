@@ -45,8 +45,7 @@ import java.util.Hashtable;
 @SuppressWarnings({"UnusedDeclaration"})
 public class TangoEventsAdapter implements java.io.Serializable {
 
-    private DeviceProxy deviceProxy = null;
-    private String deviceName = null;
+    static final Object moni = new Object();
     /*
      * A static table for each event type
      */
@@ -68,14 +67,14 @@ public class TangoEventsAdapter implements java.io.Serializable {
             tango_data_ready_source = new Hashtable<String, TangoDataReady>();
     private static Hashtable<String, TangoInterfaceChange>
             tango_interface_change_source = new Hashtable<String, TangoInterfaceChange>();
-
-    static final Object moni = new Object();
+    private DeviceProxy deviceProxy = null;
+    private String deviceName = null;
     //=======================================================================
     /**
      * Creates a new instance of TangoEventsAdapter
      *
      * @param deviceName the device used name.
-     * @throws fr.esrf.Tango.DevFailed if device does not exist
+     * @throws DevFailed if device does not exist
      */
     //=======================================================================
     public TangoEventsAdapter(String deviceName) throws DevFailed {
@@ -87,7 +86,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Creates a new instance of TangoEventsAdapter
      *
      * @param deviceProxy the device used proxy instance.
-     * @throws fr.esrf.Tango.DevFailed  (never thrown)
+     * @throws DevFailed  (never thrown)
      */
     //=======================================================================
     public TangoEventsAdapter(DeviceProxy deviceProxy) throws DevFailed {
@@ -101,7 +100,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoPeriodicListener(ITangoPeriodicListener listener, String attrName, String[] filters)
@@ -115,7 +114,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoPeriodicListener(ITangoPeriodicListener listener, String attrName, boolean stateless)
@@ -129,7 +128,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoPeriodicListener(ITangoPeriodicListener listener, String attrName, String[] filters, boolean stateless)
@@ -152,7 +151,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * remove listener for periodic event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoPeriodicListener(ITangoPeriodicListener listener, String attrName)
@@ -171,7 +170,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoPipeListener(ITangoPipeListener listener,
@@ -185,7 +184,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoPipeListener(ITangoPipeListener listener,
@@ -199,7 +198,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoPipeListener(ITangoPipeListener listener,
@@ -221,7 +220,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * remove listener for pipe event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoPipeListener(ITangoPipeListener listener, String attrName)
@@ -241,7 +240,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoChangeListener(ITangoChangeListener listener, String attrName, String[] filters)
@@ -255,7 +254,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoChangeListener(ITangoChangeListener listener, String attrName, boolean stateless)
@@ -269,7 +268,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoChangeListener(ITangoChangeListener listener, String attrName, String[] filters, boolean stateless)
@@ -290,7 +289,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for change event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoChangeListener(ITangoChangeListener listener, String attrName)
@@ -309,7 +308,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoArchiveListener(ITangoArchiveListener listener, String attrName, String[] filters)
@@ -323,7 +322,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoArchiveListener(ITangoArchiveListener listener, String attrName, boolean stateless)
@@ -338,7 +337,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoArchiveListener(ITangoArchiveListener listener, String attrName, String[] filters, boolean stateless)
@@ -360,7 +359,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for archive event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoArchiveListener(ITangoArchiveListener listener, String attrName)
@@ -379,7 +378,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      * @deprecated Event type does not exist anymore.
      */
     //=======================================================================
@@ -395,7 +394,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      * @deprecated Event type does not exist anymore.
      */
     //=======================================================================
@@ -418,7 +417,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for quality change event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoQualityChangeListener(ITangoQualityChangeListener listener, String attrName)
@@ -437,7 +436,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoUserListener(ITangoUserListener listener, String attrName, String[] filters)
@@ -451,7 +450,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoUserListener(ITangoUserListener listener, String attrName, boolean stateless)
@@ -465,7 +464,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoUserListener(ITangoUserListener listener, String attrName, String[] filters, boolean stateless)
@@ -487,7 +486,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for user event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoUserListener(ITangoUserListener listener, String attrName)
@@ -507,7 +506,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoAttConfigListener(ITangoAttConfigListener listener, String attrName, String[] filters)
@@ -521,7 +520,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoAttConfigListener(ITangoAttConfigListener listener, String attrName, boolean stateless)
@@ -535,7 +534,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoAttConfigListener(ITangoAttConfigListener listener, String attrName, String[] filters, boolean stateless)
@@ -556,7 +555,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for att_config event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoAttConfigListener(ITangoAttConfigListener listener, String attrName)
@@ -575,7 +574,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param filters filter array
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoDataReadyListener(ITangoDataReadyListener listener, String attrName, String[] filters)
@@ -589,7 +588,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param attrName the attribute name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoDataReadyListener(ITangoDataReadyListener listener, String attrName, boolean stateless)
@@ -603,7 +602,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param attrName the attribute name
      * @param filters filter array
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoDataReadyListener(ITangoDataReadyListener listener, String attrName, String[] filters, boolean stateless)
@@ -625,7 +624,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for DataReady event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoDataReadyListener(ITangoDataReadyListener listener, String attrName)
@@ -642,7 +641,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Add listener for change event
      * @param  listener the specified listener
      * @param attrName the attribute name
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed
+     * @throws DevFailed in case of connection failed
      */
     //=======================================================================
     public void addTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String attrName)
@@ -655,7 +654,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * @param  listener the specified listener
      * @param deviceName the device name
      * @param stateless if true: will re-try if failed
-     * @throws fr.esrf.Tango.DevFailed in case of connection failed and stateless is false
+     * @throws DevFailed in case of connection failed and stateless is false
      */
     //=======================================================================
     public void addTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String deviceName, boolean stateless)
@@ -674,7 +673,7 @@ public class TangoEventsAdapter implements java.io.Serializable {
      * Remove listener for change event
      * @param  listener the specified listener
      * @param deviceName the device name
-     * @throws fr.esrf.Tango.DevFailed if specified listener not found
+     * @throws DevFailed if specified listener not found
      */
     //=======================================================================
     public void removeTangoInterfaceChangeListener(ITangoInterfaceChangeListener listener, String deviceName)

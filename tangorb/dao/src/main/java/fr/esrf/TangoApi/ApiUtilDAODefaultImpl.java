@@ -74,6 +74,194 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 
     // ===================================================================
     /**
+     * Return reconnection delay for controle system.
+     */
+    // ===================================================================
+    private static int reconnection_delay = -1;
+
+    // ===================================================================
+
+    /**
+     * Create the orb object
+     *
+     * @throws DevFailed if ORB creation failed
+     */
+    // ===================================================================
+    private static synchronized void create_orb() throws DevFailed {
+        try {
+            // Modified properties fo ORB usage.
+            // ---------------------------------------
+            final Properties props = System.getProperties();
+            props.put("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
+            props.put("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
+
+            // Set retry properties
+            props.put("jacorb.retries", "0");
+            props.put("jacorb.retry_interval", "100");
+
+            // Initial timeout for establishing a connection.
+            props.put("jacorb.connection.client.connect_timeout", "300");
+
+            // Set the Largest transfer.
+            final String str = checkORBgiopMaxMsgSize();
+            props.put("jacorb.maxManagedBufSize", str);
+
+            //	Check for max threads
+            final String nbThreads = System.getProperty("max_receptor_threads");
+            if (nbThreads != null)
+                props.put("jacorb.connection.client.max_receptor_threads", nbThreads);
+
+            // Set jacorb verbosity at minimum value
+            props.put("jacorb.config.log.verbosity", "0");
+            props.put("jacorb.disableClientOrbPolicies", "off");
+
+            //  Add code set to jacorb.properties
+            props.put("jacorb.codeset", "true");
+
+            //  Add directory to get jacorb.properties
+            props.put("jacorb.config.dir", "fr/esrf/TangoApi/etc");
+            System.setProperties(props);
+
+            // Initialize ORB
+            // -----------------------------
+            final String[] argv = null;
+            ApiUtil.setOrb(ORB.init(argv, null));
+
+            // Get an instance of DevLockManager to initialize.
+            DevLockManager.getInstance();
+        } catch (final SystemException ex) {
+            // System.out.println("Excption catched in ApiUtil.create_orb");
+            ApiUtil.setOrb(null);
+            ex.printStackTrace();
+            Except.throw_connection_failed(ex.toString(), "Initializing ORB failed !",
+                    "ApiUtil.create_orb()");
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // ===================================================================
+
+    /**
+     * Check if the checkORBgiopMaxMsgSize has been set. This environment
+     * variable should be set in Mega bytes.
+     *
+     * @return the property string  to be set.
+     */
+    // ===================================================================
+    private static String checkORBgiopMaxMsgSize() {
+        /*
+         * JacORB definition (see jacorb.properties file):
+         *
+         * This is NOT the maximum buffer size that can be used, but just the
+         * largest size of buffers that will be kept and managed. This value
+         * will be added to an internal constant of 5, so the real value in
+         * bytes is 2**(5+maxManagedBufSize-1). You only need to increase this
+         * value if you are dealing with LOTS of LARGE data structures. You may
+         * decrease it to make the buffer manager release large buffers
+         * immediately rather than keeping them for later reuse.
+         */
+        String str = "20"; // Set to 16 Mbytes
+
+        // Check if environment ask for bigger size.
+        String tmp = ApiUtil.getORBgiopMaxMsgSize();
+        if (tmp != null) {
+            if ((tmp = checkBufferSize(tmp)) != null) {
+                str = tmp;
+            }
+        }
+        return str;
+    }
+
+    // ===================================================================
+
+    // ===================================================================
+    // ===================================================================
+    private static String checkBufferSize(final String str) {
+        // try to get value
+        int nb_mega;
+        try {
+            nb_mega = Integer.parseInt(str);
+        } catch (final NumberFormatException e) {
+            return null;
+        }
+
+        // Compute the real size and the power of 2
+        final long size = (long) nb_mega * 1024 * 1024;
+        long l = size;
+        int cnt;
+        for (cnt = 0; l > 0; cnt++) {
+            l >>= 1;
+        }
+        cnt--;
+
+        // Check if number ob Mb is not power of 2
+        if (Math.pow(2, cnt) < size) {
+            cnt++;
+        }
+        System.out.println(nb_mega + " Mbytes  (2^" + cnt + ")");
+
+        final int jacorb_size = cnt - 4;
+        return Integer.toString(jacorb_size);
+    }
+
+    // ===================================================================
+
+    // ==========================================================================
+    // ==========================================================================
+    public static String getUser() {
+        return System.getProperty("user.name");
+    }
+
+    // ===================================================================
+
+    @SuppressWarnings("UnusedParameters")
+    private static void removePendingReplies(final Delegate delegate) {
+        // try to solve a memory leak. pending_replies is still growing when
+        // server is in timeout
+        /*****
+         Removed for JacORB-3
+         if (!delegate.get_pending_replies().isEmpty()) {
+         delegate.get_pending_replies().clear();
+         }
+         *****/
+    }
+
+    // ===================================================================
+
+    public static void removePendingRepliesOfRequest(final Request request) {
+        final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
+                .target())._get_delegate();
+        removePendingReplies(delegate);
+    }
+
+    // ===================================================================
+
+    public static void removePendingRepliesOfDevice(final Connection connection) {
+        final org.jacorb.orb.Delegate delegate;
+        if (connection.device_4 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
+                    ._get_delegate();
+        } else if (connection.device_3 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
+                    ._get_delegate();
+        } else if (connection.device_2 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
+                    ._get_delegate();
+        } else if (connection.device != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
+                    ._get_delegate();
+        } else {
+            return;
+        }
+        removePendingReplies(delegate);
+    }
+
+    // ===================================================================
+    // ===================================================================
+
+    // ===================================================================
+
+    /**
      * Return the database object created for specified host and port.
      *
      * @param tango_host
@@ -90,6 +278,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
     /**
      * Return the database object created with TANGO_HOST environment variable .
      */
@@ -101,7 +290,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             return defaultDatabase;
         }
     }
-    // ===================================================================
+
     /**
      * Return tru if the database object has been created.
      */
@@ -111,6 +300,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
     /**
      * Return the database object created with TANGO_HOST environment variable .
      */
@@ -135,6 +325,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
     /**
      * Return the database object created for specified host and port.
      *
@@ -175,6 +366,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
     /**
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
@@ -194,6 +386,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
     /**
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
@@ -208,7 +401,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return change_db_obj(host, port);
     }
 
-    // ===================================================================
     /**
      * Return the database object created for specified host and port.
      *
@@ -225,142 +417,27 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return change_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
     }
 
-    // ===================================================================
-    // ===================================================================
-
-    // ===================================================================
-    /**
-     * Create the orb object
-     * @throws fr.esrf.Tango.DevFailed if ORB creation failed
-     */
-    // ===================================================================
-    private static synchronized void create_orb() throws DevFailed {
-        try {
-            // Modified properties fo ORB usage.
-            // ---------------------------------------
-            final Properties props = System.getProperties();
-            props.put("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
-            props.put("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
-
-            // Set retry properties
-            props.put("jacorb.retries", "0");
-            props.put("jacorb.retry_interval", "100");
-
-            // Initial timeout for establishing a connection.
-            props.put("jacorb.connection.client.connect_timeout", "300");
-
-            // Set the Largest transfer.
-            final String str = checkORBgiopMaxMsgSize();
-            props.put("jacorb.maxManagedBufSize", str);
-			
-			//	Check for max threads
-			final String nbThreads = System.getProperty("max_receptor_threads");
-			if (nbThreads!=null)
-				props.put("jacorb.connection.client.max_receptor_threads", nbThreads);
-
-            // Set jacorb verbosity at minimum value
-            props.put("jacorb.config.log.verbosity", "0");
-            props.put("jacorb.disableClientOrbPolicies", "off");
-
-            //  Add code set to jacorb.properties
-            props.put("jacorb.codeset", "true");
-
-            //  Add directory to get jacorb.properties
-            props.put("jacorb.config.dir", "fr/esrf/TangoApi/etc");
-			System.setProperties(props);
-
-            // Initialize ORB
-            // -----------------------------
-            final String[] argv = null;
-            ApiUtil.setOrb(ORB.init(argv, null));
-
-            // Get an instance of DevLockManager to initialize.
-            DevLockManager.getInstance();
-        } catch (final SystemException ex) {
-            // System.out.println("Excption catched in ApiUtil.create_orb");
-            ApiUtil.setOrb(null);
-            ex.printStackTrace();
-            Except.throw_connection_failed(ex.toString(), "Initializing ORB failed !",
-                "ApiUtil.create_orb()");
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ===================================================================
-    /**
-     * Check if the checkORBgiopMaxMsgSize has been set. This environment
-     * variable should be set in Mega bytes.
-     * @return  the property string  to be set.
-     */
-    // ===================================================================
-    private static String checkORBgiopMaxMsgSize() {
-        /*
-         * JacORB definition (see jacorb.properties file):
-         *
-         * This is NOT the maximum buffer size that can be used, but just the
-         * largest size of buffers that will be kept and managed. This value
-         * will be added to an internal constant of 5, so the real value in
-         * bytes is 2**(5+maxManagedBufSize-1). You only need to increase this
-         * value if you are dealing with LOTS of LARGE data structures. You may
-         * decrease it to make the buffer manager release large buffers
-         * immediately rather than keeping them for later reuse.
-         */
-        String str = "20"; // Set to 16 Mbytes
-
-        // Check if environment ask for bigger size.
-        String tmp = ApiUtil.getORBgiopMaxMsgSize();
-        if (tmp != null) {
-            if ((tmp = checkBufferSize(tmp)) != null) {
-                str = tmp;
-            }
-        }
-        return str;
-    }
-
-    // ===================================================================
-    // ===================================================================
-    private static String checkBufferSize(final String str) {
-        // try to get value
-        int nb_mega;
-        try {
-            nb_mega = Integer.parseInt(str);
-        } catch (final NumberFormatException e) {
-            return null;
-        }
-
-        // Compute the real size and the power of 2
-        final long size = (long) nb_mega * 1024 * 1024;
-        long l = size;
-        int cnt;
-        for (cnt = 0; l > 0; cnt++) {
-            l >>= 1;
-        }
-        cnt--;
-
-        // Check if number ob Mb is not power of 2
-        if (Math.pow(2, cnt) < size) {
-            cnt++;
-        }
-        System.out.println(nb_mega + " Mbytes  (2^" + cnt + ")");
-
-        final int jacorb_size = cnt - 4;
-        return Integer.toString(jacorb_size);
-    }
-
-    // ===================================================================
     /**
      * Return the orb object
      */
     // ===================================================================
     public ORB get_orb() throws DevFailed {
-	if (ApiUtil.getOrb() == null) {
-	    create_orb();
-	}
-	return ApiUtil.getOrb();
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
+        return ApiUtil.getOrb();
     }
+    // ==========================================================================
+    // ==========================================================================
 
-    // ===================================================================
+
+    // ==========================================================================
+    /*
+     * Asynchronous request management
+     */
+    // ==========================================================================
+    // ==========================================================================
+
     /**
      * Return the orb object
      */
@@ -369,7 +446,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	in_server_code = val;
     }
 
-    // ===================================================================
+    // ==========================================================================
+
     /**
      * Return true if in server code or false if in client code.
      */
@@ -378,12 +456,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return in_server_code;
     }
 
-    // ===================================================================
-    /**
-     * Return reconnection delay for controle system.
-     */
-    // ===================================================================
-    private static int reconnection_delay = -1;
+    // ==========================================================================
 
     public int getReconnectionDelay() {
         if (reconnection_delay < 0) {
@@ -404,22 +477,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
-    // ==========================================================================
-    public static String getUser()
-    {
-        return System.getProperty("user.name");
-    }
-    // ==========================================================================
-    // ==========================================================================
 
-
-
-    // ==========================================================================
-    /*
-     * Asynchronous request management
-     */
-    // ==========================================================================
-    // ==========================================================================
     /**
      * Add request in hash table and return id
      */
@@ -432,11 +490,10 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         return async_request_cnt;
     }
 
-    // ==========================================================================
     /**
      * Return the request in hash table for the id
      *
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ==========================================================================
     public Request get_async_request(final int id) throws DevFailed {
@@ -449,7 +506,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return aco.request;
     }
 
-    // ==========================================================================
     /**
      * Return the Asynch Object in hash table for the id
      */
@@ -458,7 +514,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return async_request_table.get(id);
     }
 
-    // ==========================================================================
     /**
      * Remove asynchronous call request and id from hashtable.
      */
@@ -475,46 +530,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
     }
 
-
-    @SuppressWarnings("UnusedParameters")
-    private static void removePendingReplies(final Delegate delegate) {
-        // try to solve a memory leak. pending_replies is still growing when
-        // server is in timeout
-        /*****
-        Removed for JacORB-3
-        if (!delegate.get_pending_replies().isEmpty()) {
-            delegate.get_pending_replies().clear();
-        }
-        *****/
-    }
-    public static void removePendingRepliesOfRequest(final Request request) {
-        final Delegate delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
-            .target())._get_delegate();
-        removePendingReplies(delegate);
-    }
-
-    public static void removePendingRepliesOfDevice(final Connection connection) {
-        final Delegate delegate;
-        if (connection.device_4 != null) {
-            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
-                ._get_delegate();
-        } else if (connection.device_3 != null) {
-            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
-                ._get_delegate();
-        } else if (connection.device_2 != null) {
-            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
-                ._get_delegate();
-        } else if (connection.device != null) {
-            delegate = (Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
-                ._get_delegate();
-        }
-        else {
-            return;
-        }
-        removePendingReplies(delegate);
-    }
-
     // ==========================================================================
+
     /**
      * Set the reply_model in AsyncCallObject for the id key.
      */
@@ -583,6 +600,18 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
+
+    /**
+     * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
+     * ApiDefs.PULL_CALLBACK).
+     */
+    // ==========================================================================
+    public int get_asynch_cb_sub_model() {
+        return async_cb_sub_model;
+    }
+
+    // ==========================================================================
+
     /**
      * Return the callback sub model used.
      *
@@ -595,16 +624,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
-    /**
-     * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
-     * ApiDefs.PULL_CALLBACK).
-     */
-    // ==========================================================================
-    public int get_asynch_cb_sub_model() {
-    	return async_cb_sub_model;
-    }
 
-    // ==========================================================================
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.

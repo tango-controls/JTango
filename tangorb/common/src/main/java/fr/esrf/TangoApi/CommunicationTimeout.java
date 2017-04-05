@@ -40,7 +40,7 @@ package fr.esrf.TangoApi;
  *	Can be instancied by <i>Except.throw_communication_timeout</i> method.
  *
  *	@see fr.esrf.TangoDs.Except
- *	@see CommunicationFailed
+ *	@see fr.esrf.TangoApi.CommunicationFailed
  *
  *
  * @author  verdier

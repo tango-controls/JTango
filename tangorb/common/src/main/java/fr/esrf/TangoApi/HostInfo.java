@@ -27,20 +27,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 30275 $
+// $Revision: 28158 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoDs.Except;
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.*;
 
 /**
  * This class manage the host information
@@ -50,145 +43,146 @@ import java.util.*;
  * @author verdier
  */
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.Except;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+
 public class HostInfo {
-    private static String name = null;
-    private static String address = null;
-    private static boolean trace;
-    private static Vector<String> addresses = new Vector<String>();
+	private static String name = null;
+	private static String address = null;
+	private static Vector<String> addresses = new Vector<String>();
 
-    //===============================================================
-    //===============================================================
-    private HostInfo() throws DevFailed {
-        String env = System.getenv("TraceAddresses");
-        trace = (env != null && env.equals("true"));
-        if (trace) System.out.println("HostInfo.HostInfo()");
-        try {
+	//===============================================================
+	//===============================================================
+	private HostInfo() throws DevFailed {
+		String env = System.getenv("TraceAddresses");
+		boolean trace = (env != null && env.equals("true"));
+		try {
 
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
+			Enumeration<NetworkInterface> enet = NetworkInterface.getNetworkInterfaces();
+			while (enet.hasMoreElements()) {
+				NetworkInterface net = enet.nextElement();
 
-                //  To do not have 127.x.x.x
-                if (networkInterface.isLoopback()) {
-                    if (trace) {
-                        System.out.println("----------------- " + networkInterface.getName() + " --------------------");
-                        Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                        while (inetAddresses.hasMoreElements()) {
-                            InetAddress inetAddress = inetAddresses.nextElement();
-                            System.out.println("getCanonicalHostName(): " + inetAddress.getCanonicalHostName());
-                            System.out.println("getHostName():          " + inetAddress.getHostName());
-                            System.out.println("getHostAddress():       " + inetAddress.getHostAddress());
-                        }
-                    }
-                    continue;
-                }
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                if (trace)
-                    System.out.println("----------------- " + networkInterface.getName() + " --------------------");
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (trace) {
+				//  To do not have 127.x.x.x
+				if (net.isLoopback())
+					continue;
+
+				Enumeration<InetAddress> eaddr = net.getInetAddresses();
+				if (trace) System.out.println("----------------- " + net.getName() + " --------------------");
+				while (eaddr.hasMoreElements()) {
+					InetAddress inetAddress = eaddr.nextElement();
+					if (trace) {
                         System.out.println("getCanonicalHostName(): " + inetAddress.getCanonicalHostName());
                         System.out.println("getHostName():          " + inetAddress.getHostName());
                         System.out.println("getHostAddress():       " + inetAddress.getHostAddress());
                     }
-                    if (!networkInterface.getName().startsWith("docker"))
-                        checkInetAddress(inetAddress);
-                }
-            }
-        } catch (SocketException e) {
-            System.err.println(e.toString());
-            Except.throw_exception("TangoApi_SocketException",
-                    e.toString(), "HostInfo.HostInfo()");
-        }
-        if (name == null || address == null) {
-            System.err.println("Host name/address cannot be determined !");
+					checkInetAddress(inetAddress);
+				}
+			}
+		} catch (SocketException e) {
+			System.err.println(e.toString());
+			Except.throw_exception("TangoApi_SockectException",
+					e.toString(), "HostInfo.HostInfo()");
+		}
+		if (name == null || address == null) {
+			System.err.println("Host name/address cannot be determined !");
             Except.throw_exception("TangoApi_NetworkSystemException",
-                    "Host name/address cannot be determined !",
-                    "HostInfo.HostInfo()");
-        }
-    }
+					"Host name/address cannot be determined !",
+					"HostInfo.HostInfo()");
+		}
+	}
 
-    //===============================================================
-    //===============================================================
-    private boolean checkInetAddress(InetAddress inetAddress) {
+	//===============================================================
+	//===============================================================
+	public static String getName() throws DevFailed {
+		if (name == null)
+			new HostInfo();
+		return name;
+	}
 
-        //  Check if not local host
-        if (! inetAddress.getCanonicalHostName().startsWith("local")) {
-            //  Check if name is not the address (???)
-            if (!inetAddress.getCanonicalHostName().equalsIgnoreCase(inetAddress.getHostAddress())) {
+	//===============================================================
+	//===============================================================
+	public static String getAddress() throws DevFailed {
+		if (address == null)
+			new HostInfo();
+		return address;
+	}
 
-                addresses.add(inetAddress.getHostAddress());
+	//===============================================================
+	//===============================================================
+	public static Vector<String> getAddresses() throws DevFailed {
+		if (address == null)
+			new HostInfo();
+		return addresses;
+	}
 
-                //  Check if IPV 4 address
-                if (isIPV4address(inetAddress.getHostAddress())) {
-                    name = inetAddress.getCanonicalHostName();
-                    address = inetAddress.getHostAddress();
-                    //System.out.println(name+":	" + address);
-                    return true;
-                }
-            } else if (trace)
+	//===============================================================
+	//===============================================================
+	private static String toStaticString() {
+		String str = "";
+		try {
+			if (name == null)
+				new HostInfo();
+			str += "name:          " + name + "\n";
+			str += "address:       " + address + "\n";
+		} catch (DevFailed e) {
+			str = e.errors[0].desc;
+		}
+		return str;
+	}
+
+	//===============================================================
+	//===============================================================
+	public static void main(String[] args) {
+		System.out.println(toStaticString());
+
+
+	}
+
+	//===============================================================
+	//===============================================================
+	private boolean checkInetAddress(InetAddress inetAddress) {
+
+		//  Check if not local host
+		if (!inetAddress.getCanonicalHostName().startsWith("local")) {
+			//  Check if name is not the address (???)
+			if (!inetAddress.getCanonicalHostName().equalsIgnoreCase(inetAddress.getHostAddress())) {
+
+				addresses.add(inetAddress.getHostAddress());
+
+				//  Check if IPV 4 address
+				if (isIPV4adress(inetAddress.getHostAddress())) {
+					name = inetAddress.getCanonicalHostName();
+					address = inetAddress.getHostAddress();
+					//System.out.println(name+":	" + address);
+					return true;
+				}
+			}
+			/*
+            else
                 System.err.println(
-                        "Warning: at least one getCanonicalHostName() returns " + inetAddress.getCanonicalHostName() +
-                        "\n  Check files /etc/resolv.conf and /etc/nsswitch.conf ");
-        }
-        return false;
-    }
+                        "Warning: at least one getCanonicalHostName() returns " + inetAddress.getCanonicalHostName());
+            */
+		}
+		return false;
+	}
 
-    //===============================================================
-    //===============================================================
-    private boolean isIPV4address(String address) {
-        StringTokenizer st = new StringTokenizer(address, ".");
-        List<String> nodes = new ArrayList<String>();
-        while (st.hasMoreTokens())
-            nodes.add(st.nextToken());
-        return (nodes.size() == 4);
-    }
-
-    //===============================================================
-    //===============================================================
-    public static String getName() throws DevFailed {
-        if (name == null)
-            new HostInfo();
-        return name;
-    }
-
-    //===============================================================
-    //===============================================================
-    public static String getAddress() throws DevFailed {
-        if (address == null)
-            new HostInfo();
-        return address;
-    }
-
-    //===============================================================
-    //===============================================================
-    public static Vector<String> getAddresses() throws DevFailed {
-        if (address == null)
-            new HostInfo();
-        return addresses;
-    }
-
-    //===============================================================
-    //===============================================================
-    private static String toStaticString() {
-        String str = "";
-        try {
-            if (name == null)
-                new HostInfo();
-            str += "name:          " + name + "\n";
-            str += "address:       " + address + "\n";
-        } catch (DevFailed e) {
-            str = e.errors[0].desc;
-        }
-        return str;
-    }
-
-    //===============================================================
-    //===============================================================
-    public static void main(String[] args) {
-        System.out.println(toStaticString());
-    }
-    //===============================================================
-    //===============================================================
+	//===============================================================
+	//===============================================================
+	private boolean isIPV4adress(String address) {
+		StringTokenizer st = new StringTokenizer(address, ".");
+		Vector<String> v = new Vector<String>();
+		while (st.hasMoreTokens())
+			v.add(st.nextToken());
+		return (v.size() == 4);
+	}
+	//===============================================================
+	//===============================================================
 }

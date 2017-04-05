@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -47,6 +47,11 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 abstract class GroupElement implements java.io.Serializable {
 
+    // ** The group element name */
+    private final String name;
+    // ** Parent element */
+    private GroupElement parent;
+
     /** Creates a new instance of GroupElement */
     GroupElement(final String _name) {
 	name = _name;
@@ -58,7 +63,9 @@ abstract class GroupElement implements java.io.Serializable {
 	return name;
     }
 
-    /** Returns the group element fully qualified name */
+    /**
+     * Returns the group element fully qualified name
+     */
     public String get_fully_qualified_name() {
 	if (parent != null) {
 	    return parent.get_fully_qualified_name() + "." + name;
@@ -66,17 +73,21 @@ abstract class GroupElement implements java.io.Serializable {
 	return name;
     }
 
+    ;
+
     /** Returns the group element size - default impl - returns 1 */
     public int get_size(final boolean fwd) {
-	return 1;
+        return 1;
     }
+
+    ;
 
     /** Returns parent element - access limited to package Group */
     GroupElement get_parent() {
 	return parent;
-    };
+    }
 
-    /**
+/**
      * Change parent element to <_parent> then return previous parent - access
      * limited to package Group
      */
@@ -84,7 +95,7 @@ abstract class GroupElement implements java.io.Serializable {
 	final GroupElement previous_parent = parent;
 	parent = _parent;
 	return previous_parent;
-    };
+    }
 
     /**
      * Returns the device list - default impl - returns name - access limited to
@@ -149,10 +160,4 @@ abstract class GroupElement implements java.io.Serializable {
 	pattern = pattern.toLowerCase().replaceAll("[*]{1}", ".*?");
 	return name.toLowerCase().matches(pattern) || get_fully_qualified_name().toLowerCase().matches(pattern);
     }
-
-    // ** The group element name */
-    private final String name;
-
-    // ** Parent element */
-    private GroupElement parent;
 }

@@ -1,14 +1,5 @@
 package fr.soleil.tango.clientapi;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.tango.utils.DevFailedUtils;
-import org.tango.utils.TangoUtil;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.TangoConst;
@@ -16,6 +7,13 @@ import fr.soleil.tango.clientapi.command.ITangoCommand;
 import fr.soleil.tango.clientapi.command.MockCommand;
 import fr.soleil.tango.clientapi.command.RealCommand;
 import fr.soleil.tango.clientapi.util.TypeConversionUtil;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.tango.utils.DevFailedUtils;
+import org.tango.utils.TangoUtil;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manage a connection to a tango command
@@ -93,9 +91,6 @@ public final class TangoCommand {
      * @throws DevFailed
      */
     public TangoCommand(final String deviceName, final String commandName) throws DevFailed {
-        if (StringUtils.countMatches(commandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
-            throw DevFailedUtils.newDevFailed(commandName + " command must contains 4 fields");
-        }
         command = new RealCommand(deviceName, commandName);
     }
 
@@ -105,9 +100,7 @@ public final class TangoCommand {
      * @throws DevFailed
      */
     public TangoCommand(final String commandName) throws DevFailed {
-        if (StringUtils.countMatches(commandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
-            throw DevFailedUtils.newDevFailed(commandName + " command must contains 4 fields");
-        }
+        TangoUtil.checkFullCommandName(commandName);
         command = new RealCommand(commandName);
     }
 

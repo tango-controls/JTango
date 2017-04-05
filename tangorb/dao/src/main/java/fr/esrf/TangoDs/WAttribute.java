@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -44,8 +44,8 @@ import java.util.Vector;
  * This class represents a writable attribute. It inherits from the Attribute
  * class and only add what is specific to writable attribute.
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
   
 public class WAttribute extends Attribute implements TangoConst

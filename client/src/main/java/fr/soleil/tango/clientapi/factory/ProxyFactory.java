@@ -1,17 +1,16 @@
 package fr.soleil.tango.clientapi.factory;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.tango.utils.TangoUtil;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeProxy;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.DeviceProxyFactory;
 import fr.esrf.TangoApi.Group.AttributeGroup;
 import fr.esrf.TangoApi.Group.Group;
+import org.tango.utils.TangoUtil;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class ProxyFactory {
     private static final float LOAD = .75F;
@@ -26,20 +25,6 @@ public final class ProxyFactory {
     private final Map<String, AttributeGroup> attributeGroupMap;
     private int timeout = DEFAULT_TMOUT;
 
-    private static class LRUMap<K, V> extends LinkedHashMap<K, V> {
-
-        private static final long serialVersionUID = -6898381007090501228L;
-
-        public LRUMap(final int initialCapacity, final float loadFactor, final boolean accessOrder) {
-            super(initialCapacity, loadFactor, accessOrder);
-        }
-
-        @Override
-        public boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
-            return size() > MAX_ENTRIES;
-        }
-    }
-
     private ProxyFactory() {
         // create cache map with a fix capacity. least-recently accessed entries
         // will be removed
@@ -50,7 +35,7 @@ public final class ProxyFactory {
     }
 
     /**
-     * 
+     *
      * @return instance
      */
     public static ProxyFactory getInstance() {
@@ -58,7 +43,7 @@ public final class ProxyFactory {
     }
 
     /**
-     * 
+     *
      * @param deviceName
      *            the device name
      * @return DeviceProxy
@@ -83,7 +68,7 @@ public final class ProxyFactory {
     }
 
     /**
-     * 
+     *
      * @param attrName
      * @return
      * @throws DevFailed
@@ -104,7 +89,7 @@ public final class ProxyFactory {
     }
 
     /**
-     * 
+     *
      * @param groupName
      * @param deviceNames
      * @return
@@ -143,7 +128,7 @@ public final class ProxyFactory {
     }
 
     /**
-     * 
+     *
      * @param timeout
      * @throws DevFailed
      */
@@ -174,6 +159,27 @@ public final class ProxyFactory {
 
     public int getTimeout() {
         return timeout;
+    }
+
+    public void clearAllMap() {
+        devicesMap.clear();
+        attributesMap.clear();
+        attributeGroupMap.clear();
+        groupMap.clear();
+    }
+
+    private static class LRUMap<K, V> extends LinkedHashMap<K, V> {
+
+        private static final long serialVersionUID = -6898381007090501228L;
+
+        public LRUMap(final int initialCapacity, final float loadFactor, final boolean accessOrder) {
+            super(initialCapacity, loadFactor, accessOrder);
+        }
+
+        @Override
+        public boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
+            return size() > MAX_ENTRIES;
+        }
     }
 
 }

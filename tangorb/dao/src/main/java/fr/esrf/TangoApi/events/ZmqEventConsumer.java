@@ -60,19 +60,9 @@ public class ZmqEventConsumer extends EventConsumer implements
     private static ZmqEventConsumer instance = null;
 
     //===============================================================
-    /**
-     * Creates a new instance of EventConsumer
-     *
-     * @return an instance of EventConsumer object
-     * @throws fr.esrf.Tango.DevFailed in case of database connection failed.
-     */
     //===============================================================
-    public static ZmqEventConsumer getInstance() throws DevFailed {
-        if (instance == null) {
-            instance = new ZmqEventConsumer();
-        }
-        return instance;
-    }
+    //===============================================================
+    private Thread runner;
     //===============================================================
     //===============================================================
     private ZmqEventConsumer() throws DevFailed {
@@ -83,15 +73,26 @@ public class ZmqEventConsumer extends EventConsumer implements
         zmqMainThread.start();
         addShutdownHook();
     }
-   //===============================================================
-   //===============================================================
-    private Thread runner;
+
+    /**
+     * Creates a new instance of EventConsumer
+     *
+     * @return an instance of EventConsumer object
+     * @throws DevFailed in case of database connection failed.
+     */
+    //===============================================================
+    public static ZmqEventConsumer getInstance() throws DevFailed {
+        if (instance == null) {
+            instance = new ZmqEventConsumer();
+        }
+        return instance;
+    }
+
     private void addShutdownHook(){
         runner = new Thread(this);
         runner.setName("ZmqEventConsumer");
         //	Create a thread and start it
         Runtime.getRuntime().addShutdownHook(
-
                 new Thread() {
                     public void run() {
                         System.out.println("======== Shutting down ZMQ event system ==========");
@@ -121,7 +122,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      * @param max_size  queue maximum size if use queue
      * @param stateless subscription stateless if true
      * @return the event ID
-     * @throws fr.esrf.Tango.DevFailed if subscription failed.
+     * @throws DevFailed if subscription failed.
      */
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -342,7 +343,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             String hostAddress = iadd.getHostAddress();
             System.err.println("Host address is " + hostAddress);
             System.err.println("Server returns  " + lsa.svalue[0]);
-             if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
+            if (!lsa.svalue[0].startsWith("tcp://" + hostAddress)) { //  Addresses are different
                  String  wrongAdd = lsa.svalue[0];
                  int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
                  if (idx>0) {
@@ -351,12 +352,14 @@ public class ZmqEventConsumer extends EventConsumer implements
                      System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
                      deviceData = new DeviceData();
                      deviceData.insert(lsa);
+                     isEndpointAvailable(lsa.svalue[0]);
                  }
-             }
+            }
         } catch (UnknownHostException e) {
             Except.throw_exception("UnknownHostException",
                     e.toString(), "ZmqEventConsumer.checkZmqAddress()");
         }
+        //System.out.println("---> Connect on "+deviceData.extractLongStringArray().svalue[0]);
         return deviceData;
     }
     //===============================================================
@@ -365,16 +368,20 @@ public class ZmqEventConsumer extends EventConsumer implements
      * @param deviceData    data from ZmqEventSubscriptionChange command
      * @param deviceProxy   the admin device
      * @return the endpoints after checked
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     //===============================================================
     private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
+        ZMQutils.zmqEventTrace("Inside checkZmqAddress()");
         DevVarLongStringArray lsa = deviceData.extractLongStringArray();
         for (int i=0 ; i<lsa.svalue.length ; i+=2) {
             String endpoint = lsa.svalue[i];
             if (isEndpointAvailable(endpoint)) {
                 lsa.svalue[0] = lsa.svalue[i];
                 lsa.svalue[1] = lsa.svalue[i+1];
+                ZMQutils.zmqEventTrace("return " + lsa.svalue[i] + " - " + lsa.svalue[i + 1]);
+                deviceData = new DeviceData();
+                deviceData.insert(lsa);
                 return deviceData;
             }
         }
@@ -384,6 +391,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private boolean isEndpointAvailable(String endpoint) {
+        System.out.println("Check endpoint: " + endpoint);
         try {
             //  Split address and port
             int start = endpoint.indexOf("//");
@@ -401,7 +409,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             return true;
         }
         catch (Exception e) {
-            System.out.println(endpoint + " Failed:\n   " + e.getMessage());
+            System.err.println(endpoint + " Failed:   " + e.getMessage());
             return false;
         }
     }

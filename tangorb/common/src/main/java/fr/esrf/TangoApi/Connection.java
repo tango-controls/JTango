@@ -48,8 +48,6 @@ import fr.esrf.TangoDs.TangoConst;
 
 public class Connection implements ApiDefs {
 
-	private IConnectionDAO iConnection = null;
-	
 	/**
 	 *	Device IDL version number
 	 */
@@ -79,25 +77,9 @@ public class Connection implements ApiDefs {
 	 */
 	protected TacoTangoDevice	taco_device = null;
 	/**
-	 *	Device IDL object used for efective connection.
-	 */
-	private org.omg.CORBA.Object obj = null;
-	/**
-	 *	Device timeout value in ms.
-	 */
-	private int			dev_timeout = 0;
-	/**
 	 *	Device name;
 	 */
 	protected String	devname = null;
-	/**
-	 *	Used to know if it is a connection or a Re-connection.
-	 */
-	private boolean		already_connected = false;
-	/**
-	 *	Device connected is a database or a device proxy
-	 */
-	private	boolean		device_is_dbase;
 	/**
 	 *	The connection class (Database, or device class)
 	 */
@@ -118,16 +100,6 @@ public class Connection implements ApiDefs {
 	 *	if true -> try to reconnect the device before exception
 	 */
 	protected boolean transparent_reconnection = true;
-
-	/**
-	 *	Previous reconnection failed excpetionm.
-	 */
-	private DevFailed	prev_failed = null;
-	/**
-	 *	Previous reconnection failed time.
-	 */
-	private long		prev_failed_t0 = 0;
-	
 	/**
 	 *	Tango access control must be checked if true
 	 */
@@ -140,17 +112,35 @@ public class Connection implements ApiDefs {
 	 *	Tango access control for this connection.
 	 */
 	protected int	access = TangoConst.ACCESS_READ;
-	
-	// ===================================================================
-	// ===================================================================
-	public Device get_device() {
-		return iConnection.get_device(this);
-	}
+    private IConnectionDAO iConnection = null;
+    /**
+     * Device IDL object used for efective connection.
+     */
+    private org.omg.CORBA.Object obj = null;
+    /**
+     * Device timeout value in ms.
+     */
+    private int dev_timeout = 0;
+    /**
+     * Used to know if it is a connection or a Re-connection.
+     */
+    private boolean already_connected = false;
+    /**
+     * Device connected is a database or a device proxy
+     */
+    private boolean device_is_dbase;
+    /**
+     * Previous reconnection failed excpetionm.
+     */
+    private DevFailed prev_failed = null;
+    /**
+     * Previous reconnection failed time.
+     */
+    private long prev_failed_t0 = 0;
 
-	// ===================================================================
-	/**
+    /**
 	 * Connection constructor. It makes a connection on database server.
-	 * 
+     *
 	 */
 	// ===================================================================
 	public Connection() throws DevFailed {
@@ -162,7 +152,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It makes a connection on database server.
-	 * 
+     *
 	 * @param host host where database is running.
 	 * @param port port for database connection.
 	 */
@@ -175,7 +165,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It makes a connection on database server.
-	 * 
+     *
 	 * @param host  host where database is running.
 	 * @param port  port for database connection.
 	 * @param auto_reconnect do not reconnect if false.
@@ -189,7 +179,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It imports the device.
-	 * 
+     *
 	 * @param devname  name of the device to be imported.
 	 */
 	// ===================================================================
@@ -201,7 +191,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It imports the device.
-	 * 
+     *
 	 *	@param	info exported info of the device to be imported.
 	 */
 	// ===================================================================
@@ -213,7 +203,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It imports the device. And set check_access.
-	 * 
+     *
 	 * @param devname name of the device to be imported.
 	 * @param check_access  set check_access value
 	 */
@@ -226,7 +216,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It imports the device.
-	 * 
+     *
 	 * @param devname name of the device to be imported.
 	 * @param param String parameter to import device.
 	 * @param src   Source to import device (ior, dbase...)
@@ -240,7 +230,7 @@ public class Connection implements ApiDefs {
 	// ===================================================================
 	/**
 	 * Connection constructor. It imports the device.
-	 * 
+     *
 	 * @param devname name of the device to be imported.
 	 * @param host    host where database is running.
 	 * @param port    port for database connection.
@@ -252,6 +242,15 @@ public class Connection implements ApiDefs {
 	}
 
 	// ===================================================================
+
+    // ===================================================================
+    // ===================================================================
+    public Device get_device() {
+        return iConnection.get_device(this);
+    }
+
+    // ===================================================================
+
 	/**
 	 *	Returns true if TANGO_HOST and device name of this obejct
 	 *		is identical the specified connection.
@@ -310,22 +309,10 @@ public class Connection implements ApiDefs {
         return device!=null;
     }
 	// ===================================================================
-	/**
-	 * Change the timeout value for a device call.
-	 * 
-	 * @param millis  New value of the timeout in milliseconds.
-	 * @throws fr.esrf.Tango.DevFailed  if orb.create_policy throws an
-     *              org.omg.CORBA.PolicyError.
-	 */
-	// ===================================================================
-	public void set_timeout_millis(int millis) throws DevFailed {
-		iConnection.set_timeout_millis(this, millis);
-	}
 
-	// ===================================================================
 	/**
 	 * return the timeout value for a device call.
-	 * 
+     *
 	 * @return the value of the timeout in milliseconds.
 	 * @deprecated use get_timeout_millis() instead
 	 */
@@ -341,17 +328,33 @@ public class Connection implements ApiDefs {
 	}
 
 	// ===================================================================
+
 	/**
 	 * return the timeout value for a device call.
-	 * 
+     *
 	 * @return the value of the timeout in milliseconds.
 	 */
 	// ===================================================================
-	public int get_timeout_millis() throws DevFailed {
-		return iConnection.get_timeout_millis(this);
-	}
+    public int get_timeout_millis() throws DevFailed {
+        return iConnection.get_timeout_millis(this);
+    }
+
+    // ===================================================================
+
+    /**
+     * Change the timeout value for a device call.
+     *
+     * @param millis New value of the timeout in milliseconds.
+     * @throws DevFailed if orb.create_policy throws an
+     *                   org.omg.CORBA.PolicyError.
+     */
+    // ===================================================================
+    public void set_timeout_millis(int millis) throws DevFailed {
+        iConnection.set_timeout_millis(this, millis);
+    }
 
 	// ===========================================================
+
 	/**
 	 * Build reason and origin of the exception And throw it into a DevFailed
 	 * exception
@@ -367,8 +370,8 @@ public class Connection implements ApiDefs {
 	 * 
 	 * @param command  Command name to send to the device.
 	 * @param argin input command argument.
-	 * @return the output argument of the command.
-	 * @throws fr.esrf.Tango.DevFailed
+     * @return the output argument of the command.
+     * @throws DevFailed
 	 */
 	// ===========================================================
 	public DeviceData command_inout(String command, DeviceData argin) throws DevFailed {
@@ -380,8 +383,8 @@ public class Connection implements ApiDefs {
 	 * Send a command to a device server.
 	 * 
 	 * @param command Command name.
-	 * @return the output argument of the command.
-	 * @throws fr.esrf.Tango.DevFailed
+     * @return the output argument of the command.
+     * @throws DevFailed
 	 */
 	// ===========================================================
 	public DeviceData command_inout(String command) throws DevFailed {

@@ -72,13 +72,13 @@ public class IORDumpUtil {
 			switch (args.length)
 			{
 			case 1:
-				System.out.println(new IORdump(args[0]).toString());
-				break;
+                System.out.println(new fr.esrf.TangoApi.IORdump(args[0]).toString());
+                break;
 			case 2:
 				if (args[0].equals("-f"))
 				{
-					System.out.println(new IORdump(null, getIor(args[1])).toString());
-					break;
+                    System.out.println(new fr.esrf.TangoApi.IORdump(null, getIor(args[1])).toString());
+                    break;
 				}
 			default:
 				printSyntax();

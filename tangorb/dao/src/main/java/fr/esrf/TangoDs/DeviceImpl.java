@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,15 +27,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoDs;
 
-import java.util.Vector;
-
+import fr.esrf.Tango.*;
+import fr.esrf.TangoApi.DbAttribute;
+import fr.esrf.TangoApi.DbDatum;
+import fr.esrf.TangoApi.DbDevice;
+import fr.esrf.TangoApi.DeviceProxy;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.omg.CORBA.Any;
@@ -43,35 +46,7 @@ import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.SystemException;
 import org.omg.PortableServer.POA;
 
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttrWriteType;
-import fr.esrf.Tango.AttributeConfig;
-import fr.esrf.Tango.AttributeConfig_2;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.DevAttrHistory;
-import fr.esrf.Tango.DevCmdHistory;
-import fr.esrf.Tango.DevCmdInfo;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevInfo;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarBooleanArrayHelper;
-import fr.esrf.Tango.DevVarDoubleArrayHelper;
-import fr.esrf.Tango.DevVarLong64ArrayHelper;
-import fr.esrf.Tango.DevVarLongArrayHelper;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.DevVarShortArrayHelper;
-import fr.esrf.Tango.DevVarStateArrayHelper;
-import fr.esrf.Tango.DevVarStringArrayHelper;
-import fr.esrf.Tango.DevVarULong64ArrayHelper;
-import fr.esrf.Tango.DevVarULongArrayHelper;
-import fr.esrf.Tango.DevVarUShortArrayHelper;
-import fr.esrf.Tango.Device_2POA;
-import fr.esrf.TangoApi.DbAttribute;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DbDevice;
-import fr.esrf.TangoApi.DeviceProxy;
+import java.util.Vector;
 
 /**
  * Base class for all TANGO device
@@ -79,6 +54,14 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
+    /**
+     * Reference to the device-class object associated with the device
+     */
+    protected final DeviceClass device_class;
+    /**
+     * DeviceImpl polling extention.
+     */
+    private final DeviceImplExt ext;
     /**
      * The device black box
      */
@@ -116,10 +99,6 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
      */
     protected int version;
     /**
-     * Reference to the device-class object associated with the device
-     */
-    protected final DeviceClass device_class;
-    /**
      * Reference to the multi attribute object
      */
     protected MultiAttribute dev_attr;
@@ -127,29 +106,20 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
      * Reference to the associated DbDevice object
      */
     protected DbDevice db_dev;
-
     private byte[] obj_id;
     private boolean exported = false;
-
     /**
      * Device's logger
      */
     private Logger logger = null;
-
     /**
      * Device's logging level backup (for stop/start_logging)
      */
     private Level last_level = Level.OFF;
-
     /**
      * Device's rolling file threshold
      */
     private long rft = LOGGING_DEF_RFT;
-
-    /**
-     * DeviceImpl polling extention.
-     */
-    private final DeviceImplExt ext;
 
     // +-------------------------------------------------------------------------
     //
@@ -2718,21 +2688,10 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
     }
 
     /**
-     * Set device state.
-     * 
-     * @param new_multi_attr
-     *            The new attribute
-     */
-
-    public void set_device_attr(final MultiAttribute new_multi_attr) {
-	dev_attr = new_multi_attr;
-    }
-
-    /**
      * Get the reference to the associated DbDevice object
-     * 
+     *
      * Return the DbDevice object reference
-     * 
+     *
      * @return DbDevice
      */
 
@@ -2742,7 +2701,7 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
     /**
      * Get the associated CORBA object identifier
-     * 
+     *
      * @return The CORBA object identifier
      */
 
@@ -2752,7 +2711,7 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
     /**
      * Set the associated CORBA object identifier
-     * 
+     *
      * @param id
      *            The CORBA object identifier
      */
@@ -2761,12 +2720,12 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 	obj_id = id;
     }
 
-    void set_exported_flag(final boolean exp) {
-	exported = exp;
-    }
-
     boolean get_exported_flag() {
 	return exported;
+    }
+
+    void set_exported_flag(final boolean exp) {
+        exported = exp;
     }
 
     /**
@@ -2875,12 +2834,6 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 	get_logger().setLevel(last_level);
     }
 
-    // =======================================
-    //
-    // Polling part
-    //
-    // =======================================
-    // ==========================================================
     /**
      * This method check that a comamnd is supported by the device and does not
      * need input value. The method throws an exception if the command is not
@@ -2904,6 +2857,13 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 	Except.throw_exception("API_CommandNotFound", "Command " + cmd_name + " not found",
 		"DeviceImpl.check_command_exists");
     }
+
+    // =======================================
+    //
+    // Polling part
+    //
+    // =======================================
+    // ==========================================================
 
     // ==========================================================
     // ==========================================================
@@ -2953,6 +2913,22 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 	return dev_attr;
     }
 
+    /**
+     * Set device state.
+     *
+     * @param new_multi_attr The new attribute
+     */
+
+    public void set_device_attr(final MultiAttribute new_multi_attr) {
+        dev_attr = new_multi_attr;
+    }
+
+    // ==========================================================
+    // ==========================================================
+    Vector get_non_auto_polled_cmd() {
+        return ext.non_auto_polled_cmd;
+    }
+
     // ==========================================================
     // ==========================================================
     void set_non_auto_polled_cmd(final String[] s) {
@@ -2963,8 +2939,8 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
     // ==========================================================
     // ==========================================================
-    Vector get_non_auto_polled_cmd() {
-	return ext.non_auto_polled_cmd;
+    Vector get_non_auto_polled_attr() {
+        return ext.non_auto_polled_attr;
     }
 
     // ==========================================================
@@ -2977,8 +2953,8 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
     // ==========================================================
     // ==========================================================
-    Vector get_non_auto_polled_attr() {
-	return ext.non_auto_polled_attr;
+    Vector get_polled_cmd() {
+        return ext.polled_cmd;
     }
 
     // ==========================================================
@@ -2991,8 +2967,8 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 
     // ==========================================================
     // ==========================================================
-    Vector get_polled_cmd() {
-	return ext.polled_cmd;
+    Vector get_polled_attr() {
+        return ext.polled_attr;
     }
 
     // ==========================================================
@@ -3001,12 +2977,6 @@ public abstract class DeviceImpl extends Device_2POA implements TangoConst {
 	for (final String value : s) {
 	    ext.polled_attr.add(value);
 	}
-    }
-
-    // ==========================================================
-    // ==========================================================
-    Vector get_polled_attr() {
-	return ext.polled_attr;
     }
 
     // ==========================================================

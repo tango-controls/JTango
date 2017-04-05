@@ -66,7 +66,7 @@ public class DeviceProxyFactory {
      *
      * @param deviceName Device name to be created or get.
      * @return the DeviceProxy object
-     * @throws fr.esrf.Tango.DevFailed if DeviceProxy creation failed
+     * @throws DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName) throws DevFailed {
@@ -93,7 +93,7 @@ public class DeviceProxyFactory {
      * @param deviceName Device name to be created or get.
      * @param tangoHost to build the url (full device name).
      * @return the DeviceProxy object
-     * @throws fr.esrf.Tango.DevFailed if DeviceProxy creation failed
+     * @throws DevFailed if DeviceProxy creation failed
      */
     //===================================================================
     public static DeviceProxy get(String deviceName, String tangoHost) throws DevFailed {
@@ -126,7 +126,7 @@ public class DeviceProxyFactory {
      *
      * @param deviceName Device name to check if exists.
      * @return true it does already exist
-     * @throws fr.esrf.Tango.DevFailed if url is not correct
+     * @throws DevFailed if url is not correct
      */
     //===================================================================
     public static boolean exists(String deviceName) throws DevFailed {

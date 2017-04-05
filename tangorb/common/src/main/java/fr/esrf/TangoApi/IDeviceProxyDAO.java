@@ -27,18 +27,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 29386 $
+// $Revision: 26454 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.Request;
-
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import org.omg.CORBA.Request;
 
 import java.util.List;
 
@@ -598,7 +597,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(DeviceProxy deviceProxy,
-												  DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
+                                                  DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
 
 	//==========================================================================
 	//==========================================================================
@@ -1133,7 +1132,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      * Query device for pipe configuration list
      * @param deviceProxy device proxy object
      * @return  pipe configuration list
-     * @throws fr.esrf.Tango.DevFailed if device connection failed
+     * @throws DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy) throws DevFailed;
@@ -1143,7 +1142,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      * @param deviceProxy device proxy object
      * @param pipeNames pipe names.
      * @return  pipe configuration list
-     * @throws fr.esrf.Tango.DevFailed if device connection failed
+     * @throws DevFailed if device connection failed
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(DeviceProxy deviceProxy, List<String> pipeNames) throws DevFailed;
@@ -1152,7 +1151,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      * Set device pipe configuration
      * @param deviceProxy device proxy object
      * @param pipeInfoList info list containing pipe name, description, label,....
-     * @throws fr.esrf.Tango.DevFailed if device connection failed
+     * @throws DevFailed if device connection failed
      */
     // ===================================================================
     public void setPipeConfig(DeviceProxy deviceProxy, List<PipeInfo> pipeInfoList) throws DevFailed;
@@ -1162,7 +1161,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      * @param deviceProxy device proxy object
      * @param pipeName pipe name
      * @return data read from specified pipe.
-     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
+     * @throws DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public DevicePipe readPipe(DeviceProxy deviceProxy, String pipeName) throws DevFailed;
@@ -1171,20 +1170,10 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      * Write data in specified pipe
      * @param deviceProxy device proxy object
      * @param devicePipe data to be written
-     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
+     * @throws DevFailed in case of device connection failed or pipe not found.
      */
     // ===================================================================
     public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
-    // ===================================================================
-    /**
-     * Write data in specified pipe
-     * @param deviceProxy device proxy object
-     * @param devicePipe data to be written
-	 * @return data read from specified pipe.
-     * @throws fr.esrf.Tango.DevFailed in case of device connection failed or pipe not found.
-     */
-    // ===================================================================
-    public DevicePipe writeReadPipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
 
 
 
@@ -1235,7 +1224,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-										int event, CallBack callback, boolean stateless) throws DevFailed;
+                                        int event, CallBack callback, boolean stateless) throws DevFailed;
     //==========================================================================
     /**
      *	Subscribe to event to be stored in an event queue.
@@ -1246,6 +1235,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-										int event, int max_size, boolean stateless) throws DevFailed;
+                                        int event, int max_size, boolean stateless) throws DevFailed;
 
 }

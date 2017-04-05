@@ -64,6 +64,9 @@ public class  ZMQutils {
     public static final int   ZMQ_CONNECT_MCAST_EVENT    = 5;
     public static final int   ZMQ_DELAY_EVENT            = 6;
     public static final int   ZMQ_RELEASE_EVENT          = 7;
+    public static final String SUBSCRIBE_COMMAND = "ZmqEventSubscriptionChange";
+    public static final String SUBSCRIBE_COMMAND_NOT_FOUND =
+            "Command " + SUBSCRIBE_COMMAND + " not found";
     private static final String[]   commandNames = {
             "ZMQ_END",
             "ZMQ_CONNECT_HEARTBEAT",
@@ -74,15 +77,16 @@ public class  ZMQutils {
             "ZMQ_DELAY_EVENT",
             "ZMQ_RELEASE_EVENT",
     };
-
+    private static final int HWM_DEFAULT = 1000;
     private static ZMQ.Context     context = ZMQ.context(1);
 	private static ZMQutils instance = null;
     private static double  zmqVersion = -1.0;
 
-    private static final int HWM_DEFAULT = 1000;
-    public static final String SUBSCRIBE_COMMAND = "ZmqEventSubscriptionChange";
-    public static final String SUBSCRIBE_COMMAND_NOT_FOUND =
-                                    "Command " + SUBSCRIBE_COMMAND + " not found";
+    //===============================================================
+    //===============================================================
+    private ZMQutils() {
+    }
+
 	//===============================================================
 	//===============================================================
     static ZMQutils getInstance() {
@@ -91,17 +95,14 @@ public class  ZMQutils {
         }
         return instance;
     }
-	//===============================================================
-	//===============================================================
-	private ZMQutils() {
-    }
+
 	//===============================================================
 	//===============================================================
     public static double getZmqVersion() {
         if (zmqVersion<0.0) {   //  Not already checked.
             zmqVersion = 0.0;
             try {
-                String  strVersion = ZMQ.getVersionString();
+                String strVersion = org.zeromq.ZMQ.getVersionString();
                 StringTokenizer stk = new StringTokenizer(strVersion, ".");
                 ArrayList<String>   list = new ArrayList<String>();
                 while (stk.hasMoreTokens())
@@ -206,7 +207,7 @@ public class  ZMQutils {
      * @param bytes  input byte buffer
      * @param start  index to start string construction
      * @return  a string built with byte buffer
-     * @throws fr.esrf.Tango.DevFailed in case of start index is equal or more than bytes.length
+     * @throws DevFailed in case of start index is equal or more than bytes.length
      */
 	//===============================================================
     private static String getString(byte[] bytes, int start) throws DevFailed {
@@ -281,7 +282,7 @@ public class  ZMQutils {
     /**
      * Send a data buffer on control socket
      * @param buffer    the specified buffer
-     * @throws fr.esrf.Tango.DevFailed in case of internal communication problem.
+     * @throws DevFailed in case of internal communication problem.
      */
 	//===============================================================
     static void sendToZmqControlSocket(byte[] buffer) throws DevFailed {
@@ -312,7 +313,7 @@ public class  ZMQutils {
      * @param attributeName specified attribute name
      * @param eventName     specified event name
      * @return the full attribute name with tango host and event name
-     * @throws fr.esrf.Tango.DevFailed in case of TANGO_HOST not defined
+     * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
     static String getFullAttributeName(String tangoHost, String deviceName, String attributeName,
@@ -345,7 +346,7 @@ public class  ZMQutils {
      * @param tangoHost    specified tango host
      * @param deviceName    specified device name
      * @return the full heartbeat name with tango host
-     * @throws fr.esrf.Tango.DevFailed in case of TANGO_HOST not defined
+     * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
     static String getFullHeartBeatName(String tangoHost, String deviceName) throws DevFailed {
@@ -359,7 +360,7 @@ public class  ZMQutils {
      * @param attributeName specified attribute
      * @param idl           device idl version
      * @param eventName     specified event
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     static void  disConnectEvent(String tgHost, String deviceName,
@@ -382,7 +383,7 @@ public class  ZMQutils {
      * @param idl           device idl version
      * @param eventName     specified event
      * @return  the buffer buffer to disconnect event
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     private static byte[] getBufferToDisConnectEvent(String tangoHost, String deviceName,
@@ -409,7 +410,7 @@ public class  ZMQutils {
      * @param lsa           the subscription parameters
      * @param eventName     specified event
      * @param forceConnect   Force reconnection if true
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     static void connectEvent(String tgHost, String deviceName, String attributeName,
@@ -437,7 +438,7 @@ public class  ZMQutils {
      * @param eventName     specified event
      * @param forceConnect   Force reconnection if true
      * @return the buffer built to connect event
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     private static byte[] getBufferToConnectEvent(String tangoHost, String deviceName,
@@ -473,7 +474,7 @@ public class  ZMQutils {
      * @param adminDeviceName    specified admin device
      * @param lsa   the subscription parameters
      * @param forceConnect   Force reconnection if true
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     static void connectHeartbeat(String tgHost, String adminDeviceName, DevVarLongStringArray lsa, boolean forceConnect) throws DevFailed{
@@ -497,7 +498,7 @@ public class  ZMQutils {
      * @param lsa   the subscription parameters
      * @param forceConnect   Force reconnection if true
      * @return the buffer built to connect heartbeat
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     private static byte[] getBufferToConnectHeartbeat(String tangoHost,
@@ -523,7 +524,7 @@ public class  ZMQutils {
      * @param tangoHost    specified tango host
      * @param deviceName    specified admin device
      * @return the buffer built to disconnect heartbeat
-     * @throws fr.esrf.Tango.DevFailed    in case of internal communication problem.
+     * @throws DevFailed    in case of internal communication problem.
      */
 	//===============================================================
     @SuppressWarnings({"UnusedDeclaration"})
@@ -558,7 +559,7 @@ public class  ZMQutils {
      *          lvalue[2]:  sub HWM.
      *          lvalue[3]:  rate (for multi cast).
      *          lvalue[4]:  ivl (for multi cast).
-     * @throws fr.esrf.Tango.DevFailed in case of admin device connection failed
+     * @throws DevFailed in case of admin device connection failed
      */
 	//===============================================================
     static DevVarLongStringArray getEventSubscriptionInfoFromAdmDevice(DeviceProxy adminDevice,
@@ -586,7 +587,7 @@ public class  ZMQutils {
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static DevError[] deMarshallErrorList(byte[] recData, boolean littleIndian) throws DevFailed {
@@ -609,7 +610,7 @@ public class  ZMQutils {
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static ZmqCallInfo deMarshallZmqCallInfo(byte[] recData, boolean littleIndian) throws DevFailed {
@@ -629,7 +630,7 @@ public class  ZMQutils {
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static AttDataReady deMarshallAttDataReady(byte[] recData, boolean littleIndian) throws DevFailed {
@@ -652,7 +653,7 @@ public class  ZMQutils {
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static DeviceInterface deMarshallAttInterfaceChange(byte[] recData, boolean littleIndian) throws DevFailed {
@@ -675,7 +676,7 @@ public class  ZMQutils {
      * @param recData   receive data
      * @param littleIndian endianness to de marshall
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static AttributeInfoEx deMarshallAttributeConfig(byte[] recData, boolean littleIndian, int idl) throws DevFailed{
@@ -706,7 +707,7 @@ public class  ZMQutils {
      * @param littleIndian endianness to de marshall
      * @param idl   idl revision to convert to attribute value
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static DeviceAttribute deMarshallAttribute(byte[] recData, boolean littleIndian, int idl) throws DevFailed {
@@ -752,7 +753,7 @@ public class  ZMQutils {
      * @param littleIndian endianness to de marshall
      * @param idl   idl revision to convert to attribute value
      * @return the data after de marshaling
-     * @throws fr.esrf.Tango.DevFailed in case of de marshaling failed
+     * @throws DevFailed in case of de marshaling failed
      */
 	//===============================================================
     static DevicePipe deMarshallPipe(byte[] recData, boolean littleIndian, int idl) throws DevFailed {
@@ -793,7 +794,7 @@ public class  ZMQutils {
      * return event type from full event name
      * @param eventName full event name
      * @return event type from full event name
-     * @throws fr.esrf.Tango.DevFailed if no event name found
+     * @throws DevFailed if no event name found
      */
 	//===============================================================
     static int getEventType(String eventName) throws DevFailed{
@@ -822,11 +823,52 @@ public class  ZMQutils {
 
     //  Non static methods.
 	//===============================================================
+
+    //===============================================================
+    //===============================================================
+    static void zmqEventTrace(String s) {
+        String env = System.getenv("ZmqTrace");
+        if (env != null && env.equals("true"))
+            System.out.println(s);
+    }
+
+    //  Trace and dump methods
+    //===============================================================
+    //===============================================================
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void trace(DevVarLongStringArray lsa) {
+        System.out.println("Svalue");
+        for (String s : lsa.svalue)
+            System.out.println("	" + s);
+        System.out.println("Lvalue");
+        for (int i : lsa.lvalue)
+            System.out.println("	" + i);
+    }
+
+    //===========================================================================
+    //===========================================================================
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void dump(byte[] rec) {
+        for (int i = 0; i < rec.length; i++) {
+
+            String s = String.format("%02x", (0xFF & rec[i]));
+            System.out.print("0x" + s + " ");
+            if (((i + 1) % 16) == 0)
+                System.out.println();
+        }
+        System.out.println();
+    }
+    //===============================================================
+    //===============================================================
+
+
+    //===============================================================
+
     /**
      * Decode data receive from control socket
      * @param bytes input buffer
      * @return decoded data from buffer
-     * @throws fr.esrf.Tango.DevFailed in case of control command unknown
+     * @throws DevFailed in case of control command unknown
      */
 	//===============================================================
     ControlStructure decodeControlBuffer(byte[] bytes) throws DevFailed {
@@ -847,6 +889,7 @@ public class  ZMQutils {
                 controlStructure.endPoint = getString(bytes, idx++);
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx);
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_HEARTBEAT:
@@ -864,7 +907,7 @@ public class  ZMQutils {
                 controlStructure.hwm   = manageHwmValue(hwm);
                 controlStructure.rate  = getInteger(bytes, idx);    idx +=sizeOfInt;
                 controlStructure.ivl   = getInteger(bytes, idx);    idx +=sizeOfInt;
-                //System.out.println(controlStructure);
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_EVENT:
@@ -883,6 +926,9 @@ public class  ZMQutils {
     }
 	//===============================================================
 	//===============================================================
+
+    //===============================================================
+    //===============================================================
     private int manageHwmValue(int ctrlValue) {
 
         //  Check if environment value is set
@@ -890,8 +936,7 @@ public class  ZMQutils {
         if (envValue!=null) {
             try {
                 return Integer.parseInt(envValue);
-            }
-            catch (NumberFormatException e ) {
+            } catch (NumberFormatException e ) {
                 System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
             }
         }
@@ -902,28 +947,7 @@ public class  ZMQutils {
         //  Else return default value from input
         return ctrlValue;
     }
-	//===============================================================
-	//===============================================================
-    static void zmqEventTrace(String s) {
-        String  env = System.getenv("ZmqTrace");
-        if (env!=null && env.equals("true"))
-            System.out.println(s);
-    }
-	//===============================================================
-	//===============================================================
 
-
-
-
-
-
-
-
-
-
-
-
- 	//===============================================================
     /**
      *   A little class to define the data read from control socket
      */
@@ -953,40 +977,6 @@ public class  ZMQutils {
         }
         //===========================================================
     }
-	//===============================================================
-	//===============================================================
-
-
-
-
-
-
-
-    //  Trace and dump methods
-	//===============================================================
-	//===============================================================
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static void trace(DevVarLongStringArray lsa){
-        System.out.println("Svalue");
-        for (String s : lsa.svalue)
-            System.out.println("	" + s);
-        System.out.println("Lvalue");
-        for (int i : lsa.lvalue)
-            System.out.println("	" + i);
-    }
-	//===========================================================================
-	//===========================================================================
-    @SuppressWarnings({"UnusedDeclaration"})
-	public static void dump(byte[] rec) {
-		for (int i=0 ; i<rec.length ; i++) {
-
-			String	s = String.format("%02x",(0xFF & rec[i]));
-			System.out.print("0x" + s + " ");
-			if ( ((i+1)%16)==0 )
-				System.out.println();
-		}
-		System.out.println();
-	}
 	//===============================================================
 	//===============================================================
 }

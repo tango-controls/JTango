@@ -24,17 +24,11 @@
  */
 package org.tango.server.events;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.SocketException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevIntrChange;
+import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.TangoApi.HostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -54,11 +48,16 @@ import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.Tango.DevPipeData;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.TangoApi.HostInfo;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Set of ZMQ low level utilities
@@ -67,33 +66,22 @@ import fr.esrf.TangoApi.HostInfo;
  */
 public final class EventManager {
 
-    private static ZContext context;
-    private static final EventManager INSTANCE = new EventManager();
     public static final int MINIMUM_IDL_VERSION = 4;
     public static final String IDL_REGEX = "idl[0-9]_[a-z]*";
     public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
+    private static final EventManager INSTANCE = new EventManager();
+    private static ZContext context;
+    private static ScheduledExecutorService heartBeatExecutor;
+    private static int serverHWM;
+    private static int clientHWN;
+    private final Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
+    private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
     private ZMQ.Socket heartbeatSocket;
     private ZMQ.Socket eventSocket;
     private boolean isInitialized = false;
     private String heartbeatEndpoint = null;
     private String eventEndpoint = null;
-    private final Logger logger = LoggerFactory.getLogger(EventManager.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
-
-    private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
-    private static ScheduledExecutorService heartBeatExecutor;
-
-    private static int serverHWM;
-
-    private static int clientHWN;
-
-    private enum SocketType {
-        HEARTBEAT, EVENTS
-    }
-
-    public static EventManager getInstance() {
-        return INSTANCE;
-    }
 
     private EventManager() {
         serverHWM = EventConstants.HWM_DEFAULT;
@@ -120,6 +108,30 @@ public final class EventManager {
         }
 
         isInitialized = false;
+    }
+
+    public static EventManager getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Check if event criteria are set for change and archive events
+     *
+     * @param attribute the specified attribute
+     * @param eventType the specified event type
+     * @throws DevFailed if event type is change or archive and no event criteria is set.
+     */
+    public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
+        switch (eventType) {
+            case CHANGE_EVENT:
+                ChangeEventTrigger.checkEventCriteria(attribute);
+                break;
+            case ARCHIVE_EVENT:
+                ArchiveEventTrigger.checkEventCriteria(attribute);
+                break;
+            default:
+                break;
+        }
     }
 
     private void initialize() throws DevFailed {
@@ -159,7 +171,7 @@ public final class EventManager {
     /**
      * Returns next port to connect the heartbeatSocket or eventSocket
      *
-     * @throws fr.esrf.Tango.DevFailed if no free port found
+     * @throws DevFailed if no free port found
      */
     private int getNextAvailablePort() throws DevFailed {
 
@@ -190,7 +202,7 @@ public final class EventManager {
      * Check next port to connect the heartbeatSocket or eventSocket
      *
      * @param socketType HEARTBEAT or EVENT
-     * @throws fr.esrf.Tango.DevFailed if no free port found
+     * @throws DevFailed if no free port found
      */
     private void setEndpoints(final SocketType socketType) throws DevFailed {
         xlogger.entry();
@@ -424,6 +436,7 @@ public final class EventManager {
      * @param attributeName specified event attribute
      * @param devFailed the attribute failed error to be sent as event
      * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
             throws DevFailed {
@@ -442,7 +455,7 @@ public final class EventManager {
      * Check if the event must be sent and fire it if must be done
      *
      * @param attributeName specified event attribute
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
@@ -464,7 +477,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param eventType specified event type.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     public void pushAttributeEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
@@ -485,7 +498,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param eventType specified event type.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     public void forceAttributePushEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
@@ -504,7 +517,7 @@ public final class EventManager {
      * @param deviceName Specified event device
      * @param attributeName specified event attribute name
      * @param counter a counter value
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     public void pushAttributeDataReadyEvent(final String deviceName, final String attributeName, final int counter)
             throws DevFailed {
@@ -564,27 +577,12 @@ public final class EventManager {
         xlogger.exit();
     }
 
-    /**
-     * Check if event criteria are set for change and archive events
-     *
-     * @param attribute the specified attribute
-     * @param eventType the specified event type
-     * @throws fr.esrf.Tango.DevFailed if event type is change or archive and no event criteria is set.
-     */
-    public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
-        switch (eventType) {
-            case CHANGE_EVENT:
-                ChangeEventTrigger.checkEventCriteria(attribute);
-                break;
-            case ARCHIVE_EVENT:
-                ArchiveEventTrigger.checkEventCriteria(attribute);
-                break;
-            default:
-                break;
-        }
+    private enum SocketType {
+        HEARTBEAT, EVENTS
     }
 
     // ===================================================
+
     /**
      * This class is a thread to send a heartbeat
      */

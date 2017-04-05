@@ -240,7 +240,7 @@ public class EventQueue {
     //==================================================================
     /**
      * @return the first event in queue.
-     * @throws fr.esrf.Tango.DevFailed if queue is empty
+     * @throws DevFailed if queue is empty
      */
     //==================================================================
     public synchronized EventData getNextEvent() throws DevFailed {
@@ -257,7 +257,7 @@ public class EventQueue {
      *
      * @param    event_type    Specified event type.
      * @return the first event in queue for specified type.
-     * @throws fr.esrf.Tango.DevFailed if queue has no specified event
+     * @throws DevFailed if queue has no specified event
      */
     //==================================================================
     public synchronized EventData getNextEvent(int event_type) throws DevFailed {
@@ -306,7 +306,7 @@ public class EventQueue {
     //==================================================================
     /**
      * @return the date of the last inserted and not yet extracted event.
-     * @throws fr.esrf.Tango.DevFailed if queue is empty
+     * @throws DevFailed if queue is empty
      */
     //==================================================================
     public synchronized long getLastEventDate() throws DevFailed {

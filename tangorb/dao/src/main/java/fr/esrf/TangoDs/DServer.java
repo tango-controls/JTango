@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,18 +27,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoDs;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Vector;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.TangoApi.DbDatum;
+import fr.esrf.TangoApi.DeviceData;
 import org.apache.log4j.Logger;
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.PortableServer.POA;
@@ -46,11 +46,10 @@ import org.omg.PortableServer.POAManager;
 import org.omg.PortableServer.POAPackage.ObjectNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DeviceData;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Vector;
 
 @SuppressWarnings( { "NestedTryStatement", "ErrorNotRethrown" })
 public class DServer extends DeviceImpl implements TangoConst {

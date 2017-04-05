@@ -34,32 +34,11 @@
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
-
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevStateHelper;
-import fr.esrf.Tango.DevVarBooleanArrayHelper;
-import fr.esrf.Tango.DevVarCharArrayHelper;
-import fr.esrf.Tango.DevVarDoubleArrayHelper;
-import fr.esrf.Tango.DevVarFloatArrayHelper;
-import fr.esrf.Tango.DevVarLong64ArrayHelper;
-import fr.esrf.Tango.DevVarLongArrayHelper;
-import fr.esrf.Tango.DevVarShortArrayHelper;
-import fr.esrf.Tango.DevVarStateArrayHelper;
-import fr.esrf.Tango.DevVarStringArrayHelper;
-import fr.esrf.Tango.DevVarULong64ArrayHelper;
-import fr.esrf.Tango.DevVarULongArrayHelper;
-import fr.esrf.Tango.DevVarUShortArrayHelper;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 
 /**
  * Class Description: This class manage data object for Tango device attribute
@@ -90,9 +69,12 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     AttributeValue_3 attrval = new AttributeValue_3();
 
     // ===========================================
+    public DeviceAttribute_3DAODefaultImpl() {
+    }
+
     /**
      * Build a DeviceAttribute IDL object
-     * 
+     *
      * @param name
      *            Attribute name.
      */
@@ -119,10 +101,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
 	attrval.err_list = null;
     }
 
-    public DeviceAttribute_3DAODefaultImpl() {
-    }
-
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
      * 
@@ -1286,8 +1266,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Throws exception if err_list not null.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1309,7 +1289,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an DevState Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1341,7 +1321,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an DevState.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1363,7 +1343,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an boolean.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1378,7 +1358,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an boolean Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1393,7 +1373,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an unsigned char.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1409,7 +1389,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an unsigned char Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1431,7 +1411,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an unsigned char Array as a char array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1447,7 +1427,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a short.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1463,7 +1443,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a short Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1478,7 +1458,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an unsigned short.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1494,7 +1474,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for an unsigned short Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1514,7 +1494,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1530,7 +1510,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1545,7 +1525,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a unsigned long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1563,7 +1543,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a unsigned long.array
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1585,7 +1565,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1600,7 +1580,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1615,7 +1595,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1630,7 +1610,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1645,7 +1625,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a float.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1661,7 +1641,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a float Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1676,7 +1656,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a double.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1692,7 +1672,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1707,7 +1687,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a DevState (state attribute).
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1723,7 +1703,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a String.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1739,7 +1719,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1772,8 +1752,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute quality
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1785,8 +1765,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1798,8 +1778,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1811,8 +1791,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1839,8 +1819,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data read.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1852,8 +1832,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data read object.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1865,8 +1845,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data Write object.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1878,8 +1858,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data written.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1891,8 +1871,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute dim_x.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1904,8 +1884,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute dim_y.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1917,8 +1897,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1930,8 +1910,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1969,8 +1949,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================

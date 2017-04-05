@@ -5,7 +5,7 @@
 //
 // Description:	source code 
 //
-// $Author$
+// $Author: abeilleg $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 14593 $
 //
 // $Log$
 // Revision 1.4  2009/12/09 12:17:58  pascal_verdier
@@ -44,16 +44,7 @@
 
 package fr.esrf.Tango.factory;
 
-import fr.esrf.TangoApi.IApiUtilDAO;
-import fr.esrf.TangoApi.IConnectionDAO;
-import fr.esrf.TangoApi.IDatabaseDAO;
-import fr.esrf.TangoApi.IDeviceAttributeDAO;
-import fr.esrf.TangoApi.IDeviceAttribute_3DAO;
-import fr.esrf.TangoApi.IDeviceDataDAO;
-import fr.esrf.TangoApi.IDeviceDataHistoryDAO;
-import fr.esrf.TangoApi.IDeviceProxyDAO;
-import fr.esrf.TangoApi.IIORDumpDAO;
-import fr.esrf.TangoApi.ITacoTangoDeviceDAO;
+import fr.esrf.TangoApi.*;
 
 public interface ITangoFactory {
 

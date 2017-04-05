@@ -34,15 +34,7 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 import fr.esrf.Tango.factory.TangoFactory;
 
 /**
@@ -1070,7 +1062,7 @@ public class DeviceAttribute_3 {
      * extract method for an DevState Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1084,7 +1076,7 @@ public class DeviceAttribute_3 {
      * extract method for an DevState.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1098,7 +1090,7 @@ public class DeviceAttribute_3 {
      * extract method for an boolean.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1112,7 +1104,7 @@ public class DeviceAttribute_3 {
      * extract method for an boolean Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1126,7 +1118,7 @@ public class DeviceAttribute_3 {
      * extract method for an unsigned char.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1140,7 +1132,7 @@ public class DeviceAttribute_3 {
      * extract method for an unsigned char Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1154,7 +1146,7 @@ public class DeviceAttribute_3 {
      * extract method for an unsigned char Array as a char array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1168,7 +1160,7 @@ public class DeviceAttribute_3 {
      * extract method for a short.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1182,7 +1174,7 @@ public class DeviceAttribute_3 {
      * extract method for a short Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1196,7 +1188,7 @@ public class DeviceAttribute_3 {
      * extract method for an unsigned short.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1210,7 +1202,7 @@ public class DeviceAttribute_3 {
      * extract method for an unsigned short Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1224,7 +1216,7 @@ public class DeviceAttribute_3 {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1238,7 +1230,7 @@ public class DeviceAttribute_3 {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1252,7 +1244,7 @@ public class DeviceAttribute_3 {
      * extract method for a unsigned long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1266,7 +1258,7 @@ public class DeviceAttribute_3 {
      * extract method for a unsigned long.array
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1280,7 +1272,7 @@ public class DeviceAttribute_3 {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1294,7 +1286,7 @@ public class DeviceAttribute_3 {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1308,7 +1300,7 @@ public class DeviceAttribute_3 {
      * extract method for a long.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1322,7 +1314,7 @@ public class DeviceAttribute_3 {
      * extract method for a long Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1336,7 +1328,7 @@ public class DeviceAttribute_3 {
      * extract method for a float.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1350,7 +1342,7 @@ public class DeviceAttribute_3 {
      * extract method for a float Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1364,7 +1356,7 @@ public class DeviceAttribute_3 {
      * extract method for a double.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1378,7 +1370,7 @@ public class DeviceAttribute_3 {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1392,7 +1384,7 @@ public class DeviceAttribute_3 {
      * extract method for a DevState (state attribute).
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1406,7 +1398,7 @@ public class DeviceAttribute_3 {
      * extract method for a String.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1420,7 +1412,7 @@ public class DeviceAttribute_3 {
      * extract method for a double Array.
      * 
      * @return the extracted value.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      *             in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
      */
@@ -1432,8 +1424,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute quality
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1445,8 +1437,8 @@ public class DeviceAttribute_3 {
     /**
      * Return attribute data format (SCALR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1457,8 +1449,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1469,8 +1461,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1481,8 +1473,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1502,8 +1494,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data read.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1514,8 +1506,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number data read object.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1526,8 +1518,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data wwrite object.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1538,8 +1530,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data written.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1550,8 +1542,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute dim_x.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1562,8 +1554,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute dim_y.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1574,8 +1566,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1586,8 +1578,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1616,8 +1608,8 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     * 
-     * @throws fr.esrf.Tango.DevFailed
+     *
+     * @throws DevFailed
      *             in case of read_attribute failed
      */
     // ===========================================
@@ -1628,7 +1620,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * @return the attribute data type
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ===========================================
     public int getType() throws DevFailed {
@@ -1641,7 +1633,7 @@ public class DeviceAttribute_3 {
      * 
      * @param devatt
      *            device attribute 4 object.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ===========================================
     public void setAttributeValue(final IDeviceAttributeDAO devatt)

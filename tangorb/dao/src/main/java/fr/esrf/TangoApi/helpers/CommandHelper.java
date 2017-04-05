@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,14 +27,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi.helpers;
-
-import java.util.Vector;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
@@ -44,6 +42,8 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.StateUtilities;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
+
+import java.util.Vector;
 
 /**
  * @author SAINTIN

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements builder pattern for {@link fr.esrf.TangoApi.PipeBlob}
+ * Implements builder pattern for {@link PipeBlob}
  *
  * Not thread safe. Designed to be thread confinement.
  *

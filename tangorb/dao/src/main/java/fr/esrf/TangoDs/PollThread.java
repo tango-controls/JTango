@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -38,38 +38,34 @@ package fr.esrf.TangoDs;
  *	Class to store all the necessary information for the
  *	polling thread. It's run() method is the thread code.
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
-
-import java.util.Vector;
-
-import org.omg.CORBA.Any;
 
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.TimeVal;
+import org.omg.CORBA.Any;
+
+import java.util.Vector;
 
 public class PollThread extends Thread implements TangoConst {
+    private static final int POLL_COMMAND = 0;
+    private static final int POLL_TRIGGER = 1;
+    private static final int POLL_TIME_OUT = 2;
+    static DeviceImpl dev_to_del = null;
+    static String name_to_del = "";
+    static int type_to_del = Tango_POLL_CMD;
     private final PollThCmd shared_cmd;
-    private PollThCmd local_cmd;
     private final TangoMonitor p_mon;
     private final Vector works;
     private final Vector ext_trig_works;
     private final TimeVal now;
     private final TimeVal after;
+    private final String[] attr_names;
+    private PollThCmd local_cmd;
     private long sleep;
     private boolean polling_stop;
-
-    static DeviceImpl dev_to_del = null;
-    static String name_to_del = "";
-    static int type_to_del = Tango_POLL_CMD;
-
-    private final String[] attr_names;
-
-    private static final int POLL_COMMAND = 0;
-    private static final int POLL_TRIGGER = 1;
-    private static final int POLL_TIME_OUT = 2;
 
     // ===============================================================
     // ===============================================================

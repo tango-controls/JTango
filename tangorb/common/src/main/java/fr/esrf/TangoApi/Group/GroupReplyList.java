@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -42,6 +42,11 @@ import java.util.Vector;
  */
 
 public class GroupReplyList extends Vector implements java.io.Serializable {
+
+    /**
+     * Global error flag
+     */
+    boolean has_failed;
     
     /** Creates a new instance of GroupReplyList */
     public GroupReplyList() {
@@ -70,7 +75,4 @@ public class GroupReplyList extends Vector implements java.io.Serializable {
     public boolean has_failed() {
         return has_failed;
     }
-    
-    /** Global error flag */
-    boolean has_failed;
 }

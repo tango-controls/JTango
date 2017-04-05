@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -46,8 +46,8 @@ import java.util.Collections;
  * the singleton design pattern. Therefore a device server process can have only
  * one instance of this class and its constructor is not public.
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
  
 public class DServerClass extends DeviceClass implements TangoConst
@@ -64,26 +64,41 @@ public class DServerClass extends DeviceClass implements TangoConst
 //
 //-----------------------------------------------------------------------------
 
-/**
- * Get the singleton object reference.
- *
- * This method returns a reference to the object of the DServerClass class.
- * If the class has not been initialised with it's init method, this method
- * print a message and abort the device server process
- *
- * @return The DServerClass object reference
- */
- 	
-	public static DServerClass instance()
-	{
-		if (_instance == null)
-		{
-			System.err.println("DServerClass is not initialised !!!");
-			System.err.println("Exiting");
-			System.exit(-1);
-		}
-		return _instance;
-	}
+    DServerClass(String name) throws DevFailed {
+        super(name);
+
+//
+// Add class command(s) to the command_list
+//
+
+        command_factory();
+
+//
+// Sort commands
+//
+
+        MyComp comp = new MyComp();
+        Collections.sort(command_list, comp);
+
+//
+// Create device name from device server name
+//
+
+        StringBuffer dev_name = new StringBuffer(Tango_DSDeviceDomain);
+        dev_name.append('/');
+        dev_name.append(Util.instance().get_ds_exec_name());
+        dev_name.append('/');
+        dev_name.append(Util.instance().get_ds_inst_name());
+
+        String[] dev_list = new String[1];
+        dev_list[0] = new String(dev_name);
+
+//
+// Create the device server device
+//
+
+        device_factory(dev_list);
+    }
 
 //+----------------------------------------------------------------------------
 //
@@ -99,27 +114,26 @@ public class DServerClass extends DeviceClass implements TangoConst
 //-----------------------------------------------------------------------------
 
 /**
- * Create and get the singleton object reference.
+ * Get the singleton object reference.
  *
  * This method returns a reference to the object of the DServerClass class.
- * If the class singleton object has not been created, it will be 
- * instanciated
+ * If the class has not been initialised with it's init method, this method
+ * print a message and abort the device server process
  *
  * @return The DServerClass object reference
- * @exception DevFailed If it is not possible to construct the object. It is a 
- * propagation of the xecption thrown by the <i>device_factory</i> method.
- * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
- * <b>DevFailed</b> exception specification
  */
-	public static DServerClass init() throws DevFailed
+
+	public static DServerClass instance()
 	{
 		if (_instance == null)
 		{
-			_instance = new DServerClass("DServer");
+			System.err.println("DServerClass is not initialised !!!");
+			System.err.println("Exiting");
+			System.exit(-1);
 		}
 		return _instance;
 	}
-	
+
 //+----------------------------------------------------------------------------
 //
 // method : 		DServerClass()
@@ -134,41 +148,26 @@ public class DServerClass extends DeviceClass implements TangoConst
 //
 //-----------------------------------------------------------------------------
 
-	DServerClass(String name) throws DevFailed
+/**
+ * Create and get the singleton object reference.
+ *
+ * This method returns a reference to the object of the DServerClass class.
+ * If the class singleton object has not been created, it will be
+ * instanciated
+ *
+ * @return The DServerClass object reference
+ * @exception DevFailed If it is not possible to construct the object. It is a
+ * propagation of the xecption thrown by the <i>device_factory</i> method.
+ * Click <a href="../../tango_basic/idl_html/Tango.html#DevFailed">here</a> to read
+ * <b>DevFailed</b> exception specification
+ */
+	public static DServerClass init() throws DevFailed
 	{
-		super(name);
-			
-//
-// Add class command(s) to the command_list
-//
-
-		command_factory();
-		
-//
-// Sort commands
-//
-
-		MyComp comp = new MyComp();
-		Collections.sort(command_list,comp);
-		
-//
-// Create device name from device server name
-//
-
-		StringBuffer dev_name = new StringBuffer(Tango_DSDeviceDomain);
-		dev_name.append('/');
-		dev_name.append(Util.instance().get_ds_exec_name());
-		dev_name.append('/');
-		dev_name.append(Util.instance().get_ds_inst_name());
-		
-		String[] dev_list = new String[1];
-		dev_list[0] = new String(dev_name);		
-				
-//
-// Create the device server device
-//
-
-		device_factory(dev_list);
+		if (_instance == null)
+		{
+			_instance = new DServerClass("DServer");
+		}
+		return _instance;
 	}
 	
 	

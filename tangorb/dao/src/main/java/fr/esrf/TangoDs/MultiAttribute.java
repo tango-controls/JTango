@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -48,36 +48,17 @@ import java.util.Vector;
  * an aggregate of Attribute or WAttribute objects. It eases management of 
  * multiple attributes
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
  
 public class MultiAttribute implements TangoConst
 {
-/**
- * The Attribute objects vector.
- *
- * This vector is often referred as the main attributes vector
- */
-	protected	Vector			attr_list = new Vector();
-/**
- * The list of writable attribute.
- *
- * It is a vector of index in the main attribute vector
- */
-	protected	Vector			writable_attr_list = new Vector();
-/**
- * The list of attribute with an alarm level defined.
- *
- * It is a vector of index in the main attribute vector
- */
-	protected	Vector			alarm_attr_list = new Vector();
-	
 	private static final AttrProperty[] def_opt_prop = new AttrProperty[] {
 	new AttrProperty("label",Tango_LabelNotSpec),
 	new AttrProperty("description",Tango_DescNotSpec),
-	new AttrProperty("unit",Tango_UnitNotSpec),	
-	new AttrProperty("standard_unit",Tango_StdUnitNotSpec),
+            new AttrProperty("unit", Tango_UnitNotSpec),
+            new AttrProperty("standard_unit",Tango_StdUnitNotSpec),
 	new AttrProperty("display_unit",Tango_DispUnitNotSpec),
 	new AttrProperty("format",Tango_FormatNotSpec),
 	new AttrProperty("min_value",Tango_AlrmValueNotSpec),
@@ -85,6 +66,24 @@ public class MultiAttribute implements TangoConst
 	new AttrProperty("min_alarm",Tango_AlrmValueNotSpec),
 	new AttrProperty("max_alarm",Tango_AlrmValueNotSpec),
 	new AttrProperty("writable_attr_name",Tango_AssocWritNotSpec)};
+    /**
+     * The Attribute objects vector.
+     * <p>
+     * This vector is often referred as the main attributes vector
+     */
+    protected Vector attr_list = new Vector();
+    /**
+     * The list of writable attribute.
+     * <p>
+     * It is a vector of index in the main attribute vector
+     */
+    protected Vector writable_attr_list = new Vector();
+    /**
+     * The list of attribute with an alarm level defined.
+     * <p>
+     * It is a vector of index in the main attribute vector
+     */
+    protected Vector alarm_attr_list = new Vector();
 
 /**
  * Create a new MultiAttribute object.

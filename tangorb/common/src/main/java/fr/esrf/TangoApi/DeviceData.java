@@ -27,16 +27,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 28928 $
+// $Revision: 25296 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
-
-import org.omg.CORBA.Any;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TypeCode;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
@@ -44,6 +40,9 @@ import fr.esrf.Tango.DevVarDoubleStringArray;
 import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoDs.TangoConst;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TypeCode;
 
 /**
  * Class Description: This class manage data object for Tango device access.
@@ -69,20 +68,19 @@ import fr.esrf.TangoDs.TangoConst;
  * </i>
  * 
  * @author verdier
- * @version $Revision: 28928 $
+ * @version $Revision: 25296 $
  */
 
 public class DeviceData implements TangoConst {
-	private IDeviceDataDAO devicedataDAO = null;
-
 	Any any;
+    private IDeviceDataDAO devicedataDAO = null;
 
 	//===========================================================
 	/**
 	 * Constructor for the TgApi Data Object.
-	 * 
-	 * @throws fr.esrf.Tango.DevFailed
-	 *             if TgApi class not instancied.
+	 *
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	//===========================================================
 	public DeviceData() throws DevFailed {
@@ -96,8 +94,8 @@ public class DeviceData implements TangoConst {
 	 * 
 	 * @param orb
 	 *            orb connection id.
-	 * @throws fr.esrf.Tango.DevFailed
-	 *             if TgApi class not instancied.
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	//===========================================================
 	public DeviceData(ORB orb) throws DevFailed {
@@ -111,8 +109,8 @@ public class DeviceData implements TangoConst {
 	 * 
 	 * @param any
 	 *            CORBA Any reference to be used in DeviceData.
-	 * @throws fr.esrf.Tango.DevFailed
-	 *             if TgApi class not instancied.
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	//===========================================================
 	public DeviceData(Any any) throws DevFailed {
@@ -771,15 +769,6 @@ public class DeviceData implements TangoConst {
 	//===========================================
 	public String[] extractStringArray() {
 		return devicedataDAO.extractStringArray(this);
-	}
-
-	//===========================================
-	/**
-	 * extract method for a boolean.
-	 */
-	//===========================================
-	public boolean[] extractBooleanArray() {
-		return devicedataDAO.extractBooleanArray(this);
 	}
 
 	//===========================================

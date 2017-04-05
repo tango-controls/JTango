@@ -7,24 +7,19 @@
  */
 package org.tango.utils;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoDs.TangoConst;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Some utilities for tango
@@ -34,12 +29,34 @@ public final class TangoUtil {
     public static final String DEVICE_SEPARATOR = "/";
     public static final int FULL_NAME_NR_SEPARATOR = 3;
     public static final String DEVICE_PATTERN = "*";
-    private static final String DBASE_NO = "#dbase=no";
-
     /**
      * Contains all tango types for scalar commands
      */
     public static final List<Integer> SCALARS;
+    /**
+     * Contains all tango types for spectrum commands
+     */
+    public static final List<Integer> SPECTRUMS;
+    public static final Map<String, AttrWriteType> WRITABLE_MAP;
+    public static final Map<String, AttrDataFormat> FORMAT_MAP;
+    public static final Map<String, Integer> TYPE_MAP;
+    private static final String DBASE_NO = "#dbase=no";
+    private static final Pattern ENTITY_SPLIT_PATTERN;
+    private static final int PREFIX_INDEX = 1;
+    private static final int ATTRIBUTE_ALIAS_INDEX = 2;
+    private static final int DEVICE_NAME_INDEX = 3;
+    private static final int DEVICE_ALIAS_INDEX = 4;
+
+    /*
+     * http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node13.html
+     *
+     * [protocol://][host:port/]device_name[/attribute][->property][#dbase=xx]
+     *
+     * From the naming schema described above, the reserved characters are :,#,/ and the reserved string is : ->.
+     */
+    private static final int ENTITY_INDEX = 5;
+    private static final int NO_DB_INDEX = 6;
+
     static {
         final List<Integer> tempList = new ArrayList<Integer>();
         tempList.add(TangoConst.Tango_DEV_BOOLEAN);
@@ -59,10 +76,6 @@ public final class TangoUtil {
         SCALARS = Collections.unmodifiableList(tempList);
     }
 
-    /**
-     * Contains all tango types for spectrum commands
-     */
-    public static final List<Integer> SPECTRUMS;
     static {
         final List<Integer> tempList2 = new ArrayList<Integer>();
         tempList2.add(TangoConst.Tango_DEVVAR_CHARARRAY);
@@ -78,7 +91,6 @@ public final class TangoUtil {
         SPECTRUMS = Collections.unmodifiableList(tempList2);
     }
 
-    public static final Map<String, AttrWriteType> WRITABLE_MAP;
     static {
         final Map<String, AttrWriteType> tmpMap1 = new HashMap<String, AttrWriteType>();
         tmpMap1.put(AttrWriteType.READ.toString(), AttrWriteType.READ);
@@ -89,7 +101,6 @@ public final class TangoUtil {
 
     }
 
-    public static final Map<String, AttrDataFormat> FORMAT_MAP;
     static {
         final Map<String, AttrDataFormat> tmpMap2 = new HashMap<String, AttrDataFormat>();
         tmpMap2.put(AttrDataFormat.SCALAR.toString(), AttrDataFormat.SCALAR);
@@ -99,7 +110,6 @@ public final class TangoUtil {
         FORMAT_MAP = Collections.unmodifiableMap(tmpMap2);
     }
 
-    public static final Map<String, Integer> TYPE_MAP;
     static {
         final Map<String, Integer> tmpMap3 = new HashMap<String, Integer>();
         tmpMap3.put("VOID", 0);
@@ -122,21 +132,6 @@ public final class TangoUtil {
         TYPE_MAP = Collections.unmodifiableMap(tmpMap3);
     }
 
-    /*
-     * http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node13.html
-     *
-     * [protocol://][host:port/]device_name[/attribute][->property][#dbase=xx]
-     *
-     * From the naming schema described above, the reserved characters are :,#,/ and the reserved string is : ->.
-     */
-
-    private static final Pattern ENTITY_SPLIT_PATTERN;
-    private static final int PREFIX_INDEX = 1;
-    private static final int ATTRIBUTE_ALIAS_INDEX = 2;
-    private static final int DEVICE_NAME_INDEX = 3;
-    private static final int DEVICE_ALIAS_INDEX = 4;
-    private static final int ENTITY_INDEX = 5;
-    private static final int NO_DB_INDEX = 6;
     static {
         // (?: xxx ) = non capturing group
         // ( xxx ) = capturing group. Group content is "xxx" once the matcher is finished
@@ -313,6 +308,14 @@ public final class TangoUtil {
     public static String getFullDeviceNameForCommand(final String commandName) throws DevFailed {
         checkNullOrEmptyString(commandName);
         return getfullNameForDevice(commandName.substring(0, commandName.lastIndexOf('/')));
+    }
+
+    public static void checkFullCommandName(final String fullCommandName) throws DevFailed {
+        checkNullOrEmptyString(fullCommandName);
+        if (!fullCommandName.contains(DBASE_NO)
+                && StringUtils.countMatches(fullCommandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
+            throw DevFailedUtils.newDevFailed(fullCommandName + " command must contains 4 fields");
+        }
     }
 
     /**

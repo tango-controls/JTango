@@ -35,13 +35,12 @@
 package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
+import fr.esrf.TangoDs.Except;
+import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
-
-import fr.esrf.TangoDs.Except;
-import fr.esrf.TangoDs.TangoConst;
 
 /**
  * Class Description: This class manage device connection for Tango objects. It
@@ -54,6 +53,9 @@ import fr.esrf.TangoDs.TangoConst;
 public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
     private boolean firstTime = true;
+
+    public ConnectionDAODefaultImpl() {
+    }
 
     // ===================================================================
     // ===================================================================
@@ -83,10 +85,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
         }
     }
 
-    public ConnectionDAODefaultImpl() {
-    }
-
     // ===================================================================
+
     /**
      * Connection constructor. It makes a connection on database server.
      * 
@@ -680,8 +680,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void set_obj_timeout(final Connection connection, final int millis) {
 
 		// Change Jacorb policy for timeout
-		final Policy p =
-			new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
+        final org.omg.CORBA.Policy p =
+                new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
 		org.omg.CORBA.Object    obj = connection.getObj()._set_policy_override(
                 new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
 
@@ -714,7 +714,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * Change the timeout value for a device call.
      * 
      * @param millis  New value of the timeout in milliseconds.
-     * @throws fr.esrf.Tango.DevFailed  if orb.create_policy throws an org.omg.CORBA.PolicyError
+     * @throws DevFailed  if orb.create_policy throws an org.omg.CORBA.PolicyError
      *             exception.
      */
     // ===================================================================
@@ -842,7 +842,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * @param command Command name to send to the device.
      * @param argin input command argument.
      * @return the output argument of the command.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ===========================================================
     public DeviceData command_inout(final Connection connection, final String command,
@@ -936,7 +936,7 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
      * @param command
      *            Command name.
      * @return the output argument of the command.
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ===========================================================
     public DeviceData command_inout(final Connection connection, final String command)

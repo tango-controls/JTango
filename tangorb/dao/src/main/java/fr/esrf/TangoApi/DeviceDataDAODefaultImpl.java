@@ -79,7 +79,7 @@ public class DeviceDataDAODefaultImpl implements TangoConst, IDeviceDataDAO {
     /**
      * Constructor for the TgApi Data Object.
      *
-     * @throws fr.esrf.Tango.DevFailed if TgApi class not instancied.
+     * @throws DevFailed if TgApi class not instancied.
      */
     // ===========================================================
     public void init(final DeviceData deviceData) throws DevFailed {
@@ -90,7 +90,7 @@ public class DeviceDataDAODefaultImpl implements TangoConst, IDeviceDataDAO {
      * Constructor for the TgApi Data Object.
      *
      * @param orb orb connection id.
-     * @throws fr.esrf.Tango.DevFailed if TgApi class not instancied.
+     * @throws DevFailed if TgApi class not instancied.
      */
     // ===========================================================
     public void init(final DeviceData deviceData, final ORB orb) throws DevFailed {
@@ -101,7 +101,7 @@ public class DeviceDataDAODefaultImpl implements TangoConst, IDeviceDataDAO {
      * Constructor for the TgApi Data Object.
      *
      * @param any CORBA Any reference to be used in DeviceData.
-     * @throws fr.esrf.Tango.DevFailed if TgApi class not instancied.
+     * @throws DevFailed if TgApi class not instancied.
      */
     // ===========================================================
     public void init(final DeviceData deviceData, final Any any) throws DevFailed {

@@ -140,17 +140,6 @@ public class DevicePipe implements PipeScanner {
 
     /**
      * Set pipe time
-     *
-     * @param timeVal pipe time
-     */
-    // ===================================================================
-    public void setTimeVal(TimeVal timeVal) {
-        this.timeVal = timeVal;
-    }
-    // ===========================================
-
-    /**
-     * Set pipe time
      * @param t pipe time (number of milli seconds since EPOCH)
      */
     // ===================================================================
@@ -159,11 +148,22 @@ public class DevicePipe implements PipeScanner {
         int millis = (int) (t - 1000 * t);
         this.timeVal = new TimeVal(seconds, millis * 1000, 0);
     }
+    // ===========================================
+
+    /**
+     * Set pipe time
+     *
+     * @param timeVal pipe time
+     */
+    // ===================================================================
+    public void setTimeVal(TimeVal timeVal) {
+        this.timeVal = timeVal;
+    }
 
     /**
      * Return attribute time value in seconds since EPOCH.
      *
-     * @throws fr.esrf.Tango.DevFailed in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValSec() throws DevFailed {
@@ -173,7 +173,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * Return attribute time value in milli seconds since EPOCH.
      *
-     * @throws fr.esrf.Tango.DevFailed in case of read_attribute failed
+     * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
     public long getTimeValMillisSec() throws DevFailed {
@@ -375,7 +375,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param index specified data element index.
      * @return the name of data element at index
-     * @throws fr.esrf.Tango.DevFailed if index is negative or higher than data element number.
+     * @throws DevFailed if index is negative or higher than data element number.
      *
     // ===================================================================
     public String getDataElementName(int index) throws DevFailed {
@@ -385,7 +385,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param index specified data element index.
      * @return the tye of DataElement at index
-     * @throws fr.esrf.Tango.DevFailed if index is negative or higher than data element number.
+     * @throws DevFailed if index is negative or higher than data element number.
      *
     // ===================================================================
     public int getDataElementType(int index) throws DevFailed {
@@ -395,7 +395,7 @@ public class DevicePipe implements PipeScanner {
     /**
      * @param name specified data element name.
      * @return the tye of DataElement for specified name
-     * @throws fr.esrf.Tango.DevFailed if name not found in data element list.
+     * @throws DevFailed if name not found in data element list.
      *
     // ===================================================================
     public int getDataElementType(String name) throws DevFailed {

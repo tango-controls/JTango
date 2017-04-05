@@ -60,7 +60,7 @@ public class DeviceInterface {
     /**
      * Creates a new instance of DeviceInterface for specified device.
      * @param deviceName specified device name
-     * @throws fr.esrf.Tango.DevFailed if device connection failed.
+     * @throws DevFailed if device connection failed.
      */
     //=============================================
     public DeviceInterface(String deviceName) throws DevFailed {
@@ -70,7 +70,7 @@ public class DeviceInterface {
     /**
      * Creates a new instance of DeviceInterface for specified device.
      * @param deviceProxy specified device proxy object.
-     * @throws fr.esrf.Tango.DevFailed if device connection failed.
+     * @throws DevFailed if device connection failed.
      */
     //=============================================
     public DeviceInterface(DeviceProxy deviceProxy) throws DevFailed {

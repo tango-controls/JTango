@@ -63,6 +63,14 @@ import java.util.*;
 public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements IDatabaseDAO {
 
     //===================================================================
+    private static final Object monitor = new Object();
+
+
+    //===================================================================
+    //===================================================================
+    private boolean access_service_read = false;
+
+    //===================================================================
     /**
      * Database access constructor.
      */
@@ -71,24 +79,21 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         super();
     }
 
-
-    //===================================================================
-
     /**
      * Database access init method.
      *
-     * @throws fr.esrf.Tango.DevFailed in case of environment not corectly set.
+     * @throws DevFailed in case of environment not corectly set.
      */
     //===================================================================
     public void init(Database database) throws DevFailed {
         super.init(database);
     }
+    //==========================================================================
 
-    //===================================================================
     /**
      * Database access constructor.
      *
-     * @throws fr.esrf.Tango.DevFailed in case of host or port not available
+     * @throws DevFailed in case of host or port not available
      * @param    host    host where database is running.
      * @param    port    port for database connection.
      */
@@ -105,7 +110,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public String toString(Database database) {
         return database.url.host + ":" + database.url.port;
     }
-    //==========================================================================
+
+
+    //**************************************
+    //       MISCELLANEOUS MANAGEMENT
+    //**************************************
+
     /**
      * Convert a String array to a sting.
      *
@@ -139,12 +149,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
     }
 
-
-    //**************************************
-    //       MISCELLANEOUS MANAGEMENT
-    //**************************************
-
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_info()
@@ -160,6 +164,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         //	format result as string
         return stringArray2String(info);
     }
+
+
+    //**************************************
+    //       SERVERS MANAGEMENT
+    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -190,11 +199,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetHostList", argin);
         return argout.extractStringArray();
     }
-
-
-    //**************************************
-    //       SERVERS MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -337,6 +341,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbPutServerInfo", argin);
     }
 
+    //**************************************
+    //       DEVICES MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_server_info(java.lang.String)
@@ -367,10 +375,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(new String[]{srcServerName, newServerName});
         command_inout(database, "DbRenameServer", argin);
     }
-
-    //**************************************
-    //       DEVICES MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -519,7 +523,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbExportDevice", argin);
     }
 
-
     //**************************************
     //       Devices list MANAGEMENT
     //**************************************
@@ -537,7 +540,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetDeviceClassList", argin);
         return argout.extractStringArray();
     }
-
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -574,6 +576,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractStringArray();
     }
 
+
+    //**************************************
+    //       SERVERS MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_family(java.lang.String)
@@ -603,11 +610,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetDeviceMemberList", argin);
         return argout.extractStringArray();
     }
-
-
-    //**************************************
-    //       SERVERS MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -651,6 +653,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbDeleteServer", argin);
     }
 
+
+    //**************************************
+    //       PROPERTIES MANAGEMENT
+    //**************************************
+    //==========================================================================
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_server(fr.esrf.TangoApi.DbDevExportInfo[])
@@ -675,6 +683,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(array);
         command_inout(database, "DbExportServer", argin);
     }
+    //==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -690,10 +699,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbUnExportServer", argin);
     }
 
-
-    //**************************************
-    //       PROPERTIES MANAGEMENT
-    //**************************************
     //==========================================================================
 
     /**
@@ -772,7 +777,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
         return properties;
     }
-
     //==========================================================================
 
     /**
@@ -892,7 +896,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         delete_obj_property(database, name, type, array);
     }
-    //==========================================================================
 
     /**
      * Delete a property for the specified object.
@@ -916,7 +919,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         delete_obj_property(database, name, type, array);
     }
-    //==========================================================================
 
     /**
      * Delete a list of properties for the specified object.
@@ -988,6 +990,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetPropertyList", argin);
         return argout.extractStringArray();
     }
+    //==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1010,7 +1013,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "";    //	No object type
         return get_obj_property(database, name, type, propname);
     }
-    //==========================================================================
 
     /**
      * Query the database for an object (ie non-device)
@@ -1183,7 +1185,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return result;
     }
 
-
     //**************************************
     //       DEVICE PROPERTIES MANAGEMENT
     //**************************************
@@ -1246,6 +1247,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         delete_obj_property(database, name, type, propnames);
     }
 
+
+    //**************************************
+    //      ATTRIBUTE PROPERTIES MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_property(java.lang.String, java.lang.String)
@@ -1267,11 +1273,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "Device";
         delete_obj_property(database, name, type, properties);
     }
-
-
-    //**************************************
-    //      ATTRIBUTE PROPERTIES MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1422,7 +1423,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         delete_device_attribute_property(database, devname, attname, array);
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute(java.lang.String, java.lang.String)
@@ -1438,7 +1438,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(array);
         command_inout(database, "DbDeleteDeviceAttribute", argin);
     }
-
 
     //**************************************
     //      CLASS PROPERTIES MANAGEMENT
@@ -1538,7 +1537,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "Class";
         delete_obj_property(database, name, type, properties);
     }
-
 
     //**************************************
     //      CLASS Attribute PROPERTIES MANAGEMENT
@@ -1654,6 +1652,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     }
 
     //==========================================================================
+    //		Aliases management
+    //==========================================================================
+
+    // ==========================================================================
+
+    //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_exported(java.lang.String)
 	 */
@@ -1668,6 +1672,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         return argout.extractStringArray();
     }
+
+    // ==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1685,10 +1691,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractStringArray();
     }
 
-    //==========================================================================
-    //		Aliases management
-    //==========================================================================
-
     // ==========================================================================
 
     /**
@@ -1697,7 +1699,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param database   specified database object.
      * @param deviceName device's name.
      * @return the device alias found.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public String getAliasFromDevice(Database database, String deviceName) throws DevFailed {
@@ -1715,7 +1717,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param database specified database object.
      * @param alias    alias name.
      * @return the device name found.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public String getDeviceFromAlias(Database database, String alias) throws DevFailed {
@@ -1725,15 +1727,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractString();
     }
 
-    // ==========================================================================
-
     /**
      * Query the database for an alias for the specified attribute.
      *
      * @param database specified database object.
      * @param attName  attribute name.
      * @return the alias found.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public String getAliasFromAttribute(Database database, String attName) throws DevFailed {
@@ -1743,15 +1743,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractString();
     }
 
-    // ==========================================================================
-
     /**
      * Query the database for an attribute name for the specified alias.
      *
      * @param database specified database object.
      * @param alias    alias name.
      * @return the attribute found.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public String getAttributeFromAlias(Database database, String alias) throws DevFailed {
@@ -1833,7 +1831,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbDeleteDeviceAlias", argin);
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_attribute_alias_list(java.lang.String)
@@ -1890,6 +1887,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(alias);
         command_inout(database, "DbDeleteAttributeAlias", argin);
     }
+
+    //==========================================================================
 
     //==========================================================================
     //==========================================================================
@@ -1959,7 +1958,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return new DbEventImportInfo(info);
     }
 
-    //==========================================================================
     /**
      * Convert the result of a DbGet...PropertyHist command.
      *
@@ -2087,7 +2085,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return array;
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_property_history(java.lang.String, java.lang.String)
@@ -2149,6 +2146,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             result[i] = v.get(i);
         return result;
     }
+    //===================================================================
+    //===================================================================
 
     //===============================================================
 	/* (non-Javadoc)
@@ -2245,13 +2244,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
     }
     //===================================================================
-    //===================================================================
 
-
-    //===================================================================
-    private boolean access_service_read = false;
-    private static final Object monitor = new Object();
-    //===================================================================
     /**
      * Check Tango Access.
      * - Check if control access is requested.
@@ -2384,7 +2377,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      *	@param database Database object.
      * @param deviceName specified device.
      * @return a list of device pipe properties.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public DbPipe getDevicePipeProperties(Database database, String deviceName, String pipeName) throws DevFailed {
@@ -2402,7 +2395,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param className specified class.
      * @param pipeName specified pipe.
      * @return a list of class pipe properties.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public DbPipe getClassPipeProperties(Database database, String className, String pipeName) throws DevFailed {
@@ -2420,7 +2413,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      *	@param database Database object.
      * @param deviceName device name.
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putDevicePipeProperty(Database database, String deviceName, DbPipe dbPipe) throws DevFailed {
@@ -2437,7 +2430,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      *	@param database Database object.
      * @param className class name.
      * @param dbPipe pipe name, and properties (names and values).
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public void putClassPipeProperty(Database database, String className, DbPipe dbPipe) throws DevFailed {
@@ -2453,7 +2446,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param deviceName specified device name.
      * @param wildcard   specified wildcard.
      * @return a list of pipes defined in database for specified device and specified wildcard.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getDevicePipeList(Database database, String deviceName, String wildcard) throws DevFailed {
@@ -2474,7 +2467,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param className specified class name.
      * @param wildcard  specified wildcard.
      * @return a list of pipes defined in database for specified class and specified wildcard.
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public List<String> getClassPipeList(Database database, String className, String wildcard) throws DevFailed {
@@ -2494,7 +2487,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param deviceName Device name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteDevicePipeProperties(Database database, String deviceName,
@@ -2518,7 +2511,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param className class name.
      * @param pipeName pipe name
      * @param propertyNames property names
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
     public void deleteClassPipeProperties(Database database, String className,
@@ -2540,7 +2533,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param database Database object.
      * @param deviceName    device name
      * @param pipeName      pipe name
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteDevicePipe(Database database, String deviceName, String pipeName) throws DevFailed {
@@ -2555,7 +2548,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param database Database object.
      * @param className    class name
      * @param pipeName      pipe name
-     * @throws fr.esrf.Tango.DevFailed in case of database access failed
+     * @throws DevFailed in case of database access failed
      */
     // ===================================================================
     public void deleteClassPipe(Database database, String className, String pipeName) throws DevFailed {
@@ -2570,7 +2563,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param database Database object.
      * @param deviceName    device name
      * @param pipeNames     pipe names
-     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
+     * @throws DevFailed  in case of database access failed
      */
     // ===================================================================
     public void deleteAllDevicePipeProperty(Database database, String deviceName,
@@ -2592,7 +2585,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param pipeName      pipe name
      * @param propertyName  property Name
      * @return the property history for specified pipe.
-     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
+     * @throws DevFailed  in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getDevicePipePropertyHistory(Database database, String deviceName,
@@ -2611,7 +2604,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * @param pipeName      pipe name
      * @param propertyName  property Name
      * @return the property history for specified pipe.
-     * @throws fr.esrf.Tango.DevFailed  in case of database access failed
+     * @throws DevFailed  in case of database access failed
      */
     // ===================================================================
     public List<DbHistory> getClassPipePropertyHistory(Database database, String className,
@@ -2628,7 +2621,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * 		as root for forwarded attributes
      * @param deviceName the specified device
      * @return a list of device using the specified device as as root for forwarded attributes
-     * @throws fr.esrf.Tango.DevFailed
+     * @throws DevFailed
      */
     // ===================================================================
     public  List<String[]> getForwardedAttributeDataForDevice(Database database, String deviceName) throws DevFailed {
