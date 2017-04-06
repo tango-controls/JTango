@@ -4,7 +4,7 @@
 
     <groupId>org.tango</groupId>
     <artifactId>JTango</artifactId>
-    <version>9.2.5</version>
+    <version>9.2.6-SNAPSHOT</version>
 
     <modules>
         <module>parent</module>
@@ -24,7 +24,7 @@
         <connection>scm:git:git@github.com:tango-controls/JTango.git</connection>
         <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
         <url>https://github.com/tango-controls/JTango</url>
-      <tag>JTango-9.2.5</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <developers>
