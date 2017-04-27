@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.tango</groupId>
@@ -28,7 +29,7 @@
             <organization>ESRF</organization>
             <organizationUrl>http://www.ersf.eu</organizationUrl>
             <roles>
-                <role>Java Developer</role>
+                <role>Developer</role>
             </roles>
             <timezone>1</timezone>
         </developer>
@@ -39,21 +40,19 @@
             <organization>Synchrotron Soleil</organization>
             <organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
             <roles>
-                <role>integrator</role>
+                <role>Integrator, Developer</role>
             </roles>
             <timezone>1</timezone>
         </developer>
-        <developer>
-            <id>ingvord</id>
+    </developers>
+
+    <contributors>
+        <contributor>
             <name>Igor Khokhriakov</name>
             <email>mail@ingvord.ru</email>
-            <organizationUrl>http://www.ingvord.ru</organizationUrl>
-            <roles>
-                <role>Contributor</role>
-            </roles>
             <timezone>3</timezone>
-        </developer>
-    </developers>
+        </contributor>
+    </contributors>
 
     <dependencyManagement>
         <dependencies>
@@ -137,6 +136,14 @@
                 <url>https://api.bintray.com/maven/tango-controls/maven/${project.artifactId}/;publish=1</url>
             </repository>
     </distributionManagement>
+
+    <!-- tango-controls bintray maven repo to resolve dependencies-->
+    <repositories>
+        <repository>
+            <id>bintray-tango-controls-maven</id>
+            <url>http://dl.bintray.com/tango-controls/maven</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
