@@ -4,7 +4,7 @@
 
     <groupId>org.tango</groupId>
     <artifactId>JTangoParent</artifactId>
-    <version>9.2.8-SNAPSHOT</version>
+    <version>9.3.0</version>
 
     <packaging>pom</packaging>
 
