@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.tango</groupId>
+    <groupId>org.tango-controls</groupId>
     <artifactId>JTangoParent</artifactId>
     <version>9.2.8-SNAPSHOT</version>
 
@@ -92,32 +93,32 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>JTangoCommons</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>JavaTangoIDL</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>JTangoClientLang</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>TangORB</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>TangORB-javacommon</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.tango</groupId>
+                <groupId>org.tango-controls</groupId>
                 <artifactId>JTangoServer</artifactId>
                 <version>${project.version}</version>
             </dependency>
