@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26328 $
 //
 //-======================================================================
 
@@ -54,7 +54,7 @@ import fr.esrf.TangoDs.Except;
  * </ul></i>
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 26328 $
  */
 
 
@@ -68,41 +68,6 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
     public Memorized memorized = Memorized.UNKNOWN;
     public String   root_attr_name = "Not specified";
     public String[] enum_label = null;
-
-    /**
-     * Define  possible memorized information
-     */
-    public enum Memorized {
-        /**
-         * Not available (IDL too old)
-         */
-        UNKNOWN,
-        /**
-         * Not memorized
-         */
-        NOT_MEMORIZED,
-        /**
-         * Memorized
-         */
-        MEMORIZED,
-        /**
-         * Memorized and set at init
-         */
-        MEMORIZED_SET_AT_INIT;
-
-        public static String toString(Memorized index) {
-            switch (index) {
-                case NOT_MEMORIZED:
-                    return "Write value is NOT memorized";
-                case MEMORIZED:
-                    return "Write value is Memorized in database";
-                case MEMORIZED_SET_AT_INIT:
-                    return "Write value is Memorized and set at init";
-                default:
-                    return "Not available (IDL too old)";
-             }
-        }
-    }
 
     //==========================================================================
     //==========================================================================
@@ -129,6 +94,7 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
         root_attr_name = attributeConfig5.root_attr_name;
         enum_label = attributeConfig5.enum_labels;
     }
+
     //==========================================================================
     //==========================================================================
     public AttributeInfoEx(AttributeConfig_3 attributeConfig3) {
@@ -138,7 +104,6 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
         extensions = attributeConfig3.extensions;
         sys_extensions = attributeConfig3.sys_extensions;
     }
-
     //==========================================================================
     //==========================================================================
     public AttributeInfoEx(AttributeConfig_2 attributeConfig2) {
@@ -179,6 +144,7 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
                 extensions,
                 sys_extensions);
     }
+
     //==========================================================================
     //==========================================================================
     public AttributeConfig_5 get_attribute_config_obj_5() {
@@ -209,7 +175,6 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
                 sys_extensions);
     }
 
-    //==========================================================================
     /**
      * Returns the label for specified index from enum
      * @param index short value from enum
@@ -229,5 +194,42 @@ public class AttributeInfoEx extends AttributeInfo implements ApiDefs, java.io.S
             Except.throw_exception(e.toString(), e.toString());
         }
         return label;
+    }
+
+    //==========================================================================
+
+    /**
+     * Define  possible memorized information
+     */
+    public enum Memorized {
+        /**
+         * Not available (IDL too old)
+         */
+        UNKNOWN,
+        /**
+         * Not memorized
+         */
+        NOT_MEMORIZED,
+        /**
+         * Memorized
+         */
+        MEMORIZED,
+        /**
+         * Memorized and set at init
+         */
+        MEMORIZED_SET_AT_INIT;
+
+        public static String toString(Memorized index) {
+            switch (index) {
+                case NOT_MEMORIZED:
+                    return "Write value is NOT memorized";
+                case MEMORIZED:
+                    return "Write value is Memorized in database";
+                case MEMORIZED_SET_AT_INIT:
+                    return "Write value is Memorized and set at init";
+                default:
+                    return "Not available (IDL too old)";
+            }
+        }
     }
 }

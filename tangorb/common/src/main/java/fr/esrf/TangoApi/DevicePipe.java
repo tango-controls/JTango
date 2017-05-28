@@ -140,17 +140,6 @@ public class DevicePipe implements PipeScanner {
 
     /**
      * Set pipe time
-     *
-     * @param timeVal pipe time
-     */
-    // ===================================================================
-    public void setTimeVal(TimeVal timeVal) {
-        this.timeVal = timeVal;
-    }
-    // ===========================================
-
-    /**
-     * Set pipe time
      * @param t pipe time (number of milli seconds since EPOCH)
      */
     // ===================================================================
@@ -158,6 +147,17 @@ public class DevicePipe implements PipeScanner {
         int seconds = (int) (t / 1000);
         int millis = (int) (t - 1000 * t);
         this.timeVal = new TimeVal(seconds, millis * 1000, 0);
+    }
+    // ===========================================
+
+    /**
+     * Set pipe time
+     *
+     * @param timeVal pipe time
+     */
+    // ===================================================================
+    public void setTimeVal(TimeVal timeVal) {
+        this.timeVal = timeVal;
     }
 
     /**

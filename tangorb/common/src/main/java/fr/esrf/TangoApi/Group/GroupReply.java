@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -43,13 +43,31 @@ import fr.esrf.TangoApi.CommunicationTimeout;
  * TANGO group reply base class
  */
 public class GroupReply implements java.io.Serializable{
-    
-    /** Enable/disable exceptions - returns previous mode */
-    static boolean enable_exception(boolean ex_mode) {
-        boolean tmp = exception_enabled;
-        exception_enabled = ex_mode;
-        return tmp;
-    }
+
+    /**
+     * Enable/disable exceptions
+     */
+    protected static boolean exception_enabled = true;
+    /**
+     * Device name
+     */
+    protected String dev_name;
+    /**
+     * Obj. name (attribute or command
+     */
+    protected String obj_name;
+    /**
+     * Error flag
+     */
+    protected boolean has_failed;
+    /**
+     * Exception
+     */
+    protected DevFailed exception;
+    /**
+     * TimeOut
+     */
+    protected boolean has_timeout;
     
     /** Creates a new instance of GroupReply - defauly ctor */
     public GroupReply() {
@@ -75,11 +93,21 @@ public class GroupReply implements java.io.Serializable{
         has_failed = true;
         has_timeout = (_ex instanceof CommunicationTimeout);
     }
+
+    /**
+     * Enable/disable exceptions - returns previous mode
+     */
+    static boolean enable_exception(boolean ex_mode) {
+        boolean tmp = exception_enabled;
+        exception_enabled = ex_mode;
+        return tmp;
+    }
     
     /** Returns error flag */
     public boolean has_failed() {
         return has_failed;
     }
+    
     /** Returns timeout flag */
     public boolean has_timeout() {
         return has_timeout;
@@ -99,22 +127,4 @@ public class GroupReply implements java.io.Serializable{
     public DevError[] get_err_stack() {
         return (has_failed && exception != null) ? exception.errors : null;
     }
-    
-    /** Enable/disable exceptions */
-    protected static boolean exception_enabled = true;
-    
-    /** Device name */
-    protected String dev_name;
-    
-    /** Obj. name (attribute or command */
-    protected String obj_name;
-    
-    /** Error flag */
-    protected boolean has_failed;
-    
-    /** Exception */
-    protected DevFailed exception;
-    
-    /** TimeOut */
-    protected boolean has_timeout;
 }

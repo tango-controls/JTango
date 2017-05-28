@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,18 +27,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26454 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.Request;
-
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import org.omg.CORBA.Request;
 
 import java.util.List;
 
@@ -598,7 +597,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(DeviceProxy deviceProxy,
-                    DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
+                                                  DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
 
 	//==========================================================================
 	//==========================================================================
@@ -1175,16 +1174,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     // ===================================================================
     public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
-    // ===================================================================
-    /**
-     * Write data in specified pipe
-     * @param deviceProxy device proxy object
-     * @param devicePipe data to be written
-	 * @return data read from specified pipe.
-     * @throws DevFailed in case of device connection failed or pipe not found.
-     */
-    // ===================================================================
-    public DevicePipe writeReadPipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
 
 
 
@@ -1235,7 +1224,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-                                int event, CallBack callback, boolean stateless) throws DevFailed;
+                                        int event, CallBack callback, boolean stateless) throws DevFailed;
     //==========================================================================
     /**
      *	Subscribe to event to be stored in an event queue.
@@ -1246,6 +1235,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-                                int event, int max_size, boolean stateless) throws DevFailed;
+                                        int event, int max_size, boolean stateless) throws DevFailed;
 
 }

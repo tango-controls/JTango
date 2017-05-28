@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30265 $
 //
 //-======================================================================
 
@@ -57,13 +57,20 @@ import java.util.*;
  * All data types are native java types e.g. simple types an arrays.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30265 $
  */
 
 public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements IDatabaseDAO {
 
     //===================================================================
+    private static final Object monitor = new Object();
 
+
+    //===================================================================
+    //===================================================================
+    private boolean access_service_read = false;
+
+    //===================================================================
     /**
      * Database access constructor.
      */
@@ -71,9 +78,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public DatabaseDAODefaultImpl() {
         super();
     }
-
-
-    //===================================================================
 
     /**
      * Database access init method.
@@ -84,8 +88,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public void init(Database database) throws DevFailed {
         super.init(database);
     }
-
-    //===================================================================
+    //==========================================================================
 
     /**
      * Database access constructor.
@@ -107,13 +110,17 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public String toString(Database database) {
         return database.url.host + ":" + database.url.port;
     }
-    //==========================================================================
+
+
+    //**************************************
+    //       MISCELLANEOUS MANAGEMENT
+    //**************************************
 
     /**
      * Convert a String array to a sting.
      *
-     * @param array String arrar to be converted
-     * @return string after convertion.
+     * @param array String array to be converted
+     * @return string after conversion.
      */
     //==========================================================================
     private String stringArray2String(String[] array) {
@@ -142,12 +149,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
     }
 
-
-    //**************************************
-    //       MISCELANEOUS MANAGEMENT
-    //**************************************
-
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_info()
@@ -163,6 +164,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         //	format result as string
         return stringArray2String(info);
     }
+
+
+    //**************************************
+    //       SERVERS MANAGEMENT
+    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -193,11 +199,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetHostList", argin);
         return argout.extractStringArray();
     }
-
-
-    //**************************************
-    //       SERVERS MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -340,6 +341,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbPutServerInfo", argin);
     }
 
+    //**************************************
+    //       DEVICES MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_server_info(java.lang.String)
@@ -370,10 +375,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(new String[]{srcServerName, newServerName});
         command_inout(database, "DbRenameServer", argin);
     }
-
-    //**************************************
-    //       DEVICES MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -522,7 +523,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbExportDevice", argin);
     }
 
-
     //**************************************
     //       Devices list MANAGEMENT
     //**************************************
@@ -540,7 +540,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetDeviceClassList", argin);
         return argout.extractStringArray();
     }
-
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -577,6 +576,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractStringArray();
     }
 
+
+    //**************************************
+    //       SERVERS MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_family(java.lang.String)
@@ -606,11 +610,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetDeviceMemberList", argin);
         return argout.extractStringArray();
     }
-
-
-    //**************************************
-    //       SERVERS MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -654,6 +653,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbDeleteServer", argin);
     }
 
+
+    //**************************************
+    //       PROPERTIES MANAGEMENT
+    //**************************************
+    //==========================================================================
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_server(fr.esrf.TangoApi.DbDevExportInfo[])
@@ -678,6 +683,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(array);
         command_inout(database, "DbExportServer", argin);
     }
+    //==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -693,10 +699,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbUnExportServer", argin);
     }
 
-
-    //**************************************
-    //       PROPERTIES MANAGEMENT
-    //**************************************
     //==========================================================================
 
     /**
@@ -775,7 +777,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
         return properties;
     }
-
     //==========================================================================
 
     /**
@@ -895,7 +896,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         delete_obj_property(database, name, type, array);
     }
-    //==========================================================================
 
     /**
      * Delete a property for the specified object.
@@ -919,7 +919,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         delete_obj_property(database, name, type, array);
     }
-    //==========================================================================
 
     /**
      * Delete a list of properties for the specified object.
@@ -991,6 +990,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetPropertyList", argin);
         return argout.extractStringArray();
     }
+    //==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1013,7 +1013,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "";    //	No object type
         return get_obj_property(database, name, type, propname);
     }
-    //==========================================================================
 
     /**
      * Query the database for an object (ie non-device)
@@ -1186,7 +1185,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return result;
     }
 
-
     //**************************************
     //       DEVICE PROPERTIES MANAGEMENT
     //**************************************
@@ -1249,6 +1247,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         delete_obj_property(database, name, type, propnames);
     }
 
+
+    //**************************************
+    //      ATTRIBUTE PROPERTIES MANAGEMENT
+    //**************************************
+
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_property(java.lang.String, java.lang.String)
@@ -1270,11 +1273,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "Device";
         delete_obj_property(database, name, type, properties);
     }
-
-
-    //**************************************
-    //      ATTRIBUTE PROPERTIES MANAGEMENT
-    //**************************************
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1425,7 +1423,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         delete_device_attribute_property(database, devname, attname, array);
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute(java.lang.String, java.lang.String)
@@ -1441,7 +1438,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(array);
         command_inout(database, "DbDeleteDeviceAttribute", argin);
     }
-
 
     //**************************************
     //      CLASS PROPERTIES MANAGEMENT
@@ -1541,7 +1537,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String type = "Class";
         delete_obj_property(database, name, type, properties);
     }
-
 
     //**************************************
     //      CLASS Attribute PROPERTIES MANAGEMENT
@@ -1657,6 +1652,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     }
 
     //==========================================================================
+    //		Aliases management
+    //==========================================================================
+
+    // ==========================================================================
+
+    //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_exported(java.lang.String)
 	 */
@@ -1671,6 +1672,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         return argout.extractStringArray();
     }
+
+    // ==========================================================================
 
     //==========================================================================
 	/* (non-Javadoc)
@@ -1687,10 +1690,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         return argout.extractStringArray();
     }
-
-    //==========================================================================
-    //		Aliases management
-    //==========================================================================
 
     // ==========================================================================
 
@@ -1728,8 +1727,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return argout.extractString();
     }
 
-    // ==========================================================================
-
     /**
      * Query the database for an alias for the specified attribute.
      *
@@ -1745,8 +1742,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argout = command_inout(database, "DbGetAttributeAlias2", argin);
         return argout.extractString();
     }
-
-    // ==========================================================================
 
     /**
      * Query the database for an attribute name for the specified alias.
@@ -1836,7 +1831,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         command_inout(database, "DbDeleteDeviceAlias", argin);
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_attribute_alias_list(java.lang.String)
@@ -1893,6 +1887,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argin.insert(alias);
         command_inout(database, "DbDeleteAttributeAlias", argin);
     }
+
+    //==========================================================================
 
     //==========================================================================
     //==========================================================================
@@ -1962,7 +1958,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return new DbEventImportInfo(info);
     }
 
-    //==========================================================================
     /**
      * Convert the result of a DbGet...PropertyHist command.
      *
@@ -2090,7 +2085,6 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         return array;
     }
 
-
     //==========================================================================
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_property_history(java.lang.String, java.lang.String)
@@ -2152,6 +2146,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             result[i] = v.get(i);
         return result;
     }
+    //===================================================================
+    //===================================================================
 
     //===============================================================
 	/* (non-Javadoc)
@@ -2248,13 +2244,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         }
     }
     //===================================================================
-    //===================================================================
 
-
-    //===================================================================
-    private boolean access_service_read = false;
-    private static final Object monitor = new Object();
-    //===================================================================
     /**
      * Check Tango Access.
      * - Check if control access is requested.

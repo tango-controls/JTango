@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -63,85 +63,21 @@ public class Logging implements TangoConst
    * The TANGO core logger (used to log TANGO core message)
    */
   private static Logger _core_logger = null;
-
-  /** 
-   * The logging path 
+    //- Some default target names
+    final String _DefaultTargetName = "default";
+    /**
+     * The logging path
    */
   private String logging_path = null;
-  
-  /** 
+    /**
    * The rolling file threshold
    */
   private long rft = LOGGING_DEF_RFT;
-  
-  /** 
+    /**
    * The rolling file threshold
    */
   private int cmd_line_level = 0;
-
-  //- Some default target names
-  final String _DefaultTargetName = "default";
   
- /**
-  * A private nested class store logging proprety
-  */
-  public class LoggingProperties {
-    public String logging_path = null;
-    public String[] logging_targets = null; 
-    public Level logging_level = Level.WARN;
-    public long logging_rft = LOGGING_DEF_RFT;
-  }
-  
- /**
-  * Get the singleton object reference.
-  *
-  * This method returns a reference to the object of the Logging class.
-  * If the class has not been initialised with it's init method, this method
-  * print a message and abort the device server process
-  *
-  * @return The Logging object reference
-  */
-	public static Logging instance()
-	{
-		if (_instance == null)
-		{
-			System.err.println("Logging is not initialised !!!");
-			System.err.println("Exiting");
-			System.exit(-1);
-		}
-		return _instance;
-	}
-  
- /**
-  * Returns the TANGO core logger.
-  * Make it static for both avoiding to call instance() each time we want to obtain
-  * the core_logger reference and ensuring that UtilPrint does not crash if the
-  * core_logger is not already instciated (log statements executed before logging init) 
-  */
-	public static Logger core_logger()
-	{
-		return _core_logger;
-	}
-  
- /**
-  * Create and get the singleton object reference.
-  *
-  * This method returns a reference to the object of the Logging class.
-  * If the class singleton object has not been created, it will be 
-  * instanciated
-  *
-  * @param ds_name The device server executable name
-  * @param db The database object
-  * @return The Logging object reference
-  */
-	public static Logging init(String ds_name, int trace_level, Database db)
-	{
-		if (_instance == null) {
-			_instance = new Logging(ds_name, trace_level, db);
-		}
-		return _instance;
-	}
-
  /**
   * Constructs a newly allocated Logging object.
   * This constructor is protected following the singleton pattern
@@ -156,7 +92,7 @@ public class Logging implements TangoConst
     //- Build DServer name
     final String ds_dev_name = "dserver/" + ds_name;
     verbose("Initializing logging for " + ds_dev_name);
-    //- Instanciate the logger 
+        //- Instanciate the logger
     Logger logger = Logger.getLogger(ds_dev_name.toLowerCase());
     if (logger == null) {
       verbose("\tFailed to instanciate the TANGO core-logger");
@@ -191,7 +127,7 @@ public class Logging implements TangoConst
     } else {
       logging_path = tango_log_path;
     }
-    //- Create process wide default logging directory 
+        //- Create process wide default logging directory
     logging_path += "/" + ds_name;
     verbose("\tDefault logging directory set to " + logging_path);
     //- Is logging level set from command line?
@@ -211,7 +147,7 @@ public class Logging implements TangoConst
     //- If not using the TANGO db then return
     if (db == null) {
      verbose("\tNot using the database. Logging Intialization complete");
-     return; 
+        return;
     }
     verbose("\tReading logging properties from database");
     LoggingProperties properties = get_logging_properties(logger, db);
@@ -221,7 +157,7 @@ public class Logging implements TangoConst
       return;
     }
     if (properties.logging_path != null) {
-      logging_path = properties.logging_path; 
+        logging_path = properties.logging_path;
       verbose("\tLogging path changed to " + logging_path);
     }
     if (level_set_from_cmd_line == false) {
@@ -232,11 +168,11 @@ public class Logging implements TangoConst
       rft = properties.logging_rft;
       verbose("\tRolling threshold changed to " + String.valueOf(rft));
     }
-    verbose("\tAdding initial targets to TANGO core-logger");  
+        verbose("\tAdding initial targets to TANGO core-logger");
     //- Be sure there is a console target if level set from cmd line
     if (level_set_from_cmd_line) {
       try {
-        add_logging_target(logger, LOGGING_CONSOLE_TARGET);   
+          add_logging_target(logger, LOGGING_CONSOLE_TARGET);
       } catch (DevFailed e) {
         //- ignore any exception
       }
@@ -254,12 +190,58 @@ public class Logging implements TangoConst
 			}
 		}
     }
-    //- Set core logger reference 
+        //- Set core logger reference
     _core_logger = logger;
   }
 
+    /**
+     * Get the singleton object reference.
+     * <p>
+     * This method returns a reference to the object of the Logging class.
+     * If the class has not been initialised with it's init method, this method
+     * print a message and abort the device server process
+     *
+     * @return The Logging object reference
+     */
+    public static Logging instance() {
+        if (_instance == null) {
+            System.err.println("Logging is not initialised !!!");
+            System.err.println("Exiting");
+            System.exit(-1);
+        }
+        return _instance;
+    }
+
+    /**
+     * Returns the TANGO core logger.
+     * Make it static for both avoiding to call instance() each time we want to obtain
+     * the core_logger reference and ensuring that UtilPrint does not crash if the
+     * core_logger is not already instciated (log statements executed before logging init)
+     */
+    public static Logger core_logger() {
+        return _core_logger;
+    }
+
+    /**
+     * Create and get the singleton object reference.
+     * <p>
+     * This method returns a reference to the object of the Logging class.
+     * If the class singleton object has not been created, it will be
+     * instanciated
+     *
+     * @param ds_name The device server executable name
+     * @param db      The database object
+     * @return The Logging object reference
+     */
+    public static Logging init(String ds_name, int trace_level, Database db) {
+        if (_instance == null) {
+            _instance = new Logging(ds_name, trace_level, db);
+        }
+        return _instance;
+    }
+
  /**
-  * Reads logging properties from TANGO database 
+  * Reads logging properties from TANGO database
   */
   public LoggingProperties get_logging_properties (Logger logger, Database db)
   {
@@ -294,15 +276,15 @@ public class Logging implements TangoConst
       if (db_data[1].is_empty() == false) {
         properties.logging_rft = db_data[1].extractLong();
       }
-      if (properties.logging_rft < LOGGING_MIN_RFT)
-         properties.logging_rft = LOGGING_MIN_RFT;  
-      else if (properties.logging_rft > LOGGING_MAX_RFT)
-         properties.logging_rft = LOGGING_MAX_RFT;  
+        if (properties.logging_rft < LOGGING_MIN_RFT)
+         properties.logging_rft = LOGGING_MIN_RFT;
+        else if (properties.logging_rft > LOGGING_MAX_RFT)
+         properties.logging_rft = LOGGING_MAX_RFT;
       //- Set logging level (if not set from cmd line)
-      if (db_data[2].is_empty() == false) {
-        String level_str = db_data[2].extractString(); 
+        if (db_data[2].is_empty() == false) {
+        String level_str = db_data[2].extractString();
         properties.logging_level = tango_to_log4j_level(level_str);
-      } 
+      }
       //- Get logging targets (will be set later)
       if (db_data[3].is_empty() == false) {
         properties.logging_targets = db_data[3].extractStringArray();
@@ -314,13 +296,13 @@ public class Logging implements TangoConst
     }
     return properties;
   }
-  
+
  /**
   * Adds logging target(s) to the specified device(s)
   *
-  * @param 	dvsa A string array where str[i]=dev-name and str[i+1]=target_type::target_name
-  */	
-	public void add_logging_target (String[] dvsa) throws DevFailed
+  * @param    dvsa A string array where str[i]=dev-name and str[i+1]=target_type::target_name
+  */
+ public void add_logging_target (String[] dvsa) throws DevFailed
 	{
     //- Fight against "zombie appender" synfrom
     kill_zombie_appenders();
@@ -352,26 +334,26 @@ public class Logging implements TangoConst
 		}
     }
 	}
-
+  
  /**
   * Adds a logging target to the specified logger (i.e. device).
   *
   * @param 	logger A lo4j logger to which the target will be added
   * @param 	ttype The target type
   * @param 	tname The target name
-  */	
-	public void add_logging_target (Logger logger, String ttype, String tname) throws DevFailed
+  */
+ public void add_logging_target (Logger logger, String ttype, String tname) throws DevFailed
 	{
     add_logging_target(logger, ttype + LOGGING_SEPARATOR + tname);
 	}
-  
+
  /**
   * Adds a logging target to the specified logger (i.e. device)
   *
   * @param 	logger A lo4j logger to which the target will be added
   * @param 	ttype_tname A string containing something like target_type::target_name
-  */	
-	public void add_logging_target (Logger logger, String ttype_tname) throws DevFailed
+  */
+ public void add_logging_target (Logger logger, String ttype_tname) throws DevFailed
 	{
     //- Check input (is logger valid)
     if (logger == null) {
@@ -380,8 +362,8 @@ public class Logging implements TangoConst
     //- Avoid case sensitive troubles
     ttype_tname = ttype_tname.toLowerCase();
     //- Split ttype_tname into target type and name
-    String ttype = get_target_type(ttype_tname);
-    String tname = get_target_name(ttype_tname); 
+        String ttype = get_target_type(ttype_tname);
+    String tname = get_target_name(ttype_tname);
     //- Find out target type
     int type_id = LOGGING_UNKNOWN_TARGET_ID;
     if (LOGGING_FILE_TARGET.equals(ttype)) {
@@ -418,10 +400,10 @@ public class Logging implements TangoConst
         }
         File file = new File(full_file_name);
         File dir = new File(file.getParent());
-        if (dir.isDirectory() == false) {
+          if (dir.isDirectory() == false) {
           try {
             dir.mkdirs();
-          } 
+          }
           catch (Exception e) {
             String desc = "Failed to create directory " + dir.getPath();
             Except.throw_exception("API_SystemException", desc, "Logging::add_logging_target");
@@ -443,8 +425,8 @@ public class Logging implements TangoConst
     }
     //- Attach appender to the logger (if not already attached)
     Appender appender = logger.getAppender(appender_name);
-    if (appender != null) {
-      Util.out4.println("Target " + appender_name + " is already attached to " + logger.getName());  
+        if (appender != null) {
+            Util.out4.println("Target " + appender_name + " is already attached to " + logger.getName());
       return;
     }
     //- Instanciate the appender
@@ -477,17 +459,16 @@ public class Logging implements TangoConst
     }
     catch (Exception e) {
       String desc = "System exception caugth while trying to add target " + ttype_tname + " to " +  logger.getName();
-      Except.throw_exception("API_SystemException", desc , "Logging::add_logging_target");
+      Except.throw_exception("API_SystemException", desc, "Logging::add_logging_target");
     }
-	}
-  
- /**
-  * Removes logging target(s) from target list of the specified device(s) 
+    }
+
+    /**
+  * Removes logging target(s) from target list of the specified device(s)
   *
-  * @param 	dvsa A string array where str[i]=dev-name and str[i+1]=target_type::target_name
-  */	
-	public void remove_logging_target (String[] dvsa) throws DevFailed
-	{ 
+  * @param    dvsa A string array where str[i]=dev-name and str[i+1]=target_type::target_name
+  */
+    public void remove_logging_target (String[] dvsa) throws DevFailed {
     //- Fight against "zombie appender" synfrom
     kill_zombie_appenders();
     //- N x [device-name, ttype::tname] expected
@@ -585,15 +566,14 @@ public class Logging implements TangoConst
 			} // else (if remove_all_targets)
 		} // for each device in <dl>
     }
-	}
+    }
 
-  /**
-  * Set logging level for the specified devices
-  *
-  * @param dvlsa A Tango.DevVarLongStringArray containing device-names and logging levels 
-  */	
-	public void set_logging_level (DevVarLongStringArray dvlsa) throws DevFailed
-	{ 
+    /**
+     * Set logging level for the specified devices
+     *
+     * @param dvlsa A Tango.DevVarLongStringArray containing device-names and logging levels
+  */
+    public void set_logging_level (DevVarLongStringArray dvlsa) throws DevFailed {
     //- Check input
     if (dvlsa.svalue.length != dvlsa.svalue.length) {
       String desc = "Imcompatible command argument type, long and string arrays must have the same length";
@@ -626,9 +606,8 @@ public class Logging implements TangoConst
   * Get logging level for the specified devices
   *
   * @param dvsa A Tango.DevVarStringArray containing device names
-  */	
-	public DevVarLongStringArray get_logging_level (String[] dvsa) throws DevFailed
-	{ 
+  */
+  public DevVarLongStringArray get_logging_level (String[] dvsa) throws DevFailed {
     //- Temp vector
     int i;
     Iterator it;
@@ -655,8 +634,8 @@ public class Logging implements TangoConst
     Iterator level_it = tmp_level.iterator();
     while (name_it.hasNext() && level_it.hasNext()) {
       dvlsa.svalue[i] = (String)name_it.next();
-      dvlsa.lvalue[i] = log4j_to_tango_level((Level)level_it.next());
-      i++; 
+        dvlsa.lvalue[i] = log4j_to_tango_level((Level)level_it.next());
+      i++;
     }
     return dvlsa;
 	}
@@ -665,14 +644,13 @@ public class Logging implements TangoConst
   * Get logging target for the specified devices
   *
   * @param dev_name The device names
-  */	
-	public String[] get_logging_target (String dev_name) throws DevFailed
-	{ 
+  */
+  public String[] get_logging_target (String dev_name) throws DevFailed {
     //- Get device by name
     DeviceImpl dev = Util.instance().get_device_by_name(dev_name);
     //- Get device targets (i.e appenders)
-    Enumeration all_appenders  = dev.get_logger().getAllAppenders();
-    //- Instanciate returned value 
+        Enumeration all_appenders  = dev.get_logger().getAllAppenders();
+    //- Instanciate returned value
     int num_appenders = 0;
     Enumeration a_shame_copy = dev.get_logger().getAllAppenders();
     while (a_shame_copy.hasMoreElements()) {
@@ -687,37 +665,33 @@ public class Logging implements TangoConst
       targets[num_appenders++] = appender.getName();
     }
     return targets;
-	}
-  
-  /**
-  * For each device, save its current logging Level then set it to OFF
-  */	
-	public void stop_logging ()
-	{ 
-   		Vector dl = Util.instance().get_device_list("*");
-		for (Object aDl : dl)
-		{
-			((DeviceImpl) aDl).stop_logging();
-		}
-	}
+    }
 
-  /**
-  * For each device, restore the logging level to the value saved during a previous call to stop_logging 
-  */	
-	public void start_logging ()
-	{ 
+    /**
+  * For each device, save its current logging Level then set it to OFF
+  */
+    public void stop_logging () {
+   		Vector dl = Util.instance().get_device_list("*");
+        for (Object aDl : dl) {
+            ((DeviceImpl) aDl).stop_logging();
+        }
+    }
+
+    /**
+     * For each device, restore the logging level to the value saved during a previous call to stop_logging
+  */
+    public void start_logging () {
     	Vector dl = Util.instance().get_device_list("*");
 		for (Object aDl : dl)
 		{
 			((DeviceImpl) aDl).start_logging();
 		}
 	}
-  
+
  /**
   * Kills zombie targets (i.e. appenders)
-  */	
-	public void kill_zombie_appenders ()
-	{ 
+  */
+ public void kill_zombie_appenders () {
    		//- Get all devices
     	Vector dl = Util.instance().get_device_list("*");
     	//- Check appenders validity then kill them if needed
@@ -739,14 +713,14 @@ public class Logging implements TangoConst
 						logger.removeAppender(appender);
 					}
 				}
-			}
-		}
-	} 
+            }
+        }
+    }
 
-  /**
-   * Split type::name into type and name - returns type
+    /**
+     * Split type::name into type and name - returns type
    */
-  private String get_target_type (String ttype_tname) 
+  private String get_target_type (String ttype_tname)
   {
     String[] split;
     try {
@@ -756,11 +730,11 @@ public class Logging implements TangoConst
     }
     return split[0];
   }
-  
-  /**
-   * Split type::name into type and name - returns name
+
+    /**
+     * Split type::name into type and name - returns name
    */
-  private String get_target_name (String ttype_tname) 
+  private String get_target_name (String ttype_tname)
   {
     String[] split;
     try {
@@ -771,24 +745,24 @@ public class Logging implements TangoConst
     return (split.length > 1) ? split[1] :  _DefaultTargetName;
   }
 
-  /**
-   * Given a device name returns its default logging file name
+    /**
+     * Given a device name returns its default logging file name
    */
-  private String device_to_file_name (String dev_name) 
+  private String device_to_file_name (String dev_name)
   {
     return dev_name.replace('/', '_');
   }
-  
-  /**
-   * Prints logging initialization messages
-   */
-  private void verbose(String msg) 
+
+    /**
+     * Prints logging initialization messages
+     */
+    private void verbose(String msg)
   {
     if (cmd_line_level >= 4) {
-     System.out.println(msg); 
+     System.out.println(msg);
     }
   }
-
+  
   /**
    * Given to TANGO logging level, converts it to lo4j level
    */
@@ -814,11 +788,11 @@ public class Logging implements TangoConst
     //- Make compiler happy
     return Level.WARN;
   }
-  
-  /**
-   * Given to TANGO logging level, converts it to lo4j level
-   */
-  public Level tango_to_log4j_level (String level) 
+
+    /**
+     * Given to TANGO logging level, converts it to lo4j level
+     */
+    public Level tango_to_log4j_level(String level)
   {
    level = level.toUpperCase();
    if (level.equals(LOGGING_LEVELS[LOGGING_OFF])) {
@@ -838,11 +812,11 @@ public class Logging implements TangoConst
    }
    return Level.WARN;
   }
-  
-  /**
-   * Given to log4j logging level, converts it to TANGO level
-   */
-  public int log4j_to_tango_level (Level level) 
+
+    /**
+     * Given to log4j logging level, converts it to TANGO level
+     */
+    public int log4j_to_tango_level(Level level)
   {
    if (level.equals(Level.OFF)) {
      return LOGGING_OFF;
@@ -857,34 +831,42 @@ public class Logging implements TangoConst
      return LOGGING_WARN;
    }
    if (level.equals(Level.INFO)) {
-     return LOGGING_INFO;
+       return LOGGING_INFO;
    }
-   return LOGGING_DEBUG;
+      return LOGGING_DEBUG;
   }
-  
-  /**
-   * Set the specified logger's rolling threshold 
+
+    /**
+     * Set the specified logger's rolling threshold
    */
-  public void set_rolling_file_threshold (Logger logger, long rft)
-  {
-    if (logger == null) {
-      return; 
-    }
-    if (rft < LOGGING_MIN_RFT) {
-      rft = LOGGING_MIN_RFT;  
-    }
-    else if (rft > LOGGING_MAX_RFT) {
-      rft = LOGGING_MAX_RFT;  
-    }
-    String prefix = LOGGING_FILE_TARGET + LOGGING_SEPARATOR;
-    Enumeration all_appenders = logger.getAllAppenders();
-    while (all_appenders.hasMoreElements()) {
-      Appender appender = (Appender)all_appenders.nextElement();
-      if (appender.getName().indexOf(prefix) != -1) {
-        TangoRollingFileAppender trfa = (TangoRollingFileAppender)appender;
-        trfa.setMaximumFileSize(rft * 1024);
+  public void set_rolling_file_threshold (Logger logger, long rft) {
+      if (logger == null) {
+          return;
       }
-    }
+      if (rft < LOGGING_MIN_RFT) {
+          rft = LOGGING_MIN_RFT;
+      } else if (rft > LOGGING_MAX_RFT) {
+          rft = LOGGING_MAX_RFT;
+      }
+      String prefix = LOGGING_FILE_TARGET + LOGGING_SEPARATOR;
+      Enumeration all_appenders = logger.getAllAppenders();
+      while (all_appenders.hasMoreElements()) {
+          Appender appender = (Appender)all_appenders.nextElement();
+          if (appender.getName().indexOf(prefix) != -1) {
+              TangoRollingFileAppender trfa = (TangoRollingFileAppender) appender;
+              trfa.setMaximumFileSize(rft * 1024);
+          }
+      }
   }
+
+    /**
+     * A private nested class store logging proprety
+     */
+    public class LoggingProperties {
+        public String logging_path = null;
+        public String[] logging_targets = null;
+        public Level logging_level = Level.WARN;
+        public long logging_rft = LOGGING_DEF_RFT;
+    }
 }
   

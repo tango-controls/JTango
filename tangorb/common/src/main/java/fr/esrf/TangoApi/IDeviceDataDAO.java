@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,30 +27,29 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.Any;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TypeCode;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.DevVarDoubleStringArray;
 import fr.esrf.Tango.DevVarLongStringArray;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TypeCode;
 
 public interface IDeviceDataDAO {
 
 	// ===========================================================
 	/**
 	 * Constructor for the TgApi Data Object.
-	 * 
-	 * @throws DevFailed
-	 *             if TgApi class not instancied.
+	 *
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	// ===========================================================	
 	public void init(DeviceData deviceData) throws DevFailed;
@@ -61,8 +60,8 @@ public interface IDeviceDataDAO {
 	 * 
 	 * @param orb
 	 *            orb connection id.
-	 * @throws DevFailed
-	 *             if TgApi class not instancied.
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	// ===========================================================
 	public void init(DeviceData deviceData, ORB orb) throws DevFailed;
@@ -73,8 +72,8 @@ public interface IDeviceDataDAO {
 	 * 
 	 * @param any
 	 *            CORBA Any reference to be used in DeviceData.
-	 * @throws DevFailed
-	 *             if TgApi class not instancied.
+     * @throws DevFailed
+     *             if TgApi class not instancied.
 	 */
 	// ===========================================================
 	public void init(DeviceData deviceData, Any any) throws DevFailed;
@@ -499,12 +498,6 @@ public interface IDeviceDataDAO {
 	 *	extract method for a String Array.
 	 */
 	String[] extractStringArray(DeviceData deviceData);
-
-	//===========================================
-	/**
-	 *	extract method for a boolean Array.
-	 */
-	boolean[] extractBooleanArray(DeviceData deviceData);
 
 	//===========================================
 	/**

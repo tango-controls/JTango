@@ -24,14 +24,7 @@
  */
 package org.tango.server.attribute;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import fr.esrf.Tango.*;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.DeviceState;
@@ -41,12 +34,8 @@ import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.utils.CaseInsensitiveMap;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.ArchiveEventProp;
-import fr.esrf.Tango.ChangeEventProp;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.EventProperties;
-import fr.esrf.Tango.PeriodicEventProp;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * User class to create attribute properties.
@@ -56,6 +45,7 @@ import fr.esrf.Tango.PeriodicEventProp;
  */
 public final class AttributePropertiesImpl {
 
+    private final EventProperties eventProp;
     private String label = "";
     private String description = Constants.NO_DESCRIPTION;
     private String unit = Constants.NO_UNIT;
@@ -79,7 +69,6 @@ public final class AttributePropertiesImpl {
     private long deltaTLong = 0;
     private String deltaVal = Constants.NOT_SPECIFIED;
     private String[] alarmExtensions = new String[0];
-    private final EventProperties eventProp;
     private String[] extensions = new String[0];
     private String[] sysExtensions = new String[0];
     private double deltaValDouble = 0;
@@ -355,24 +344,12 @@ public final class AttributePropertiesImpl {
         return writableAttrName;
     }
 
-    public String getMinWarning() {
-        return minWarning;
-    }
-
-    public String getMaxWarning() {
-        return maxWarning;
-    }
-
-    public String getDeltaT() {
-        return deltaT;
-    }
-
-    public String getDeltaVal() {
-        return deltaVal;
-    }
-
     public void setWritableAttrName(final String writableAttrName) {
         this.writableAttrName = writableAttrName;
+    }
+
+    public String getMinWarning() {
+        return minWarning;
     }
 
     public void setMinWarning(final String minWarning) {
@@ -388,6 +365,10 @@ public final class AttributePropertiesImpl {
         }
     }
 
+    public String getMaxWarning() {
+        return maxWarning;
+    }
+
     public void setMaxWarning(final String maxWarning) {
         if (maxWarning.equalsIgnoreCase(Constants.NAN) || maxWarning.equalsIgnoreCase(Constants.NONE)) {
             this.maxWarning = Constants.NOT_SPECIFIED;
@@ -401,6 +382,10 @@ public final class AttributePropertiesImpl {
         }
     }
 
+    public String getDeltaT() {
+        return deltaT;
+    }
+
     public void setDeltaT(final String deltaT) {
         if (deltaT.equalsIgnoreCase(Constants.NAN) || deltaT.equalsIgnoreCase(Constants.NONE)) {
             this.deltaT = Constants.NOT_SPECIFIED;
@@ -412,6 +397,10 @@ public final class AttributePropertiesImpl {
             } catch (final NumberFormatException e) {
             }
         }
+    }
+
+    public String getDeltaVal() {
+        return deltaVal;
     }
 
     public void setDeltaVal(final String deltaVal) {
@@ -601,7 +590,7 @@ public final class AttributePropertiesImpl {
     @Override
     public boolean equals(final Object obj) {
         final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-        .toString();
+                .toString();
         final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
         boolean isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
         if (isEqual) {
@@ -620,8 +609,10 @@ public final class AttributePropertiesImpl {
     }
 
     public void setRootAttribute(final String rootAttribute) {
-        this.rootAttribute = rootAttribute;
-        isFwdAttribute = true;
+        if (rootAttribute != null && !rootAttribute.isEmpty() && !rootAttribute.equals(Constants.NOT_SPECIFIED)) {
+            this.rootAttribute = rootAttribute;
+            isFwdAttribute = true;
+        }
     }
 
     void persist(final String deviceName, final String attributeName) throws DevFailed {

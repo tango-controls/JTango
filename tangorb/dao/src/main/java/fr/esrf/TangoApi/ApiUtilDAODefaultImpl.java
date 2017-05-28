@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30265 $
 //
 //-======================================================================
 
@@ -59,7 +59,7 @@ import java.util.*;
  * </i>
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30265 $
  */
 
 public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
@@ -74,164 +74,16 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 
     // ===================================================================
     /**
-     * Return the database object created for specified host and port.
-     *
-     * @param tango_host
-     *            host and port (hostname:portnumber) where database is running.
+     * Return reconnection delay for controle system.
      */
     // ===================================================================
-    public Database get_db_obj(final String tango_host) throws DevFailed {
-        final int i = tango_host.indexOf(":");
-        if (i <= 0) {
-            Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
-                "Cannot parse port number", "ApiUtil.get_db_obj()");
-        }
-        return get_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
-    }
+    private static int reconnection_delay = -1;
 
     // ===================================================================
-    /**
-     * Return the database object created with TANGO_HOST environment variable .
-     */
-    // ===================================================================
-    public Database get_default_db_obj() throws DevFailed {
-        if (defaultDatabase == null) {
-            return get_db_obj();
-        } else {
-            return defaultDatabase;
-        }
-    }
-    // ===================================================================
-    /**
-     * Return tru if the database object has been created.
-     */
-    // ===================================================================
-    public boolean default_db_obj_exists() throws DevFailed {
-        return  (defaultDatabase != null);
-    }
 
-    // ===================================================================
-    /**
-     * Return the database object created with TANGO_HOST environment variable .
-     */
-    // ===================================================================
-    public synchronized Database get_db_obj() throws DevFailed {
-        if (ApiUtil.getOrb() == null) {
-            create_orb();
-        }
-
-        // If first time, create vector
-        // ---------------------------------------------------------------
-        if (db_list == null) {
-            db_list = new ArrayList<Database>();
-        }
-        // If first time, create Database object
-        // -----------------------------------------------------------
-        if (defaultDatabase == null) {
-            defaultDatabase = new Database();
-            db_list.add(defaultDatabase);
-        }
-        return db_list.get(0);
-    }
-
-    // ===================================================================
-    /**
-     * Return the database object created for specified host and port.
-     *
-     * @param host host where database is running.
-     * @param port port for database connection.
-     */
-    // ===================================================================
-    public Database get_db_obj(final String host, final String port) throws DevFailed {
-        if (ApiUtil.getOrb() == null) {
-            create_orb();
-        }
-
-        // If first time, create vector
-        if (db_list == null) {
-            db_list = new ArrayList<Database>();
-        }
-
-        // Build tango_host string
-        // ---------------------------
-        final String tango_host = host + ":" + port;
-
-        // Search if database object already created for this host and port
-        if (defaultDatabase != null) {
-            if (defaultDatabase.get_tango_host().equals(tango_host)) {
-                return defaultDatabase;
-            }
-        }
-
-        for (final Database dbase : db_list) {
-            if (dbase.get_tango_host().equals(tango_host)) {
-                return dbase;
-            }
-        }
-
-        // Else, create a new database object
-        final Database dbase = new Database(host, port);
-        db_list.add(dbase);
-        return dbase;
-    }
-
-    // ===================================================================
-    /**
-     * Return the database object created for specified host and port, and set
-     * this database object for all following uses..
-     *
-     * @param host host where database is running.
-     * @param port port for database connection.
-     */
-    // ===================================================================
-    public Database change_db_obj(final String host, final String port) throws DevFailed {
-        // Get requested database object
-        final Database dbase = get_db_obj(host, port);
-        // And set it at first vector element as default Dbase
-        db_list.remove(dbase);
-        db_list.add(0, dbase);
-        defaultDatabase = dbase;
-        return dbase;
-    }
-
-    // ===================================================================
-    /**
-     * Return the database object created for specified host and port, and set
-     * this database object for all following uses..
-     *
-     * @param host
-     *            host where database is running.
-     * @param port
-     *            port for database connection.
-     */
-    // ===================================================================
-    public Database set_db_obj(final String host, final String port) throws DevFailed {
-	return change_db_obj(host, port);
-    }
-
-    // ===================================================================
-    /**
-     * Return the database object created for specified host and port.
-     *
-     * @param tango_host
-     *            host and port (hostname:portnumber) where database is running.
-     */
-    // ===================================================================
-    public Database set_db_obj(final String tango_host) throws DevFailed {
-	final int i = tango_host.indexOf(":");
-	if (i <= 0) {
-	    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
-		    "Cannot parse port number", "ApiUtil.set_db_obj()");
-	}
-	return change_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
-    }
-
-    // ===================================================================
-    // ===================================================================
-
-    // ===================================================================
     /**
      * Create the orb object
+     *
      * @throws DevFailed if ORB creation failed
      */
     // ===================================================================
@@ -253,11 +105,11 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             // Set the Largest transfer.
             final String str = checkORBgiopMaxMsgSize();
             props.put("jacorb.maxManagedBufSize", str);
-			
-			//	Check for max threads
-			final String nbThreads = System.getProperty("max_receptor_threads");
-			if (nbThreads!=null)
-				props.put("jacorb.connection.client.max_receptor_threads", nbThreads);
+
+            //	Check for max threads
+            final String nbThreads = System.getProperty("max_receptor_threads");
+            if (nbThreads != null)
+                props.put("jacorb.connection.client.max_receptor_threads", nbThreads);
 
             // Set jacorb verbosity at minimum value
             props.put("jacorb.config.log.verbosity", "0");
@@ -268,7 +120,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 
             //  Add directory to get jacorb.properties
             props.put("jacorb.config.dir", "fr/esrf/TangoApi/etc");
-			System.setProperties(props);
+            System.setProperties(props);
 
             // Initialize ORB
             // -----------------------------
@@ -282,17 +134,18 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             ApiUtil.setOrb(null);
             ex.printStackTrace();
             Except.throw_connection_failed(ex.toString(), "Initializing ORB failed !",
-                "ApiUtil.create_orb()");
+                    "ApiUtil.create_orb()");
         } catch (final Exception e) {
             e.printStackTrace();
         }
     }
-
     // ===================================================================
+
     /**
      * Check if the checkORBgiopMaxMsgSize has been set. This environment
      * variable should be set in Mega bytes.
-     * @return  the property string  to be set.
+     *
+     * @return the property string  to be set.
      */
     // ===================================================================
     private static String checkORBgiopMaxMsgSize() {
@@ -318,6 +171,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
         return str;
     }
+
+    // ===================================================================
 
     // ===================================================================
     // ===================================================================
@@ -350,18 +205,239 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ===================================================================
+
+    // ==========================================================================
+    // ==========================================================================
+    public static String getUser() {
+        return System.getProperty("user.name");
+    }
+
+    // ===================================================================
+
+    @SuppressWarnings("UnusedParameters")
+    private static void removePendingReplies(final Delegate delegate) {
+        // try to solve a memory leak. pending_replies is still growing when
+        // server is in timeout
+        /*****
+         Removed for JacORB-3
+         if (!delegate.get_pending_replies().isEmpty()) {
+         delegate.get_pending_replies().clear();
+         }
+         *****/
+    }
+
+    // ===================================================================
+
+    public static void removePendingRepliesOfRequest(final Request request) {
+        final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
+                .target())._get_delegate();
+        removePendingReplies(delegate);
+    }
+
+    // ===================================================================
+
+    public static void removePendingRepliesOfDevice(final Connection connection) {
+        final org.jacorb.orb.Delegate delegate;
+        if (connection.device_4 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
+                    ._get_delegate();
+        } else if (connection.device_3 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
+                    ._get_delegate();
+        } else if (connection.device_2 != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
+                    ._get_delegate();
+        } else if (connection.device != null) {
+            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
+                    ._get_delegate();
+        } else {
+            return;
+        }
+        removePendingReplies(delegate);
+    }
+
+    // ===================================================================
+    // ===================================================================
+
+    // ===================================================================
+
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param tango_host
+     *            host and port (hostname:portnumber) where database is running.
+     */
+    // ===================================================================
+    public Database get_db_obj(final String tango_host) throws DevFailed {
+        final int i = tango_host.indexOf(":");
+        if (i <= 0) {
+            Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
+                "Cannot parse port number", "ApiUtil.get_db_obj()");
+        }
+        return get_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
+    }
+
+    // ===================================================================
+
+    /**
+     * Return the database object created with TANGO_HOST environment variable .
+     */
+    // ===================================================================
+    public Database get_default_db_obj() throws DevFailed {
+        if (defaultDatabase == null) {
+            return get_db_obj();
+        } else {
+            return defaultDatabase;
+        }
+    }
+
+    /**
+     * Return tru if the database object has been created.
+     */
+    // ===================================================================
+    public boolean default_db_obj_exists() throws DevFailed {
+        return  (defaultDatabase != null);
+    }
+
+    // ===================================================================
+
+    /**
+     * Return the database object created with TANGO_HOST environment variable .
+     */
+    // ===================================================================
+    public synchronized Database get_db_obj() throws DevFailed {
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
+
+        // If first time, create vector
+        // ---------------------------------------------------------------
+        if (db_list == null) {
+            db_list = new ArrayList<Database>();
+        }
+        // If first time, create Database object
+        // -----------------------------------------------------------
+        if (defaultDatabase == null) {
+            defaultDatabase = new Database();
+            db_list.add(defaultDatabase);
+        }
+        return db_list.get(0);
+    }
+
+    // ===================================================================
+
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param host host where database is running.
+     * @param port port for database connection.
+     */
+    // ===================================================================
+    public Database get_db_obj(final String host, final String port) throws DevFailed {
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
+
+        // If first time, create vector
+        if (db_list == null) {
+            db_list = new ArrayList<Database>();
+        }
+
+        // Build tango_host string
+        final String tango_host = host + ":" + port;
+
+        // Search if database object already created for this host and port
+        if (defaultDatabase != null) {
+            if (defaultDatabase.get_tango_host().equals(tango_host)) {
+                return defaultDatabase;
+            }
+        }
+
+        for (final Database dbase : db_list) {
+            if (dbase.get_tango_host().equals(tango_host)) {
+                return dbase;
+            }
+        }
+
+        // Else, create a new database object
+        final Database dbase = new Database(host, port);
+        db_list.add(dbase);
+        return dbase;
+    }
+
+    // ===================================================================
+
+    /**
+     * Return the database object created for specified host and port, and set
+     * this database object for all following uses..
+     *
+     * @param host host where database is running.
+     * @param port port for database connection.
+     */
+    // ===================================================================
+    public Database change_db_obj(final String host, final String port) throws DevFailed {
+        // Get requested database object
+        final Database dbase = get_db_obj(host, port);
+        // And set it at first vector element as default Dbase
+        db_list.remove(dbase);
+        db_list.add(0, dbase);
+        defaultDatabase = dbase;
+        return dbase;
+    }
+
+    // ===================================================================
+
+    /**
+     * Return the database object created for specified host and port, and set
+     * this database object for all following uses..
+     *
+     * @param host
+     *            host where database is running.
+     * @param port
+     *            port for database connection.
+     */
+    // ===================================================================
+    public Database set_db_obj(final String host, final String port) throws DevFailed {
+	return change_db_obj(host, port);
+    }
+
+    /**
+     * Return the database object created for specified host and port.
+     *
+     * @param tango_host
+     *            host and port (hostname:portnumber) where database is running.
+     */
+    // ===================================================================
+    public Database set_db_obj(final String tango_host) throws DevFailed {
+	final int i = tango_host.indexOf(":");
+	if (i <= 0) {
+	    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
+		    "Cannot parse port number", "ApiUtil.set_db_obj()");
+	}
+	return change_db_obj(tango_host.substring(0, i), tango_host.substring(i + 1));
+    }
+
     /**
      * Return the orb object
      */
     // ===================================================================
     public ORB get_orb() throws DevFailed {
-	if (ApiUtil.getOrb() == null) {
-	    create_orb();
-	}
-	return ApiUtil.getOrb();
+        if (ApiUtil.getOrb() == null) {
+            create_orb();
+        }
+        return ApiUtil.getOrb();
     }
+    // ==========================================================================
+    // ==========================================================================
 
-    // ===================================================================
+
+    // ==========================================================================
+    /*
+     * Asynchronous request management
+     */
+    // ==========================================================================
+    // ==========================================================================
+
     /**
      * Return the orb object
      */
@@ -370,7 +446,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	in_server_code = val;
     }
 
-    // ===================================================================
+    // ==========================================================================
+
     /**
      * Return true if in server code or false if in client code.
      */
@@ -379,12 +456,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return in_server_code;
     }
 
-    // ===================================================================
-    /**
-     * Return reconnection delay for controle system.
-     */
-    // ===================================================================
-    private static int reconnection_delay = -1;
+    // ==========================================================================
 
     public int getReconnectionDelay() {
         if (reconnection_delay < 0) {
@@ -405,22 +477,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
-    // ==========================================================================
-    public static String getUser()
-    {
-        return System.getProperty("user.name");
-    }
-    // ==========================================================================
-    // ==========================================================================
 
-
-
-    // ==========================================================================
-    /*
-     * Asynchronous request management
-     */
-    // ==========================================================================
-    // ==========================================================================
     /**
      * Add request in hash table and return id
      */
@@ -433,7 +490,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         return async_request_cnt;
     }
 
-    // ==========================================================================
     /**
      * Return the request in hash table for the id
      *
@@ -450,7 +506,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return aco.request;
     }
 
-    // ==========================================================================
     /**
      * Return the Asynch Object in hash table for the id
      */
@@ -459,7 +514,6 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 	return async_request_table.get(id);
     }
 
-    // ==========================================================================
     /**
      * Remove asynchronous call request and id from hashtable.
      */
@@ -476,46 +530,8 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
     }
 
-
-    @SuppressWarnings("UnusedParameters")
-    private static void removePendingReplies(final Delegate delegate) {
-        // try to solve a memory leak. pending_replies is still growing when
-        // server is in timeout
-        /*****
-        Removed for JacORB-3
-        if (!delegate.get_pending_replies().isEmpty()) {
-            delegate.get_pending_replies().clear();
-        }
-        *****/
-    }
-    public static void removePendingRepliesOfRequest(final Request request) {
-        final org.jacorb.orb.Delegate delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) request
-            .target())._get_delegate();
-        removePendingReplies(delegate);
-    }
-
-    public static void removePendingRepliesOfDevice(final Connection connection) {
-        final org.jacorb.orb.Delegate delegate;
-        if (connection.device_4 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_4)
-                ._get_delegate();
-        } else if (connection.device_3 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_3)
-                ._get_delegate();
-        } else if (connection.device_2 != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device_2)
-                ._get_delegate();
-        } else if (connection.device != null) {
-            delegate = (org.jacorb.orb.Delegate) ((org.omg.CORBA.portable.ObjectImpl) connection.device)
-                ._get_delegate();
-        }
-        else {
-            return;
-        }
-        removePendingReplies(delegate);
-    }
-
     // ==========================================================================
+
     /**
      * Set the reply_model in AsyncCallObject for the id key.
      */
@@ -584,6 +600,18 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
+
+    /**
+     * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
+     * ApiDefs.PULL_CALLBACK).
+     */
+    // ==========================================================================
+    public int get_asynch_cb_sub_model() {
+        return async_cb_sub_model;
+    }
+
+    // ==========================================================================
+
     /**
      * Return the callback sub model used.
      *
@@ -596,16 +624,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     }
 
     // ==========================================================================
-    /**
-     * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
-     * ApiDefs.PULL_CALLBACK).
-     */
-    // ==========================================================================
-    public int get_asynch_cb_sub_model() {
-    	return async_cb_sub_model;
-    }
 
-    // ==========================================================================
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -43,7 +43,7 @@ import fr.esrf.Tango.DevVarLongStringArray;
  * This class is an object containing the imported device information.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 25296 $
  */
 
 
@@ -171,6 +171,29 @@ public class DbDevImportInfo implements java.io.Serializable {
         }
     }
 
+    //===============================================================
+//===============================================================
+    public static void main(String[] args) {
+        //noinspection ProhibitedExceptionCaught
+        try {
+            String devname = args[0];
+            Database db = ApiUtil.get_db_obj();
+            DbDevImportInfo info = db.import_device(devname);
+            System.out.println(info);
+        } catch (DevFailed e) {
+            if (args.length < 2 || !args[1].equals("-no_exception"))
+                fr.esrf.TangoDs.Except.print_exception(e);
+            System.exit(1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Device name ?");
+            System.exit(0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+        System.exit(0);
+    }
+
     //===============================================
     //===============================================
     public String toString() {
@@ -203,28 +226,5 @@ public class DbDevImportInfo implements java.io.Serializable {
                 result = sb.toString();
             }
         return result;
-    }
-
-    //===============================================================
-//===============================================================
-    public static void main(String[] args) {
-        //noinspection ProhibitedExceptionCaught
-        try {
-            String devname = args[0];
-            Database db = ApiUtil.get_db_obj();
-            DbDevImportInfo info = db.import_device(devname);
-            System.out.println(info);
-        } catch (DevFailed e) {
-            if (args.length < 2 || !args[1].equals("-no_exception"))
-                fr.esrf.TangoDs.Except.print_exception(e);
-            System.exit(1);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Device name ?");
-            System.exit(0);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-        System.exit(0);
     }
 }

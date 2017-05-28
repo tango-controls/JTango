@@ -5,7 +5,7 @@
 //
 // Description:	source code
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 15087 $
 //
 // $Log$
 // Revision 1.8  2010/05/31 12:21:56  abeilleg
@@ -47,21 +47,12 @@
 
 package fr.esrf.Tango.factory;
 
+import fr.esrf.TangoApi.*;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
-
-import fr.esrf.TangoApi.IApiUtilDAO;
-import fr.esrf.TangoApi.IConnectionDAO;
-import fr.esrf.TangoApi.IDatabaseDAO;
-import fr.esrf.TangoApi.IDeviceAttributeDAO;
-import fr.esrf.TangoApi.IDeviceAttribute_3DAO;
-import fr.esrf.TangoApi.IDeviceDataDAO;
-import fr.esrf.TangoApi.IDeviceDataHistoryDAO;
-import fr.esrf.TangoApi.IDeviceProxyDAO;
-import fr.esrf.TangoApi.IIORDumpDAO;
-import fr.esrf.TangoApi.ITacoTangoDeviceDAO;
 
 /**
  * 
@@ -81,9 +72,64 @@ public class TangoFactory {
         initTangoFactory();
     }
 
+    public static TangoFactory getSingleton() {
+        return singleton;
+    }
+
+    /**
+     * We get the properties file which contains default properties
+     *
+     * @return Properties
+     */
+    private static Properties getPropertiesFile() {
+        try {
+
+            // We use the class loader to load the properties file.
+            // This compatible with unix and windows.
+            final InputStream stream = TangoFactory.class.getClassLoader().getResourceAsStream(
+                    FACTORY_PROPERTIES);
+            final Properties properties = new Properties();
+
+            // We read the data in the properties file.
+            if (stream != null) {
+                // We need to use a Buffered Input Stream to load the datas
+                final BufferedInputStream bufStream = new BufferedInputStream(stream);
+                properties.clear();
+                properties.load(bufStream);
+            }
+            return properties;
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * We instanciate the Component
+     *
+     * @param className
+     * @return Object
+     */
+    private static Object getObject(final String className) {
+        try {
+            // we get the class coresponding to the life cycle name
+            final Class<?> clazz = Class.forName(className);
+
+            // we get the default constructor (with no parameter)
+            final Constructor<?> contructor = clazz.getConstructor(new Class[]{});
+
+            // we create an instance of the class using the constructor
+            return contructor.newInstance(new Object[]{});
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Load properties with impl specification and create instances
-     * 
+     *
      */
     private void initTangoFactory() {
         // we get the properties with instance of objects
@@ -108,10 +154,6 @@ public class TangoFactory {
         tangoFactory = (ITangoFactory) getObject(factoryClassName);
         isDefaultFactory = false;
         // }
-    }
-
-    public static TangoFactory getSingleton() {
-        return singleton;
     }
 
     public IConnectionDAO getConnectionDAO() {
@@ -152,59 +194,6 @@ public class TangoFactory {
 
     public IIORDumpDAO getIORDumpDAO() {
         return tangoFactory.getIORDumpDAO();
-    }
-
-    /**
-     * We get the properties file which contains default properties
-     * 
-     * @return Properties
-     */
-    private static Properties getPropertiesFile() {
-        try {
-
-            // We use the class loader to load the properties file.
-            // This compatible with unix and windows.
-            final InputStream stream = TangoFactory.class.getClassLoader().getResourceAsStream(
-                    FACTORY_PROPERTIES);
-            final Properties properties = new Properties();
-
-            // We read the data in the properties file.
-            if (stream != null) {
-                // We need to use a Buffered Input Stream to load the datas
-                final BufferedInputStream bufStream = new BufferedInputStream(stream);
-                properties.clear();
-                properties.load(bufStream);
-            }
-            return properties;
-        }
-        catch (final Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * We instanciate the Component
-     * 
-     * @param className
-     * @return Object
-     */
-    private static Object getObject(final String className) {
-        try {
-            // we get the class coresponding to the life cycle name
-            final Class<?> clazz = Class.forName(className);
-
-            // we get the default constructor (with no parameter)
-            final Constructor<?> contructor = clazz.getConstructor(new Class[] {});
-
-            // we create an instance of the class using the constructor
-            return contructor.newInstance(new Object[] {});
-
-        }
-        catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public boolean isDefaultFactory() {

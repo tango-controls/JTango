@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,29 +27,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.Tango.*;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
-
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.DevAttrHistory;
-import fr.esrf.Tango.DevAttrHistory_3;
-import fr.esrf.Tango.DevCmdHistory;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevVarDoubleStringArray;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.TimeVal;
 
 public interface IDeviceDataHistoryDAO {
 
@@ -402,56 +389,56 @@ public interface IDeviceDataHistoryDAO {
 	//===========================================
 	/**
 	 *	Return attribute name.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public String getName(DeviceDataHistory deviceDataHistory);
 
 	//===========================================
 	/**
 	 *	Return number of data read.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public int getNbRead(DeviceDataHistory deviceDataHistory);
 
 	//===========================================
 	/**
 	 *	Return number of data written.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public int getNbWritten(DeviceDataHistory deviceDataHistory);
 
 	//===========================================
 	/**
 	 *	Set attribute written dim_x.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public void setWrittenDimX(DeviceDataHistory deviceDataHistory, int nb);
 
 	//===========================================
 	/**
 	 *	Set attribute written dim_y.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public void setWrittenDimY(DeviceDataHistory deviceDataHistory, int nb);
 
 	//===========================================
 	/**
 	 *	Return attribute written dim_x.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public int getWrittenDimX(DeviceDataHistory deviceDataHistory);
 
 	//===========================================
 	/**
 	 *	Return attribute written dim_y.
-	 *	@throws	DevFailed in case of read_attribute failed
-	 */
+     *    @throws DevFailed in case of read_attribute failed
+     */
 	// ===========================================
 	public int getWrittenDimY(DeviceDataHistory deviceDataHistory);
 

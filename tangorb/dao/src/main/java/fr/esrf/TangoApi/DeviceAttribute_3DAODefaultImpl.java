@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,39 +27,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
-
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttributeDim;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevStateHelper;
-import fr.esrf.Tango.DevVarBooleanArrayHelper;
-import fr.esrf.Tango.DevVarCharArrayHelper;
-import fr.esrf.Tango.DevVarDoubleArrayHelper;
-import fr.esrf.Tango.DevVarFloatArrayHelper;
-import fr.esrf.Tango.DevVarLong64ArrayHelper;
-import fr.esrf.Tango.DevVarLongArrayHelper;
-import fr.esrf.Tango.DevVarShortArrayHelper;
-import fr.esrf.Tango.DevVarStateArrayHelper;
-import fr.esrf.Tango.DevVarStringArrayHelper;
-import fr.esrf.Tango.DevVarULong64ArrayHelper;
-import fr.esrf.Tango.DevVarULongArrayHelper;
-import fr.esrf.Tango.DevVarUShortArrayHelper;
-import fr.esrf.Tango.TimeVal;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 
 /**
  * Class Description: This class manage data object for Tango device attribute
@@ -83,16 +62,19 @@ import fr.esrf.TangoDs.TangoConst;
  * </ul></i>
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 25297 $
  */
 
 public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     AttributeValue_3 attrval = new AttributeValue_3();
 
     // ===========================================
+    public DeviceAttribute_3DAODefaultImpl() {
+    }
+
     /**
      * Build a DeviceAttribute IDL object
-     * 
+     *
      * @param name
      *            Attribute name.
      */
@@ -119,10 +101,8 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
 	attrval.err_list = null;
     }
 
-    public DeviceAttribute_3DAODefaultImpl() {
-    }
-
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
      * 
@@ -1286,7 +1266,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Throws exception if err_list not null.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1772,7 +1752,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute quality
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1785,7 +1765,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1798,7 +1778,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1811,7 +1791,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1839,7 +1819,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data read.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1852,7 +1832,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data read object.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1865,7 +1845,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data Write object.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1878,7 +1858,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return number of data written.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1891,7 +1871,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute dim_x.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1904,7 +1884,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute dim_y.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1917,7 +1897,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1930,7 +1910,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1969,7 +1949,7 @@ public class DeviceAttribute_3DAODefaultImpl implements IDeviceAttribute_3DAO {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     * 
+     *
      * @throws DevFailed
      *             in case of read_attribute failed
      */

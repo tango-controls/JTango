@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 28442 $
 //
 //-======================================================================
 
@@ -44,9 +44,21 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     private boolean use_union = true; // since IDL 4
 
     // ===========================================
+    public DeviceAttributeDAODefaultImpl() {
+    }
+
+    // ===========================================
+    // ===========================================
+    private static int DIM_MINI(final int y) {
+        return y == 0 ? 1 : y;
+    }
+
+
+    // ===========================================
+
     /**
      * Build a DeviceAttribute IDL object
-     * 
+     *
      * @param name Attribute name.
      */
     // ===========================================
@@ -71,11 +83,8 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
         attributeValue_5.err_list = new DevError[0];
     }
 
-    public DeviceAttributeDAODefaultImpl() {
-    }
-
-
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
      *
@@ -87,9 +96,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param attributeValue_4 AttributeValue_4 IDL object.
      */
     // ===========================================
@@ -98,9 +108,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param attributeValue_3 AttributeValue_3 IDL object.
      */
     // ===========================================
@@ -109,9 +120,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param attributeValue AttributeValue IDL object.
      */
     // ===========================================
@@ -120,9 +132,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      */
     // ===========================================
@@ -131,9 +144,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -146,9 +160,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -159,9 +174,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -172,9 +188,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -186,9 +203,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -199,9 +217,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -213,9 +232,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -226,9 +246,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -242,9 +263,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -255,9 +277,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -271,9 +294,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -284,9 +308,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -300,9 +325,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -313,9 +339,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -329,9 +356,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -342,9 +370,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -358,9 +387,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param value Attribute value.
      */
@@ -370,10 +400,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 	insert(value);
     }
 
-    // ===========================================
     /**
      * DeviceAttribute class constructor.
-     * 
+     *
      * @param name Attribute name.
      * @param values Attribute values.
      * @param dim_x array dimention in X
@@ -387,12 +416,15 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
+    // ===========================================
     // ===========================================
     public boolean hasFailed() {
 		return attributeValue_5.err_list != null && attributeValue_5.err_list.length > 0;
     }
 
     // ===========================================
+
     /**
      * Returns the attribute errors list
      */
@@ -402,9 +434,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Set the AttributeValue internal object with input one.
-     * 
+     *
      * @param attributeValue_4 AttributeValue_4 input object
      */
     // ===========================================
@@ -421,9 +454,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Set the AttributeValue internal object with input one.
-     * 
+     *
      * @param attributeValue_3 AttributeValue_3 input object
      */
     // ===========================================
@@ -440,10 +474,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		attributeValue_5.data_format = AttrDataFormat.FMT_UNKNOWN;
     }
 
-    // ===========================================
     /**
      * Set the AttributeValue internal object with input one.
-     * 
+     *
      * @param attributeValue AttributeValue input object
      */
     // ===========================================
@@ -471,19 +504,22 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
-    // ===========================================
-    public AttributeDim getWriteAttributeDim() {
-		return attributeValue_5.w_dim;
-    }
-
-    // ===========================================
     // Insert methods
     // ===========================================
 
     // ===========================================
+
+    // ===========================================
+    // ===========================================
+    public AttributeDim getWriteAttributeDim() {
+        return attributeValue_5.w_dim;
+    }
+
+    // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -501,9 +537,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -519,9 +556,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -539,9 +577,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
    	}
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -559,9 +598,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -577,9 +617,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -597,9 +638,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -616,9 +658,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -634,9 +677,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -653,9 +697,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -675,9 +720,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x nb data.in x direction
      * @param dim_y nb data.in y direction
@@ -699,9 +745,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -717,9 +764,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -731,9 +779,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -749,9 +798,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -769,9 +819,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -788,9 +839,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
    	}
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -807,9 +859,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -825,9 +878,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -847,9 +901,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -865,9 +920,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -887,9 +943,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -901,9 +958,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -919,9 +977,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -939,9 +998,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -953,9 +1013,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -971,9 +1032,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -991,9 +1053,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1011,9 +1074,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values as unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1031,9 +1095,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1049,9 +1114,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1071,9 +1137,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1089,9 +1156,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute valuesas unsigned.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1111,9 +1179,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1131,9 +1200,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1149,9 +1219,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -1169,9 +1240,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1187,9 +1259,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1205,9 +1278,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -1225,9 +1299,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1239,9 +1314,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1257,9 +1333,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -1277,9 +1354,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
    	}
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1291,9 +1369,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1309,9 +1388,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      * @param dim_x array dimention in X
      * @param dim_y array dimention in Y
@@ -1329,9 +1409,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Insert method for attribute values.
-     * 
+     *
      * @param argIn Attribute values.
      */
     // ===========================================
@@ -1344,10 +1425,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		attributeValue_5.value.encoded_att_value(new DevEncoded[] { argIn });
     }
 
-    // ===========================================
     /**
      * Throws exception if err_list not null.
-     * 
+     *
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1365,6 +1445,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 			}
 		}
     }
+
+    // ===========================================
+
     // ===========================================
     // ===========================================
     private void manageExceptions(final String method_name) throws DevFailed {
@@ -1372,9 +1455,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 	}
 
     // ===========================================
+
     /**
      * extract method for an DevState Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed  in case of read_attribute failed or if AttrQuality is
      *             ATTR_INVALID.
@@ -1407,12 +1491,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an DevState.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *		 	if AttrQuality is ATTR_INVALID.
+     *		 	if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public DevState extractDevState() throws DevFailed {
@@ -1430,12 +1515,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an boolean.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *		 	if AttrQuality is ATTR_INVALID.
+     *		 	if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public boolean extractBoolean() throws DevFailed {
@@ -1448,12 +1534,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an boolean Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public boolean[] extractBooleanArray() throws DevFailed {
@@ -1466,12 +1553,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an unsigned char.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed  in case of read_attribute failed or
-	 *			if AttrQuality is  ATTR_INVALID.
+     *			if AttrQuality is  ATTR_INVALID.
      */
     // ===========================================
     public short extractUChar() throws DevFailed {
@@ -1484,12 +1572,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an unsigned char Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public short[] extractUCharArray() throws DevFailed {
@@ -1509,12 +1598,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an unsigned char Array as a char array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public byte[] extractCharArray() throws DevFailed {
@@ -1528,12 +1618,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a short.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
       */
     // ===========================================
     public short extractShort() throws DevFailed {
@@ -1546,12 +1637,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a short Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public short[] extractShortArray() throws DevFailed {
@@ -1564,12 +1656,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an unsigned short.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
       */
     // ===========================================
     public int extractUShort() throws DevFailed {
@@ -1582,12 +1675,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for an unsigned short Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
       */
     // ===========================================
     public int[] extractUShortArray() throws DevFailed {
@@ -1605,12 +1699,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
       */
     // ===========================================
     public int extractLong() throws DevFailed {
@@ -1623,12 +1718,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public int[] extractLongArray() throws DevFailed {
@@ -1641,12 +1737,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a unsigned long.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long extractULong() throws DevFailed {
@@ -1662,12 +1759,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a unsigned long.array
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long[] extractULongArray() throws DevFailed {
@@ -1687,12 +1785,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long extractLong64() throws DevFailed {
@@ -1705,12 +1804,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long[] extractLong64Array() throws DevFailed {
@@ -1723,12 +1823,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long extractULong64() throws DevFailed {
@@ -1737,12 +1838,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a long Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public long[] extractULong64Array() throws DevFailed {
@@ -1755,12 +1857,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a float.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public float extractFloat() throws DevFailed {
@@ -1769,12 +1872,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a float Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public float[] extractFloatArray() throws DevFailed {
@@ -1787,12 +1891,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a double.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public double extractDouble() throws DevFailed {
@@ -1801,12 +1906,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a double Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public double[] extractDoubleArray() throws DevFailed {
@@ -1819,12 +1925,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a DevState (state attribute).
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public DevState extractState() throws DevFailed {
@@ -1835,12 +1942,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a String.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public String extractString() throws DevFailed {
@@ -1849,12 +1957,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a double Array.
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed or
-	 *			if AttrQuality is ATTR_INVALID.
+     *			if AttrQuality is ATTR_INVALID.
      */
     // ===========================================
     public String[] extractStringArray() throws DevFailed {
@@ -1867,9 +1976,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * extract method for a DevEncoded[]
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed
      */
@@ -1883,9 +1993,13 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+    // ===========================================
+
+    // ===========================================
+
     /**
      * extract method for a DevEncoded[]
-     * 
+     *
      * @return the extracted value.
      * @throws DevFailed in case of read_attribute failed
      */
@@ -1899,12 +2013,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
-    // ===========================================
 
-    // ===========================================
     /**
      * Return attribute quality
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1914,10 +2026,11 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Return attribute data format (SCALR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1926,9 +2039,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Return attribute time value.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1938,9 +2052,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
    	}
 
     // ===========================================
+
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1950,9 +2065,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
+
     /**
      * Return attribute time value in seconds since EPOCH.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1961,10 +2077,9 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
 		return attributeValue_5.time.tv_sec * 1000L + attributeValue_5.time.tv_usec / 1000L;
     }
 
-    // ===========================================
     /**
      * Return attribute name.
-     * 
+     *
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1973,15 +2088,10 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     }
 
     // ===========================================
-    // ===========================================
-    private static int DIM_MINI(final int y) {
-		return y == 0 ? 1 : y;
-    }
 
-    // ===========================================
     /**
      * Return number of data read.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1994,7 +2104,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return number of data written.
-     * 
+     *
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -2007,7 +2117,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return attribute dim_x.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -2019,7 +2129,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return attribute dim_y.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -2031,7 +2141,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -2043,7 +2153,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -2055,7 +2165,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return AttributeValue IDL object.
-     * 
+     *
      * @throws DevFailed
      */
     // ===========================================
@@ -2069,7 +2179,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * Return AttributeValue IDL object.
-     * 
+     *
      * @throws DevFailed
      */
     // ===========================================
@@ -2112,7 +2222,7 @@ public class DeviceAttributeDAODefaultImpl implements IDeviceAttributeDAO {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     * 
+     *
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================

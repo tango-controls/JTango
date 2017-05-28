@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -35,9 +35,6 @@
 package fr.esrf.TangoApi.Group;
 
 //- Import Java stuffs
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.Database;
@@ -46,50 +43,35 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
 
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.Vector;
+
 /**
  * TANGO group abstraction main class
  */
 
 public class Group extends GroupElement implements java.io.Serializable {
 
-    // -- PRIVATE INNER CLASS: GroupElementFactory -----------------------------
-    // -------------------------------------------------------------------------
-    private final class GroupElementFactory {
-	// ======================================================================
-	/**
-	 * Instanciate the TangoElements which name matches the pattern p
-	 * 
-	 * @param device
-	 *            name pattern (wild card).
-	 * @return a vector of GroupElement.
-	 */
-	// ======================================================================
-	public Vector instanciate(final String p) throws DevFailed {
-	    // - a vector to store GroupElement
-	    String[] dnl = null;
-	    // - is <p> a device name or a device name pattern ?
-	    if (p.indexOf('*') == -1) {
-		// - <p> is a pure device name
-		dnl = new String[1];
-		dnl[0] = p;
-	    } else {
-		// - ask the db the list of device matching pattern p
-		final Database db = new Database();
-		dnl = db.get_device_exported(p);
-	    }
-	    if (dnl.length == 0) {
-		return null;
-	    }
-	    final Vector ge = new Vector();
-	    for (final String element : dnl) {
-		ge.add(new GroupDeviceElement(element));
-	    }
-	    return ge;
-	}
-    }
+    /**
+     * Group's elements repository
+     */
+    private final Vector elements;
 
     // -- PUBLIC INTERFACE -----------------------------------------------------
     // -------------------------------------------------------------------------
+    /**
+     * Group element factory
+     */
+    private final GroupElementFactory factory;
+    /**
+     * Asynch request repository
+     */
+    private final TreeMap arp;
+    /**
+     * Pseudo asynch. request id generator
+     */
+    private int asynch_req_id;
 
     /** Creates a new instance of Group */
     public Group(final String name) {
@@ -162,7 +144,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      * Adds devices matching pattern
      * <p>
      * to the group
-     * 
+     *
      * @throws DevFailed
      */
     public void add(final String p) throws DevFailed {
@@ -179,7 +161,7 @@ public class Group extends GroupElement implements java.io.Serializable {
 
     /**
      * Adds devices matching patterns <pl> to the group
-     * 
+     *
      * @throws DevFailed
      */
     public void add(final String[] pl) throws DevFailed {
@@ -382,11 +364,14 @@ public class Group extends GroupElement implements java.io.Serializable {
 
     /** write_attribute */
     public GroupReplyList write_attribute(final DeviceAttribute[] da, final boolean fwd) throws DevFailed {
-	synchronized (this) {
-	    final int rid = write_attribute_asynch_i(da, fwd, next_req_id());
-	    return write_attribute_reply_i(rid, 0, fwd);
-	}
+        synchronized (this) {
+            final int rid = write_attribute_asynch_i(da, fwd, next_req_id());
+            return write_attribute_reply_i(rid, 0, fwd);
+        }
     }
+
+    // -- PRIVATE INTERFACE ----------------------------------------------------
+    // -------------------------------------------------------------------------
 
     /** write_attribute_asynch */
     public int write_attribute_asynch(final DeviceAttribute da, final boolean fwd) throws DevFailed {
@@ -413,9 +398,6 @@ public class Group extends GroupElement implements java.io.Serializable {
 	arp.remove(rid_obj);
 	return write_attribute_reply_i(rid, tmo, fwd.booleanValue());
     }
-
-    // -- PRIVATE INTERFACE ----------------------------------------------------
-    // -------------------------------------------------------------------------
 
     /** Returns the group's device list - access limited to package Group */
     @Override
@@ -821,21 +803,45 @@ public class Group extends GroupElement implements java.io.Serializable {
 	return asynch_req_id;
     }
 
-    /** Group's elements repository */
-    private final Vector elements;
-
-    /** Pseudo asynch. request id generator */
-    private int asynch_req_id;
-
-    /** Group element factory */
-    private final GroupElementFactory factory;
-
-    /** Asynch request repository */
-    private final TreeMap arp;
-
     @Override
     int read_attribute_asynch_i(final String[] a, final boolean fwd, final int rid) throws DevFailed {
 
-	return 0;
+        return 0;
+    }
+
+    // -- PRIVATE INNER CLASS: GroupElementFactory -----------------------------
+    // -------------------------------------------------------------------------
+    private final class GroupElementFactory {
+        // ======================================================================
+
+        /**
+         * Instanciate the TangoElements which name matches the pattern p
+         *
+         * @param device name pattern (wild card).
+         * @return a vector of GroupElement.
+         */
+        // ======================================================================
+        public Vector instanciate(final String p) throws DevFailed {
+            // - a vector to store GroupElement
+            String[] dnl = null;
+            // - is <p> a device name or a device name pattern ?
+            if (p.indexOf('*') == -1) {
+                // - <p> is a pure device name
+                dnl = new String[1];
+                dnl[0] = p;
+            } else {
+                // - ask the db the list of device matching pattern p
+                final Database db = new Database();
+                dnl = db.get_device_exported(p);
+            }
+            if (dnl.length == 0) {
+                return null;
+            }
+            final Vector ge = new Vector();
+            for (final String element : dnl) {
+                ge.add(new GroupDeviceElement(element));
+            }
+            return ge;
+        }
     }
 }

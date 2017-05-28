@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -49,13 +49,14 @@ import java.util.Vector;
  * database allows the Tango core software to create the Attribute object
  * for the attribute created by the user.
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
  
 public class Attr implements TangoConst
 {
-	 String 	    	name;
+    protected int poll_period;
+    String 	    	name;
 	 AttrDataFormat        	format;
 	 AttrWriteType         	writable;
 	 int		       	type;
@@ -63,7 +64,6 @@ public class Attr implements TangoConst
 	 DispLevel			disp_level = DispLevel.OPERATOR;
 	 Vector 	       	class_properties = new Vector();
 	 Vector			user_default_properties = new Vector();
-	protected	int			poll_period;
 		
 /**
  * Constructs a newly allocated Attr object.

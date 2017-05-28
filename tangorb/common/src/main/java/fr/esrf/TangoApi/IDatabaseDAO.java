@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26454 $
 //
 //-======================================================================
 
@@ -46,8 +46,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	/**
 	 *	Database access init method.
 	 *
-	 *	@throws DevFailed in case of environment not corectly set.
-	 */
+     *    @throws DevFailed in case of environment not corectly set.
+     */
 	//===================================================================
 	public abstract void init(Database database) throws DevFailed;	
 	
@@ -57,8 +57,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 *
 	 *	@param	host	host where database is running.
 	 *	@param	port	port for database connection.
-	 *	@throws DevFailed in case of host or port not available
-	 */
+     *	@throws DevFailed in case of host or port not available
+     */
 	//===================================================================
 	public abstract void init(Database database, String host, String port) throws DevFailed;	
 	
@@ -212,7 +212,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void add_device(Database database, String devname, String classname,
-			String servname) throws DevFailed;
+                                    String servname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -382,7 +382,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract String[] get_object_property_list(Database database, String objname,
-			String wildcard) throws DevFailed;
+                                                      String wildcard) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -488,7 +488,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract String[] get_class_property_list(Database database, String classname,
-			String wildcard) throws DevFailed;
+                                                     String wildcard) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -500,7 +500,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract String[] get_device_property_list(Database database, String devname,
-			String wildcard) throws DevFailed;
+                                                      String wildcard) throws DevFailed;
 
 	//==========================================================================
 	//==========================================================================
@@ -525,7 +525,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbDatum[] get_device_property(Database database, String name,
-			String[] propnames) throws DevFailed;
+                                                  String[] propnames) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -550,7 +550,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbDatum[] get_device_property(Database database, String name,
-			DbDatum[] properties) throws DevFailed;
+                                                  DbDatum[] properties) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -592,7 +592,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_device_property(Database database, String name,
-			DbDatum[] properties) throws DevFailed;
+                                                DbDatum[] properties) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -614,7 +614,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbAttribute[] get_device_attribute_property(Database database, String devname,
-			String[] attnames) throws DevFailed;
+                                                                String[] attnames) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -626,7 +626,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbAttribute get_device_attribute_property(Database database, String devname,
-			String attname) throws DevFailed;
+                                                              String attname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -638,7 +638,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void put_device_attribute_property(Database database, String devname,
-			DbAttribute[] attr) throws DevFailed;
+                                                       DbAttribute[] attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -650,7 +650,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void put_device_attribute_property(Database database, String devname,
-			DbAttribute attr) throws DevFailed;
+                                                       DbAttribute attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -660,7 +660,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_device_attribute_property(Database database, String devname,
-			DbAttribute attr) throws DevFailed;
+                                                          DbAttribute attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -670,7 +670,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_device_attribute_property(Database database, String devname,
-			DbAttribute[] attr) throws DevFailed;
+                                                          DbAttribute[] attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -681,7 +681,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_device_attribute_property(Database database, String devname,
-			String attname, String[] propnames) throws DevFailed;
+                                                          String attname, String[] propnames) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -692,7 +692,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_device_attribute_property(Database database, String devname,
-			String attname, String propname) throws DevFailed;
+                                                          String attname, String propname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -751,7 +751,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbDatum[] get_class_property(Database database, String name,
-			DbDatum[] properties) throws DevFailed;
+                                                 DbDatum[] properties) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -809,7 +809,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract String[] get_class_attribute_list(Database database, String classname,
-			String wildcard) throws DevFailed;
+                                                      String wildcard) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -821,7 +821,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract DbAttribute get_class_attribute_property(Database database, String classname,
-			String attname) throws DevFailed;
+                                                             String attname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -847,7 +847,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void put_class_attribute_property(Database database, String classname,
-			DbAttribute[] attr) throws DevFailed;
+                                                      DbAttribute[] attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -861,7 +861,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void put_class_attribute_property(Database database, String classname,
-			DbAttribute attr) throws DevFailed;
+                                                      DbAttribute attr) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -871,7 +871,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_class_attribute_property(Database database, String name,
-			String attname, String propname) throws DevFailed;
+                                                         String attname, String propname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -882,7 +882,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//==========================================================================
 	public abstract void delete_class_attribute_property(Database database, String name,
-			String attname, String[] propnames) throws DevFailed;
+                                                         String attname, String[] propnames) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -1056,11 +1056,11 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 * Returns the history of the specified device property.
 	 * @param devname Device name
 	 * @param propname Property name (can be wildcarded)
-	 * @throws DevFailed in case of failure
-	 */
+     * @throws DevFailed in case of failure
+     */
 	//==========================================================================
 	public abstract DbHistory[] get_device_property_history(Database database, String devname,
-			String propname) throws DevFailed;
+                                                            String propname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -1068,8 +1068,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 * @param devname Device name
 	 * @param attname Attribute name (can be wildcarded)
 	 * @param propname Property name (can be wildcarded)
-	 * @throws DevFailed in case of failure
-	 */
+     * @throws DevFailed in case of failure
+     */
 	//==========================================================================
 	public abstract DbHistory[] get_device_attribute_property_history(
 			Database database, String devname, String attname, String propname) throws DevFailed;
@@ -1079,11 +1079,11 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 * Returns the history of the specified class property.
 	 * @param classname Class name
 	 * @param propname Property name (can be wildcarded)
-	 * @throws DevFailed in case of failure
-	 */
+     * @throws DevFailed in case of failure
+     */
 	//==========================================================================
 	public abstract DbHistory[] get_class_property_history(Database database, String classname,
-			String propname) throws DevFailed;
+                                                           String propname) throws DevFailed;
 
 	//==========================================================================
 	/**
@@ -1091,8 +1091,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 * @param classname Class name
 	 * @param attname Attribute name (can be wildcarded)
 	 * @param propname Property name (can be wildcarded)
-	 * @throws DevFailed in case of failure
-	 */
+     * @throws DevFailed in case of failure
+     */
 	//==========================================================================
 	public abstract DbHistory[] get_class_attribute_property_history(
 			Database database, String classname, String attname, String propname) throws DevFailed;
@@ -1102,11 +1102,11 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 * Returns the history of the specified object property.
 	 * @param objname Object name
 	 * @param propname Property name (can be wildcarded)
-	 * @throws DevFailed in case of failure
-	 */
+     * @throws DevFailed in case of failure
+     */
 	//==========================================================================
 	public abstract DbHistory[] get_property_history(Database database, String objname,
-			String propname) throws DevFailed;
+                                                     String propname) throws DevFailed;
 
 	//===================================================================
 	/**
@@ -1115,8 +1115,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 *	@param	servicename		The service name.
 	 *	@param	instname		The instance name (could be * for all instances).
 	 *	@return The device names found for specified service and instance.
-	 *	@throws DevFailed in case of failure
-	 */
+     *	@throws DevFailed in case of failure
+     */
 	//===================================================================
 	public abstract String[] getServices(Database database, String servicename, String instname)
 			throws DevFailed;
@@ -1132,7 +1132,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//===============================================================
 	public abstract void registerService(Database database, String serviceName,
-			String instanceName, String devname) throws DevFailed;
+                                         String instanceName, String devname) throws DevFailed;
 
 	//===============================================================
 	/**
@@ -1145,8 +1145,8 @@ public interface IDatabaseDAO extends IConnectionDAO{
 	 */
 	//===============================================================
 	public abstract void unregisterService(Database database, String serviceName,
-			String instanceName, String devname) throws DevFailed;
-	//===================================================================
+                                           String instanceName, String devname) throws DevFailed;
+    //===================================================================
 	//===================================================================
 
 	//===================================================================
@@ -1268,7 +1268,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
      */
     // ==========================================================================
     public void deleteDevicePipeProperties(Database database, String deviceName,
-                                         String pipeName, List<String> propertyNames) throws DevFailed;
+                                           String pipeName, List<String> propertyNames) throws DevFailed;
     // ==========================================================================
     /**
      * Delete a pipe property for the specified class.
@@ -1281,7 +1281,7 @@ public interface IDatabaseDAO extends IConnectionDAO{
      */
     // ==========================================================================
     public void deleteClassPipeProperties(Database database, String className,
-                                         String pipeName, List<String> propertyNames) throws DevFailed;
+                                          String pipeName, List<String> propertyNames) throws DevFailed;
     // ===================================================================
     /**
      * Delete specified pipe for specified device.
@@ -1339,16 +1339,4 @@ public interface IDatabaseDAO extends IConnectionDAO{
     // ===================================================================
     public List<DbHistory> getClassPipePropertyHistory(Database database, String className,
                                                        String pipeName, String propertyName) throws DevFailed;
-
-
-	// ===================================================================
-	/**
-	 * Query database to get a list of device using the specified device as
-	 * 		as root for forwarded attributes
-	 * @param deviceName the specified device
-	 * @return a list of device using the specified device as as root for forwarded attributes
-	 * @throws DevFailed
-	 */
-	// ===================================================================
-	public  List<String[]> getForwardedAttributeDataForDevice(Database database, String deviceName) throws DevFailed;
 }

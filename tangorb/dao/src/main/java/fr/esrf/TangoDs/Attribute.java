@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -44,8 +44,8 @@ import java.util.Vector;
 /**
  * This class represents a Tango attribute.
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
  
 public class Attribute implements TangoConst
@@ -204,9 +204,15 @@ public class Attribute implements TangoConst
  * A flag set to true if the attribute is actve (beeing read)
  */	
 	protected	boolean			active = false;
-
-
-	private		DevEncoded		tmp_enc[]  = new DevEncoded[2];
+    /**
+     * Index in the main attribute vector of the associated writable attribute (if any)
+     */
+    protected int assoc_ind;
+    protected DispLevel disp_level = DispLevel.OPERATOR;
+    protected int poll_period;
+    int dim_x;
+    int dim_y;
+    private		DevEncoded		tmp_enc[]  = new DevEncoded[2];
 	private		DevState		tmp_st[]   = new DevState[2];
 	private		short			tmp_sh[]   = new short[2];
 	private		int				tmp_lo[]   = new int[2];
@@ -215,21 +221,8 @@ public class Attribute implements TangoConst
 	private		double			tmp_db[]   = new double[2];
 	private		String			tmp_str[]  = new String[2];
 	private		boolean			tmp_bool[] = new boolean[2];
-
-	      		int		      	dim_x;
-				int		      	dim_y;
-	
 	private		int				name_size;
 	private		String			name_upper;
-
-/**
- * Index in the main attribute vector of the associated writable attribute (if any)
- */		
-	protected	int			assoc_ind;
-	
-	protected	DispLevel	disp_level = DispLevel.OPERATOR;
-	
-	protected	int			poll_period;
 
 	
 //+-------------------------------------------------------------------------
@@ -2657,15 +2650,14 @@ public class Attribute implements TangoConst
 		return name_size;
 	}
 	
-	void set_value_flag(boolean val)
-	{
-		value_flag = val;
-	}
-	
 	boolean get_value_flag()
 	{
 		return value_flag;
-	}
+    }
+
+    void set_value_flag(boolean val) {
+        value_flag = val;
+    }
 
 	DevEncoded[] get_enc_value()
 	{
@@ -2722,20 +2714,19 @@ public class Attribute implements TangoConst
 		poll_period = p;
 	}
 
-
-	//===============================================================
-	//===============================================================
-	void setActive(boolean b)
-	{
-		active = b;
-	}
-	
 	//===============================================================
 	//===============================================================
 	boolean isActive()
 	{
 		return active;
-	}
+    }
+
+    //===============================================================
+    //===============================================================
+    void setActive(boolean b) {
+        active = b;
+    }
+
 	//===============================================================
 	//===============================================================
 	synchronized void waitEndOfRead()

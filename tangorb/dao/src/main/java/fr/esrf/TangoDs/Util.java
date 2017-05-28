@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,12 +27,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25482 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoDs;
+
+import fr.esrf.Tango.*;
+import fr.esrf.TangoApi.ApiUtil;
+import fr.esrf.TangoApi.Database;
+import fr.esrf.TangoApi.DbDevImportInfo;
+import org.apache.log4j.Level;
+import org.omg.CORBA.*;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -41,107 +51,76 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Pattern;
-
-import org.apache.log4j.Level;
-import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.NO_RESPONSE;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.TRANSIENT;
-import org.omg.CORBA.UserException;
-import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.PortableServer.POA;
-import org.omg.PortableServer.POAHelper;
-
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttrWriteType;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevVarBooleanArrayHelper;
-import fr.esrf.Tango.DevVarDoubleArrayHelper;
-import fr.esrf.Tango.DevVarFloatArrayHelper;
-import fr.esrf.Tango.DevVarLong64ArrayHelper;
-import fr.esrf.Tango.DevVarLongArrayHelper;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.DevVarShortArrayHelper;
-import fr.esrf.Tango.DevVarStringArrayHelper;
-import fr.esrf.Tango.Device;
-import fr.esrf.Tango.DeviceHelper;
-import fr.esrf.Tango.TimeVal;
-import fr.esrf.TangoApi.ApiUtil;
-import fr.esrf.TangoApi.Database;
-import fr.esrf.TangoApi.DbDevImportInfo;
+import java.lang.Object;
 
 /**
  * This class is a used to store TANGO device server process data and to provide
  * the user with a set of utilities method. This class is implemented using the
  * singleton design pattern. Therefore a device server process can have only one
  * instance of this class and its constructor is not public.
- * 
- * @author $Author$
- * @version $Revision$
+ *
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25482 $
  */
 
 @SuppressWarnings( { "NestedTryStatement" })
 public class Util implements TangoConst {
-    private static Util _instance = null;
-    private String ds_exec_name;
-    private String ds_instance_name;
-    private StringBuffer ds_name;
-    private String real_server_name;
-    private final UtilExt ext;
-    static int _tracelevel = 0;
-
     /**
      * The UtilPrint object used for level 1 printing
      */
 
     static public UtilPrint out1;
-
     /**
      * The UtilPrint object used for level 2 printing
      */
 
     static public UtilPrint out2;
-
     /**
      * The UtilPrint object used for level 3 printing
      */
 
     static public UtilPrint out3;
-
     /**
      * The UtilPrint object used for level 4 printing
      */
     static public UtilPrint out4;
-
     /**
      * The UtilPrint object used for level 5 printing
      */
 
     static public UtilPrint out5;
-
     static public boolean _UseDb = true;
     static public boolean _daemon = false;
     static public int _sleep_between_connect = 10;
-
+    static int _tracelevel = 0;
+    /**
+     * Get the serial model (TangoConst.BY_DEVICE, TangoConst.BY_Class or
+     * TangoConst.NO_SYNC)
+     */
+    // ==========================================================
+    static int access_counter = 0;
+    private static Util _instance = null;
+    static private int serial_model = BY_DEVICE;
+    /**
+     * returns the POA thread_pool_max value for ORB
+     */
+    // ==========================================================
+    private static int thread_pool_max = 20; // Default value from
+    // jacob.property (in jacrob
+    // distrib.)
+    private static boolean thread_pool_max_done = false;
+    private final UtilExt ext;
+    private final Vector<String> cmd_line_name_list = new Vector<String>();
+    private final Vector class_name_list = new Vector();
+    private String ds_exec_name;
+    private String ds_instance_name;
+    private StringBuffer ds_name;
+    private String real_server_name;
     private String db_host;
     private Database db = null;
     private String hostname;
     private String version_str;
     private String pid_str;
-    private Vector class_list;
-
-    private ORB orb;
-    private POA _poa;
-
-    private final Vector<String> cmd_line_name_list = new Vector<String>();
-    private final Vector class_name_list = new Vector();
-
-    static private int serial_model = BY_DEVICE;
 
     // +----------------------------------------------------------------------------
     //
@@ -151,25 +130,7 @@ public class Util implements TangoConst {
     // been initialised
     //
     // -----------------------------------------------------------------------------
-
-    /**
-     * Get the singleton object reference.
-     * 
-     * This method returns a reference to the object of the Util class. If the
-     * class has not been initialised with it's init method, this method print a
-     * message and abort the device server process
-     * 
-     * @return The Util object reference
-     */
-
-    public static Util instance() {
-	if (_instance == null) {
-	    System.err.println("Util is not initialised !!!");
-	    System.err.println("Exiting");
-	    System.exit(-1);
-	}
-	return _instance;
-    }
+    private Vector class_list;
 
     // +----------------------------------------------------------------------------
     //
@@ -183,26 +144,7 @@ public class Util implements TangoConst {
     // - class_name : The device server class name
     //
     // -----------------------------------------------------------------------------
-
-    /**
-     * Create and get the singleton object reference.
-     * 
-     * This method returns a reference to the object of the Util class. If the
-     * class singleton object has not been created, it will be instanciated
-     * 
-     * @param argv
-     *            The process argument String array
-     * @param exec_name
-     *            The device server executable name
-     * @return The Util object reference
-     */
-
-    public static Util init(final String[] argv, final String exec_name) {
-	if (_instance == null) {
-	    _instance = new Util(argv, exec_name);
-	}
-	return _instance;
-    }
+    private ORB orb;
 
     // +----------------------------------------------------------------------------
     //
@@ -214,17 +156,31 @@ public class Util implements TangoConst {
     // - class_name : The device server class name
     //
     // -----------------------------------------------------------------------------
+    private POA _poa;
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : ckeck_args()
+    // 
+    // description : Check the command line arguments. The first one is
+    // mandatory and is the server personal name. A -v option
+    // is authorized with an optional argument. The other
+    // option should be ORBacus option
+    //
+    // in : - argv : The command line argument
+    //
+    // -----------------------------------------------------------------------------
 
     /**
      * Constructs a newly allocated Util object.
-     * 
+     *
      * This constructor is protected following the singleton pattern
-     * 
+     *
      * @param argv
      *            The device server command line argument
      * @param class_name
      *            The TANGO device class name
-     * 
+     *
      */
     protected Util(final String[] argv, final String class_name) {
 
@@ -368,14 +324,234 @@ public class Util implements TangoConst {
 
     // +----------------------------------------------------------------------------
     //
-    // method : ckeck_args()
+    // method : Tango::print_usage()
     // 
-    // description : Check the command line arguments. The first one is
-    // mandatory and is the server personal name. A -v option
-    // is authorized with an optional argument. The other
-    // option should be ORBacus option
+    // description : Print device server command line syntax
     //
-    // in : - argv : The command line argument
+    // in : - serv_name : The server name
+    //
+    // -----------------------------------------------------------------------------
+
+    /**
+     * Get the singleton object reference.
+     * <p>
+     * This method returns a reference to the object of the Util class. If the
+     * class has not been initialised with it's init method, this method print a
+     * message and abort the device server process
+     *
+     * @return The Util object reference
+     */
+
+    public static Util instance() {
+        if (_instance == null) {
+            System.err.println("Util is not initialised !!!");
+            System.err.println("Exiting");
+            System.exit(-1);
+        }
+        return _instance;
+    }
+
+    /**
+     * Create and get the singleton object reference.
+     * <p>
+     * This method returns a reference to the object of the Util class. If the
+     * class singleton object has not been created, it will be instanciated
+     *
+     * @param argv      The process argument String array
+     * @param exec_name The device server executable name
+     * @return The Util object reference
+     */
+
+    public static Util init(final String[] argv, final String exec_name) {
+        if (_instance == null) {
+            _instance = new Util(argv, exec_name);
+        }
+        return _instance;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : read_env()
+    // 
+    // description : Get the TANGO_HOST system property and extract the
+    // database server host and port for it.
+    // This system property should be set when the java
+    // interpreter is started with its -D option
+    //
+    // -----------------------------------------------------------------------------
+
+    /**
+     * Create and return an empty CORBA Any object.
+     * <p>
+     * Create an empty CORBA Any object. Could be used by command which does not
+     * return anything to the client. This method also prints a message on
+     * screen (level 4) before it returns
+     *
+     * @param cmd The cmd name which use this empty Any. Only used to create the
+     *            thrown exception (in case of) and in the displayed message
+     * @return The empty CORBA Any
+     * @throws DevFailed If the Any object creation failed. Click <a
+     *                   href="../../tango_basic/idl_html/Tango.html#DevFailed"
+     *                   >here</a> to read <b>DevFailed</b> exception specification
+     */
+    public static Any return_empty_any(final String cmd) throws DevFailed {
+        Any ret = null;
+        // noinspection ErrorNotRethrown
+        try {
+            ret = Util.instance().get_orb().create_any();
+        } catch (final OutOfMemoryError ex) {
+            final StringBuffer o = new StringBuffer(cmd);
+            o.append(".execute");
+
+            Util.out3.println("Bad allocation while in " + cmd + ".execute()");
+            Except.throw_exception("API_MemoryAllocation", "Can't allocate memory in server", o
+                    .toString());
+        }
+
+        Util.out4.println("Leaving " + cmd + ".execute()");
+
+        return ret;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : misc_init()
+    // 
+    // description : This method initialises miscellaneous variable which
+    // are needed later in the device server startup
+    // sequence. These variables are :
+    // The process ID
+    // The host name
+    // The Tango version
+    //
+    // -----------------------------------------------------------------------------
+
+    /**
+     * idem fabs in c libraray.
+     */
+    // ===============================================================
+    public static double fabs(final double d) {
+        if (d >= 0.0) {
+            return d;
+        } else {
+            return -1.0 * d;
+        }
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : connect_db()
+    // 
+    // description : This method builds a connection to the Tango database
+    // servant. It uses the db_host and db_port object
+    // variables. The Tango database server implements its
+    // CORBA object as named servant.
+    //
+    // -----------------------------------------------------------------------------
+
+    static int getPoaThreadPoolMax() {
+        if (!thread_pool_max_done) {
+            final String str = System.getProperty("jacorb.poa.thread_pool_max");
+            int value;
+            try {
+                value = Integer.parseInt(str);
+                if (value > 0) {
+                    thread_pool_max = value;
+                }
+            } catch (final NumberFormatException e) {
+            }
+            thread_pool_max_done = true;
+        }
+        return thread_pool_max;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : server_already_running()
+    // 
+    // description : Check if the same device server is not already running
+    // somewhere else and refuse to start in this case
+    //
+    // -----------------------------------------------------------------------------
+
+    /**
+     * Get the serial model (TangoConst.BY_DEVICE, TangoConst.BY_Class or
+     * TangoConst.NO_SYNC)
+     */
+    // ==========================================================
+    static public int get_serial_model() {
+        return serial_model;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : server_init()
+    // 
+    // description : To initialise all classes in the device server process
+    //
+    // -----------------------------------------------------------------------------
+
+    /**
+     * Set the serial model. The default is TangoConst.BY_DEVICE
+     *
+     * @param model the specified model (TangoConst.BY_DEVICE, TangoConst.BY_Class
+     *              or TangoConst.NO_SYNC)
+     */
+    // ==========================================================
+    static public void set_serial_model(final int model) {
+        serial_model = model;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : server_run()
+    // 
+    // description : To start a device server
+    //
+    // -----------------------------------------------------------------------------
+
+    static synchronized void increaseAccessConter() {
+        access_counter++;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : get_device_list()
+    // 
+    // description : To return a list of device reference which name match the
+    // specified pattern
+    //
+    // in : - pattern : The device name pattern
+    //
+    // -----------------------------------------------------------------------------
+
+    static synchronized void decreaseAccessConter() {
+        access_counter--;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : get_device_list_by_class()
+    // 
+    // description : To return a reference to the vector of device for a
+    // specific class
+    //
+    // in : - class_name : The class name
+    //
+    // -----------------------------------------------------------------------------
+
+    static synchronized int getAccessConter() {
+        return access_counter;
+    }
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : get_device_by_name()
+    // 
+    // description : To return a reference to the device object from its
+    // name
+    //
+    // in : - dev_name : The device name
     //
     // -----------------------------------------------------------------------------
 
@@ -469,7 +645,7 @@ public class Util implements TangoConst {
 
 				//
 				// Extract each device name
-				//	
+                    //
 				String str;
 				int start = 0;
 				int pos;
@@ -546,11 +722,10 @@ public class Util implements TangoConst {
 
     // +----------------------------------------------------------------------------
     //
-    // method : Tango::print_usage()
+    // method : get_dserver_device()
     // 
-    // description : Print device server command line syntax
-    //
-    // in : - serv_name : The server name
+    // description : To return a reference to the dserver device automatically
+    // attached to each device server process
     //
     // -----------------------------------------------------------------------------
 
@@ -562,40 +737,48 @@ public class Util implements TangoConst {
 
     // +----------------------------------------------------------------------------
     //
-    // method : printInstanceNames
+    // method : unregister_server()
     // 
+    // description : Unregister the server from the database
+    //
+    // -----------------------------------------------------------------------------
+
+    // +----------------------------------------------------------------------------
+    //
+    // method : printInstanceNames
+    //
     // description : Print server instances found in database
     //
     // in : - serv_name : The server name
     //
     // +----------------------------------------------------------------------------
     private void printInstanceNames() {
-	try {
-	    System.out.println("Instance name defined in database for server PowerSupply :");
-	    final String[] instnames = ApiUtil.get_db_obj().get_instance_name_list(ds_exec_name);
-	    for (final String instname : instnames) {
-		System.out.println("\t" + instname);
-	    }
-	} catch (final DevFailed e) {
-	    Except.print_exception(e);
-	}
+        try {
+            System.out.println("Instance name defined in database for server PowerSupply :");
+            final String[] instnames = ApiUtil.get_db_obj().get_instance_name_list(ds_exec_name);
+            for (final String instname : instnames) {
+                System.out.println("\t" + instname);
+            }
+        } catch (final DevFailed e) {
+            Except.print_exception(e);
+        }
     }
 
-    // +----------------------------------------------------------------------------
+    // +-------------------------------------------------------------------------
     //
-    // method : read_env()
+    // method : return_empty_any
     // 
-    // description : Get the TANGO_HOST system property and extract the
-    // database server host and port for it.
-    // This system property should be set when the java
-    // interpreter is started with its -D option
+    // description : Build and return one emty any for all commands which
+    // returns an empty any (obvious no!)
     //
-    // -----------------------------------------------------------------------------
+    // arguments : in : - cmd : The command name
+    //
+    // --------------------------------------------------------------------------
 
     private void read_env() {
-	String env;
-	try {
-	    if ((env = System.getProperty("TANGO_HOST")) == null) {
+        String env;
+        try {
+            if ((env = System.getProperty("TANGO_HOST")) == null) {
 		if ((env = System.getenv("TANGO_HOST")) == null) {
 		    Except.throw_connection_failed("TangoApi_TANGO_HOST_NOT_SET",
 			    "Property \"TANGO_HOST\" not exported", "TangoDs.Util.read_env()");
@@ -615,26 +798,17 @@ public class Util implements TangoConst {
 	}
     }
 
-    // +----------------------------------------------------------------------------
     //
-    // method : misc_init()
-    // 
-    // description : This method initialises miscellaneous variable which
-    // are needed later in the device server startup
-    // sequence. These variables are :
-    // The process ID
-    // The host name
-    // The Tango version
+    // Miscellaneous basic methods
     //
-    // -----------------------------------------------------------------------------
 
     private void misc_init() {
 
-	//
-	// Get PID
-	//
+        //
+        // Get PID
+        //
 
-	pid_str = String.valueOf(0);
+        pid_str = String.valueOf(0);
 
 	//
 	// Get hostname
@@ -663,20 +837,9 @@ public class Util implements TangoConst {
 	version_str = String.valueOf(Tango_DevVersion);
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : connect_db()
-    // 
-    // description : This method builds a connection to the Tango database
-    // servant. It uses the db_host and db_port object
-    // variables. The Tango database server implements its
-    // CORBA object as named servant.
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Connect the process to the TANGO database.
-     * 
+     *
      * If the connection to the database failed, a message is displayed on the
      * screen and the process is aborted
      */
@@ -726,15 +889,6 @@ public class Util implements TangoConst {
 	}
 	Util.out4.println("Connected to database");
     }
-
-    // +----------------------------------------------------------------------------
-    //
-    // method : server_already_running()
-    // 
-    // description : Check if the same device server is not already running
-    // somewhere else and refuse to start in this case
-    //
-    // -----------------------------------------------------------------------------
 
     private synchronized void server_already_running() {
 
@@ -833,18 +987,10 @@ public class Util implements TangoConst {
 	Util.out4.println("Leaving Tango::server_already_running method");
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : server_init()
-    // 
-    // description : To initialise all classes in the device server process
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Initialise all the device server pattern(s) embedded in a device server
      * process.
-     * 
+     *
      * @exception DevFailed
      *                If the device pattern initialistaion failed Click <a
      *                href="../../tango_basic/idl_html/Tango.html#DevFailed"
@@ -859,17 +1005,9 @@ public class Util implements TangoConst {
 	polling_configure();
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : server_run()
-    // 
-    // description : To start a device server
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Ask a device server to listen for incoming request.
-     * 
+     *
      * This method does not return.
      */
 
@@ -877,22 +1015,11 @@ public class Util implements TangoConst {
 	orb.run();
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : get_device_list()
-    // 
-    // description : To return a list of device reference which name match the
-    // specified pattern
-    //
-    // in : - pattern : The device name pattern
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Get the list of device references which name name match the specified
      * pattern Returns a null vector in case there is no device matching the
      * pattern
-     * 
+     *
      * @param pattern
      *            The device name pattern
      */
@@ -962,23 +1089,12 @@ public class Util implements TangoConst {
 	return dl;
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : get_device_list_by_class()
-    // 
-    // description : To return a reference to the vector of device for a
-    // specific class
-    //
-    // in : - class_name : The class name
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Get the list of device references for a given TANGO class.
-     * 
+     *
      * Return the list of references for all devices served by one
      * implementation of the TANGO device pattern implemented in the process
-     * 
+     *
      * @param class_name
      *            The TANGO device class name
      * @return The device reference list
@@ -1031,20 +1147,9 @@ public class Util implements TangoConst {
 	return ((DeviceClass) cl_list.elementAt(i)).get_device_list();
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : get_device_by_name()
-    // 
-    // description : To return a reference to the device object from its
-    // name
-    //
-    // in : - dev_name : The device name
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Get a device reference from its name
-     * 
+     *
      * @param dev_name
      *            The TANGO device name
      * @return The device reference
@@ -1122,19 +1227,10 @@ public class Util implements TangoConst {
 	return (DeviceImpl) dev_list.elementAt(j);
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : get_dserver_device()
-    // 
-    // description : To return a reference to the dserver device automatically
-    // attached to each device server process
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Get a reference to the dserver device attached to the device server
      * process
-     * 
+     *
      * @return A reference to the dserver device
      */
 
@@ -1142,17 +1238,9 @@ public class Util implements TangoConst {
 	return (DServer) DServerClass.instance().get_device_list().elementAt(0);
     }
 
-    // +----------------------------------------------------------------------------
-    //
-    // method : unregister_server()
-    // 
-    // description : Unregister the server from the database
-    //
-    // -----------------------------------------------------------------------------
-
     /**
      * Unregister a device server process from the TANGO database.
-     * 
+     *
      * If the database call fails, a message is displayed on the screen and the
      * process is aborted
      */
@@ -1183,59 +1271,26 @@ public class Util implements TangoConst {
 	Util.out4.println("Leaving Tango::unregister_server method");
     }
 
-    // +-------------------------------------------------------------------------
-    //
-    // method : return_empty_any
-    // 
-    // description : Build and return one emty any for all commands which
-    // returns an empty any (obvious no!)
-    //
-    // arguments : in : - cmd : The command name
-    //
-    // --------------------------------------------------------------------------
-
     /**
-     * Create and return an empty CORBA Any object.
-     * 
-     * Create an empty CORBA Any object. Could be used by command which does not
-     * return anything to the client. This method also prints a message on
-     * screen (level 4) before it returns
-     * 
-     * @param cmd
-     *            The cmd name which use this empty Any. Only used to create the
-     *            thrown exception (in case of) and in the displayed message
-     * @return The empty CORBA Any
-     * @exception DevFailed
-     *                If the Any object creation failed. Click <a
-     *                href="../../tango_basic/idl_html/Tango.html#DevFailed"
-     *                >here</a> to read <b>DevFailed</b> exception specification
+     * Get the process trace level.
+     *
+     * @return The process trace level
      */
-    public static Any return_empty_any(final String cmd) throws DevFailed {
-	Any ret = null;
-	// noinspection ErrorNotRethrown
-	try {
-	    ret = Util.instance().get_orb().create_any();
-	} catch (final OutOfMemoryError ex) {
-	    final StringBuffer o = new StringBuffer(cmd);
-	    o.append(".execute");
 
-	    Util.out3.println("Bad allocation while in " + cmd + ".execute()");
-	    Except.throw_exception("API_MemoryAllocation", "Can't allocate memory in server", o
-		    .toString());
-	}
-
-	Util.out4.println("Leaving " + cmd + ".execute()");
-
-	return ret;
+    public int get_trace_level() {
+        return _tracelevel;
     }
 
-    //
-    // Miscellaneous basic methods
-    //
+    /**
+     * Get a reference to the CORBA Boot Manager
+     *
+     * @return The CORBA boot manager public BootManager get_boot_manager() {
+     *         return boot_manager; }
+     */
 
     /**
      * Set the process trace level.
-     * 
+     *
      * @param level
      *            The new process level
      */
@@ -1244,18 +1299,8 @@ public class Util implements TangoConst {
     }
 
     /**
-     * Get the process trace level.
-     * 
-     * @return The process trace level
-     */
-
-    public int get_trace_level() {
-	return _tracelevel;
-    }
-
-    /**
      * Get the device server instance name.
-     * 
+     *
      * @return The device server instance name
      */
 
@@ -1265,7 +1310,7 @@ public class Util implements TangoConst {
 
     /**
      * Get the device server executable name.
-     * 
+     *
      * @return The device server executable name
      */
 
@@ -1275,10 +1320,10 @@ public class Util implements TangoConst {
 
     /**
      * Get the device server name.
-     * 
+     *
      * The device server name is the device server executable name/the device
      * server instance name
-     * 
+     *
      * @return The device server name
      */
 
@@ -1288,10 +1333,10 @@ public class Util implements TangoConst {
 
     /**
      * Get the real (not only lowercase) server name.
-     * 
+     *
      * The device server name is the device server executable name/the device
      * server instance name
-     * 
+     *
      * @return The real server name
      */
 
@@ -1301,7 +1346,7 @@ public class Util implements TangoConst {
 
     /**
      * Get the host name where the device server process is running.
-     * 
+     *
      * @return The host name
      */
 
@@ -1311,7 +1356,7 @@ public class Util implements TangoConst {
 
     /**
      * Get the device server TANGO version.
-     * 
+     *
      * @return The device server version
      */
 
@@ -1319,47 +1364,44 @@ public class Util implements TangoConst {
 	return version_str;
     }
 
+    // ===============================================================
+
     /**
      * Get the TANGO database object reference
-     * 
+     *
      * @return The database reference
      */
 
     public Database get_database() {
-	return db;
+        return db;
     }
+
+    // ==========================================================
 
     /**
      * Get a reference to the CORBA ORB
-     * 
+     *
      * @return The CORBA ORB
      */
     public ORB get_orb() {
-	return orb;
+        return orb;
     }
 
     /**
      * Get a reference to the CORBA Portable Object Adapter (POA).
-     * 
+     *
      * For classical device server, this is the root POA. For no database device
      * server, this is a specific POA with the USER_ID policy.
-     * 
+     *
      * @return The CORBA POA
      */
     public POA get_poa() {
-	return _poa;
+        return _poa;
     }
 
     /**
-     * Get a reference to the CORBA Boot Manager
-     * 
-     * @return The CORBA boot manager public BootManager get_boot_manager() {
-     *         return boot_manager; }
-     */
-
-    /**
      * Get the device server process identifier as a String
-     * 
+     *
      * Return 0 as process identifer. Is ther any way to know process identifier
      * in a PURE java class ?
      */
@@ -1369,36 +1411,40 @@ public class Util implements TangoConst {
     }
 
     /**
+     * Get the DeviceClass list vector
+     *
+     * @return The DeviceClass vector reference
+     */
+    Vector get_class_list() {
+        return class_list;
+    }
+
+    /**
      * Set the DeviceClass list vector
-     * 
+     *
      * @param list
      *            The DeviceClass vector reference
      */
     public void set_class_list(final Vector list) {
-	class_list = list;
+        class_list = list;
     }
 
-    /**
-     * Get the DeviceClass list vector
-     * 
-     * @return The DeviceClass vector reference
-     */
-    Vector get_class_list() {
-	return class_list;
-    }
+    // ==========================================================
 
     /**
      * Get the commnd line device name list (for device server without database)
-     * 
+     *
      * @return The command line device name list
      */
     Vector get_cmd_line_name_list() {
 	return cmd_line_name_list;
     }
 
+    // ==========================================================
+
     /**
      * Add a new class in this device server (For no database device server)
-     * 
+     *
      * @param name
      *            The class name
      */
@@ -1406,9 +1452,11 @@ public class Util implements TangoConst {
 	class_name_list.addElement(name);
     }
 
+    // ==========================================================
+
     /**
      * Get the class name list (For no database device server)
-     * 
+     *
      * @return A string vector. Each element is a class name
      */
 
@@ -1416,52 +1464,43 @@ public class Util implements TangoConst {
 	return class_name_list;
     }
 
+    // ==========================================================
+    // ==========================================================
+
+    // ==========================================================
+
     /**
      * WARNING: The following code is JacORB specific. The jacorb.jar must have
      * been modified by adding org.jacorb.orb.ORB.putObjectKeyMap method. public
      * void putObjectKeyMap(String s, String t) { objectKeyMap.put(s, t); }
-     * 
+     *
      * Add device name in HashTable used for JacORB objectKeyMap if
      * _UseDb==false.
-     * 
+     *
      * @param name
      *            The device's name.
      */
     void registerDeviceForJacorb(final String name) {
-	// Get the 3 fields of device name
-	final StringTokenizer st = new StringTokenizer(name, "/");
-	final String[] field = new String[3];
-	for (int i = 0; i < 3 && st.countTokens() > 0; i++) {
-	    field[i] = st.nextToken();
-	}
+        // Get the 3 fields of device name
+        final StringTokenizer st = new StringTokenizer(name, "/");
+        final String[] field = new String[3];
+        for (int i = 0; i < 3 && st.countTokens() > 0; i++) {
+            field[i] = st.nextToken();
+        }
 
-	// After a header used by JacORB, in the device name
-	// the '/' char must be replaced by another separator
-	final String separator = "&%25";
-	final String targetname = "StandardImplName/nodb_poa/" + field[0] + separator + field[1]
-		+ separator + field[2];
+        // After a header used by JacORB, in the device name
+        // the '/' char must be replaced by another separator
+        final String separator = "&%25";
+        final String targetname = "StandardImplName/nodb_poa/" + field[0] + separator + field[1]
+                + separator + field[2];
 
-	// And set the JacORB objectKeyMap HashMap
-	final org.jacorb.orb.ORB jacorb = (org.jacorb.orb.ORB) orb;
-	// Method added by PV for server without database.
-	// in org/jacorb/orb/ORB.java
-	jacorb.addObjectKey(name, targetname);
+        // And set the JacORB objectKeyMap HashMap
+        final org.jacorb.orb.ORB jacorb = (org.jacorb.orb.ORB) orb;
+        // Method added by PV for server without database.
+        // in org/jacorb/orb/ORB.java
+        jacorb.addObjectKey(name, targetname);
     }
 
-    // ===============================================================
-    /**
-     * idem fabs in c libraray.
-     */
-    // ===============================================================
-    public static double fabs(final double d) {
-	if (d >= 0.0) {
-	    return d;
-	} else {
-	    return -1.0 * d;
-	}
-    }
-
-    // ==========================================================
     /**
      * This method sends command to the polling thread for all cmd/attr with
      * polling configuration stored in db.
@@ -1561,10 +1600,14 @@ public class Util implements TangoConst {
     }
 
     // ==========================================================
+
+    // ==========================================================
     // ==========================================================
     TangoMonitor get_poll_monitor() {
 	return ext.poll_mon;
     }
+
+    // ==========================================================
 
     // ==========================================================
     // ==========================================================
@@ -1573,12 +1616,13 @@ public class Util implements TangoConst {
     }
 
     // ==========================================================
+
+    // ==========================================================
     // ==========================================================
     boolean poll_status() {
 	return ext.poll_on;
     }
 
-    // ==========================================================
     /**
      * Trigger the polling thread for polled attributes registered with a
      * polling update period set as "externally triggered" (0 mS)
@@ -1656,7 +1700,7 @@ public class Util implements TangoConst {
 	    // shared_cmd.trigger. But, the polling thread is already waiting
 	    // for
 	    // the device monitor and ..... deadlock....
-	    // 
+        //
 	    /*
 	     * bool deadlock = false; if (th->id() ==
 	     * dev_mon.get_locking_thread_id()) { cout4 <<
@@ -1678,19 +1722,18 @@ public class Util implements TangoConst {
 	out4.println("Thread cmd normally executed");
     }
 
-    // ==========================================================
     /**
      * This method fills the polling buffer for one polled attribute registered
      * with an update period defined as "externally triggerred" (polling period
      * set to 0)
-     * 
+     *
      * @param dev
      *            The TANGO device
      * @param att_name
      *            The attribute name which must be polled
      * @param data
      *            The data stack with one element for each history element
-     * 
+     *
      * @throws DevFailed
      *             If the call failed
      */
@@ -1803,10 +1846,10 @@ public class Util implements TangoConst {
 			break;
 
 		    /*
-		     * case Tango_DEV_USHORT :
+             * case Tango_DEV_USHORT :
 		     * DevVarUShortArrayHelper.insert(any,
 		     * att.get_ushort_value()); break;
-		     * 
+		     *
 		     * case Tango_DEV_UCHAR : DevVarUCharArrayHelper.insert(any,
 		     * att.get_uchar_value()); break;
 		     */
@@ -1843,7 +1886,6 @@ public class Util implements TangoConst {
 	}
     }
 
-    // ==========================================================
     /**
      * This class is used for polling
      */
@@ -1872,77 +1914,5 @@ public class Util implements TangoConst {
 	    shared_data.cmd_pending = false;
 	    poll_mon = new TangoMonitor();
 	}
-    }
-
-    // ==========================================================
-    // ==========================================================
-
-    // ==========================================================
-    /**
-     * returns the POA thread_pool_max value for ORB
-     */
-    // ==========================================================
-    private static int thread_pool_max = 20; // Default value from
-    // jacob.property (in jacrob
-    // distrib.)
-    private static boolean thread_pool_max_done = false;
-
-    static int getPoaThreadPoolMax() {
-	if (!thread_pool_max_done) {
-	    final String str = System.getProperty("jacorb.poa.thread_pool_max");
-	    int value;
-	    try {
-		value = Integer.parseInt(str);
-		if (value > 0) {
-		    thread_pool_max = value;
-		}
-	    } catch (final NumberFormatException e) {
-	    }
-	    thread_pool_max_done = true;
-	}
-	return thread_pool_max;
-    }
-
-    // ==========================================================
-    /**
-     * Set the serial model. The default is TangoConst.BY_DEVICE
-     * 
-     * @param model
-     *            the specified model (TangoConst.BY_DEVICE, TangoConst.BY_Class
-     *            or TangoConst.NO_SYNC)
-     */
-    // ==========================================================
-    static public void set_serial_model(final int model) {
-	serial_model = model;
-    }
-
-    // ==========================================================
-    /**
-     * Get the serial model (TangoConst.BY_DEVICE, TangoConst.BY_Class or
-     * TangoConst.NO_SYNC)
-     */
-    // ==========================================================
-    static public int get_serial_model() {
-	return serial_model;
-    }
-
-    // ==========================================================
-    /**
-     * Get the serial model (TangoConst.BY_DEVICE, TangoConst.BY_Class or
-     * TangoConst.NO_SYNC)
-     */
-    // ==========================================================
-    static int access_counter = 0;
-
-    static synchronized void increaseAccessConter() {
-	access_counter++;
-    }
-
-    static synchronized void decreaseAccessConter() {
-	access_counter--;
-    }
-
-    static synchronized int getAccessConter() {
-	return access_counter;
     }
 }

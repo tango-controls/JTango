@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,20 +27,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 26454 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.Request;
-
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.events.IEventConsumer;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Request;
 
 public interface IApiUtilDAO {
     // ===================================================================
@@ -159,7 +157,7 @@ public interface IApiUtilDAO {
     // ==========================================================================
     /**
      * Return the request in hash table for the id
-     * 
+     *
      * @throws DevFailed
      */
     // ==========================================================================
@@ -213,15 +211,7 @@ public interface IApiUtilDAO {
     public int pending_asynch_call(int reply_model);
 
     // ==========================================================================
-    /**
-     * Return the callback sub model used.
-     * 
-     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
-     */
-    // ==========================================================================
-    public void set_asynch_cb_sub_model(int model);
 
-    // ==========================================================================
     /**
      * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
      * ApiDefs.PULL_CALLBACK).
@@ -230,6 +220,17 @@ public interface IApiUtilDAO {
     public int get_asynch_cb_sub_model();
 
     // ==========================================================================
+
+    /**
+     * Return the callback sub model used.
+     *
+     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
+     */
+    // ==========================================================================
+    public void set_asynch_cb_sub_model(int model);
+
+    // ==========================================================================
+
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.

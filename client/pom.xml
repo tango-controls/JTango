@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.tango</groupId>
+		<groupId>org.tango-controls</groupId>
 		<artifactId>JTangoParent</artifactId>
-		<version>9.1.2-SNAPSHOT</version>
+		<version>9.3.2-SNAPSHOT</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>JTangoClientLang</artifactId>
@@ -17,16 +15,15 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.tango</groupId>
+			<groupId>org.tango-controls</groupId>
 			<artifactId>JTangoCommons</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
-			<artifactId>javascript</artifactId>
-			<version>1.6R5</version>
+			<artifactId>rhino</artifactId>
+			<version>1.7.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.transmorph</groupId>

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 28159 $
 //
 //-======================================================================
 
@@ -45,8 +45,7 @@ import java.util.Hashtable;
 @SuppressWarnings({"UnusedDeclaration"})
 public class TangoEventsAdapter implements java.io.Serializable {
 
-    private DeviceProxy deviceProxy = null;
-    private String deviceName = null;
+    static final Object moni = new Object();
     /*
      * A static table for each event type
      */
@@ -68,8 +67,8 @@ public class TangoEventsAdapter implements java.io.Serializable {
             tango_data_ready_source = new Hashtable<String, TangoDataReady>();
     private static Hashtable<String, TangoInterfaceChange>
             tango_interface_change_source = new Hashtable<String, TangoInterfaceChange>();
-
-    static final Object moni = new Object();
+    private DeviceProxy deviceProxy = null;
+    private String deviceName = null;
     //=======================================================================
     /**
      * Creates a new instance of TangoEventsAdapter

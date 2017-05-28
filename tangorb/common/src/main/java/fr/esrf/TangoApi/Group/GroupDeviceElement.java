@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25296 $
 //
 //-======================================================================
 
@@ -35,8 +35,6 @@
 package fr.esrf.TangoApi.Group;
 
 //- Import Tango stuffs
-import java.util.HashMap;
-import java.util.Map;
 
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
@@ -46,49 +44,23 @@ import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * TANGO group device element - private class for package Group
  */
 
 class GroupDeviceElement extends GroupElement implements java.io.Serializable {
 
-    /** Inner class: AsynchRequest */
-    private class AsynchRequest {
-	/** Ctor */
-	AsynchRequest(final int _req_id, final String _obj_name) {
-	    req_id = _req_id;
-	    obj_name = new String[1];
-	    obj_name[0] = _obj_name;
-	    exception = null;
-	}
-
-	AsynchRequest(final int _req_id, final String[] _obj_name) {
-	    req_id = _req_id;
-	    obj_name = _obj_name;
-	    exception = null;
-	}
-
-	/** Ctor */
-	AsynchRequest(final int _req_id, final String _obj_name, final DevFailed _exception) {
-	    req_id = _req_id;
-	    obj_name = new String[1];
-	    obj_name[0] = _obj_name;
-	    exception = _exception;
-	}
-
-	AsynchRequest(final int _req_id, final String[] _obj_name, final DevFailed _exception) {
-	    req_id = _req_id;
-	    obj_name = _obj_name;
-	    exception = _exception;
-	}
-
-	/** Asynch request id holder */
-	public int req_id;
-	/** Command or attribuet name */
-	public String[] obj_name;
-	/** Exception holder */
-	public DevFailed exception;
-    }
+    /**
+     * Asynch Request Repository
+     */
+    private final Map<Integer, AsynchRequest> arp;
+    /**
+     * The underlying DeviceProxy
+     */
+    private DeviceProxy proxy;
 
     /** Creates a new instance of GroupDeviceElement */
     public GroupDeviceElement(final String name) {
@@ -453,12 +425,50 @@ class GroupDeviceElement extends GroupElement implements java.io.Serializable {
 	    }
 	}
 	arp.remove(rid_obj);
-	return rl;
+        return rl;
     }
 
-    /** The underlying DeviceProxy */
-    private DeviceProxy proxy;
+    /**
+     * Inner class: AsynchRequest
+     */
+    private class AsynchRequest {
+        /** Asynch request id holder */
+        public int req_id;
+        /** Command or attribuet name */
+        public String[] obj_name;
+        /** Exception holder */
+        public DevFailed exception;
 
-    /** Asynch Request Repository */
-    private final Map<Integer, AsynchRequest> arp;
+        /**
+         * Ctor
+         */
+        AsynchRequest(final int _req_id, final String _obj_name) {
+            req_id = _req_id;
+            obj_name = new String[1];
+            obj_name[0] = _obj_name;
+            exception = null;
+        }
+
+        AsynchRequest(final int _req_id, final String[] _obj_name) {
+            req_id = _req_id;
+            obj_name = _obj_name;
+            exception = null;
+        }
+
+        /**
+         * Ctor
+         */
+        AsynchRequest(final int _req_id, final String _obj_name, final DevFailed _exception) {
+            req_id = _req_id;
+            obj_name = new String[1];
+            obj_name[0] = _obj_name;
+            exception = _exception;
+        }
+
+        AsynchRequest(final int _req_id, final String[] _obj_name, final DevFailed _exception) {
+            req_id = _req_id;
+            obj_name = _obj_name;
+            exception = _exception;
+        }
+    }
 }

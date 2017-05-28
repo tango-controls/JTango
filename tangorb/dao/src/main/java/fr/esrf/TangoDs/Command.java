@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -45,8 +45,8 @@ import org.omg.CORBA.BAD_OPERATION;
  * related classes for command implemented with the inheritance model or
  * with the template command model
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
  
 public abstract class Command implements TangoConst
@@ -279,16 +279,36 @@ public abstract class Command implements TangoConst
 		return in_type_desc;
 	}
 
+    /**
+     * Set the input parameter description field.
+     *
+     * @param type The input parameter description
+     */
+
+    public void set_in_type_desc(String type) {
+        in_type_desc = type;
+    }
+
 /**
  * Return the output parameter description.
  *
  * @return The output parameter description
  */
- 	
+
 	public String get_out_type_desc()
 	{
 		return out_type_desc;
-	}
+    }
+
+    /**
+     * Set the output parameter description field.
+     *
+     * @param type The output parameter description
+     */
+
+    public void set_out_type_desc(String type) {
+        out_type_desc = type;
+    }
 
 /**
  * Return the device class name on which command must be executed.
@@ -297,46 +317,12 @@ public abstract class Command implements TangoConst
  * command method
  * @return The TANGO device class name
  */
- 	
+
 	public String get_device_class_name()
 	{
 		return device_class_name;
 	}
 
-/**
- * Determines if the command is implemented using the template command method.
- *
- * If the Command object is implemented using the template
- * command model, returns true, otherwise returns false
- */
- 	
-	public boolean is_template()
-	{
-		return template_cmd;
-	}
-
-/**
- * Set the input parameter description field.
- *
- * @param type The input parameter description
- */
- 	
-	public void set_in_type_desc(String type)
-	{
-		in_type_desc = type;
-	}
-
-/**
- * Set the output parameter description field.
- *
- * @param type The output parameter description
- */
- 
-	public void set_out_type_desc(String type)
-	{
-		out_type_desc = type;
-	}
-	
 /**
  * Set the TANGO device class name field.
  *
@@ -344,11 +330,22 @@ public abstract class Command implements TangoConst
  * command method
  * @param name The TANGO device class name
  */
- 	
-	public void set_device_class_name(String name)
+
+public void set_device_class_name(String name)
 	{
-		device_class_name = name;
-	}
+        device_class_name = name;
+    }
+
+    /**
+     * Determines if the command is implemented using the template command method.
+     *
+     * If the Command object is implemented using the template
+     * command model, returns true, otherwise returns false
+     */
+
+    public boolean is_template() {
+        return template_cmd;
+    }
 
 /**
  * Analyse the method given at construction time.

@@ -60,6 +60,20 @@ public class ZmqEventConsumer extends EventConsumer implements
     private static ZmqEventConsumer instance = null;
 
     //===============================================================
+    //===============================================================
+    //===============================================================
+    private Thread runner;
+    //===============================================================
+    //===============================================================
+    private ZmqEventConsumer() throws DevFailed {
+
+        super();
+        //  Start ZMQ main thread
+        ZmqMainThread zmqMainThread = new ZmqMainThread(ZMQutils.getContext());
+        zmqMainThread.start();
+        addShutdownHook();
+    }
+
     /**
      * Creates a new instance of EventConsumer
      *
@@ -73,25 +87,12 @@ public class ZmqEventConsumer extends EventConsumer implements
         }
         return instance;
     }
-    //===============================================================
-    //===============================================================
-    private ZmqEventConsumer() throws DevFailed {
 
-        super();
-        //  Start ZMQ main thread
-        ZmqMainThread zmqMainThread = new ZmqMainThread(ZMQutils.getContext());
-        zmqMainThread.start();
-        addShutdownHook();
-    }
-   //===============================================================
-   //===============================================================
-    private Thread runner;
     private void addShutdownHook(){
         runner = new Thread(this);
         runner.setName("ZmqEventConsumer");
         //	Create a thread and start it
         Runtime.getRuntime().addShutdownHook(
-
                 new Thread() {
                     public void run() {
                         System.out.println("======== Shutting down ZMQ event system ==========");
@@ -342,7 +343,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             String hostAddress = iadd.getHostAddress();
             System.err.println("Host address is " + hostAddress);
             System.err.println("Server returns  " + lsa.svalue[0]);
-             if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
+            if (!lsa.svalue[0].startsWith("tcp://" + hostAddress)) { //  Addresses are different
                  String  wrongAdd = lsa.svalue[0];
                  int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
                  if (idx>0) {
@@ -351,12 +352,14 @@ public class ZmqEventConsumer extends EventConsumer implements
                      System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
                      deviceData = new DeviceData();
                      deviceData.insert(lsa);
+                     isEndpointAvailable(lsa.svalue[0]);
                  }
-             }
+            }
         } catch (UnknownHostException e) {
             Except.throw_exception("UnknownHostException",
                     e.toString(), "ZmqEventConsumer.checkZmqAddress()");
         }
+        //System.out.println("---> Connect on "+deviceData.extractLongStringArray().svalue[0]);
         return deviceData;
     }
     //===============================================================
@@ -369,12 +372,16 @@ public class ZmqEventConsumer extends EventConsumer implements
      */
     //===============================================================
     private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
+        ZMQutils.zmqEventTrace("Inside checkZmqAddress()");
         DevVarLongStringArray lsa = deviceData.extractLongStringArray();
         for (int i=0 ; i<lsa.svalue.length ; i+=2) {
             String endpoint = lsa.svalue[i];
             if (isEndpointAvailable(endpoint)) {
                 lsa.svalue[0] = lsa.svalue[i];
                 lsa.svalue[1] = lsa.svalue[i+1];
+                ZMQutils.zmqEventTrace("return " + lsa.svalue[i] + " - " + lsa.svalue[i + 1]);
+                deviceData = new DeviceData();
+                deviceData.insert(lsa);
                 return deviceData;
             }
         }
@@ -384,6 +391,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private boolean isEndpointAvailable(String endpoint) {
+        System.out.println("Check endpoint: " + endpoint);
         try {
             //  Split address and port
             int start = endpoint.indexOf("//");
@@ -401,7 +409,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             return true;
         }
         catch (Exception e) {
-            System.out.println(endpoint + " Failed:\n   " + e.getMessage());
+            System.err.println(endpoint + " Failed:   " + e.getMessage());
             return false;
         }
     }

@@ -68,26 +68,6 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
     private boolean orbRunning = false;
 
     //===============================================================
-    /**
-     * Creates a new instance of EventConsumer
-     *
-     * @return an instance of EventConsumer object
-     * @throws DevFailed in case of database connection failed.
-     */
-    //===============================================================
-    public static NotifdEventConsumer create() throws DevFailed {
-        if (instance == null) {
-            instance = new NotifdEventConsumer();
-        }
-        return instance;
-    }
-    //===============================================================
-    public static NotifdEventConsumer getInstance() throws DevFailed {
-        if (instance == null) {
-            instance = new NotifdEventConsumer();
-        }
-        return instance;
-    }
     //===============================================================
     //===============================================================
     private NotifdEventConsumer() throws DevFailed {
@@ -122,7 +102,30 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
         );
         runner.start();
     }
+
+    /**
+     * Creates a new instance of EventConsumer
+     *
+     * @return an instance of EventConsumer object
+     * @throws DevFailed in case of database connection failed.
+     */
     //===============================================================
+    public static NotifdEventConsumer create() throws DevFailed {
+        if (instance == null) {
+            instance = new NotifdEventConsumer();
+        }
+        return instance;
+    }
+
+    //===============================================================
+    public static NotifdEventConsumer getInstance() throws DevFailed {
+        if (instance == null) {
+            instance = new NotifdEventConsumer();
+        }
+        return instance;
+    }
+    //===============================================================
+
     /**
      * activate POA and go into endless loop waiting for events to be pushed
      */

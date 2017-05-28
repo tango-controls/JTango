@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25898 $
 //
 //-======================================================================
 
@@ -47,26 +47,26 @@ public interface IEventConsumer {
 	// ===============================================================
 	// ===============================================================
 	public int subscribe_event(final DeviceProxy device,
-			final String attribute, final int event, final CallBack callback,
-			final String[] filters, final boolean stateless) throws DevFailed;
+                               final String attribute, final int event, final CallBack callback,
+                               final String[] filters, final boolean stateless) throws DevFailed;
 
 	// ===============================================================
 	// ===============================================================
 	public int subscribe_event(final DeviceProxy device,
-			final String attribute, final int event, final int max_size,
-			final String[] filters, final boolean stateless) throws DevFailed;
+                               final String attribute, final int event, final int max_size,
+                               final String[] filters, final boolean stateless) throws DevFailed;
 
 	// ===============================================================
 	// ===============================================================
 	public int subscribe_event(final DeviceProxy device,
-			final String attribute, final int event, final CallBack callback,
-			final int max_size, final String[] filters, final boolean stateless)
-			throws DevFailed;
+                               final String attribute, final int event, final CallBack callback,
+                               final int max_size, final String[] filters, final boolean stateless)
+            throws DevFailed;
 	// ===============================================================
 	// ===============================================================
 	public int subscribe_event(final DeviceProxy device,
-			final int event, final CallBack callback,final int max_size,
-            final boolean stateless) throws DevFailed;
+                               final int event, final CallBack callback, final int max_size,
+                               final boolean stateless) throws DevFailed;
 
 	// ===============================================================
 	// ===============================================================

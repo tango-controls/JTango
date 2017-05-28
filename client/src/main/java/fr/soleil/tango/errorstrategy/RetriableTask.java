@@ -1,10 +1,9 @@
 package fr.soleil.tango.errorstrategy;
 
+import fr.esrf.Tango.DevFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
 
 /**
  * This class is a wrapper for a Callable that adds retry functionality. The
@@ -16,7 +15,7 @@ import fr.esrf.Tango.DevFailed;
  * exceeded. InterruptedException and CancellationException are allowed to
  * propogate instead of causing retries, in order to allow cancellation by an
  * executor service etc.
- * 
+ *
  * @param <T>
  *            the return type of the call() method
  */
@@ -26,13 +25,13 @@ public final class RetriableTask<T> {
 
     private final int delay;
 
-    private final Logger logger = LoggerFactory.getLogger(RetriableTask.class);;
+    private final Logger logger = LoggerFactory.getLogger(RetriableTask.class);
 
     /**
      * Creates a new RetriableTask around an existing Callable. Supplying zero
      * or a negative number for the tries parameter will allow the task to retry
      * an infinite number of times -- use with caution!
-     * 
+     *
      * @param taskToWrap
      *            the Callable to wrap
      * @param tries
@@ -41,40 +40,40 @@ public final class RetriableTask<T> {
      *            time in ms before retrying
      */
     public RetriableTask(final int tries, final int delay) {
-	this.tries = tries;
-	this.delay = delay;
+        this.tries = tries;
+        this.delay = delay;
     }
 
     /**
      * Invokes the wrapped Callable's call method, optionally retrying if an
      * exception occurs. See class documentation for more detail.
-     * 
+     *
      * @return the return value of the wrapped call() method
      */
     public T execute(final Task<T> taskToWrap) throws DevFailed {
-	int triesLeft = tries;
-	do {
-	    try {
-		return taskToWrap.call();
-	    } catch (final DevFailed e) {
-		triesLeft--;
-		// Are we allowed to try again?
-		if (triesLeft <= 0) {
-		    // No -- throw
-		    logger.error("Caught exception, all retries done for error: {}", DevFailedUtils.toString(e));
-		    throw e;
-		}
+        int triesLeft = tries;
+        do {
+            try {
+                return taskToWrap.call();
+            } catch (final DevFailed e) {
+                triesLeft--;
+                // Are we allowed to try again?
+                if (triesLeft <= 0) {
+                    // No -- throw
+                    logger.error("Caught exception, all retries done for error: {}", DevFailedUtils.toString(e));
+                    throw e;
+                }
 
-		// Yes -- log and allow to loop
-		logger.info("Caught exception, retrying... Error was: {}" + DevFailedUtils.toString(e));
-		try {
-		    Thread.sleep(delay);
-		} catch (final InterruptedException e1) {
+                // Yes -- log and allow to loop
+                logger.info("Caught exception, retrying... Error was: {}" + DevFailedUtils.toString(e));
+                try {
+                    Thread.sleep(delay);
+                } catch (final InterruptedException e1) {
 
-		}
-	    }
-	} while (triesLeft > 0);
-	return null;
+                }
+            }
+        } while (triesLeft > 0);
+        return null;
 
     }
 }

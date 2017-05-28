@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,27 +27,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoDs;
 
-import java.util.Vector;
-
-import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.ORB;
-import org.omg.PortableServer.POA;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.Device;
 import fr.esrf.TangoApi.DbClass;
 import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DbDevExportInfo;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.ORB;
+import org.omg.PortableServer.POA;
+
+import java.util.Vector;
 
 public abstract class DeviceClass implements TangoConst {
+    private final Vector nodb_name_list = new Vector();
     /**
      * The TANGO device class name
      */
@@ -72,8 +72,6 @@ public abstract class DeviceClass implements TangoConst {
      * The class attributes object
      */
     protected MultiClassAttribute class_attr;
-
-    private final Vector nodb_name_list = new Vector();
 
     // +----------------------------------------------------------------------------
     //

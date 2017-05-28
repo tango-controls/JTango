@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30265 $
 //
 //-======================================================================
 
@@ -36,12 +36,11 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.events.EventConsumerUtil;
-import org.omg.CORBA.*;
-
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
 import fr.esrf.TangoDs.TangoConst;
+import org.omg.CORBA.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ import java.util.List;
  * is an api between user and IDL Device object.
  *
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 30265 $
  */
 
 public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implements ApiDefs,
@@ -1457,14 +1456,14 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     /**
      * Write the attribute value for the specified device.
      * 
-     * @param devattr attribute name and value.
+     * @param deviceAttribute attribute name and value.
      */
     // ==========================================================================
-    public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute devattr)
+    public void write_attribute(final DeviceProxy deviceProxy, final DeviceAttribute deviceAttribute)
 	    	throws DevFailed {
 		checkIfTango(deviceProxy, "write_attribute");
 		try {
-	    	final DeviceAttribute[] array = { devattr };
+	    	final DeviceAttribute[] array = { deviceAttribute };
 	    	write_attribute(deviceProxy, array);
 		} catch (final NamedDevFailedList e) {
 	    	final NamedDevFailed namedDF = e.elementAt(0);
@@ -2291,8 +2290,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     data = deviceProxy.command_inout(command);
                 else
                     data = deviceProxy.command_inout(command, argin);
-            }
-            catch (org.omg.CORBA.Bounds e1) {
+            } catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }
@@ -2461,8 +2459,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                                     + "." + idl_cmd + "_reply("
                                     + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
                     }
-                    else
-                    if (except instanceof org.omg.CORBA.TIMEOUT) {
+                    else if (except instanceof org.omg.CORBA.TIMEOUT) {
                         throw_dev_failed(deviceProxy, except,
                                 deviceProxy.getFull_class_name()
                                     + "." + idl_cmd + "_reply("
@@ -2470,8 +2467,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     }
                     else
                     // Check if user exception (DevFailed).
-                    if (except instanceof org.omg.CORBA.UnknownUserException) {
-                        final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
+                        if (except instanceof org.omg.CORBA.UnknownUserException) {
+                            final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
                         MultiDevFailed ex = null;
                         try {
                             //noinspection ThrowableResultOfMethodCallIgnored
@@ -2613,8 +2610,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
                 //  And do the synchronous read_attributes
                 data = deviceProxy.read_attribute(attributeNames);
-            }
-            catch (org.omg.CORBA.Bounds e1) {
+            } catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
 				if (e instanceof DevFailed)
 	                throw (DevFailed)e;
@@ -2844,8 +2840,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 }
                 else
                     throw e;
-            }
-            catch (org.omg.CORBA.Bounds e1) {
+            } catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }

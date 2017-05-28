@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 30281 $
 //
 //-======================================================================
 
@@ -51,7 +51,8 @@ import java.util.List;
 
 public class IORDumpDAODefaultImpl implements IIORDumpDAO
 {
-	private String	iorString   = null;
+    List<NetworkConnection> connections = new ArrayList<NetworkConnection>();
+    private String	iorString   = null;
 	private String	type_id     = null;
 	private String	iiopVersion = null;
 	private String	host        = null;
@@ -59,7 +60,6 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
 	private int		port        = -1;
 	private int		prg_number  = -1;		//	used by TACO
 	private String  deviceName = null;
-    ArrayList<NetworkConnection>    connections = new ArrayList<NetworkConnection>();
 
 
 	public IORDumpDAODefaultImpl()
@@ -138,7 +138,7 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
                 sb.append("iiop_version:    ").append(get_iiop_version()).append("\n");
 
             sb.append("host:            ").append(get_host()).append("\n");
-            ArrayList<String> alternates = getAlternateAddresses();
+            List<String> alternates = getAlternateAddresses();
             if (alternates.size()>0) {
                 for (String add : alternates )
                     sb.append("alternate addr.: ").append(add).append("\n");
@@ -194,11 +194,11 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
                     (int) p.version().minor;
 
             try {
-                //  check for multiple connections
+				//  check for multiple connections
                 connections.add(new NetworkConnection((IIOPAddress) p.getAddress()));
                 List	alternates = p.getAlternateAddresses();
-                for (Object alternate : alternates)
-                    connections.add(new NetworkConnection((IIOPAddress)alternate));
+				for (Object alternate : alternates)
+					connections.add(new NetworkConnection((IIOPAddress) alternate));
             }
             catch (Exception e) {
                 host = " (" + e + ")";
@@ -214,6 +214,84 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
             port = connection.port;
         }
 	}
+
+    /**
+     *	Return the ID type
+     */
+    //===============================================================
+	public String get_type_id()
+	{
+		return type_id;
+	}
+    //===============================================================
+
+    /**
+     *	Return the host where the process is running.
+     */
+    //===============================================================
+	public String get_host()
+	{
+		return host;
+	}
+    //===============================================================
+
+    /**
+     *	Return the host name where the process is running.
+     */
+    //===============================================================
+	public String get_hostname()
+	{
+		return hostname;
+	}
+    //===============================================================
+
+    /**
+     *	Return the connection port.
+     */
+    //===============================================================
+	public int get_port()
+	{
+		return port;
+	}
+    //===============================================================
+
+    /**
+     *	Return the connection TACO prg_number.
+     */
+    //===============================================================
+	public int get_prg_number()
+	{
+		return prg_number;
+	}
+    //===============================================================
+
+    /**
+     *	Return the IIOP version number.
+     */
+    //===============================================================
+	public String get_iiop_version()
+	{
+		return iiopVersion;
+	}
+    //===============================================================
+
+    /**
+     *	Return alternate address  list .
+     */
+    //===============================================================
+	public List<String> getAlternateAddresses() {
+        List<String>   list = new ArrayList<String>();
+        for (int i=1 ; i<connections.size() ; i++) {
+            NetworkConnection connection = connections.get(i);
+            String  address = connection.address;
+            if (!connection.name.equals(connection.address))
+                address += " (" + connection.name +")";
+            list.add(address);
+        }
+		return list;
+	}
+    //===============================================================
+
     //===============================================================
     //===============================================================
     private class NetworkConnection {
@@ -225,82 +303,43 @@ public class IORDumpDAODefaultImpl implements IIORDumpDAO
             String originalHost = iiopAddress.getOriginalHost();
             InetAddress inetAddress = InetAddress.getByName(originalHost);
             address = inetAddress.getHostAddress();
-            name = inetAddress.getHostName();
+
+            //  Start a thread to get host name with timeout
+            GetHostNameThread thread = new GetHostNameThread(inetAddress);
+            thread.start();
+            try {
+                thread.join(100);
+            } catch (InterruptedException e) {
+                System.err.println(e.toString());
+            }
+            //  If host name is not, set it as address
+            if (thread.hostName != null)
+                name = thread.hostName;
+            else
+                name = address;
             port = iiopAddress.getPort();
             if (port < 0) port += 65536;
         }
     }
     //===============================================================
+
     /**
-     *	Return the ID type
+     * A little thread to get host name with timeout.
+     * Sometimes getHostName() method could be quiet slow (5 sec.)
      */
     //===============================================================
-	public String get_type_id()
-	{
-		return type_id;
-	}
-    //===============================================================
-    /**
-     *	Return the host where the process is running.
-     */
-    //===============================================================
-	public String get_host()
-	{
-		return host;
-	}
-    //===============================================================
-    /**
-     *	Return the host name where the process is running.
-     */
-    //===============================================================
-	public String get_hostname()
-	{
-		return hostname;
-	}
-    //===============================================================
-    /**
-     *	Return the connection port.
-     */
-    //===============================================================
-	public int get_port()
-	{
-		return port;
-	}
-    //===============================================================
-    /**
-     *	Return the connection TACO prg_number.
-     */
-    //===============================================================
-	public int get_prg_number()
-	{
-		return prg_number;
-	}
-    //===============================================================
-    /**
-     *	Return the IIOP version number.
-     */
-    //===============================================================
-	public String get_iiop_version()
-	{
-		return iiopVersion;
-	}
-    //===============================================================
-    /**
-     *	Return alternate address  list .
-     */
-    //===============================================================
-	public ArrayList<String> getAlternateAddresses()
-	{
-        ArrayList<String>   list = new ArrayList<String>();
-        for (int i=1 ; i<connections.size() ; i++) {
-            NetworkConnection connection = connections.get(i);
-            String  address = connection.address;
-            if (!connection.name.equals(connection.address))
-                address += " (" + connection.name +")";
-            list.add(address);
+    private class GetHostNameThread extends Thread {
+        private InetAddress inetAddress;
+        private String hostName = null;
+
+        private GetHostNameThread(InetAddress inetAddress) {
+            this.inetAddress = inetAddress;
         }
-		return list;
-	}
+
+        public void run() {
+            hostName = inetAddress.getHostName();
+        }
+    }
 }
 
 

@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 25297 $
 //
 //-======================================================================
 
@@ -39,8 +39,8 @@ package fr.esrf.TangoDs;
  *	polling thread and CORBA request. It is used only for
  *	the command_inout and read_attribute calls	
  *
- * @author	$Author$
- * @version	$Revision$
+ * @author $Author: pascal_verdier $
+ * @version $Revision: 25297 $
  */
 
 import fr.esrf.Tango.DevFailed;
@@ -49,6 +49,9 @@ public class TangoMonitor implements TangoConst {
     boolean used;
     long _timeout;
     int locked_ctr;
+    // ===============================================================
+    // ===============================================================
+    private boolean interrupted;
 
     // omni_condition cond;
     // omni_thread locking_thread;
@@ -134,10 +137,6 @@ public class TangoMonitor implements TangoConst {
 	} catch (final InterruptedException e) {
 	}
     }
-
-    // ===============================================================
-    // ===============================================================
-    private boolean interrupted;
 
     synchronized boolean wait_it(final long ms) {
 	interrupted = false;

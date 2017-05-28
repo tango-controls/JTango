@@ -5,7 +5,7 @@
 //
 // Description:  java source code for the TANGO client/server API.
 //
-// $Author$
+// $Author: pascal_verdier $
 //
 // Copyright (C) :      2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,
 //						European Synchrotron Radiation Facility
@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision$
+// $Revision: 29387 $
 //
 //-======================================================================
 
@@ -35,25 +35,27 @@
 package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
+import fr.esrf.TangoDs.Except;
+import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
-
-import fr.esrf.TangoDs.Except;
-import fr.esrf.TangoDs.TangoConst;
 
 /**
  * Class Description: This class manage device connection for Tango objects. It
  * is an api between user and IDL Device object.
  * 
  * @author verdier
- * @version $Revision$
+ * @version $Revision: 29387 $
  */
 
 public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
     private boolean firstTime = true;
+
+    public ConnectionDAODefaultImpl() {
+    }
 
     // ===================================================================
     // ===================================================================
@@ -83,10 +85,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
         }
     }
 
-    public ConnectionDAODefaultImpl() {
-    }
-
     // ===================================================================
+
     /**
      * Connection constructor. It makes a connection on database server.
      * 
@@ -680,8 +680,8 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
     private void set_obj_timeout(final Connection connection, final int millis) {
 
 		// Change Jacorb policy for timeout
-		final org.omg.CORBA.Policy p =
-			new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
+        final org.omg.CORBA.Policy p =
+                new org.jacorb.orb.policies.RelativeRoundtripTimeoutPolicy(10000 * millis);
 		org.omg.CORBA.Object    obj = connection.getObj()._set_policy_override(
                 new Policy[] { p }, org.omg.CORBA.SetOverrideType.ADD_OVERRIDE);
 

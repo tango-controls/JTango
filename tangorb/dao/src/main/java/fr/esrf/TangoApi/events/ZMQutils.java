@@ -64,6 +64,9 @@ public class  ZMQutils {
     public static final int   ZMQ_CONNECT_MCAST_EVENT    = 5;
     public static final int   ZMQ_DELAY_EVENT            = 6;
     public static final int   ZMQ_RELEASE_EVENT          = 7;
+    public static final String SUBSCRIBE_COMMAND = "ZmqEventSubscriptionChange";
+    public static final String SUBSCRIBE_COMMAND_NOT_FOUND =
+            "Command " + SUBSCRIBE_COMMAND + " not found";
     private static final String[]   commandNames = {
             "ZMQ_END",
             "ZMQ_CONNECT_HEARTBEAT",
@@ -74,15 +77,16 @@ public class  ZMQutils {
             "ZMQ_DELAY_EVENT",
             "ZMQ_RELEASE_EVENT",
     };
-
+    private static final int HWM_DEFAULT = 1000;
     private static ZMQ.Context     context = ZMQ.context(1);
 	private static ZMQutils instance = null;
     private static double  zmqVersion = -1.0;
 
-    private static final int HWM_DEFAULT = 1000;
-    public static final String SUBSCRIBE_COMMAND = "ZmqEventSubscriptionChange";
-    public static final String SUBSCRIBE_COMMAND_NOT_FOUND =
-                                    "Command " + SUBSCRIBE_COMMAND + " not found";
+    //===============================================================
+    //===============================================================
+    private ZMQutils() {
+    }
+
 	//===============================================================
 	//===============================================================
     static ZMQutils getInstance() {
@@ -91,17 +95,14 @@ public class  ZMQutils {
         }
         return instance;
     }
-	//===============================================================
-	//===============================================================
-	private ZMQutils() {
-    }
+
 	//===============================================================
 	//===============================================================
     public static double getZmqVersion() {
         if (zmqVersion<0.0) {   //  Not already checked.
             zmqVersion = 0.0;
             try {
-                String  strVersion = org.zeromq.ZMQ.getVersionString();
+                String strVersion = org.zeromq.ZMQ.getVersionString();
                 StringTokenizer stk = new StringTokenizer(strVersion, ".");
                 ArrayList<String>   list = new ArrayList<String>();
                 while (stk.hasMoreTokens())
@@ -822,6 +823,47 @@ public class  ZMQutils {
 
     //  Non static methods.
 	//===============================================================
+
+    //===============================================================
+    //===============================================================
+    static void zmqEventTrace(String s) {
+        String env = System.getenv("ZmqTrace");
+        if (env != null && env.equals("true"))
+            System.out.println(s);
+    }
+
+    //  Trace and dump methods
+    //===============================================================
+    //===============================================================
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void trace(DevVarLongStringArray lsa) {
+        System.out.println("Svalue");
+        for (String s : lsa.svalue)
+            System.out.println("	" + s);
+        System.out.println("Lvalue");
+        for (int i : lsa.lvalue)
+            System.out.println("	" + i);
+    }
+
+    //===========================================================================
+    //===========================================================================
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void dump(byte[] rec) {
+        for (int i = 0; i < rec.length; i++) {
+
+            String s = String.format("%02x", (0xFF & rec[i]));
+            System.out.print("0x" + s + " ");
+            if (((i + 1) % 16) == 0)
+                System.out.println();
+        }
+        System.out.println();
+    }
+    //===============================================================
+    //===============================================================
+
+
+    //===============================================================
+
     /**
      * Decode data receive from control socket
      * @param bytes input buffer
@@ -847,6 +889,7 @@ public class  ZMQutils {
                 controlStructure.endPoint = getString(bytes, idx++);
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx);
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_HEARTBEAT:
@@ -864,7 +907,7 @@ public class  ZMQutils {
                 controlStructure.hwm   = manageHwmValue(hwm);
                 controlStructure.rate  = getInteger(bytes, idx);    idx +=sizeOfInt;
                 controlStructure.ivl   = getInteger(bytes, idx);    idx +=sizeOfInt;
-                //System.out.println(controlStructure);
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_EVENT:
@@ -883,6 +926,9 @@ public class  ZMQutils {
     }
 	//===============================================================
 	//===============================================================
+
+    //===============================================================
+    //===============================================================
     private int manageHwmValue(int ctrlValue) {
 
         //  Check if environment value is set
@@ -890,8 +936,7 @@ public class  ZMQutils {
         if (envValue!=null) {
             try {
                 return Integer.parseInt(envValue);
-            }
-            catch (NumberFormatException e ) {
+            } catch (NumberFormatException e ) {
                 System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
             }
         }
@@ -902,28 +947,7 @@ public class  ZMQutils {
         //  Else return default value from input
         return ctrlValue;
     }
-	//===============================================================
-	//===============================================================
-    static void zmqEventTrace(String s) {
-        String  env = System.getenv("ZmqTrace");
-        if (env!=null && env.equals("true"))
-            System.out.println(s);
-    }
-	//===============================================================
-	//===============================================================
 
-
-
-
-
-
-
-
-
-
-
-
- 	//===============================================================
     /**
      *   A little class to define the data read from control socket
      */
@@ -953,40 +977,6 @@ public class  ZMQutils {
         }
         //===========================================================
     }
-	//===============================================================
-	//===============================================================
-
-
-
-
-
-
-
-    //  Trace and dump methods
-	//===============================================================
-	//===============================================================
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static void trace(DevVarLongStringArray lsa){
-        System.out.println("Svalue");
-        for (String s : lsa.svalue)
-            System.out.println("	" + s);
-        System.out.println("Lvalue");
-        for (int i : lsa.lvalue)
-            System.out.println("	" + i);
-    }
-	//===========================================================================
-	//===========================================================================
-    @SuppressWarnings({"UnusedDeclaration"})
-	public static void dump(byte[] rec) {
-		for (int i=0 ; i<rec.length ; i++) {
-
-			String	s = String.format("%02x",(0xFF & rec[i]));
-			System.out.print("0x" + s + " ");
-			if ( ((i+1)%16)==0 )
-				System.out.println();
-		}
-		System.out.println();
-	}
 	//===============================================================
 	//===============================================================
 }
