@@ -1,5 +1,5 @@
 [![logo](http://www.tango-controls.org/static/tango/img/logo_tangocontrols.png)](http://www.tango-controls.org)
-
+[![Dependency Status](https://www.versioneye.com/user/projects/592bf375a8a0560033ef3698/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/592bf375a8a0560033ef3698)
 [![Download](https://api.bintray.com/packages/tango-controls/maven/JTango/images/download.svg) ](https://bintray.com/tango-controls/maven/JTango/_latestVersion)
 
 # JTango
