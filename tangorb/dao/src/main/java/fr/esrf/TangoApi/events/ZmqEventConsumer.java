@@ -391,7 +391,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private boolean isEndpointAvailable(String endpoint) {
-        System.out.println("Check endpoint: " + endpoint);
+        //System.out.println("Check endpoint: " + endpoint);
         try {
             //  Split address and port
             int start = endpoint.indexOf("//");
