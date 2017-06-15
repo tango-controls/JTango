@@ -53,13 +53,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         implements TangoConst, IEventConsumer {
 
     protected static int subscribe_event_id = 0;
-    protected static Hashtable<String, EventChannelStruct>   channel_map        = new Hashtable<String, EventChannelStruct>();
-    protected static Hashtable<String, String>               device_channel_map = new Hashtable<String, String>();
-    protected static Hashtable<String, EventCallBackStruct>  event_callback_map = new Hashtable<String, EventCallBackStruct>();
-    protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<String, EventCallBackStruct>();
+    protected static Hashtable<String, EventChannelStruct>   channel_map        = new Hashtable<>();
+    protected static Hashtable<String, String>               device_channel_map = new Hashtable<>();
+    protected static Hashtable<String, EventCallBackStruct>  event_callback_map = new Hashtable<>();
+    protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<>();
 
     //  Alternate tango hosts
-    static ArrayList<String>  possibleTangoHosts = new ArrayList<String>();
+    static ArrayList<String>  possibleTangoHosts = new ArrayList<>();
     //===============================================================
     //===============================================================
     abstract protected  void checkDeviceConnection(DeviceProxy device,
@@ -253,13 +253,19 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         try {
             //  Check idl version
             if (device.get_idl_version()>=5) {
-                if (event_name.equals("intr_change"))   //  No IDL for interface change
-                    callback_key += "." + event_name;
-                else
-                if (event_name.equals("pipe")) //    No IDL for pipe
-                    callback_key += "/" + attribute + "." + event_name;
-                else
-                    callback_key += "/" + attribute + ".idl" + device.get_idl_version()+ "_" + event_name;
+                switch (event_name) {
+                    case "intr_change":
+                        //  No IDL for interface change
+                        callback_key += "." + event_name;
+                        break;
+                    case "pipe":
+                        //  No IDL for pipe
+                        callback_key += "/" + attribute + "." + event_name;
+                        break;
+                    default:
+                        callback_key += "/" + attribute + ".idl" + device.get_idl_version() + "_" + event_name;
+                        break;
+                }
             }
             else
                 callback_key += "/" + attribute + "." + event_name;
@@ -357,13 +363,10 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
      */
     //===============================================================
     static void subscribeIfNotDone() {
-        Enumeration callback_structs = failed_event_callback_map.elements();
-        while (callback_structs.hasMoreElements()) {
-            EventCallBackStruct eventCallBackStruct =
-                    (EventCallBackStruct) callback_structs.nextElement();
-            String callbackKey = eventCallBackStruct.device.name().toLowerCase() +
-                    "/" + eventCallBackStruct.attr_name + "." + eventCallBackStruct.event_name;
-
+        Enumeration<String > callbackKeys = failed_event_callback_map.keys();
+        while (callbackKeys.hasMoreElements()) {
+            String callbackKey = callbackKeys.nextElement();
+            EventCallBackStruct eventCallBackStruct = failed_event_callback_map.get(callbackKey);
             if (eventCallBackStruct.consumer!=null) {
                 try {
                     subscribeIfNotDone(eventCallBackStruct, callbackKey);

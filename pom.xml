@@ -41,6 +41,17 @@
             <timezone>1</timezone>
         </developer>
         <developer>
+            <id>verdier</id>
+            <name>Pascal Verdier</name>
+            <email>verdier@esrf.fr</email>
+            <organization>ESRF</organization>
+            <organizationUrl>http://www.esrf.eu</organizationUrl>
+            <roles>
+                <role>Java Developer</role>
+            </roles>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
             <id>ingvord</id>
             <name>Igor Khokhriakov</name>
             <email>mail@ingvord.ru</email>
