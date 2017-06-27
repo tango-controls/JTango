@@ -109,7 +109,8 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
      */
     @Override
     public void setValue(final Object value) throws DevFailed {
-        time = System.currentTimeMillis();
+        if (time==0) // Initialize if not already done
+            time = System.currentTimeMillis();
         if (value != null) {
             if (!value.getClass().isArray()) { // SCALAR
                 // check if this value can be an attribute value
