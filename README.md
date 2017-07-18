@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/tango-controls/JTango/badge.svg?branch=master)](https://coveralls.io/github/tango-controls/JTango?branch=master)
 [![codebeat badge](https://codebeat.co/badges/04195151-0ff7-4420-94eb-68d246ebfe75)](https://codebeat.co/projects/github-com-tango-controls-jtango-master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d3dd5b565ec546e4b3ad4e28bd0b85dd)](https://www.codacy.com/app/tango-controls/JTango?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tango-controls/JTango&amp;utm_campaign=Badge_Grade)
+[![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/master/LICENSE)
 
 [![Download](https://api.bintray.com/packages/tango-controls/maven/JTango/images/download.svg) ](https://bintray.com/tango-controls/maven/JTango/_latestVersion)
 
