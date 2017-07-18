@@ -13,6 +13,14 @@
 	<description>Library for Tango Server (ie. Tango Device) in Java</description>
 	<inceptionYear>2012</inceptionYear>
 
+	<licenses>
+		<license>
+			<name>LGPL-3.0</name>
+			<url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+			<distribution>site</distribution>
+		</license>
+	</licenses>
+
 	<build>
 		<plugins>
             <!-- TODO migrate to travis and enable tests -->
