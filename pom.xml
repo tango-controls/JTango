@@ -28,6 +28,14 @@
       <tag>HEAD</tag>
   </scm>
 
+    <licenses>
+        <license>
+            <name>LGPL-3.0</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>site</distribution>
+        </license>
+    </licenses>
+
     <developers>
         <developer>
             <id>abeille</id>
