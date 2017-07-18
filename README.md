@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d3dd5b565ec546e4b3ad4e28bd0b85dd)](https://www.codacy.com/app/tango-controls/JTango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/JTango&utm_campaign=badger)
 [![logo](http://www.tango-controls.org/static/tango/img/logo_tangocontrols.png)](http://www.tango-controls.org)
 
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
