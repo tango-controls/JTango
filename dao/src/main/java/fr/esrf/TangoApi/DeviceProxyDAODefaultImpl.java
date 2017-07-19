@@ -41,7 +41,6 @@ import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
 import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.*;
-import org.tango.client.database.DeviceExportInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -465,7 +464,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
      */
     // ==========================================================================
     public void export_device(final DeviceProxy deviceProxy,
-                              final DeviceExportInfo deviceExportInfo) throws DevFailed {
+                              final DbDevExportInfo deviceExportInfo) throws DevFailed {
         checkIfTango(deviceProxy, "export_device");
         checkIfUseDb(deviceProxy, "export_device()");
 

@@ -37,7 +37,6 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import org.tango.client.database.DeviceExportInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,7 +133,7 @@ public class DbDevice implements java.io.Serializable {
      * @param deviceExportInfo Device information to export.
      */
     //==========================================================================
-    public void export_device(DeviceExportInfo deviceExportInfo)
+    public void export_device(DbDevExportInfo deviceExportInfo)
             throws DevFailed {
         database.export_device(deviceExportInfo);
     }
