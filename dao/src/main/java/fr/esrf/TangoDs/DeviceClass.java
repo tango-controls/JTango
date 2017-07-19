@@ -38,11 +38,11 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.Device;
 import fr.esrf.TangoApi.DbClass;
 import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DbDevExportInfo;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
+import org.tango.client.database.DeviceExportInfo;
 
 import java.util.Vector;
 
@@ -242,14 +242,13 @@ public abstract class DeviceClass {
             //
         }
 
-        final DbDevExportInfo exp_info = new DbDevExportInfo(dev.get_name(), orb
-                .object_to_string(d), tg.get_host_name(), tg.get_version_str());
-
+        DeviceExportInfo exportInfo = new DeviceExportInfo(
+                dev.get_name(), orb.object_to_string(d), tg.get_host_name(), tg.get_version_str(), tg.get_pid_str(), dev.get_device_class().get_name());
         //
         // Call db server
         //
 
-        tg.get_database().export_device(exp_info);
+        tg.get_database().export_device(exportInfo);
 
         Util.out4.println("Leaving DeviceClass::export_device method()");
 

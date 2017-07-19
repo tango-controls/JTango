@@ -35,79 +35,78 @@
 package fr.esrf.TangoApi;
 
 
-
-
 /**
- *	Class Description:
- *	This class is an object containing the exported device information.
+ * Class Description:
+ * This class is an object containing the exported device information.
  *
- * @author  verdier
- * @version  $Revision: 25296 $
+ * @author verdier
+ * @version $Revision: 25296 $
+ * @deprecated use {@link org.tango.client.database.DeviceExportInfo}
  */
 
+@Deprecated
+public class DbDevExportInfo implements java.io.Serializable {
+    /**
+     * The devivce name.
+     */
+    public String name;
+    /**
+     * ior connection as String.
+     */
+    public String ior;
+    /**
+     * Host name where device will be exported.
+     */
+    public String host;
+    /**
+     * TANGO protocol version number.
+     */
+    public String version;
 
-public class DbDevExportInfo implements java.io.Serializable
-{
-	/**
-	 *	The devivce name.
-	 */
-	public String	name;
-	/**
-	 *	ior connection as String.
-	 */
-	public String	ior;
-	/**
-	 *	Host name where device will be exported.
-	 */
-	public String	host;
-	/**
-	 *	TANGO protocol version number.
-	 */
-	public String	version;
+    //===============================================
 
-	//===============================================
-	/**
-	 *	Default constructor.
-	 */
-	//===============================================
-	@SuppressWarnings({"UnusedDeclaration"})
-    public DbDevExportInfo()
-	{
-	}
-	//===============================================
-	/**
-	 *	Complete constructor (pid does not exit in java).
+    /**
+     * Default constructor.
+     */
+    //===============================================
+    @SuppressWarnings({"UnusedDeclaration"})
+    public DbDevExportInfo() {
+    }
+    //===============================================
+
+    /**
+     * Complete constructor (pid does not exit in java).
      *
-     * @param name device name
-     * @param ior   IOR found in database
-     * @param host  host wher running (or have been running)
+     * @param name    device name
+     * @param ior     IOR found in database
+     * @param host    host wher running (or have been running)
      * @param version IDL revision
      */
-	//===============================================
-	public DbDevExportInfo(String name, String ior,
-										String host, String version)
-	{
-		this.name     = name;
-		this.ior      = ior;
-		this.host     = host;
-		this.version  = version;
-	}
-	//===============================================
-	/**
-	 *	Serialise object data to a string array data.
-     * @return  a description as a String array.
+    //===============================================
+    public DbDevExportInfo(String name, String ior,
+                           String host, String version) {
+        this.name = name;
+        this.ior = ior;
+        this.host = host;
+        this.version = version;
+    }
+    //===============================================
+
+    /**
+     * Serialise object data to a string array data.
+     *
+     * @return a description as a String array.
      */
-	//===============================================
-	public String[] toStringArray()
-	{
-		String[]	argout;
-		argout = new String[5];
-		int	i=0;
-		argout[i++] = name;
-		argout[i++] = ior;
-		argout[i++] = host;
-		argout[i++] = version;
-		argout[i] = "0";
-		return argout;
-	}
+    //===============================================
+    public String[] toStringArray() {
+        String[] argout;
+        argout = new String[5];
+        int i = 0;
+        argout[i++] = name;
+        argout[i++] = ior;
+        argout[i++] = host;
+        argout[i++] = version;
+        argout[i] = "0";
+        return argout;
+    }
 }

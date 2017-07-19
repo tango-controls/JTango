@@ -41,6 +41,7 @@ import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
 import fr.esrf.TangoDs.TangoConst;
 import org.omg.CORBA.*;
+import org.tango.client.database.DeviceExportInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -459,12 +460,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     /**
      * Update the export info for this device in the database.
-     * 
-     * @param devinfo Device information to export.
+     *
+     * @param deviceExportInfo Device information to export.
      */
     // ==========================================================================
     public void export_device(final DeviceProxy deviceProxy,
-                              final DbDevExportInfo devinfo) throws DevFailed {
+                              final DeviceExportInfo deviceExportInfo) throws DevFailed {
         checkIfTango(deviceProxy, "export_device");
         checkIfUseDb(deviceProxy, "export_device()");
 
@@ -472,7 +473,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
                 deviceProxy.url.strPort));
         }
-        deviceProxy.getDb_dev().export_device(devinfo);
+        deviceProxy.getDb_dev().export_device(deviceExportInfo);
     }
 
     // ==========================================================================

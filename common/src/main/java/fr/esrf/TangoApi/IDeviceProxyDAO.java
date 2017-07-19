@@ -38,6 +38,7 @@ import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import org.omg.CORBA.Request;
+import org.tango.client.database.DeviceExportInfo;
 
 import java.util.List;
 
@@ -221,10 +222,10 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	//==========================================================================
 	/**
 	 *	Update the export info for this device in the database.
-	 *	@param devinfo	Device information to export.
+	 * @param deviceExportInfo    Device information to export.
 	 */
 	//==========================================================================
-	public abstract void export_device(DeviceProxy deviceProxy, DbDevExportInfo devinfo) throws DevFailed;
+	public abstract void export_device(DeviceProxy deviceProxy, DeviceExportInfo deviceExportInfo) throws DevFailed;
 
 	//==========================================================================
 	/**
