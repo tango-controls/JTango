@@ -34,6 +34,8 @@
 
 package fr.esrf.TangoApi;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.factory.TangoFactory;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
@@ -41,6 +43,7 @@ import fr.esrf.TangoDs.Except;
 import org.tango.client.database.DeviceExportInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -519,11 +522,13 @@ public class Database extends Connection {
     /**
      * Update the export info fort this device in the database.
      *
-     * @param deviceExportInfo Device information to export.
+     * @param devinfo Device information to export.
      * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
-    public void export_device(DeviceExportInfo deviceExportInfo) throws DevFailed {
+    public void export_device(DbDevExportInfo devinfo) throws DevFailed {
+        DeviceExportInfo deviceExportInfo = new DeviceExportInfo(devinfo.name, devinfo.ior, devinfo.host, devinfo.version, null, null);
+
         databaseDAO.export_device(this, deviceExportInfo);
     }
 
@@ -641,11 +646,18 @@ public class Database extends Connection {
     /**
      * Add a group of devices to the database.
      *
-     * @param deviceExportInfos Devices and server information.
+     * @param devinfos Devices and server information.
      * @throws DevFailed in case of database access failed
      */
     // ==========================================================================
-    public void export_server(DeviceExportInfo[] deviceExportInfos) throws DevFailed {
+    public void export_server(DbDevExportInfo[] devinfos) throws DevFailed {
+        DeviceExportInfo[] deviceExportInfos = Lists.transform(Arrays.asList(devinfos), new Function<DbDevExportInfo, DeviceExportInfo>() {
+            @Override
+            public DeviceExportInfo apply(DbDevExportInfo dbDevExportInfo) {
+                return new DeviceExportInfo(dbDevExportInfo.name, dbDevExportInfo.ior, dbDevExportInfo.host, dbDevExportInfo.version, null, null);
+            }
+        }).toArray(new DeviceExportInfo[devinfos.length]);
+
         databaseDAO.export_server(this, deviceExportInfos);
     }
 
