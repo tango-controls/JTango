@@ -35,6 +35,8 @@
 package fr.esrf.TangoApi;
 
 
+import org.tango.client.database.DeviceExportInfo;
+
 /**
  * Class Description:
  * This class is an object containing the exported device information.
@@ -45,33 +47,8 @@ package fr.esrf.TangoApi;
  */
 
 @Deprecated
-public class DbDevExportInfo implements java.io.Serializable {
-    /**
-     * The devivce name.
-     */
-    public String name;
-    /**
-     * ior connection as String.
-     */
-    public String ior;
-    /**
-     * Host name where device will be exported.
-     */
-    public String host;
-    /**
-     * TANGO protocol version number.
-     */
-    public String version;
-
-    //===============================================
-
-    /**
-     * Default constructor.
-     */
-    //===============================================
-    @SuppressWarnings({"UnusedDeclaration"})
-    public DbDevExportInfo() {
-    }
+public class DbDevExportInfo {
+    private final DeviceExportInfo value;
     //===============================================
 
     /**
@@ -85,10 +62,7 @@ public class DbDevExportInfo implements java.io.Serializable {
     //===============================================
     public DbDevExportInfo(String name, String ior,
                            String host, String version) {
-        this.name = name;
-        this.ior = ior;
-        this.host = host;
-        this.version = version;
+        this.value = new DeviceExportInfo(name, ior, host, version, "", "");
     }
     //===============================================
 
@@ -99,14 +73,6 @@ public class DbDevExportInfo implements java.io.Serializable {
      */
     //===============================================
     public String[] toStringArray() {
-        String[] argout;
-        argout = new String[5];
-        int i = 0;
-        argout[i++] = name;
-        argout[i++] = ior;
-        argout[i++] = host;
-        argout[i++] = version;
-        argout[i] = "0";
-        return argout;
+        return value.toStringArray();
     }
 }
