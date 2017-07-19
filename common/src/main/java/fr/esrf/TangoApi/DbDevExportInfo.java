@@ -75,4 +75,8 @@ public class DbDevExportInfo {
     public String[] toStringArray() {
         return value.toStringArray();
     }
+
+    public DeviceExportInfo asDeviceExportInfo() {
+        return value;
+    }
 }

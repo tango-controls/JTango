@@ -527,9 +527,7 @@ public class Database extends Connection {
      */
     // ==========================================================================
     public void export_device(DbDevExportInfo devinfo) throws DevFailed {
-        DeviceExportInfo deviceExportInfo = new DeviceExportInfo(devinfo.name, devinfo.ior, devinfo.host, devinfo.version, null, null);
-
-        databaseDAO.export_device(this, deviceExportInfo);
+        databaseDAO.export_device(this, devinfo.asDeviceExportInfo());
     }
 
     // ==========================================================================
@@ -654,7 +652,7 @@ public class Database extends Connection {
         DeviceExportInfo[] deviceExportInfos = Lists.transform(Arrays.asList(devinfos), new Function<DbDevExportInfo, DeviceExportInfo>() {
             @Override
             public DeviceExportInfo apply(DbDevExportInfo dbDevExportInfo) {
-                return new DeviceExportInfo(dbDevExportInfo.name, dbDevExportInfo.ior, dbDevExportInfo.host, dbDevExportInfo.version, null, null);
+                return dbDevExportInfo.asDeviceExportInfo();
             }
         }).toArray(new DeviceExportInfo[devinfos.length]);
 
