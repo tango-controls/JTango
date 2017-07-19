@@ -37,8 +37,8 @@ package fr.esrf.TangoApi;
 /**
  * This class get the asynchronous call result and send it to a CallBack object.
  */
-
-public class CallbackThread extends Thread implements ApiDefs {
+//TODO replace with Runnable
+public class CallbackThread extends Thread {
     private final AsyncCallObject aco;
 
     // ===============================================================
