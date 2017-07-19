@@ -44,6 +44,7 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
+import java.lang.Object;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
@@ -51,7 +52,8 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import java.lang.Object;
+
+import static fr.esrf.TangoDs.TangoConst.*;
 
 /**
  * This class is a used to store TANGO device server process data and to provide
@@ -59,12 +61,14 @@ import java.lang.Object;
  * singleton design pattern. Therefore a device server process can have only one
  * instance of this class and its constructor is not public.
  *
+ * @deprecated use {@link org.tango.server.ServerManager}
+ *
  * @author $Author: pascal_verdier $
  * @version $Revision: 25482 $
  */
-
+@Deprecated
 @SuppressWarnings( { "NestedTryStatement" })
-public class Util implements TangoConst {
+public class Util {
     /**
      * The UtilPrint object used for level 1 printing
      */

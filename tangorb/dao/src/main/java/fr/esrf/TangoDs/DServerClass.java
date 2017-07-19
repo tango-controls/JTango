@@ -39,6 +39,7 @@ import fr.esrf.Tango.DevState;
 
 import java.util.Collections;
 
+import static fr.esrf.TangoDs.TangoConst.*;
 
 /**
  * Class for all data common to all devices of the DServer class.
@@ -49,8 +50,8 @@ import java.util.Collections;
  * @author $Author: pascal_verdier $
  * @version $Revision: 25297 $
  */
- 
-public class DServerClass extends DeviceClass implements TangoConst
+@Deprecated
+public class DServerClass extends DeviceClass
 {
 	private static DServerClass 	_instance = null;
 	
@@ -64,6 +65,7 @@ public class DServerClass extends DeviceClass implements TangoConst
 //
 //-----------------------------------------------------------------------------
 
+    //TODO singleton is anti-pattern
     DServerClass(String name) throws DevFailed {
         super(name);
 

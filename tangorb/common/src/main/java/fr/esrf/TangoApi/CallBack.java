@@ -75,6 +75,7 @@ import fr.esrf.TangoApi.events.EventData;
  */
 
 
+//TODO replace with interface
 public class CallBack implements java.io.Serializable {
     //===============================================================
     //===============================================================

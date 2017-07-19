@@ -46,7 +46,10 @@ import org.omg.PortableServer.POA;
 
 import java.util.Vector;
 
-public abstract class DeviceClass implements TangoConst {
+import static fr.esrf.TangoDs.TangoConst.*;
+
+//TODO merge with DServerClass
+public abstract class DeviceClass {
     private final Vector nodb_name_list = new Vector();
     /**
      * The TANGO device class name
@@ -84,58 +87,56 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Construct a newly allocated DeviceClass object.
-     * 
-     * @param s
-     *            The Tango device class name
-     * 
+     *
+     * @param s The Tango device class name
      */
     protected DeviceClass(final String s) throws DevFailed {
-	name = s;
+        name = s;
 
-	//
-	// Create the associated DbClass object
-	//
+        //
+        // Create the associated DbClass object
+        //
 
-	if (Util._UseDb) {
-	    db_class = new DbClass(name);
-	}
+        if (Util._UseDb) {
+            db_class = new DbClass(name);
+        }
 
-	//
-	// Create the vector object(s)
-	//
+        //
+        // Create the vector object(s)
+        //
 
-	command_list = new Vector();
-	device_list = new Vector();
+        command_list = new Vector();
+        device_list = new Vector();
 
-	//
-	// initialise command_list with State and Status
-	//
+        //
+        // initialise command_list with State and Status
+        //
 
-	//
-	// Retrieve basic class resource
-	//
+        //
+        // Retrieve basic class resource
+        //
 
-	get_class_system_resource();
+        get_class_system_resource();
 
-	//
-	// Create the multi class attribute object
-	//
+        //
+        // Create the multi class attribute object
+        //
 
-	class_attr = new MultiClassAttribute();
-	initClass();
+        class_attr = new MultiClassAttribute();
+        initClass();
 
     }
 
     public void initClass() {
-	device_list.clear();
-	command_list.clear();
-	class_attr.get_attr_list().clear();
-	command_list.addElement(new StatusCmd("Status", Tango_DEV_VOID, Tango_DEV_STRING,
-		"Device status"));
-	command_list.addElement(new StateCmd("State", Tango_DEV_VOID, Tango_DEV_STATE,
-		"Device state"));
-	command_list.addElement(new InitCmd("Init", Tango_DEV_VOID, Tango_DEV_VOID));
-	Util.out4.println("DeviceClass  add cmd State/Status/Init " + get_name());
+        device_list.clear();
+        command_list.clear();
+        class_attr.get_attr_list().clear();
+        command_list.addElement(new StatusCmd("Status", Tango_DEV_VOID, Tango_DEV_STRING,
+                "Device status"));
+        command_list.addElement(new StateCmd("State", Tango_DEV_VOID, Tango_DEV_STATE,
+                "Device state"));
+        command_list.addElement(new InitCmd("Init", Tango_DEV_VOID, Tango_DEV_VOID));
+        Util.out4.println("DeviceClass  add cmd State/Status/Init " + get_name());
     }
 
     // +----------------------------------------------------------------------------
@@ -150,34 +151,34 @@ public abstract class DeviceClass implements TangoConst {
 
     private void get_class_system_resource() {
 
-	//
-	// Try to retrieve the class resource doc_url
-	//
+        //
+        // Try to retrieve the class resource doc_url
+        //
 
-	if (Util._UseDb) {
-	    try {
+        if (Util._UseDb) {
+            try {
 
-		//
-		// Call db server
-		//
+                //
+                // Call db server
+                //
 
-		final DbDatum res_value = db_class.get_property("doc_url");
+                final DbDatum res_value = db_class.get_property("doc_url");
 
-		if (res_value.is_empty() == true) {
-		    Util.out4.println("doc_url property for class " + name
-			    + " is not defined in database");
-		    doc_url = Tango_DefaultDocUrl;
-		} else {
-		    doc_url = res_value.extractString();
-		}
-	    } catch (final DevFailed ex) {
-		doc_url = Tango_DefaultDocUrl;
-	    } catch (final BAD_OPERATION ex) {
-		doc_url = Tango_DefaultDocUrl;
-	    }
-	} else {
-	    doc_url = Tango_DefaultDocUrl;
-	}
+                if (res_value.is_empty() == true) {
+                    Util.out4.println("doc_url property for class " + name
+                            + " is not defined in database");
+                    doc_url = Tango_DefaultDocUrl;
+                } else {
+                    doc_url = res_value.extractString();
+                }
+            } catch (final DevFailed ex) {
+                doc_url = Tango_DefaultDocUrl;
+            } catch (final BAD_OPERATION ex) {
+                doc_url = Tango_DefaultDocUrl;
+            }
+        } else {
+            doc_url = Tango_DefaultDocUrl;
+        }
     }
 
     // +-------------------------------------------------------------------------
@@ -192,134 +193,129 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Export a device.
-     * 
+     * <p>
      * Send device network parameter to TANGO database. The main parameter sent
      * to database is the CORBA stringified device IOR.
-     * 
-     * @param dev
-     *            The device to be exported
-     * @exception DevFailed
-     *                If the command sent to the database failed. Click <a
-     *                href="../../tango_basic/idl_html/Tango.html#DevFailed"
-     *                >here</a> to read <b>DevFailed</b> exception specification
+     *
+     * @param dev The device to be exported
+     * @throws DevFailed If the command sent to the database failed. Click <a
+     *                   href="../../tango_basic/idl_html/Tango.html#DevFailed"
+     *                   >here</a> to read <b>DevFailed</b> exception specification
      */
 
     protected void export_device(final DeviceImpl dev) throws DevFailed {
-	Util.out4.println("DeviceClass::export_device() arrived");
-	Device d;
+        Util.out4.println("DeviceClass::export_device() arrived");
+        Device d;
 
-	//
-	// Activate the CORBA object incarnated by the Java object
-	//
+        //
+        // Activate the CORBA object incarnated by the Java object
+        //
 
-	final Util tg = Util.instance();
-	final ORB orb = tg.get_orb();
-	d = dev._this(orb);
+        final Util tg = Util.instance();
+        final ORB orb = tg.get_orb();
+        d = dev._this(orb);
 
-	//
-	// Get the object id and store it
-	//
+        //
+        // Get the object id and store it
+        //
 
-	byte[] oid = null;
-	final POA r_poa = tg.get_poa();
-	try {
-	    oid = r_poa.reference_to_id(d);
-	} catch (final Exception ex) {
-	    final StringBuffer o = new StringBuffer("Can't get CORBA reference ID for device ");
-	    o.append(dev.get_name());
+        byte[] oid = null;
+        final POA r_poa = tg.get_poa();
+        try {
+            oid = r_poa.reference_to_id(d);
+        } catch (final Exception ex) {
+            final StringBuffer o = new StringBuffer("Can't get CORBA reference ID for device ");
+            o.append(dev.get_name());
 
-	    Except.throw_exception("API_CantGetDevObjectID", o.toString(),
-		    "DeviceClass.export_device()");
-	}
-	dev.set_obj_id(oid);
+            Except.throw_exception("API_CantGetDevObjectID", o.toString(),
+                    "DeviceClass.export_device()");
+        }
+        dev.set_obj_id(oid);
 
-	//
-	// Before exporting, check if database is used
-	//
-	if (Util._UseDb == false) {
-	    return;
-	    //
-	    // Prepare sent parameters
-	    //
-	}
+        //
+        // Before exporting, check if database is used
+        //
+        if (Util._UseDb == false) {
+            return;
+            //
+            // Prepare sent parameters
+            //
+        }
 
-	final DbDevExportInfo exp_info = new DbDevExportInfo(dev.get_name(), orb
-		.object_to_string(d), tg.get_host_name(), tg.get_version_str());
+        final DbDevExportInfo exp_info = new DbDevExportInfo(dev.get_name(), orb
+                .object_to_string(d), tg.get_host_name(), tg.get_version_str());
 
-	//
-	// Call db server
-	//
+        //
+        // Call db server
+        //
 
-	tg.get_database().export_device(exp_info);
+        tg.get_database().export_device(exp_info);
 
-	Util.out4.println("Leaving DeviceClass::export_device method()");
+        Util.out4.println("Leaving DeviceClass::export_device method()");
 
-	//
-	// Mark the device as exported
-	//
+        //
+        // Mark the device as exported
+        //
 
-	dev.set_exported_flag(true);
+        dev.set_exported_flag(true);
     }
 
     /**
      * Export a device.
-     * 
+     * <p>
      * This method activate the CORBA object associated with the servant dev. It
      * is used for device where a CORBALOC string is used to connect with. This
      * method is mainly used for the Tango database server.
-     * 
-     * @param dev
-     *            The device to be exported
-     * @param name
-     *            The device CORBALOC name
-     * @exception DevFailed
-     *                If the command sent to the database failed. Click <a
-     *                href="../../tango_basic/idl_html/Tango.html#DevFailed"
-     *                >here</a> to read <b>DevFailed</b> exception specification
+     *
+     * @param dev  The device to be exported
+     * @param name The device CORBALOC name
+     * @throws DevFailed If the command sent to the database failed. Click <a
+     *                   href="../../tango_basic/idl_html/Tango.html#DevFailed"
+     *                   >here</a> to read <b>DevFailed</b> exception specification
      */
 
     protected void export_device(final DeviceImpl dev, final String name) throws DevFailed {
-	Util.out4.println("DeviceClass::export_device() arrived");
-	Util.out4.println("name = " + name);
+        Util.out4.println("DeviceClass::export_device() arrived");
+        Util.out4.println("name = " + name);
 
-	//
-	// For server started without db usage (Mostly the database server). In
-	// this case,
-	// it is necessary to create our own CORBA object id and to bind it into
-	// the
-	// OOC Boot Manager for access through a stringified object reference
-	// constructed using the corbaloc style
-	//
+        //
+        // For server started without db usage (Mostly the database server). In
+        // this case,
+        // it is necessary to create our own CORBA object id and to bind it into
+        // the
+        // OOC Boot Manager for access through a stringified object reference
+        // constructed using the corbaloc style
+        //
 
-	final byte[] oid = name.getBytes();
-	final Util tg = Util.instance();
-	try {
-	    final org.omg.PortableServer.POA r_poa = tg.get_poa();
-	    r_poa.activate_object_with_id(oid, dev);
-	} catch (final Exception ex) {
-	    final StringBuffer o = new StringBuffer("Can't activate device for device ");
-	    o.append(dev.get_name());
+        final byte[] oid = name.getBytes();
+        final Util tg = Util.instance();
+        try {
+            final org.omg.PortableServer.POA r_poa = tg.get_poa();
+            r_poa.activate_object_with_id(oid, dev);
+        } catch (final Exception ex) {
+            final StringBuffer o = new StringBuffer("Can't activate device for device ");
+            o.append(dev.get_name());
 
-	    Except.throw_exception("API_CantBindDevice", o.toString(),
-		    "DeviceClass.export_device()");
-	}
+            Except.throw_exception("API_CantBindDevice", o.toString(),
+                    "DeviceClass.export_device()");
+        }
 
-	//
-	// Get the object id and store it
-	//
-	final ORB orb = tg.get_orb();
-	dev._this(orb);
-	dev.set_obj_id(oid);
+        //
+        // Get the object id and store it
+        //
+        final ORB orb = tg.get_orb();
+        dev._this(orb);
+        dev.set_obj_id(oid);
 
-	tg.registerDeviceForJacorb(name);
+        tg.registerDeviceForJacorb(name);
 
-	//
-	// Mark the device as exported
-	//
+        //
+        // Mark the device as exported
+        //
 
-	dev.set_exported_flag(true);
+        dev.set_exported_flag(true);
 
-	Util.out4.println("Leaving DeviceClass::export_device method()");
+        Util.out4.println("Leaving DeviceClass::export_device method()");
     }
 
     // +----------------------------------------------------------------------------
@@ -339,83 +335,78 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Execute a command.
-     * 
+     * <p>
      * It looks for the correct command object in the command object vector. If
      * the command is found, it invoke the <i>always_executed_hook</i> method.
      * Check if the command is allowed by invoking the <i>is_allowed</i> method
      * If the command is allowed, invokes the <i>execute</i> method.
-     * 
-     * @param device
-     *            The device on which the command must be executed
-     * @param command
-     *            The command name
-     * @param in_any
-     *            The command input data still packed in a CORBA Any object
+     *
+     * @param device  The device on which the command must be executed
+     * @param command The command name
+     * @param in_any  The command input data still packed in a CORBA Any object
      * @return A CORBA Any object with the output data packed in
-     * @exception DevFailed
-     *                If the command is not found, if the command is not allowed
-     *                in the actual device state and re-throws of all the
-     *                exception thrown by the <i>always_executed_hook</i>,
-     *                <i>is_alloed</i> and <i>execute</i> methods. Click <a
-     *                href=
-     *                "../../tango_basic/idl_html/Tango.html#DevFailed">here</a>
-     *                to read <b>DevFailed</b> exception specification
-     * 
+     * @throws DevFailed If the command is not found, if the command is not allowed
+     *                   in the actual device state and re-throws of all the
+     *                   exception thrown by the <i>always_executed_hook</i>,
+     *                   <i>is_alloed</i> and <i>execute</i> methods. Click <a
+     *                   href=
+     *                   "../../tango_basic/idl_html/Tango.html#DevFailed">here</a>
+     *                   to read <b>DevFailed</b> exception specification
      */
     public Any command_handler(final DeviceImpl device, final String command, final Any in_any)
-	    throws DevFailed {
-	Any ret = Util.instance().get_orb().create_any();
+            throws DevFailed {
+        Any ret = Util.instance().get_orb().create_any();
 
-	Util.out4.println("Entering DeviceClass::command_handler() method");
+        Util.out4.println("Entering DeviceClass::command_handler() method");
 
-	int i;
-	final String cmd_name = command.toLowerCase();
-	for (i = 0; i < command_list.size(); i++) {
-	    final Command cmd = (Command) command_list.elementAt(i);
-	    if (cmd.get_name().toLowerCase().equals(cmd_name) == true) {
+        int i;
+        final String cmd_name = command.toLowerCase();
+        for (i = 0; i < command_list.size(); i++) {
+            final Command cmd = (Command) command_list.elementAt(i);
+            if (cmd.get_name().toLowerCase().equals(cmd_name) == true) {
 
-		//
-		// Call the always executed method
-		//
+                //
+                // Call the always executed method
+                //
 
-		device.always_executed_hook();
+                device.always_executed_hook();
 
-		//
-		// Check if the command is allowed
-		//
+                //
+                // Check if the command is allowed
+                //
 
-		if (cmd.is_allowed(device, in_any) == false) {
-		    final StringBuffer o = new StringBuffer("Command ");
-		    o.append(command);
-		    o.append(" not allowed when the device is in ");
-		    o.append(Tango_DevStateName[device.get_state().value()]);
-		    o.append(" state");
+                if (cmd.is_allowed(device, in_any) == false) {
+                    final StringBuffer o = new StringBuffer("Command ");
+                    o.append(command);
+                    o.append(" not allowed when the device is in ");
+                    o.append(Tango_DevStateName[device.get_state().value()]);
+                    o.append(" state");
 
-		    Except.throw_exception("API_CommandNotAllowed", o.toString(),
-			    "DeviceClass.command_handler");
-		}
+                    Except.throw_exception("API_CommandNotAllowed", o.toString(),
+                            "DeviceClass.command_handler");
+                }
 
-		//
-		// Execute the command
-		//
+                //
+                // Execute the command
+                //
 
-		ret = cmd.execute(device, in_any);
-		break;
-	    }
-	}
+                ret = cmd.execute(device, in_any);
+                break;
+            }
+        }
 
-	if (i == command_list.size()) {
-	    Util.out3.println("DeviceClass.command_handler(): command " + command + " not found");
+        if (i == command_list.size()) {
+            Util.out3.println("DeviceClass.command_handler(): command " + command + " not found");
 
-	    //		
-	    // throw an exception to client
-	    //
-	    Except.throw_exception("API_CommandNotFound", "Command " + command + " not found",
-		    "DeviceClass.command_handler");
-	}
+            //
+            // throw an exception to client
+            //
+            Except.throw_exception("API_CommandNotFound", "Command " + command + " not found",
+                    "DeviceClass.command_handler");
+        }
 
-	Util.out4.println("Leaving DeviceClass.command_handler() method");
-	return ret;
+        Util.out4.println("Leaving DeviceClass.command_handler() method");
+        return ret;
     }
 
     //
@@ -424,22 +415,20 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Create command objects for all command supported by this class of device.
-     * 
+     * <p>
      * In the DeviceClass class, this method is pure abstract and must be
      * defined in sub-class. Its rule is to create the command object and to
      * store them in a vector of command objects
-     * 
      */
 
     public abstract void command_factory();
 
     /**
      * Create all the attributes name supported by this class of device.
-     * 
+     * <p>
      * In the DeviceClass class, this method does nothing and must be re-defined
      * in sub-class if the sub-class supports attributes. Its rule is to store
      * the name of all the supported attributes in a vector.
-     * 
      */
 
     public void attribute_factory(final Vector v) throws DevFailed {
@@ -447,13 +436,12 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Create device(s) name list (for no database device server).
-     * 
+     * <p>
      * This method can be re-defined in DeviceClass sub-class for device server
      * started without database. Its rule is to initialise class device name.
      * The default method does nothing.
-     * 
-     * @param list
-     *            The device name list within a String vector
+     *
+     * @param list The device name list within a String vector
      */
 
     public void device_name_factory(final Vector list) {
@@ -461,18 +449,16 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Create device(s).
-     * 
+     * <p>
      * In the DeviceClass class, this method is pure abstract and must be
      * defined in sub-class. Its rule is to create all the calss devices and to
      * store them in a vector of device
-     * 
-     * @param dev_list
-     *            The device name list
-     * @exception DevFailed
-     *                This method does not throw exception but a redefined
-     *                method can. Click <a
-     *                href="../../tango_basic/idl_html/Tango.html#DevFailed"
-     *                >here</a> to read <b>DevFailed</b> exception specification
+     *
+     * @param dev_list The device name list
+     * @throws DevFailed This method does not throw exception but a redefined
+     *                   method can. Click <a
+     *                   href="../../tango_basic/idl_html/Tango.html#DevFailed"
+     *                   >here</a> to read <b>DevFailed</b> exception specification
      */
 
     public abstract void device_factory(String[] dev_list) throws DevFailed;
@@ -483,81 +469,81 @@ public abstract class DeviceClass implements TangoConst {
 
     /**
      * Get the command object vector.
-     * 
+     *
      * @return A reference to the command vector
      */
 
     public Vector get_command_list() {
-	return command_list;
+        return command_list;
     }
 
     /**
      * Get the device object vector.
-     * 
+     *
      * @return A reference to the device vector
      */
 
     public Vector get_device_list() {
-	return device_list;
+        return device_list;
     }
 
     /**
      * Get the DServer object at the index in vector.
-     * 
+     *
      * @return the DServer object found at index.
      */
 
     public DeviceImpl get_device_at(final int idx) {
-	return (DeviceImpl) device_list.elementAt(idx);
+        return (DeviceImpl) device_list.elementAt(idx);
     }
 
     /**
      * Get the TANGO device class name.
-     * 
+     *
      * @return The TANGO device class name
      */
 
     public String get_name() {
-	return name;
+        return name;
     }
 
     /**
      * Get the TANGO device class documentation URL.
-     * 
+     *
      * @return The TANGO device class documentation
      */
 
     public String get_doc_url() {
-	return doc_url;
+        return doc_url;
     }
 
     /**
      * Get a handle to the object with all the attributes defined at class level
-     * 
+     *
      * @return A reference to the MultiClassAttribute object
      */
 
     public MultiClassAttribute get_class_attr() {
-	return class_attr;
+        return class_attr;
     }
 
     /**
      * Get a handle to the DbClass object
-     * 
+     *
      * @return A reference to the DbClass object
      */
 
     public DbClass get_db_class() {
-	return db_class;
+        return db_class;
     }
 
     /**
      * Get a reference to the vector with device name list (for no database
      * device server).
-     * 
+     *
      * @return The device name list
      */
     public Vector get_nodb_name_list() {
-	return nodb_name_list;
+        return nodb_name_list;
     }
 }
