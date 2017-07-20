@@ -62,7 +62,7 @@ public class DbDevExportInfo {
     //===============================================
     public DbDevExportInfo(String name, String ior,
                            String host, String version) {
-        this.value = new DeviceExportInfo(name, ior, host, version, "", "");
+        this.value = new DeviceExportInfo(name, ior, host, version, "null", "null");
     }
     //===============================================
 
