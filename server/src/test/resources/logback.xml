@@ -11,28 +11,32 @@
 	with Tango. If not, see <http://www.gnu.org/licenses/>. -->
 <configuration>
 
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%-5level %d [%thread - %X{deviceName}] %logger{36}.%M:%L - %msg%n</pattern>
-		</encoder>
-	</appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.FileAppender">
+        <file>target/logback.out</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%-5level %d [%thread - %X{deviceName}] %logger{36}.%M:%L - %msg%n</pattern>
+        </encoder>
+    </appender>
 
-	<appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>REQUEST %d [%X{deviceName}] - %msg%n</pattern>
-		</encoder>
-	</appender>
+    <appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.FileAppender">
+        <file>target/logback.out</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>REQUEST %d [%X{deviceName}] - %msg%n</pattern>
+        </encoder>
+    </appender>
 
-	<logger name="org.jacorb" level="OFF" />
-	<logger name="org.tango" level="DEBUG" />
-	<logger name="org.quartz" level="OFF" />
-	<logger name="net.sf.ehcache" level="OFF"/>
-	<logger name="ch.qos.logback" level="OFF"/>
-	<logger name="TangoClientRequests" level="OFF" additivity="false">
-		<appender-ref ref="CONSOLE-REQUEST" />
-	</logger>
+    <logger name="org.jacorb" level="OFF"/>
+    <logger name="org.tango" level="DEBUG"/>
+    <logger name="org.quartz" level="OFF"/>
+    <logger name="net.sf.ehcache" level="OFF"/>
+    <logger name="ch.qos.logback" level="OFF"/>
+    <logger name="TangoClientRequests" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE-REQUEST"/>
+    </logger>
 
-	<root level="ERROR">
-		<appender-ref ref="CONSOLE" />
-	</root>
+    <root level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </root>
 </configuration>
