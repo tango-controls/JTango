@@ -24,18 +24,13 @@
  */
 package org.tango.server.testserver;
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.*;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.server.ServerManager;
-
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.ApiUtil;
-import fr.esrf.TangoApi.AttributeInfo;
-import fr.esrf.TangoApi.Database;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DeviceData;
-import fr.esrf.TangoApi.DeviceProxy;
 
 /**
  * properties tests
@@ -43,7 +38,8 @@ import fr.esrf.TangoApi.DeviceProxy;
  * @author ABEILLE
  * 
  */
-// @Ignore
+//TODO move to integration tests (start db)
+@Ignore
 public class PropertiesTest {
     // XXX: device must be declared in tango db before running this test
     private static String deviceName = "test/tango/jtangotest.1";
