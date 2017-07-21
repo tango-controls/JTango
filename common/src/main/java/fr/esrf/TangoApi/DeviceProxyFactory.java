@@ -113,6 +113,7 @@ public class DeviceProxyFactory {
                 proxy_table.put(fullDeviceName, dev);
             }
             catch(DevFailed e) {
+                //TODO #35
                 e.printStackTrace();
                 throw e;
             }
