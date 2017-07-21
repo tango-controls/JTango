@@ -267,6 +267,7 @@
                             <coverageReportFile>${project.build.directory}/cobertura/cobertura.ser</coverageReportFile>
                             <projectToken>${env.CODACY_PROJECT_TOKEN}</projectToken>
                             <apiToken>${env.CODACY_API_TOKEN}</apiToken>
+                            <failOnMissingReportFile>false</failOnMissingReportFile>
                         </configuration>
                     </plugin>
                 </plugins>
