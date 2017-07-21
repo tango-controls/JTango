@@ -24,13 +24,14 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.DeviceDataHistory;
+import fr.esrf.TangoApi.DeviceProxy;
+import fr.soleil.tango.clientapi.TangoCommand;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.DeviceState;
 import org.tango.server.Constants;
@@ -38,13 +39,13 @@ import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceDataHistory;
-import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.tango.clientapi.TangoCommand;
+import java.util.Arrays;
 
-//@Ignore(value = "attribute_history does not work without db")
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
+//TODO move to integration tests (start db)
+@Ignore(value = "attribute_history does not work without db")
 public class HistoryTest {
 
     // XXX: device must be declared in tango db before running this test
