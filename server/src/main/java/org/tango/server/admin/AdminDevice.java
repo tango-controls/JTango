@@ -24,15 +24,9 @@
  */
 package org.tango.server.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import fr.esrf.Tango.ClntIdent;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevVarLongStringArray;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -47,14 +41,7 @@ import org.tango.server.ExceptionMessages;
 import org.tango.server.IPollable;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.StateMachine;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.build.DeviceClassBuilder;
@@ -72,9 +59,9 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevVarLongStringArray;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The administration device. Will be started automatically for each device
@@ -153,7 +140,6 @@ public final class AdminDevice implements TangoMXBean {
     @Command(name = "DevPollStatus", inTypeDesc = DEVICE_NAME, outTypeDesc = "Device polling status")
     public String[] getPollStatus(final String deviceName) throws DevFailed {
         xlogger.entry();
-        // TODO: manage tango://localhost:12354/1/1/1#dbase=no style device
         // XXX WARN!!! The string table is parsed by jive.Do not change a letter
         // of
         // the result!
@@ -492,6 +478,15 @@ public final class AdminDevice implements TangoMXBean {
      */
     public String getStatus() {
         return status;
+    }
+
+    /**
+     * set status
+     *
+     * @param status
+     */
+    public void setStatus(final String status) {
+        this.status = status;
     }
 
     /**
@@ -1016,15 +1011,6 @@ public final class AdminDevice implements TangoMXBean {
         }
         logger.debug("DevLockStatus {} {}", Arrays.toString(result.lvalue), Arrays.toString(result.svalue));
         return result;
-    }
-
-    /**
-     * set status
-     *
-     * @param status
-     */
-    public void setStatus(final String status) {
-        this.status = status;
     }
 
     public void setPollingThreadsPoolSize(final int pollingThreadsPoolSize) {
