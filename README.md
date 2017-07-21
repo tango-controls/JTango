@@ -1,7 +1,7 @@
 [![logo](http://www.tango-controls.org/static/tango/img/logo_tangocontrols.png)](http://www.tango-controls.org)
 
 
-[![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=enable-tests)](https://travis-ci.org/tango-controls/JTango)
+[![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=fix-admin-server-test)](https://travis-ci.org/tango-controls/JTango)
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
 [![codecov](https://codecov.io/gh/tango-controls/JTango/branch/fix-admin-server-test/graph/badge.svg)](https://codecov.io/gh/tango-controls/JTango)
 [![codebeat badge](https://codebeat.co/badges/04195151-0ff7-4420-94eb-68d246ebfe75)](https://codebeat.co/projects/github-com-tango-controls-jtango-master)
