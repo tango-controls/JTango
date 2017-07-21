@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=enable-tests)](https://travis-ci.org/tango-controls/JTango)
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
-[![codecov](https://codecov.io/gh/tango-controls/JTango/branch/master/graph/badge.svg)](https://codecov.io/gh/tango-controls/JTango)
+[![codecov](https://codecov.io/gh/tango-controls/JTango/branch/fix-admin-server-test/graph/badge.svg)](https://codecov.io/gh/tango-controls/JTango)
 [![codebeat badge](https://codebeat.co/badges/04195151-0ff7-4420-94eb-68d246ebfe75)](https://codebeat.co/projects/github-com-tango-controls-jtango-master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d3dd5b565ec546e4b3ad4e28bd0b85dd)](https://www.codacy.com/app/tango-controls/JTango?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tango-controls/JTango&amp;utm_campaign=Badge_Grade)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/master/LICENSE)
