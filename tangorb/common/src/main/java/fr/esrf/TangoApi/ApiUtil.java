@@ -60,6 +60,7 @@ import java.util.*;
  */
 
 public class ApiUtil {
+    //TODO replace with package.getImplementationVersion
     public static String revNumber =
             "9.1.0  -  Wed Jun 24 14:15:07 CEST 2015";
     /**
