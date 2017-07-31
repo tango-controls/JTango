@@ -9,6 +9,14 @@
 
     <packaging>pom</packaging>
 
+    <licenses>
+        <license>
+            <name>LGPL-3.0</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>site</distribution>
+        </license>
+    </licenses>
+
     <properties>
         <jacorb.version>3.8</jacorb.version>
         <!-- TODO remove -->

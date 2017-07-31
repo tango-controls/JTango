@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.tango-controls</groupId>
-		<artifactId>JTangoParent</artifactId>
-		<version>9.3.3-SNAPSHOT</version>
-		<relativePath>../parent/pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.tango-controls</groupId>
+        <artifactId>JTangoParent</artifactId>
+        <version>9.3.3-SNAPSHOT</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
 
 
-	<artifactId>JavaTangoIDL</artifactId>
-	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
-	<inceptionYear>2004</inceptionYear>
+    <artifactId>JavaTangoIDL</artifactId>
+    <description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
+    <inceptionYear>2004</inceptionYear>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jacorb</groupId>
-			<artifactId>jacorb-omgapi</artifactId>
-		</dependency>
-	</dependencies>
+    <licenses>
+        <license>
+            <name>LGPL-3.0</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>site</distribution>
+        </license>
+    </licenses>
 
-	<!-- TODO generate java from idl on generate-source -->
+    <dependencies>
+        <dependency>
+            <groupId>org.jacorb</groupId>
+            <artifactId>jacorb-omgapi</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- TODO generate java from idl on generate-source -->
 </project>
