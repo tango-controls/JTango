@@ -28,7 +28,6 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevIntrChange;
 import fr.esrf.Tango.DevPipeData;
 import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.TangoApi.HostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -49,8 +48,10 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -210,7 +211,11 @@ public final class EventManager {
         if (ORBManager.OAI_ADDR != null && !ORBManager.OAI_ADDR.isEmpty()) {
             ipAddress = ORBManager.OAI_ADDR;
         } else {
-            ipAddress = HostInfo.getAddress();
+            try {
+                ipAddress = Inet4Address.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                throw DevFailedUtils.newDevFailed(e);
+            }
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
