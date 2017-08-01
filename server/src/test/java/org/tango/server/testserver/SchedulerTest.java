@@ -28,13 +28,9 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.tango.client.database.DatabaseFactory;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -46,13 +42,7 @@ import static org.junit.Assert.assertThat;
  * @author ABEILLE
  *
  */
-@RunWith(Parameterized.class)
 public class SchedulerTest extends NoDBDeviceManager {
-
-    @Parameterized.Parameters
-    public static List<Object[]> data() {
-        return Arrays.asList(new Object[100][0]);
-    }
 
     @Test
     public void test() throws DevFailed {
