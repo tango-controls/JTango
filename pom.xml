@@ -10,7 +10,7 @@
         <module>parent</module>
         <module>idl</module>
         <module>common</module>
-        <module>tangorb/dao</module>
+        <module>dao</module>
         <module>client</module>
         <module>server</module>
         <module>assembly</module>

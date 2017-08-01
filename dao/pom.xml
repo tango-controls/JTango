@@ -6,7 +6,7 @@
 		<groupId>org.tango-controls</groupId>
 		<artifactId>JTangoParent</artifactId>
 		<version>9.3.3-SNAPSHOT</version>
-		<relativePath>../../parent/pom.xml</relativePath>
+		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>TangORB</artifactId>
