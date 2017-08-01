@@ -9,9 +9,8 @@
     <modules>
         <module>parent</module>
         <module>idl</module>
-        <module>tangorb/common</module>
+        <module>common</module>
         <module>tangorb/dao</module>
-        <module>commons</module>
         <module>client</module>
         <module>server</module>
         <module>assembly</module>

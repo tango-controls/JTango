@@ -40,7 +40,7 @@
 
 		<dependency>
 			<groupId>org.tango-controls</groupId>
-			<artifactId>TangORB-javacommon</artifactId>
+			<artifactId>JTangoCommons</artifactId>
 		</dependency>
 
 		<dependency>

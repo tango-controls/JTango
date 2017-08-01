@@ -136,20 +136,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jacorb</groupId>
-			<artifactId>jacorb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jacorb</groupId>
 			<artifactId>jacorb-omgapi</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.jacorb</groupId>
-			<artifactId>jacorb-services</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tango-controls</groupId>
-			<artifactId>JTangoCommons</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.tango-controls</groupId>
+            <artifactId>TangORB</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.tango-controls</groupId>
 			<artifactId>JTangoClientLang</artifactId>
