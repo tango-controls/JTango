@@ -1,9 +1,8 @@
 package org.tango.client.database.cache;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeProxy;
+import fr.esrf.TangoApi.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DeviceExportInfo;
@@ -11,9 +10,9 @@ import org.tango.client.database.DeviceImportInfo;
 import org.tango.utils.CaseInsensitiveMap;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeProxy;
-import fr.esrf.TangoApi.Connection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -24,12 +23,11 @@ import fr.esrf.TangoApi.Connection;
 public final class DatabaseCache implements ICachableDatabase {
     private static final String RELEASE_1_X = "release 1\\.[7-9]";
     private final Logger logger = LoggerFactory.getLogger(ServerCache.class);
-    private ServerCache serverCache;
-
-    private boolean isCacheAvailable;
     private final NoCacheDatabase dbDevice;
     private final String version;
     private final Connection database;
+    private ServerCache serverCache;
+    private boolean isCacheAvailable;
 
     public DatabaseCache(final Connection database, final NoCacheDatabase dbDevice) throws DevFailed {
         this.dbDevice = dbDevice;

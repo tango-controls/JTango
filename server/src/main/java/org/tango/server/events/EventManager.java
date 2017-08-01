@@ -24,16 +24,18 @@
  */
 package org.tango.server.events;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevIntrChange;
 import fr.esrf.Tango.DevPipeData;
 import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.TangoApi.HostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.client.database.DatabaseFactory;
-import org.tango.orb.ORBManager;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.ServerManager;
@@ -48,13 +50,9 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -71,22 +69,26 @@ public final class EventManager {
     public static final String IDL_REGEX = "idl[0-9]_[a-z]*";
     public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
     private static final EventManager INSTANCE = new EventManager();
-    private static ZContext context;
-    private static ScheduledExecutorService heartBeatExecutor;
-    private static int serverHWM;
-    private static int clientHWN;
+    private final static ScheduledExecutorService heartBeatExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+        @Override
+        public Thread newThread(final Runnable r) {
+            return new Thread(r, "Event HeartBeat");
+        }
+    });
     private final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
-    private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
-    private ZMQ.Socket heartbeatSocket;
-    private ZMQ.Socket eventSocket;
+    //TODO not thread safe
+    private final Map<String, EventImpl> eventImplMap = new HashMap<>();
+    //TODO concurrency
+    private final Map<String, ZMQ.Socket> heartbeatEndpoints = new LinkedHashMap<>();
+    private final Map<String, ZMQ.Socket> eventEndpoints = new LinkedHashMap<>();
+    private ZContext context;
+    private int serverHWM = EventConstants.HWM_DEFAULT;
+    private int clientHWN = EventConstants.HWM_DEFAULT;
     private boolean isInitialized = false;
-    private String heartbeatEndpoint = null;
-    private String eventEndpoint = null;
 
     private EventManager() {
-        serverHWM = EventConstants.HWM_DEFAULT;
-        // Check the High Water Mark value from environment
+        // Check the         serverHWM
         final String env = System.getenv("TANGO_DS_EVENT_BUFFER_HWM");
         try {
             if (env != null) {
@@ -96,19 +98,15 @@ public final class EventManager {
             logger.error("system env TANGO_DS_EVENT_BUFFER_HWM is not a number: {} ", env);
         }
 
-        clientHWN = EventConstants.HWM_DEFAULT;
         // Check the High Water Mark value from Control System property
-        String value = "";
         try {
-            value = DatabaseFactory.getDatabase().getFreeProperty("CtrlSystem", "EventBufferHwm");
+            String value = DatabaseFactory.getDatabase().getFreeProperty("CtrlSystem", "EventBufferHwm");
             clientHWN = Integer.parseInt(value);
         } catch (final DevFailed e) {
             DevFailedUtils.logDevFailed(e, logger);
         } catch (final NumberFormatException e) {
-            logger.error("ControlSystem/EventBufferHwm property is not a number: {} ", value);
+            logger.error("CtrlSystem/EventBufferHwm property is not a number: {}", e.getMessage());
         }
-
-        isInitialized = false;
     }
 
     public static EventManager getInstance() {
@@ -150,19 +148,20 @@ public final class EventManager {
 
         final String adminDeviceName = ServerManager.getInstance().getAdminDeviceName();
 
-        // Get the free ports and build endpoints
-        setEndpoints(SocketType.HEARTBEAT);
-        setEndpoints(SocketType.EVENTS);
-
-        // Start the heartbeat thread
-        heartBeatExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+        Iterable<String> ipAddress = HostInfo.getIpAddresses();
+        Iterable<String> ip4Address = Iterables.filter(ipAddress, new Predicate<String>() {
             @Override
-            public Thread newThread(final Runnable r) {
-                return new Thread(r, "Event HeartBeat");
+            public boolean apply(String s) {
+                return s.split("\\.").length == 4;
             }
         });
+        // Get the free ports and build endpoints
+        bindEndpoints(ip4Address, heartbeatEndpoints, SocketType.HEARTBEAT);
+        bindEndpoints(ip4Address, eventEndpoints, SocketType.EVENTS);
+
         // // TODO : without database?
         final String heartbeatName = EventUtilities.buildHeartBeatEventName(adminDeviceName);
+        // Start the heartbeat thread
         heartBeatExecutor.scheduleAtFixedRate(new HeartbeatThread(heartbeatName), 0,
                 EventConstants.EVENT_HEARTBEAT_PERIOD, TimeUnit.MILLISECONDS);
         isInitialized = true;
@@ -200,42 +199,28 @@ public final class EventManager {
     }
 
     /**
-     * Check next port to connect the heartbeatSocket or eventSocket
+     * Binds given socket types to the list of addresses
      *
-     * @param socketType HEARTBEAT or EVENT
-     * @throws DevFailed if no free port found
+     * @param ipAddresses
+     * @param heartbeatEndpoints
+     * @param socketType
      */
-    private void setEndpoints(final SocketType socketType) throws DevFailed {
-        xlogger.entry();
-        String ipAddress;
-        if (ORBManager.OAI_ADDR != null && !ORBManager.OAI_ADDR.isEmpty()) {
-            ipAddress = ORBManager.OAI_ADDR;
-        } else {
-            try {
-                ipAddress = Inet4Address.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        }
+    public void bindEndpoints(Iterable<String> ipAddresses, Map<String, ZMQ.Socket> heartbeatEndpoints, SocketType socketType) {
+        xlogger.entry(ipAddresses, heartbeatEndpoints, socketType);
 
-        final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
         final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
         socket.setLinger(0);
         socket.setReconnectIVL(-1);
-        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
-        socket.bind(endpoint);
+        for (String ipAddress : ipAddresses) {
+            final StringBuilder endpoint = new StringBuilder("tcp://").append(ipAddress).append(":*");
 
-        switch (socketType) {
-            case HEARTBEAT:
-                heartbeatSocket = socket;
-                heartbeatEndpoint = endpoint;
-                break;
-            case EVENTS:
-                socket.setSndHWM(serverHWM);
-                eventSocket = socket;
-                eventEndpoint = endpoint;
-                logger.debug("HWM has been set to {}", socket.getSndHWM());
-                break;
+
+            int port = socket.bind(endpoint.toString());
+
+            //replace * with actual port
+            endpoint.deleteCharAt(endpoint.length() - 1).append(port);
+            heartbeatEndpoints.put(endpoint.toString(), socket);
+            logger.debug("bind ZMQ socket {} for {}", endpoint.toString(), socketType);
         }
 
         xlogger.exit();
@@ -320,13 +305,24 @@ public final class EventManager {
         // longStringArray.lvalue = new int[0];
         longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
                 EventConstants.ZMQ_RELEASE };
-        if (heartbeatEndpoint == null || eventEndpoint == null) {
+        if (heartbeatEndpoints.isEmpty() || eventEndpoints.isEmpty()) {
             longStringArray.svalue = new String[] { "No ZMQ event yet !" };
         } else {
-            longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
+            longStringArray.svalue = endpointsAsStringArray();
         }
         return longStringArray;
 
+    }
+
+    private String[] endpointsAsStringArray() {
+        List<String> svalue = new ArrayList<>(heartbeatEndpoints.size() + eventEndpoints.size());
+
+        for (int i = 0, size = heartbeatEndpoints.size(); i < size; ++i) {
+            svalue.add(Iterables.get(heartbeatEndpoints.keySet(), i));
+            svalue.add(Iterables.get(eventEndpoints.keySet(), i));
+        }
+
+        return svalue.toArray(new String[svalue.size()]);
     }
 
     /**
@@ -430,7 +426,7 @@ public final class EventManager {
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
                 EventConstants.ZMQ_RELEASE };
-        longStringArray.svalue = new String[] { heartbeatEndpoint, eventEndpoint };
+        longStringArray.svalue = endpointsAsStringArray();
         logger.debug("event registered for {}", fullName);
         return longStringArray;
     }
@@ -450,7 +446,9 @@ public final class EventManager {
             final String fullName5 = EventUtilities.buildEventName(deviceName, attributeName, eventType);
             final EventImpl eventImpl5 = getEventImpl(fullName5);
             if (eventImpl5 != null) {
-                eventImpl5.pushEvent(eventSocket, fullName5, devFailed);
+                for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                    eventImpl5.pushEvent(eventSocket, fullName5, devFailed);
+                }
             }
         }
         xlogger.exit();
@@ -465,13 +463,7 @@ public final class EventManager {
     public void pushAttributeEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
-            for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
-                final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
-                final EventImpl eventImpl = getEventImpl(fullName);
-                if (eventImpl != null) {
-                    eventImpl.pushAttributeEvent(eventSocket, fullName);
-                }
-            }
+            pushAttributeEvent(deviceName, attributeName, eventType);
         }
         xlogger.exit();
     }
@@ -491,7 +483,9 @@ public final class EventManager {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeEvent(eventSocket, fullName);
+                for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                    eventImpl.pushAttributeEvent(eventSocket, fullName);
+                }
             }
         }
         xlogger.exit();
@@ -511,7 +505,9 @@ public final class EventManager {
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.forcePushEvent(eventSocket, fullName);
+            for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                eventImpl.pushAttributeEvent(eventSocket, fullName);
+            }
         }
         xlogger.exit();
     }
@@ -530,7 +526,9 @@ public final class EventManager {
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName, EventType.DATA_READY_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushAttributeDataReadyEvent(eventSocket, fullName, counter);
+            for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                eventImpl.pushAttributeDataReadyEvent(eventSocket, fullName, counter);
+            }
         }
         xlogger.exit();
     }
@@ -542,7 +540,9 @@ public final class EventManager {
                     idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeConfigEvent(eventSocket, fullName);
+                for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                    eventImpl.pushAttributeConfigEvent(eventSocket, fullName);
+                }
             }
         }
         xlogger.exit();
@@ -554,7 +554,9 @@ public final class EventManager {
         final String fullName = EventUtilities.buildDeviceEventName(deviceName, EventType.INTERFACE_CHANGE_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushInterfaceChangeEvent(eventSocket, fullName, deviceInterface);
+            for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                eventImpl.pushInterfaceChangeEvent(eventSocket, fullName, deviceInterface);
+            }
         }
         xlogger.exit();
     }
@@ -564,9 +566,11 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushPipeEvent(eventSocket, fullName,
-                    new DevPipeData(pipeName, TangoIDLUtil.getTime(blob.getTime()), blob.getValue()
-                            .getDevPipeBlobObject()));
+            for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                eventImpl.pushPipeEvent(eventSocket, fullName,
+                        new DevPipeData(pipeName, TangoIDLUtil.getTime(blob.getTime()), blob.getValue()
+                                .getDevPipeBlobObject()));
+            }
         }
         xlogger.exit();
     }
@@ -577,7 +581,9 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushEvent(eventSocket, fullName, devFailed);
+            for (ZMQ.Socket eventSocket : eventEndpoints.values()) {
+                eventImpl.pushEvent(eventSocket, fullName, devFailed);
+            }
         }
         xlogger.exit();
     }
@@ -603,7 +609,8 @@ public final class EventManager {
         @Override
         public void run() {
             xlogger.entry();
-            if (!eventImplMap.isEmpty()) {
+            if (eventImplMap.isEmpty()) return;
+            for (ZMQ.Socket heartbeatSocket : heartbeatEndpoints.values()) {
                 // Fire heartbeat
                 try {
                     heartbeatSocket.sendMore(heartbeatName);
@@ -614,7 +621,6 @@ public final class EventManager {
                     DevFailedUtils.logDevFailed(e, logger);
                 }
                 logger.debug("Heartbeat sent for {}", heartbeatName);
-                // System.out.println("Heartbeat sent for " + heartbeatName);
             }
             xlogger.exit();
         }

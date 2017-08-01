@@ -1,7 +1,6 @@
 package org.tango.client.database;
 
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.cache.DatabaseCache;
@@ -9,7 +8,7 @@ import org.tango.client.database.cache.ICachableDatabase;
 import org.tango.client.database.cache.NoCacheDatabase;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.util.Map;
 
 /**
  * Client of the tango database device.

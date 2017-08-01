@@ -24,9 +24,6 @@
  */
 package org.tango.orb;
 
-import java.net.InetAddress;
-import java.net.Socket;
-
 import org.jacorb.orb.iiop.ServerIIOPConnection;
 import org.jacorb.orb.portableInterceptor.ServerRequestInfoImpl;
 import org.omg.ETF.Connection;
@@ -34,6 +31,9 @@ import org.omg.PortableInterceptor.ForwardRequest;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.Socket;
 
 /**
  * A CORBA Server Interceptor to retrieve the identity of clients
@@ -44,20 +44,22 @@ import org.slf4j.LoggerFactory;
 public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject implements
         org.omg.PortableInterceptor.ServerRequestInterceptor {
     private static final String GIOP_TCP = "giop:tcp:";
-
-    private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
-
     /**
      *
      */
     private static final long serialVersionUID = 1L;
+    private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
+    private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
     private final ThreadLocal<String> clientHostName = new ThreadLocal<String>();
     private volatile ThreadLocal<String> giopHostAddress = new ThreadLocal<String>();
     private volatile ThreadLocal<String> clientIPAddress = new ThreadLocal<String>();
-    private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
 
     private ServerRequestInterceptor() {
 
+    }
+
+    public static ServerRequestInterceptor getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -131,10 +133,6 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
 
     public String getGiopHostAddress() {
         return giopHostAddress.get();
-    }
-
-    public static ServerRequestInterceptor getInstance() {
-        return INSTANCE;
     }
 
 }

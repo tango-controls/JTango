@@ -1,11 +1,11 @@
 package org.tango.client.database.cache;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.utils.CaseInsensitiveMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class ClassCache {
 

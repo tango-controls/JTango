@@ -1,30 +1,20 @@
 package org.tango.client.database.cache;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.TangoApi.DbDatum;
+import fr.esrf.TangoApi.DeviceData;
 import org.apache.commons.lang3.ArrayUtils;
 import org.tango.TangoHostManager;
 import org.tango.client.database.DeviceExportInfo;
 import org.tango.client.database.DeviceImportInfo;
 import org.tango.utils.CaseInsensitiveMap;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DeviceData;
+import java.util.*;
 
 public final class NoCacheDatabase implements ICachableDatabase {
 
     private final fr.esrf.TangoApi.Database database;
-
-    private enum PropertyType {
-        Class, Device;
-    }
 
     /**
      * Ctr
@@ -511,5 +501,9 @@ public final class NoCacheDatabase implements ICachableDatabase {
             }
         }
         return args;
+    }
+
+    private enum PropertyType {
+        Class, Device;
     }
 }

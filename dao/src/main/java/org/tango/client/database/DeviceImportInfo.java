@@ -1,8 +1,7 @@
 package org.tango.client.database;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import fr.esrf.Tango.DevVarLongStringArray;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Class Description: This class is an object containing the imported device information.

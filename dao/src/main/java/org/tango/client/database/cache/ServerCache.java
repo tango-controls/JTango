@@ -1,20 +1,15 @@
 package org.tango.client.database.cache;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.Connection;
+import fr.esrf.TangoApi.DeviceData;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.Connection;
-import fr.esrf.TangoApi.DeviceData;
+import java.util.*;
 
 public final class ServerCache {
 
@@ -22,31 +17,11 @@ public final class ServerCache {
     private final Logger logger = LoggerFactory.getLogger(ServerCache.class);
     private final Connection database;
     private final List<String> adminInfos = new LinkedList<String>();
-
-    private String adminDeviceName;
-    private String adminClassName;
     private final Map<String, ClassCache> classCaches = new HashMap<String, ClassCache>();
-
-    private class Server {
-        private final Map<String, String[]> devicesPerServer = new HashMap<String, String[]>();
-
-        public void addClass(final String className, final String[] deviceNames) {
-            devicesPerServer.put(className, deviceNames);
-        }
-
-        public String[] getDevices(final String className) {
-            return devicesPerServer.get(className);
-        }
-
-        @Override
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        }
-    }
-
     private final Map<String, Server> servers = new HashMap<String, ServerCache.Server>();
     private final Map<String, DeviceCache> deviceCaches = new HashMap<String, DeviceCache>();
-
+    private String adminDeviceName;
+    private String adminClassName;
     public ServerCache(final Connection database) throws DevFailed {
         this.database = database;
 
@@ -296,5 +271,22 @@ public final class ServerCache {
             }
         }
         return result;
+    }
+
+    private class Server {
+        private final Map<String, String[]> devicesPerServer = new HashMap<String, String[]>();
+
+        public void addClass(final String className, final String[] deviceNames) {
+            devicesPerServer.put(className, deviceNames);
+        }
+
+        public String[] getDevices(final String className) {
+            return devicesPerServer.get(className);
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        }
     }
 }

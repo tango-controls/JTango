@@ -43,7 +43,10 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 
 import java.io.FileOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.StringTokenizer;
 
 /**
  * Class Description: This class manage a static vector of Database object. <Br>
@@ -51,7 +54,7 @@ import java.util.*;
  * <Br>
  * <b> Usage example: </b> <Br>
  * <ul>
- * <i> Database dbase = ApiUtil.get_db_obj(); <Br>
+ * <i> Databaspogoe dbase = ApiUtil.get_db_obj(); <Br>
  * </ul>
  * </i>
  * 
@@ -184,9 +187,11 @@ public class ApiUtil {
 
     /**
      * Return the host address.
+     *
+     * @deprecated use {@link HostInfo}
      */
-    // ===================================================================
-	public static String getHostAddress() throws DevFailed {
+    @Deprecated
+    public static String getHostAddress() throws DevFailed {
 		return HostInfo.getAddress();
 	}
     // ===================================================================
@@ -197,20 +202,24 @@ public class ApiUtil {
 
     /**
      * Return the host addresses.
+     *
+     * @deprecated use {@link HostInfo}
      */
-    // ===================================================================
-	public static Vector<String> getHostAddresses() throws DevFailed {
-		return HostInfo.getAddresses();
-	}
+    @Deprecated
+    public static Iterable<String> getHostAddresses() throws DevFailed {
+        return HostInfo.getAddresses();
+    }
     // ===================================================================
 
     /**
      * Return the host name.
+     *
+     * @deprecated use {@link HostInfo}
      */
-    // ===================================================================
-	public static String getHostName() throws DevFailed {
-		return HostInfo.getName();
-	}
+    @Deprecated
+    public static String getHostName() throws DevFailed {
+        return HostInfo.getName();
+    }
     // ===================================================================
 
     /**

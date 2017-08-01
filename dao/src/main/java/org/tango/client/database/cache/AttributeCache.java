@@ -1,10 +1,10 @@
 package org.tango.client.database.cache;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.utils.CaseInsensitiveMap;
+
+import java.util.Map;
 
 public final class AttributeCache {
     private final String name;

@@ -206,14 +206,16 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
 
     // ===================================================================
 
-    // ==========================================================================
-    // ==========================================================================
-    public static String getUser() {
-        return System.getProperty("user.name");
-    }
-
     // ===================================================================
 
+    /**
+     * NOOP
+     *
+     * @param delegate
+     * @deprecated
+     */
+    //TODO remove
+    @Deprecated
     @SuppressWarnings("UnusedParameters")
     private static void removePendingReplies(final Delegate delegate) {
         // try to solve a memory leak. pending_replies is still growing when

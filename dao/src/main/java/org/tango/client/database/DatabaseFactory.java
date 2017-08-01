@@ -1,14 +1,13 @@
 package org.tango.client.database;
 
+import fr.esrf.Tango.DevFailed;
+import org.tango.TangoHostManager;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.tango.TangoHostManager;
-
-import fr.esrf.Tango.DevFailed;
 
 /**
  * Factory to connect to the tango database device
@@ -95,9 +94,13 @@ public final class DatabaseFactory {
         return useDb;
     }
 
+    public static void setUseDb(final boolean useDb) {
+        DatabaseFactory.useDb = useDb;
+    }
+
     /**
      * Build a mock tango db with a file containing the properties
-     * 
+     *
      * @param dbFile
      * @param devices
      * @param classes
@@ -110,16 +113,12 @@ public final class DatabaseFactory {
 
     /**
      * Build a mock tango db
-     * 
+     *
      * @param devices
      * @param classes
      */
     public static void setNoDbDevices(final String[] devices, final String className) {
         DatabaseFactory.useDb = false;
         DatabaseFactory.fileDatabase = new FileTangoDB(Arrays.copyOf(devices, devices.length), className);
-    }
-
-    public static void setUseDb(final boolean useDb) {
-        DatabaseFactory.useDb = useDb;
     }
 }
