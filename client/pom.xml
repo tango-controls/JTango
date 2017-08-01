@@ -18,7 +18,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.tango-controls</groupId>
-			<artifactId>JTangoCommons</artifactId>
+			<artifactId>TangORB</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
