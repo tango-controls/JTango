@@ -21,10 +21,6 @@
         </dependency>
         <dependency>
             <groupId>org.tango-controls</groupId>
-            <artifactId>TangORB-javacommon</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.tango-controls</groupId>
             <artifactId>TangORB</artifactId>
         </dependency>
     </dependencies>
