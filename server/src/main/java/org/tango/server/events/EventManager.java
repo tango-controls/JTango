@@ -156,8 +156,8 @@ public final class EventManager {
             }
         });
         // Get the free ports and build endpoints
-        bindEndpoints(ip4Address, heartbeatEndpoints, SocketType.HEARTBEAT);
-        bindEndpoints(ip4Address, eventEndpoints, SocketType.EVENTS);
+        bindEndpoints(createSocket(), ip4Address, heartbeatEndpoints, SocketType.HEARTBEAT);
+        bindEndpoints(createSocket(), ip4Address, eventEndpoints, SocketType.EVENTS);
 
         // // TODO : without database?
         final String heartbeatName = EventUtilities.buildHeartBeatEventName(adminDeviceName);
@@ -201,16 +201,15 @@ public final class EventManager {
     /**
      * Binds given socket types to the list of addresses
      *
+     * @param socket
      * @param ipAddresses
      * @param heartbeatEndpoints
      * @param socketType
      */
-    public void bindEndpoints(Iterable<String> ipAddresses, Map<String, ZMQ.Socket> heartbeatEndpoints, SocketType socketType) {
+    public void bindEndpoints(ZMQ.Socket socket, Iterable<String> ipAddresses, Map<String, ZMQ.Socket> heartbeatEndpoints, SocketType socketType) {
         xlogger.entry(ipAddresses, heartbeatEndpoints, socketType);
 
-        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
-        socket.setLinger(0);
-        socket.setReconnectIVL(-1);
+
         for (String ipAddress : ipAddresses) {
             final StringBuilder endpoint = new StringBuilder("tcp://").append(ipAddress).append(":*");
 
@@ -224,6 +223,13 @@ public final class EventManager {
         }
 
         xlogger.exit();
+    }
+
+    private ZMQ.Socket createSocket() {
+        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
+        socket.setLinger(0);
+        socket.setReconnectIVL(-1);
+        return socket;
     }
 
     /**
