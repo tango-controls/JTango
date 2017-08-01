@@ -11,7 +11,6 @@ import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
-import fr.esrf.TangoApi.ConnectionFailed;
 import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoDs.TangoConst;
 import org.apache.commons.lang3.StringUtils;
@@ -333,15 +332,8 @@ public final class TangoUtil {
         if (deviceName.contains(DBASE_NO) || fields.length != 1) {
             return deviceName;
         } else {
-            try {
-                final Database db = ApiUtil.get_db_obj();
-                return db.get_device_from_alias(fields[0]);
-            } catch (ConnectionFailed connectionFailed) {
-                //This can be real connection failure OR device is running in no db mode
-                //Assume the second case and proceed
-                //TODO #35 logger.warn
-                return deviceName;
-            }
+            final Database db = ApiUtil.get_db_obj();
+            return db.get_device_from_alias(fields[0]);
         }
     }
 

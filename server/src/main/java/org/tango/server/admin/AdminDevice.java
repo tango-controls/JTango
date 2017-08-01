@@ -24,6 +24,11 @@
  */
 package org.tango.server.admin;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
@@ -139,42 +144,23 @@ public final class AdminDevice implements TangoMXBean {
      */
     @Command(name = "DevPollStatus", inTypeDesc = DEVICE_NAME, outTypeDesc = "Device polling status")
     public String[] getPollStatus(final String deviceName) throws DevFailed {
-        xlogger.entry();
+        xlogger.entry(deviceName);
         // XXX WARN!!! The string table is parsed by jive.Do not change a letter
         // of
         // the result!
-        final String fullDeviceName = TangoUtil.getfullNameForDevice(deviceName);
         final List<String> pollStatus = new ArrayList<String>();
-        boolean deviceFound = true;
-        for (final DeviceClassBuilder deviceClass : classList) {
-            int nbDevices = 0;
-            for (final DeviceImpl device : deviceClass.getDeviceImplList()) {
-                if (fullDeviceName.equalsIgnoreCase(device.getName())) {
-                    for (final CommandImpl command : device.getCommandList()) {
-                        if (command.isPolled()) {
-                            final StringBuilder buf = buildPollingStatus(device, command);
-                            pollStatus.add(buf.toString());
-                        }
-                    }
-                    for (final AttributeImpl attribute : device.getAttributeList()) {
-                        if (attribute.isPolled()) {
-                            final StringBuilder buf = buildPollingStatus(device, attribute);
-                            pollStatus.add(buf.toString());
-                        }
-                    }
-                    break;
-                }
-                nbDevices++;
-            }
-            if (nbDevices == deviceClass.getDeviceImplList().size()) {
-                deviceFound = false;
-            } else {
-                deviceFound = true;
-                break;
+        DeviceImpl device = tryFindDeviceByName(deviceName);
+        for (final CommandImpl command : device.getCommandList()) {
+            if (command.isPolled()) {
+                final StringBuilder buf = buildPollingStatus(device, command);
+                pollStatus.add(buf.toString());
             }
         }
-        if (!deviceFound) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXIST);
+        for (final AttributeImpl attribute : device.getAttributeList()) {
+            if (attribute.isPolled()) {
+                final StringBuilder buf = buildPollingStatus(device, attribute);
+                pollStatus.add(buf.toString());
+            }
         }
         String[] ret;
         if (pollStatus.isEmpty()) {
@@ -184,8 +170,44 @@ public final class AdminDevice implements TangoMXBean {
         } else {
             ret = pollStatus.toArray(new String[pollStatus.size()]);
         }
-        xlogger.exit();
+        xlogger.exit(ret);
         return ret;
+    }
+
+    private DeviceImpl tryFindDeviceByName(final String deviceName) throws DevFailed {
+        List<DeviceImpl> allDevices = Lists.newLinkedList(Iterables.concat(Iterables.transform(classList, new Function<DeviceClassBuilder, List<DeviceImpl>>() {
+            @Override
+            public List<DeviceImpl> apply(DeviceClassBuilder input) {
+                return input.getDeviceImplList();
+            }
+        })));
+
+        Optional<DeviceImpl> device = Iterables.tryFind(allDevices, new Predicate<DeviceImpl>() {
+            @Override
+            public boolean apply(DeviceImpl input) {
+                return deviceName.equalsIgnoreCase(input.getName());
+            }
+        });
+        if (!device.isPresent()) {
+            //try to find device by alias
+            device = Iterables.tryFind(allDevices, new Predicate<DeviceImpl>() {
+                @Override
+                public boolean apply(DeviceImpl input) {
+                    try {
+                        //returns alias or deviceName
+                        return TangoUtil.getfullNameForDevice(deviceName).equalsIgnoreCase(input.getName());
+                    } catch (DevFailed devFailed) {
+                        logger.warn("Failed to get full name for device {}", deviceName);
+                        DevFailedUtils.logDevFailed(devFailed, logger);
+                        return false;
+                    }
+                }
+            });
+        }
+        if (!device.isPresent()) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXIST);
+        }
+        return device.get();
     }
 
     private StringBuilder buildPollingStatus(final DeviceImpl device, final IPollable pollable) {
@@ -535,8 +557,8 @@ public final class AdminDevice implements TangoMXBean {
         final String type = dvlsa.svalue[1];
         final String polledObjectName = dvlsa.svalue[2];
         final int pollPeriod = dvlsa.lvalue[0];
-        logger.info("add polling for {}/{} {} with period {}", new Object[] { deviceName, polledObjectName, type,
-                pollPeriod });
+        logger.info("add polling for {}/{} {} with period {}", new Object[]{deviceName, polledObjectName, type,
+                pollPeriod});
         for (final DeviceClassBuilder deviceClass : classList) {
             if (deviceClass.containsDevice(deviceName)) {
                 final DeviceImpl dev = deviceClass.getDeviceImpl(deviceName);
@@ -726,7 +748,7 @@ public final class AdminDevice implements TangoMXBean {
             }
             final EventType eventType = EventType.getEvent(eventTypeAndIDL);
             logger.debug("Subscribe event for {}/{} with type {}",
-                    new Object[] { deviceName, attributeName, eventType });
+                    new Object[]{deviceName, attributeName, eventType});
             // Search the specified device and attribute objects
             final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, attributeName);
             returned = subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
@@ -764,7 +786,7 @@ public final class AdminDevice implements TangoMXBean {
      * @throws DevFailed
      */
     private DevVarLongStringArray subcribeIDLInEventString(final String eventTypeAndIDL, final String deviceName,
-            final String objName) throws DevFailed {
+                                                           final String objName) throws DevFailed {
         // event name like "idl5_archive" or "archive"
         String event = eventTypeAndIDL;
         int idlversion = EventManager.MINIMUM_IDL_VERSION;
@@ -773,14 +795,14 @@ public final class AdminDevice implements TangoMXBean {
             event = eventTypeAndIDL.substring(eventTypeAndIDL.indexOf("_") + 1, eventTypeAndIDL.length());
         }
         final EventType eventType = EventType.getEvent(event);
-        logger.debug("event subscription/confirmation for {}, attribute/pipe {} with type {} and IDL {}", new Object[] {
-                deviceName, objName, eventType, idlversion });
+        logger.debug("event subscription/confirmation for {}, attribute/pipe {} with type {} and IDL {}", new Object[]{
+                deviceName, objName, eventType, idlversion});
         final Pair<PipeImpl, AttributeImpl> result = findSubscribers(eventType, deviceName, objName);
         return subscribeEvent(eventType, deviceName, idlversion, result.getRight(), result.getLeft());
     }
 
     private Pair<PipeImpl, AttributeImpl> findSubscribers(final EventType eventType, final String deviceName,
-            final String objName) throws DevFailed {
+                                                          final String objName) throws DevFailed {
         DeviceImpl device = null;
         PipeImpl pipe = null;
         AttributeImpl attribute = null;
@@ -870,7 +892,7 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     private DevVarLongStringArray subscribeEvent(final EventType eventType, final String deviceName,
-            final int idlversion, final AttributeImpl attribute, final PipeImpl pipe) throws DevFailed {
+                                                 final int idlversion, final AttributeImpl attribute, final PipeImpl pipe) throws DevFailed {
         DevVarLongStringArray result;
         // Subscribe and returns connection parameters for client
         // Str[0] = Heartbeat pub endpoint -
