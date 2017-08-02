@@ -25,6 +25,7 @@
 package org.tango.server.admin;
 
 import com.google.common.collect.Lists;
+import fr.esrf.Tango.DevFailed;
 import org.junit.Test;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.build.DeviceClassBuilder;
@@ -103,5 +104,14 @@ public class PollStatusCommandTest {
         String[] result = instance.call();
 
         assertEquals(2, result.length);
+    }
+
+    @Test
+    public void nonExistingDevice() throws DevFailed {
+        try {
+            new PollStatusCommand("1/1/3", classList).call();
+        } catch (DevFailed devFailed) {
+            assertEquals("API_DeviceNotFound", devFailed.getMessage());
+        }
     }
 }
