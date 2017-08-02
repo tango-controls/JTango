@@ -24,11 +24,6 @@
  */
 package org.tango.server.admin;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarLongStringArray;
@@ -43,7 +38,6 @@ import org.tango.logging.LoggingManager;
 import org.tango.orb.ORBManager;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
-import org.tango.server.IPollable;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.*;
@@ -78,8 +72,8 @@ import java.util.regex.Pattern;
 @Device(transactionType = TransactionType.DEVICE)
 public final class AdminDevice implements TangoMXBean {
 
+    public static final String DOES_NOT_EXIST = " does not exist";
     private static final String DOES_NOT_EXISTS = " does not exists";
-    private static final String DOES_NOT_EXIST = " does not exist";
     private static final String DEVICE_NAME = "Device name";
     private static final String INPUT_ERROR = "INPUT_ERROR";
     private final Logger logger = LoggerFactory.getLogger(AdminDevice.class);
@@ -145,106 +139,10 @@ public final class AdminDevice implements TangoMXBean {
     @Command(name = "DevPollStatus", inTypeDesc = DEVICE_NAME, outTypeDesc = "Device polling status")
     public String[] getPollStatus(final String deviceName) throws DevFailed {
         xlogger.entry(deviceName);
-        // XXX WARN!!! The string table is parsed by jive.Do not change a letter
-        // of
-        // the result!
-        final List<String> pollStatus = new ArrayList<String>();
-        DeviceImpl device = tryFindDeviceByName(deviceName);
-        for (final CommandImpl command : device.getCommandList()) {
-            if (command.isPolled()) {
-                final StringBuilder buf = buildPollingStatus(device, command);
-                pollStatus.add(buf.toString());
-            }
-        }
-        for (final AttributeImpl attribute : device.getAttributeList()) {
-            if (attribute.isPolled()) {
-                final StringBuilder buf = buildPollingStatus(device, attribute);
-                pollStatus.add(buf.toString());
-            }
-        }
-        String[] ret;
-        if (pollStatus.isEmpty()) {
-            ret = new String[0];
-            // ret[0] =
-            // "Dear Client,\nI am in a great mood today, I ain't gonna bug.\nYour favourite server :)";
-        } else {
-            ret = pollStatus.toArray(new String[pollStatus.size()]);
-        }
+
+        String[] ret = new PollStatusCommand(deviceName, classList).call();
         xlogger.exit(ret);
         return ret;
-    }
-
-    private DeviceImpl tryFindDeviceByName(final String deviceName) throws DevFailed {
-        List<DeviceImpl> allDevices = Lists.newLinkedList(Iterables.concat(Iterables.transform(classList, new Function<DeviceClassBuilder, List<DeviceImpl>>() {
-            @Override
-            public List<DeviceImpl> apply(DeviceClassBuilder input) {
-                return input.getDeviceImplList();
-            }
-        })));
-
-        Optional<DeviceImpl> device = Iterables.tryFind(allDevices, new Predicate<DeviceImpl>() {
-            @Override
-            public boolean apply(DeviceImpl input) {
-                return deviceName.equalsIgnoreCase(input.getName());
-            }
-        });
-        if (!device.isPresent()) {
-            //try to find device by alias
-            device = Iterables.tryFind(allDevices, new Predicate<DeviceImpl>() {
-                @Override
-                public boolean apply(DeviceImpl input) {
-                    try {
-                        //returns alias or deviceName
-                        return TangoUtil.getfullNameForDevice(deviceName).equalsIgnoreCase(input.getName());
-                    } catch (DevFailed devFailed) {
-                        logger.warn("Failed to get full name for device {}", deviceName);
-                        DevFailedUtils.logDevFailed(devFailed, logger);
-                        return false;
-                    }
-                }
-            });
-        }
-        if (!device.isPresent()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXIST);
-        }
-        return device.get();
-    }
-
-    private StringBuilder buildPollingStatus(final DeviceImpl device, final IPollable pollable) {
-        final StringBuilder buf;
-        if (pollable instanceof AttributeImpl) {
-            buf = new StringBuilder("Polled attribute name = ");
-        } else {
-            buf = new StringBuilder("Polled command name = ");
-        }
-
-        buf.append(pollable.getName());
-        if (pollable.getPollingPeriod() == 0) {
-            buf.append("\nPolling externally triggered");
-        } else {
-            buf.append("\nPolling period (mS) = ");
-            buf.append(pollable.getPollingPeriod());
-        }
-        buf.append("\nPolling ring buffer depth = ");
-        buf.append(pollable.getPollRingDepth());
-        if (pollable instanceof AttributeImpl && device.getAttributeHistorySize((AttributeImpl) pollable) == 0) {
-            buf.append("\nNo data recorded yet");
-        }
-        if (pollable instanceof CommandImpl && device.getCommandHistorySize((CommandImpl) pollable) == 0) {
-            buf.append("\nNo data recorded yet");
-        }
-
-        if (!pollable.getLastDevFailed().isEmpty()) {
-            buf.append("\nLast attribute read FAILED :\n").append(pollable.getLastDevFailed());
-        } else {
-            buf.append("\nTime needed for the last attribute reading (mS) = ");
-            buf.append(pollable.getExecutionDuration());
-            buf.append("\nData not updated since ");
-            buf.append(System.currentTimeMillis() - (long) pollable.getLastUpdateTime());
-            buf.append(" mS\nDelta between last records (in mS) = ");
-            buf.append(pollable.getDeltaTime());
-        }
-        return buf;
     }
 
     /**
