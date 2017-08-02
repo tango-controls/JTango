@@ -68,40 +68,24 @@ public class PollStatusCommand implements Callable<String[]> {
 
         final DeviceImpl device = tryFindDeviceByName(deviceName);
 
-        addPolledCommands(result, device);
+        addPolledStatus(result, device, device.getCommandList());
 
-        addPolledAttributes(result, device);
+        addPolledStatus(result, device, device.getAttributeList());
 
         return result.toArray(new String[result.size()]);
     }
 
-    private void addPolledAttributes(List<String> pollStatus, final DeviceImpl device) {
-        Collection<AttributeImpl> polledAttributes = Collections2.filter(device.getAttributeList(), new Predicate<AttributeImpl>() {
+    private void addPolledStatus(List<String> pollStatus, final DeviceImpl device, List<? extends IPollable> pollableList) {
+        Collection<? extends IPollable> polledCommands = Collections2.filter(pollableList, new Predicate<IPollable>() {
             @Override
-            public boolean apply(AttributeImpl attribute) {
-                return attribute.isPolled();
-            }
-        });
-
-        pollStatus.addAll(Collections2.transform(polledAttributes, new Function<AttributeImpl, String>() {
-            @Override
-            public String apply(AttributeImpl attribute) {
-                return buildPollingStatus(device, attribute).toString();
-            }
-        }));
-    }
-
-    private void addPolledCommands(List<String> pollStatus, final DeviceImpl device) {
-        Collection<CommandImpl> polledCommands = Collections2.filter(device.getCommandList(), new Predicate<CommandImpl>() {
-            @Override
-            public boolean apply(CommandImpl command) {
+            public boolean apply(IPollable command) {
                 return command.isPolled();
             }
         });
         pollStatus.addAll(
-                Collections2.transform(polledCommands, new Function<CommandImpl, String>() {
+                Collections2.transform(polledCommands, new Function<IPollable, String>() {
                     @Override
-                    public String apply(CommandImpl command) {
+                    public String apply(IPollable command) {
                         return buildPollingStatus(device, command).toString();
                     }
                 }));
