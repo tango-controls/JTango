@@ -62,6 +62,10 @@ public class PollStatusCommand implements Callable<String[]> {
         this.classList = classList;
     }
 
+    /**
+     * @return an array of strings with polling info
+     * @throws DevFailed in case device cannot be found
+     */
     @Override
     public String[] call() throws DevFailed {
         final List<String> result = new ArrayList<String>();
@@ -78,15 +82,15 @@ public class PollStatusCommand implements Callable<String[]> {
     private void addPolledStatus(List<String> pollStatus, final DeviceImpl device, List<? extends IPollable> pollableList) {
         Collection<? extends IPollable> polledCommands = Collections2.filter(pollableList, new Predicate<IPollable>() {
             @Override
-            public boolean apply(IPollable command) {
-                return command.isPolled();
+            public boolean apply(IPollable pollable) {
+                return pollable.isPolled();
             }
         });
         pollStatus.addAll(
                 Collections2.transform(polledCommands, new Function<IPollable, String>() {
                     @Override
-                    public String apply(IPollable command) {
-                        return buildPollingStatus(device, command).toString();
+                    public String apply(IPollable pollable) {
+                        return buildPollingStatus(device, pollable).toString();
                     }
                 }));
     }
