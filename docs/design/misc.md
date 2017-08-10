@@ -4,9 +4,19 @@ The package _org.tango.server.testserver_ contains device classes for unit test 
 
 # Quality monitor
 
-This API has been designed to maintain the highest standards of quality.  The code is constantly monitored by the sonar tool (http://www.sonarsource.org/). Here is an example screenshot that gives an overview of the JTangoServer library:
+This API has been designed to maintain the highest standards of quality.  The code is constantly monitored by 3rd party tools available on GitHub. Here is an example screenshot that gives an overview of the JTangoServer library:
 
-![](sonar.png)
+![](quality.png)
+
+Sample screenshot of Codebeat (https://codebeat.co/projects/github-com-tango-controls-jtango-master) dashboard
+
+![](quality_2.png)
+
+Sample screenshots of Codecov (https://codecov.io/gh/tango-controls/JTango)
+
+![](codecov_1.png)
+
+![](codecov_2.png)
 
 Of course, the current version is not perfect and some improvements are continually needed!
 
