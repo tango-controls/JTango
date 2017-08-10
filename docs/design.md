@@ -12,8 +12,11 @@ There is also another documentation which is a user manual of this API. It shoul
 # Background
 
 Here are some definitions about Tango:
+
 * A server is a standalone instance that contains devices. 
+
 * A device class is the definition of the behavior a device.
+
 * A device is an object that is built from its class.  A server may have several devices of different classes. 
 
 The administration device is a special device started automatically by the server.
@@ -34,29 +37,33 @@ The code is located on GitHub (https://github.com/tango-controls/JTango):
 
 * IDL: contains the CORBA IDL ([Interface Description Language](http://en.wikipedia.org/wiki/Interface_description_language) ). 
 Compiled with JacORB which the ORB choosen for Tango in Java
+
 * TangORB: CORBA specific classes.
+
 * JTangoCommons: contains utilities that may be used for client or server code.
+
 * JTangoClientLang: contains Tango utilities for client code, especially the code for connecting to the Tango database that will be used in the server part.
+
 * JTangoServer: code of the server API. Package overview:
 
-  - org.tango.logging: to manage tango logging
-  - org.tango.server : common classes
-  - org.tango.server.admin : The administration device which is started for each server
-  - org.tango.server.annotation : The definitions of all annotations
-  - org.tango.server.attribute : All classes for managing attributes
-  - org.tango.server.build : All classes for building a Java server.
-  - org.tango.server.cache : All classes for managing caching (or polling threads)
-  - org.tango.server.command :  All classes for managing commands
-  - org.tango.server.device :All classes for managing a device
-  - org.tango.server.dynamic : manage dynamic commands an attributes
-  - org.tango.server.export : start-up / shutdown of the server 
-  - org.tango.server.history: manage history of the server
-  - org.tango.server.idl: utility classes to convert values to classes defined in IDL (AttributeValUnion for instance for attributes)
-  - org.tango.server.lock: manage device locking
-  - org.tango.server.properties: manage class, device, attribute properties
-  - org.tango.server.schedule: to schedule tasks inside a device
-  - org.tango.server.servant: manage the CORBA part of Tango (servant implementation)
-  - org.tango.server.testserver: Test devices to perform unit tests.
+    - org.tango.logging: to manage tango logging
+    - org.tango.server : common classes
+    - org.tango.server.admin : The administration device which is started for each server
+    - org.tango.server.annotation : The definitions of all annotations
+    - org.tango.server.attribute : All classes for managing attributes
+    - org.tango.server.build : All classes for building a Java server.
+    - org.tango.server.cache : All classes for managing caching (or polling threads)
+    - org.tango.server.command :  All classes for managing commands
+    - org.tango.server.device :All classes for managing a device
+    - org.tango.server.dynamic : manage dynamic commands an attributes
+    - org.tango.server.export : start-up / shutdown of the server 
+    - org.tango.server.history: manage history of the server
+    - org.tango.server.idl: utility classes to convert values to classes defined in IDL (AttributeValUnion for instance for attributes)
+    - org.tango.server.lock: manage device locking
+    - org.tango.server.properties: manage class, device, attribute properties
+    - org.tango.server.schedule: to schedule tasks inside a device
+    - org.tango.server.servant: manage the CORBA part of Tango (servant implementation)
+    - org.tango.server.testserver: Test devices to perform unit tests.
 
 The rest of this document will focus in details on the most important packages.
 
@@ -67,6 +74,7 @@ Tango is based on CORBA.  The chosen ORB is JacORB (http://www.jacorb.org). JacO
 The only important points to know are:
 
 * It is configurable with Java system properties: These properties can be passed as command line, properties files. All details are described in the JacORB documentation. It is only useful for fine tuning of the ORB, the default parameters are satisfactory. 
+
 * It uses the logging API slf4j; see logging chapter for details. 
 
 > NB: The class org.tango.orb.ORBManager overrides some properties like for instance:
@@ -80,7 +88,9 @@ The only important points to know are:
 As every CORBA project, Tango has an IDL (Interface Description Language) that defines the interface of a Tango server and its client. Those IDL files are then compiled in the desired language. So the Java API has to extend the compiled IDL class Device_POA and implements its behavior for methods like:
 
 * Read_attributes
+
 * Write_attributes
+
 * Command_inout
 
 In the history of Tango, several versions of Device_POA have been defined. The latest version is the 4th one while the Java Server API was still in the 2nd one.  So, it is the latest one, Device_4POA that is used in the current version of the Java API.
@@ -107,22 +117,29 @@ Here is a class code of simple device with one Tango command and one attribute:
 ![](design/annotations.png)
 
 Here is a first list of annotations defined for Tango:
+
 * The __@Device__ annotation on the class defines this class as a Tango Device.
+
 * The __@Attribute__annotation defines a field as a Tango attribute. 
-  - The attribute type is defined by the field type.  
-  - If this field has a getter, it is a READ attribute; 
-  - if it has a setter, it is a WRITE attribute; 
-  - if it has both getter and setter, it is a READ/WRITE attribute.
+    - The attribute type is defined by the field type.  
+    - If this field has a getter, it is a READ attribute; 
+    - if it has a setter, it is a WRITE attribute; 
+    - if it has both getter and setter, it is a READ/WRITE attribute.
+
 * The annotation __@Command__ defines a method as a Tango command:
-  - The parameter type defines the input type
-  - The return type defines the output type
+    - The parameter type defines the input type
+    - The return type defines the output type
+
 * The __@Init__ annotation defines a method called at server startup and when “Init” command is called.
-* The __@Delete__ annotation defines a method called at server shutdown and at “Init” command before “@Init”.
+
+* The __@Delete__ annotation defines a method called at server shutdown and at “Init” command before __@Init__.
 
 All the annotations definitions are defined the package _org.tango.server.annotation_.
 
 These annotations are defined at runtime. It means the device and its interface are built at the start-up phase of the server.  This way of programming is very flexible; it was inspired by the software concept of component/container:
+
 * The class that defines the device (the component), if it is used in the Tango context (the container), is a Tango device. 
+
 * But outside the Tango context, the class can be re-used as a Java standard class (also known as POJO or Plain Old Java Object).
 
 (http://www.cs.sjsu.edu/~pearce/modules/patterns/enterprise/Container.htm)
@@ -165,14 +182,19 @@ All the reflection code is located in the package _org.tango.server.build_.
 # Architecture
 
 For each class annotated __@Device__, an instance of its CORBA servant is built. Its code is located in the package org.tango.server.servant. The servant, called “DeviceImpl”, is where all the Tango operations are effectively executed.  It inherits from the CORBA IDL stub “Device_4POA”. So DeviceImpl overrides all abstract methods defined by the Tango IDL like for instance:
+
 * Command_inout_4: to execute a command.
+
 * Read_attributes_4: to read some attributes.
+
 * Write_attributes_4: to write some attributes.
 
 DeviceImpl contains an instance of the business class which defines the behavior of the device (the class of the device annotated @Device), the attribute and command lists. So, for example, when a client requests for an attribute value, it will:
 
 * Call read_attributes_4
+
 * This call will be then delegated the class that manages the attribute (AttributeImpl)
+
 * And then get the value from the business class.
 
 ![](design/architecture.png)
@@ -180,6 +202,7 @@ DeviceImpl contains an instance of the business class which defines the behavior
 The implementation of attributes and commands is detailed in next chapter. The class DeviceImpl contains also the implementation for default attributes and commands:
 
 * Commands “Init”, “State”, “Status”.
+
 * Attributes “State”, “Status”.
 
 > NB: When __@Device__ is configured with the option __@Device__(transactionType = TransactionType._NONE_), a Tango device is able to support several client requests in parallel. The exceptions are:
@@ -191,9 +214,13 @@ The implementation of attributes and commands is detailed in next chapter. The c
 ## Init phase
 
 When the Init command is executed or when a device starts, many things are done:
+
 * Calls the user method @Delete if exists.
+
 * Retrieved all properties from the tango database
+
 * Restarts polling
+
 * Calls the user method __@Init__ if exists.
 
 Init never fails, it will catch all errors and report them in the status of the device; the device will be in FAULT state. This mechanism allows a server to always start; even an underlying resource is not available. It simplifies a lot the start-up phase of a control system. If a server does not start, you would have to connect to the host that runs the server, launch it in command line and pray that its developer has logged something…
@@ -205,16 +232,23 @@ The code for managing __@Init__ is in _org.tango.server.device.InitImpl_, the In
 ## Attributes & commands
 
 The code for attributes and commands is located in the packages org.tango.server.attribute and org.tango.server.command. As described previously, the attributes and commands of a device are discovered at runtime:
+
 * For each attribute, an instance of AttributeImpl will be build.
+
 * For each command, an instance of CommandImpl will be build.
 
 The attribute and command design follow the same principle: 
+
 * Their behaviors are delegated to some interfaces, respectively IAttributeBehavior and ICommandBehavior. 
+
 * Those interfaces have default implementations ReflectAttributeBehavior and ReflectCommandBehavior; which are the behavior defined by the annotations @Attribute and @Command. They will invoke the annotated method defined in the user device with the Java reflection API.
+
 * The user may also implements IAttributeBehavior or ICommandBehavior to define dynamic attributes or commands. 
 
 Here is a class diagram for a device with command and attribute. The user defines its code :
+
 * Either in the class “BusinessClass” with the help of the annotations @Attribute and @Commands
+
 * Either in classes that implements IAttributeBehavior or ICommandBehavior (MyDynamicAttribute and MyDynamicCommand)
 
 ![](design/diagram.png)
@@ -224,10 +258,15 @@ Here is a class diagram for a device with command and attribute. The user define
 ## Other functionalities
 
 All others functionalities of this framework follow the same principal:
+
 * __@Init__ is managed by org.tango.server.device.InitImpl
+
 * __@State__ is managed by org.tango.server.device.StateImpl
+
 * __@Status__ is managed by org.tango.server.device.StatusImpl
+
 * __@AroundInvoke__ is managed by org.tango.server.device. AroundInvokeImpl
+
 * …
 
 # Polling
@@ -245,21 +284,29 @@ A device maintains a history of all client requests. It contains the request nam
 For each Tango server, a special device is started, the administration device (class org.tango.server.admin.AdminDevice). The device name pattern is dserver/ServerName.
 
 It has the same commands as in the other Tango APIs like:
+
 * DevPollingStatus: get an array of strings with the polling status.
+
 * DevRestart: restart a device of the server.
+
 * RestartServer: restart the entire server.
+
 * Kill: kill the server process.
+
 * Start/StopPolling: ….
 
 # Server start-up / shutdown
 
 The entry point to start or stop a server is the class org.tango.server.ServerManager which is a singleton. It has several options:
+
 - A server can be started with or without a Tango database.
+
 - A server can contain several device classes.
 
 Since this class is a singleton, its means that only one server at a time can be running in a JVM (Java Virtual Machine).
 
 When a server starts, it builds an instance of org.tango.server.export.TangoExporter that will:
+
 1. Retrieve all interfaces of classes of the server by introspection
 2. Ask tango db if server is declared
 3. If yes, ask tango db for classes and devices declared in the server
@@ -313,8 +360,11 @@ Here is a sample screenshot of a server threads done with VisualVM (http://visua
   DEBUG 15:44:23.889 [RequestProcessor-5 - tmp/test/simpledevice] org.tango.server.servant.DeviceImpl.commandHandler:1650 - execute command State from DEVICE
   ```
 * Devicename Init: thread for device initialization.
+
 * Polling thread X: threads used for polling.
+
 * RMIxxx, JMX…: VisualVM threads
+
 * The other threads are internal for the JVM.
 
 # Logging
@@ -347,6 +397,7 @@ An extension of sfl4j (class org.slf4j.ext.XLogger) is also used to log all entr
 ## Special appenders
 
 Some logging appenders have been added to:
+
 * Send logs of a device to the logging device (which is provided with the tango logviewer application): the logs are sent asynchrounsly with the command “Log”.
 * Send logs of a device to a file.
 
