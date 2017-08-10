@@ -5,6 +5,8 @@ pages:
 - Home: index.md
 - User Guide:
     - Java Server User Manual: manual/manual.md
+    - Basics: manual/basics.md
+    - Advanced features and techniques: manual/advanced.md
     - Annexes: manual/annexes.md
 - Developer Guide:
     - Design: design.md
