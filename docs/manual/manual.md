@@ -79,11 +79,11 @@ public class TestDevice {
 
 Before starting this device, it has to be declared in the Tango database with Jive menu “Create server”.  Hereafter, a server “TestDevice/1” with one device “tmp/test/device.1” is created:
 
-![](manual/jive.png)
+![](jive.png)
 
 The newly added device must appear in the device tree:
 
-![](manual/jive_result.png)
+![](jive_result.png)
 
 As the TestDevice class of this device has a main method, it can be started as a standard Java program:
 
@@ -93,7 +93,7 @@ As the TestDevice class of this device has a main method, it can be started as a
 
 Once started, the device can be tested. Here is an example of the Tango generic client ATKPanel:
 
-![](manual/atk.png)
+![](atk.png)
 
 > NB: In Tango, the commands Init, State, Status and the attributes State, Status are created by default for any device.
 
