@@ -7,8 +7,8 @@ jdk:
   - openjdk7
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - mvn sonar:sonar
-  - mvn com.gavinmogan:codacy-maven-plugin:coverage
+  - mvn sonar:sonar -Ptravis
+  - mvn com.gavinmogan:codacy-maven-plugin:coverage -Ptravis
 addons:
   sonarcloud:
     organization: "tango-controls"
