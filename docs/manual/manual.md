@@ -1,5 +1,3 @@
-# Introduction
-
 This paper is a documentation intended for developers. It described how to build a Java Tango Device. A background in the Java language is strongly recommended. The pre-requisites are:
 
 * The Tango concepts: attribute, command, device property…  Please read the Tango reference manual : [tango-controls.org](http://www.tango-controls.org/), [tango-controls documentation](http://tango-controls.readthedocs.io)

@@ -4,7 +4,7 @@ repo_url: https://github.com/tango-controls/JTango
 pages:
 - Home: index.md
 - User Guide:
-    - Java Server User Manual: manual/manual.md
+    - Introduction: manual/manual.md
     - Basics: manual/basics.md
     - Advanced features and techniques: manual/advanced.md
     - Startup: manual/start.md
