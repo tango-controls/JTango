@@ -291,7 +291,7 @@
                         </executions>-->
                         <configuration>
                             <language>Java</language>
-                            <coverageReportFile>${project.build.directory}/jacoco.exec</coverageReportFile>
+                            <coverageReportFile>${project.build.directory}/site/jacoco/jacoco.xml</coverageReportFile>
                             <projectToken>${env.CODACY_PROJECT_TOKEN}</projectToken>
                             <apiToken>${env.CODACY_API_TOKEN}</apiToken>
                             <failOnMissingReportFile>false</failOnMissingReportFile>
