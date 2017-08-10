@@ -40,7 +40,7 @@ public final class TangoUtil {
     public static final Map<String, AttrWriteType> WRITABLE_MAP;
     public static final Map<String, AttrDataFormat> FORMAT_MAP;
     public static final Map<String, Integer> TYPE_MAP;
-    private static final String DBASE_NO = "#dbase=no";
+    public static final String DBASE_NO = "#dbase=no";
     private static final Pattern ENTITY_SPLIT_PATTERN;
     private static final int PREFIX_INDEX = 1;
     private static final int ATTRIBUTE_ALIAS_INDEX = 2;
@@ -167,7 +167,7 @@ public final class TangoUtil {
      *
      * @param entityName the entity name to split. It can contain aliases for device or attribute
      * @return a Map.Entry containing the full device name as key and the attribute name as value, or null if split was
-     *         not possible
+     * not possible
      * @throws DevFailed in case of DB access problem
      */
     public static final Entry<String, String> splitDeviceEntity(final String entityName) throws DevFailed {
@@ -327,27 +327,20 @@ public final class TangoUtil {
      */
     public static String getfullNameForDevice(final String deviceName) throws DevFailed {
         checkNullOrEmptyString(deviceName);
-        String result;
         final String[] fields = deviceName.split(DEVICE_SEPARATOR);
 
-        if (deviceName.contains(DBASE_NO)) {
-            result = deviceName;
+        if (deviceName.contains(DBASE_NO) || fields.length != 1) {
+            return deviceName;
         } else {
             final Database db = ApiUtil.get_db_obj();
-            if (fields.length == 1) {
-                result = db.get_device_from_alias(fields[0]);
-            } else {
-                result = deviceName;
-            }
+            return db.get_device_from_alias(fields[0]);
         }
-        return result;
     }
 
     /**
      * Get the list of device names which matches the pattern p
      *
-     * @param deviceNamePattern
-     *            The pattern. The wild char is *
+     * @param deviceNamePattern The pattern. The wild char is *
      * @return A list of device names
      * @throws DevFailed
      */
@@ -370,9 +363,8 @@ public final class TangoUtil {
     /**
      * Get the list of device names which matches the pattern p
      *
-     * @param deviceNamePattern
-     *            The pattern. The wild char is *
-     * @param boolean to get the exported device
+     * @param deviceNamePattern The pattern. The wild char is *
+     * @param boolean           to get the exported device
      * @return A list of device names
      * @throws DevFailed
      */

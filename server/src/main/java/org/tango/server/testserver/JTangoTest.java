@@ -24,43 +24,22 @@
  */
 package org.tango.server.testserver;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.esrf.Tango.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.AroundInvoke;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.AttributeProperties;
-import org.tango.server.annotation.ClassProperty;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Delete;
+import org.tango.server.annotation.*;
 import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceManagement;
-import org.tango.server.annotation.DeviceProperties;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.DynamicManagement;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.Schedule;
-import org.tango.server.annotation.State;
-import org.tango.server.annotation.StateMachine;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceManager;
 import org.tango.server.dynamic.DynamicManager;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarDoubleStringArray;
-import fr.esrf.Tango.DevVarLongStringArray;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tango device to test all commands and attributes
@@ -70,8 +49,6 @@ import fr.esrf.Tango.DevVarLongStringArray;
  */
 @Device(transactionType = TransactionType.NONE)
 public final class JTangoTest {
-    private final Logger logger = LoggerFactory.getLogger(JTangoTest.class);
-
     public static final String NO_DB_DEVICE_NAME = "1/1/1";
     // public static final String NO_DB_GIOP_PORT = "12354";
     public static final String INSTANCE_NAME = "1";
@@ -81,38 +58,37 @@ public final class JTangoTest {
      */
     // Spectrum
     private static final int SPECTRUM_SIZE = 100000;
-
     // Image
     private static final int X_IMAGE_SIZE = 200;
     private static final int Y_IMAGE_SIZE = 500;
-
-    @State
-    private DevState state;
-
-    @Status
-    private String status;
-
-    /*
-     * PROPERTY
-     */
-    @DeviceProperties
-    private Map<String, String[]> props = new HashMap<String, String[]>();
-
-    @DeviceProperty(defaultValue = "default")
-    private String myProp = "toto";
-
-    @DeviceProperty
-    private boolean booleanProp = false;
-
-    @ClassProperty(defaultValue = "classDefault")
-    private String[] myClassProp = { "test0" };
-
+    private final Logger logger = LoggerFactory.getLogger(JTangoTest.class);
     /*
      * ATTRIBUTE
      */
     @Attribute
     @AttributeProperties(deltaTime = "1", deltaValue = "5")
     private final double deltaAttribute = 0;
+    @Attribute
+    @AttributeProperties(minAlarm = "2")
+    private final double invalidQuality = 0;
+    @Attribute
+    @AttributeProperties(minAlarm = "2")
+    private final double invalidQuality2 = 0;
+    @State
+    private DevState state;
+    @Status
+    private String status;
+    /*
+     * PROPERTY
+     */
+    @DeviceProperties
+    private Map<String, String[]> props = new HashMap<String, String[]>();
+    @DeviceProperty(defaultValue = "default")
+    private String myProp = "toto";
+    @DeviceProperty
+    private boolean booleanProp = false;
+    @ClassProperty(defaultValue = "classDefault")
+    private String[] myClassProp = { "test0" };
     private short shortScalar = 0;
     @Attribute
     private short[] shortSpectrum = {};
@@ -145,7 +121,6 @@ public final class JTangoTest {
     private double[] doubleSpectrum = {};
     @Attribute
     private double[][] doubleImage = {};
-
     private byte byteScalar = 1;
     @Attribute
     private byte[] byteSpectrum = {};
@@ -168,16 +143,8 @@ public final class JTangoTest {
     private DeviceState stateScalar = DeviceState.ON;
     @Attribute
     private DeviceState[] stateSpectrum = new DeviceState[] { DeviceState.ON, DeviceState.OFF };
-
     @Attribute
     private DevEncoded devEncodedScalar = new DevEncoded("yfui", new byte[] { 1, 2, 3 });
-
-    public enum TestType {
-        VALUE1, VALUE2
-    }
-
-    @Attribute
-    private TestType enumAttribute = TestType.VALUE1;
 
     // @Attribute
     // private DevEncoded[] devEncodedSpectrum = new DevEncoded[] { new
@@ -186,18 +153,57 @@ public final class JTangoTest {
     // @Attribute
     // private final DevEncoded[][] devEncodedImage = new DevEncoded[][] { { new
     // DevEncoded("yfui", new byte[] { 1, 2, 3 }) } };
-
+    @Attribute
+    private TestType enumAttribute = TestType.VALUE1;
     @DynamicManagement
     private DynamicManager dynamicManager;
-
     @DeviceManagement
     private DeviceManager deviceManager;
-
     private boolean error = false;
-
     private boolean error2 = false;
+    private volatile boolean isScheduleRunning;
 
-    private boolean isScheduleRunning;
+    /**
+     * Start a device with tango database. The server must be declared in tango
+     * db.
+     *
+     * @throws DevFailed
+     */
+    public static void start() throws DevFailed {
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME}, SERVER_NAME);
+    }
+
+    public static void startNoDbFile(final int portNr) throws DevFailed {
+        System.setProperty("OAPort", Integer.toString(portNr));
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(
+                new String[]{INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
+                        "-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath()}, SERVER_NAME);
+    }
+
+    public static void startNoDb(final int portNr) throws DevFailed {
+        System.setProperty("OAPort", Integer.toString(portNr));
+        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME},
+                SERVER_NAME);
+    }
+
+    public static void main(final String[] args) {
+        if (args.length > 1 && args[1].equals("NODB")) {
+            try {
+                startNoDb(Integer.valueOf(args[2]));
+            } catch (final NumberFormatException e) {
+                e.printStackTrace();
+            } catch (final DevFailed e) {
+                e.printStackTrace();
+            }
+        } else {
+            // System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+            ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
+            ServerManager.getInstance().start(new String[]{"1"}, SERVER_NAME);
+        }
+    }
 
     @Schedule(activationProperty = "isRunRefresh", cronExpression = "0/1 * * * * ?")
     public void refresh() {
@@ -226,6 +232,8 @@ public final class JTangoTest {
         logger.debug("props {}", props);
         status = "hello";
     }
+
+    // SHORT
 
     @Command
     public String getName() {
@@ -279,6 +287,12 @@ public final class JTangoTest {
         }
     }
 
+    /**
+     * @return shortSpectrum attribute
+     */
+    // public short[] getShortSpectrum() {
+    // return Arrays.copyOf(shortSpectrum, shortSpectrum.length);
+    // }
     private void createDynamicCommands() throws DevFailed {
         dynamicManager.addCommand(new DynamicCommandTest(String.class));
         dynamicManager.addCommand(new DynamicCommandTest(String[].class));
@@ -339,7 +353,8 @@ public final class JTangoTest {
         dynamicManager.clearAll();
     }
 
-    // SHORT
+    // INTEGER
+
     /**
      *
      * @return shortScalar attribute
@@ -358,14 +373,6 @@ public final class JTangoTest {
     public void setShortScalar(final short shortScalar) {
         this.shortScalar = shortScalar;
     }
-
-    /**
-     *
-     * @return shortSpectrum attribute
-     */
-    // public short[] getShortSpectrum() {
-    // return Arrays.copyOf(shortSpectrum, shortSpectrum.length);
-    // }
 
     /**
      *
@@ -394,11 +401,11 @@ public final class JTangoTest {
         this.shortImage = ArrayUtils.copyOf(shortImage);
     }
 
-    // INTEGER
-
     public int getIntScalar() {
         return intScalar;
     }
+
+    // LONG
 
     public void setIntScalar(final int intScalar) {
         this.intScalar = intScalar;
@@ -421,8 +428,6 @@ public final class JTangoTest {
         this.intImage = ArrayUtils.copyOf(intImage);
     }
 
-    // LONG
-
     public long getLongScalar() {
         return longScalar;
     }
@@ -434,6 +439,8 @@ public final class JTangoTest {
     public long[] getLongSpectrum() {
         return Arrays.copyOf(longSpectrum, longSpectrum.length);
     }
+
+    // FLOAT
 
     public void setLongSpectrum(final long[] longSpectrum) {
         this.longSpectrum = new long[longSpectrum.length];
@@ -462,11 +469,11 @@ public final class JTangoTest {
         this.longImage = ArrayUtils.copyOf(longImage);
     }
 
-    // FLOAT
-
     public float getFloatScalar() {
         return floatScalar;
     }
+
+    // DOUBLE
 
     public void setFloatScalar(final float floatScalar) {
         this.floatScalar = floatScalar;
@@ -489,11 +496,11 @@ public final class JTangoTest {
         this.floatImage = ArrayUtils.copyOf(floatImage);
     }
 
-    // DOUBLE
-
     public double getDoubleScalar() {
         return doubleScalar;
     }
+
+    // BOOLEAN
 
     public void setDoubleScalar(final double doubleScalar) {
         this.doubleScalar = doubleScalar;
@@ -516,13 +523,13 @@ public final class JTangoTest {
         this.doubleImage = ArrayUtils.copyOf(doubleImage);
     }
 
-    // BOOLEAN
-
     public AttributeValue isBooleanScalar() throws DevFailed {
         final AttributeValue val = new AttributeValue(booleanScalar, AttrQuality.ATTR_CHANGING);
         val.setValue(booleanScalar, 123456L);
         return val;
     }
+
+    // STRING
 
     public void setBooleanScalar(final boolean booleanScalar) {
         this.booleanScalar = booleanScalar;
@@ -544,8 +551,6 @@ public final class JTangoTest {
     public void setBooleanImage(final boolean[][] booleanImage) {
         this.booleanImage = ArrayUtils.copyOf(booleanImage);
     }
-
-    // STRING
 
     public String getStringScalar() {
         return stringScalar;
@@ -577,16 +582,12 @@ public final class JTangoTest {
         return byteScalar;
     }
 
-    public byte[] getByteSpectrum() {
-        return Arrays.copyOf(byteSpectrum, byteSpectrum.length);
-    }
-
-    public byte[][] getByteImage() {
-        return ArrayUtils.copyOf(byteImage);
-    }
-
     public void setByteScalar(final byte byteScalar) {
         this.byteScalar = byteScalar;
+    }
+
+    public byte[] getByteSpectrum() {
+        return Arrays.copyOf(byteSpectrum, byteSpectrum.length);
     }
 
     public void setByteSpectrum(final byte[] byteSpectrum) {
@@ -594,21 +595,19 @@ public final class JTangoTest {
         System.arraycopy(byteSpectrum, 0, this.byteSpectrum, 0, byteSpectrum.length);
     }
 
+    public byte[][] getByteImage() {
+        return ArrayUtils.copyOf(byteImage);
+    }
+
     public void setByteImage(final byte[][] byteImage) {
         this.byteImage = ArrayUtils.copyOf(byteImage);
     }
 
-    @Attribute
-    @AttributeProperties(minAlarm = "2")
-    private final double invalidQuality = 0;
+    // SHORT
 
     public AttributeValue getInvalidQuality() throws DevFailed {
         return new AttributeValue(invalidQuality, AttrQuality.ATTR_INVALID);
     }
-
-    @Attribute
-    @AttributeProperties(minAlarm = "2")
-    private final double invalidQuality2 = 0;
 
     public AttributeValue getInvalidQuality2() throws DevFailed {
         final AttributeValue value = new AttributeValue();
@@ -616,6 +615,8 @@ public final class JTangoTest {
         value.setValue(invalidQuality2);
         return value;
     }
+
+    // INTEGER
 
     /*
      *
@@ -625,51 +626,32 @@ public final class JTangoTest {
     public void voidCommand() {
     }
 
-    // SHORT
-
     @Command(outTypeDesc = "returns the input value (short)")
     public short shortCommand(final short value) {
         return value;
     }
+
+    // Byte
 
     @Command(outTypeDesc = "returns the input value (short[])")
     public short[] shortSpectrumCommand(final short[] value) {
         return value;
     }
 
-    // INTEGER
-
     @Command(outTypeDesc = "returns the input value (int)")
     public int intCommand(final int value) {
         return value;
     }
+
+    // LONG
 
     @Command(outTypeDesc = "returns the input value (int[])")
     public int[] intSpectrumCommand(final int[] value) {
         return value;
     }
 
-    // Byte
-
     @Command(outTypeDesc = "returns the input value (byte)")
     public byte byteCommand(final byte value) {
-        return value;
-    }
-
-    @Command(outTypeDesc = "returns the input value (byte[])")
-    public byte[] byteSpectrumCommand(final byte[] value) {
-        return value;
-    }
-
-    // LONG
-
-    @Command(outTypeDesc = "returns the input value (long)")
-    public long longCommand(final long value) {
-        return value;
-    }
-
-    @Command(outTypeDesc = "returns the input value (long[])")
-    public long[] longSpectrumCommand(final long[] value) {
         return value;
     }
 
@@ -682,17 +664,36 @@ public final class JTangoTest {
 
     // FLOAT
 
+    @Command(outTypeDesc = "returns the input value (byte[])")
+    public byte[] byteSpectrumCommand(final byte[] value) {
+        return value;
+    }
+
+    @Command(outTypeDesc = "returns the input value (long)")
+    public long longCommand(final long value) {
+        return value;
+    }
+
+    // DOUBLE
+
+    @Command(outTypeDesc = "returns the input value (long[])")
+    public long[] longSpectrumCommand(final long[] value) {
+        return value;
+    }
+
     @Command(outTypeDesc = "returns the input value (float)")
     public float floatCommand(final float value) {
         return value;
     }
+
+    // BOOLEAN
 
     @Command(outTypeDesc = "returns the input value (float[])")
     public float[] floatSpectrumCommand(final float[] value) {
         return value;
     }
 
-    // DOUBLE
+    // STRING
 
     @Command(outTypeDesc = "returns the input value (double)")
     public double doubleCommand(final double value) {
@@ -704,14 +705,12 @@ public final class JTangoTest {
         return value;
     }
 
-    // BOOLEAN
+    // DEVVAR
 
     @Command(outTypeDesc = "returns the input value (boolean)")
     public boolean booleanCommand(final boolean value) {
         return value;
     }
-
-    // STRING
 
     @Command(outTypeDesc = "returns the input value (String)")
     public String stringCommand(final String value) {
@@ -722,8 +721,6 @@ public final class JTangoTest {
     public String[] stringSpectrumCommmand(final String[] value) {
         return value;
     }
-
-    // DEVVAR
 
     @Command(outTypeDesc = "returns the input value (DevVarLongStringArray)")
     public DevVarLongStringArray longStringCommand(final DevVarLongStringArray value) {
@@ -757,53 +754,6 @@ public final class JTangoTest {
     }
 
     /**
-     * Start a device with tango database. The server must be declared in tango
-     * db.
-     *
-     * @throws DevFailed
-     */
-    public static void start() throws DevFailed {
-        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME }, SERVER_NAME);
-    }
-
-    public static void startNoDbFile(final int portNr) throws DevFailed {
-        System.setProperty("OAPort", Integer.toString(portNr));
-        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-        ServerManager.getInstance().startError(
-                new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
-                        "-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath() }, SERVER_NAME);
-    }
-
-    public static void startNoDb(final int portNr) throws DevFailed {
-        System.setProperty("OAPort", Integer.toString(portNr));
-        ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME },
-                SERVER_NAME);
-    }
-
-    public static void main(final String[] args) {
-        if (args.length > 1 && args[1].equals("NODB")) {
-            try {
-                startNoDb(Integer.valueOf(args[2]));
-            } catch (final NumberFormatException e) {
-                e.printStackTrace();
-            } catch (final DevFailed e) {
-                e.printStackTrace();
-            }
-        } else {
-            // System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
-            ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-            ServerManager.getInstance().start(new String[] { "1" }, SERVER_NAME);
-        }
-    }
-
-    /*
-     * GETTER AND SETTER ATTRIBUTE//
-     */
-
-    // PROPERTIES
-    /**
      *
      * @param myProp
      *            String []
@@ -811,6 +761,12 @@ public final class JTangoTest {
     public void setMyProp(final String myProp) {
         this.myProp = myProp;
     }
+
+    /*
+     * GETTER AND SETTER ATTRIBUTE//
+     */
+
+    // PROPERTIES
 
     /**
      *
@@ -840,6 +796,10 @@ public final class JTangoTest {
 
     public DeviceState getStateScalar() {
         return stateScalar;
+    }
+
+    public void setStateScalar(final DeviceState stateScalar) {
+        this.stateScalar = stateScalar;
     }
 
     public DevEncoded getDevEncodedScalar() {
@@ -901,10 +861,6 @@ public final class JTangoTest {
         return Arrays.copyOf(stateSpectrum, stateSpectrum.length);
     }
 
-    public void setStateScalar(final DeviceState stateScalar) {
-        this.stateScalar = stateScalar;
-    }
-
     public void setStateSpectrum(final DeviceState[] stateSpectrum) {
         this.stateSpectrum = Arrays.copyOf(stateSpectrum, stateSpectrum.length);
     }
@@ -927,6 +883,10 @@ public final class JTangoTest {
 
     public void setEnumAttribute(final TestType enumAttribute) {
         this.enumAttribute = enumAttribute;
+    }
+
+    public enum TestType {
+        VALUE1, VALUE2
     }
 
 }

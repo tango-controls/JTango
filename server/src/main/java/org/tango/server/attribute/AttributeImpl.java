@@ -24,8 +24,10 @@
  */
 package org.tango.server.attribute;
 
-import java.lang.reflect.Array;
-
+import fr.esrf.Tango.*;
+import net.entropysoft.transmorph.ConverterException;
+import net.entropysoft.transmorph.DefaultConverters;
+import net.entropysoft.transmorph.Transmorph;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -33,11 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.attribute.AttributeTangoType;
-import org.tango.server.Constants;
-import org.tango.server.DeviceBehaviorObject;
-import org.tango.server.ExceptionMessages;
-import org.tango.server.IPollable;
-import org.tango.server.IReadableWritable;
+import org.tango.server.*;
 import org.tango.server.cache.PollingUtils;
 import org.tango.server.events.EventManager;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -45,24 +43,14 @@ import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.AttrWriteType;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DispLevel;
-import net.entropysoft.transmorph.ConverterException;
-import net.entropysoft.transmorph.DefaultConverters;
-import net.entropysoft.transmorph.Transmorph;
+import java.lang.reflect.Array;
 
 /**
  * Tango attribute
  *
  * @author ABEILLE
  */
-public final class AttributeImpl extends DeviceBehaviorObject
+public class AttributeImpl extends DeviceBehaviorObject
         implements Comparable<AttributeImpl>, IPollable, IReadableWritable<AttributeValue> {
 
     private final Logger logger = LoggerFactory.getLogger(AttributeImpl.class);
@@ -70,24 +58,21 @@ public final class AttributeImpl extends DeviceBehaviorObject
 
     private final String name;
     private final AttributeConfiguration config;
-    private AttributeValue readValue;
-    private AttributeValue writeValue = null;
     private final AttributeHistory history;
     private final AttributePropertiesManager attributePropertiesManager;
-
     private final IAttributeBehavior behavior;
+    private final boolean isFwdAttribute;
+    private final String deviceName;
+    private AttributeValue readValue;
+    private AttributeValue writeValue = null;
     private DevFailed lastError;
     private boolean isAlarmToHigh;
     private boolean isOutOfLimits;
-
     private long writtenTimestamp = 0;
     private boolean isDeltaAlarm;
-
     private volatile double executionDuration;
     private volatile double lastUpdateTime;
     private volatile double deltaTime;
-    private final boolean isFwdAttribute;
-    private final String deviceName;
 
     public AttributeImpl(final IAttributeBehavior behavior, final String deviceName) throws DevFailed {
         super();
@@ -520,31 +505,6 @@ public final class AttributeImpl extends DeviceBehaviorObject
         }
     }
 
-    /**
-     * Set the attribute properties.
-     *
-     * @param properties
-     *            The attribute properties
-     * @throws DevFailed
-     */
-    public void setProperties(final AttributePropertiesImpl properties) throws DevFailed {
-        if (isMemorized() && getMemorizedValue() != null) {
-            final double memoValue = Double.parseDouble(getMemorizedValue().toString());
-            if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
-                throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
-            }
-        }
-        config.setAttributeProperties(properties);
-        if (isFwdAttribute) {
-            // set config on forwarded attribute
-            final ForwardedAttribute fwdAttr = (ForwardedAttribute) behavior;
-            properties.setRootAttribute(fwdAttr.getRootName());
-            fwdAttr.setAttributeConfiguration(config);
-        }
-        config.persist(deviceName);
-        EventManager.getInstance().pushAttributeConfigEvent(deviceName, name);
-    }
-
     @Override
     public String getName() {
         return name;
@@ -573,6 +533,30 @@ public final class AttributeImpl extends DeviceBehaviorObject
             config.setAttributeProperties(fwdAttr.getProperties());
         }
         return config.getAttributeProperties();
+    }
+
+    /**
+     * Set the attribute properties.
+     *
+     * @param properties The attribute properties
+     * @throws DevFailed
+     */
+    public void setProperties(final AttributePropertiesImpl properties) throws DevFailed {
+        if (isMemorized() && getMemorizedValue() != null) {
+            final double memoValue = Double.parseDouble(getMemorizedValue().toString());
+            if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
+                throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
+            }
+        }
+        config.setAttributeProperties(properties);
+        if (isFwdAttribute) {
+            // set config on forwarded attribute
+            final ForwardedAttribute fwdAttr = (ForwardedAttribute) behavior;
+            properties.setRootAttribute(fwdAttr.getRootName());
+            fwdAttr.setAttributeConfiguration(config);
+        }
+        config.persist(deviceName);
+        EventManager.getInstance().pushAttributeConfigEvent(deviceName, name);
     }
 
     public DispLevel getDispLevel() {

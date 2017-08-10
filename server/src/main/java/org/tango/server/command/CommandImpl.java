@@ -24,6 +24,9 @@
  */
 package org.tango.server.command;
 
+import fr.esrf.Tango.DevError;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DispLevel;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.ext.XLogger;
@@ -34,19 +37,13 @@ import org.tango.server.IPollable;
 import org.tango.server.cache.PollingUtils;
 import org.tango.server.properties.AttributePropertiesManager;
 
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DispLevel;
-
-public final class CommandImpl extends DeviceBehaviorObject implements Comparable<CommandImpl>, IPollable {
-
-    // private static Logger logger =
-    // LoggerFactory.getLogger(CommandImpl.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(CommandImpl.class);
+public class CommandImpl extends DeviceBehaviorObject implements Comparable<CommandImpl>, IPollable {
 
     public static final int TANGO_OPERATOR_CMD = 0;
     public static final int TANGO_EXPERT_CMD = 1;
-
+    // private static Logger logger =
+    // LoggerFactory.getLogger(CommandImpl.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(CommandImpl.class);
     private final String name;
     private final CommandConfiguration config;
     private final ICommandBehavior behavior;

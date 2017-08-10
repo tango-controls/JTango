@@ -24,18 +24,12 @@
  */
 package org.tango.server.build;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.servant.DeviceImpl;
 
-import fr.esrf.Tango.DevFailed;
+import java.util.*;
 
 /**
  * Builder of a Tango class
@@ -43,7 +37,7 @@ import fr.esrf.Tango.DevFailed;
  * @author ABEILLE
  * 
  */
-public final class DeviceClassBuilder {
+public class DeviceClassBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(DeviceClassBuilder.class);
     /**

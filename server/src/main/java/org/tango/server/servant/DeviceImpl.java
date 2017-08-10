@@ -24,18 +24,7 @@
  */
 package org.tango.server.servant;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import fr.esrf.Tango.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.omg.CORBA.Any;
@@ -53,29 +42,15 @@ import org.tango.server.InvocationContext;
 import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.AroundInvoke;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.ClassProperty;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Delete;
+import org.tango.server.annotation.*;
 import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceProperties;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.State;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.PollingManager;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
-import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLocker;
-import org.tango.server.device.InitImpl;
-import org.tango.server.device.StateImpl;
-import org.tango.server.device.StatusImpl;
+import org.tango.server.device.*;
 import org.tango.server.events.DeviceInterfaceChangedSender;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -90,50 +65,19 @@ import org.tango.server.properties.PropertiesUtils;
 import org.tango.server.schedule.DeviceScheduler;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttributeConfig;
-import fr.esrf.Tango.AttributeConfig_2;
-import fr.esrf.Tango.AttributeConfig_3;
-import fr.esrf.Tango.AttributeConfig_5;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.AttributeValue_5;
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.DevAttrHistory;
-import fr.esrf.Tango.DevAttrHistory_3;
-import fr.esrf.Tango.DevAttrHistory_4;
-import fr.esrf.Tango.DevAttrHistory_5;
-import fr.esrf.Tango.DevCmdHistory;
-import fr.esrf.Tango.DevCmdHistory_4;
-import fr.esrf.Tango.DevCmdInfo;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevInfo;
-import fr.esrf.Tango.DevInfo_3;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.Tango.DevPipeData;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.Device_5POA;
-import fr.esrf.Tango.MultiDevFailed;
-import fr.esrf.Tango.PipeConfig;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The CORBA servant for a tango device server in IDL 5.
  *
  * @author ABEILLE
  */
-public final class DeviceImpl extends Device_5POA {
+public class DeviceImpl extends Device_5POA {
 
     public static final String INIT_CMD = "Init";
-    private final Logger logger = LoggerFactory.getLogger(DeviceImpl.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceImpl.class);
-
-    private static final String NOT_IMPORTANT_ERROR = "not important error";
-    private static final String READ_ASKED_FOR_0_ATTRIBUTES = "read asked for 0 attributes";
-    private static final String READ_ERROR = "READ_ERROR";
-
     /**
      * TANGO system version
      */
@@ -142,29 +86,89 @@ public final class DeviceImpl extends Device_5POA {
      * for logging
      */
     public static final String MDC_KEY = "deviceName";
-
     /**
      * Special attribute name meaning all attributes
      */
     public static final String ALL_ATTR = "All attributes";
-
     public static final String ALL_PIPES = "All pipes";
-
     public static final String STATE_NAME = "State";
     public static final String STATUS_NAME = "Status";
+    private static final String NOT_IMPORTANT_ERROR = "not important error";
+    private static final String READ_ASKED_FOR_0_ATTRIBUTES = "read asked for 0 attributes";
+    private static final String READ_ERROR = "READ_ERROR";
+    /**
+     * Recreating a device does not delete locking object. So maintain a
+     * reference
+     */
+    private static final Map<String, ClientLocking> CLIENT_LOCKING_MAP = new HashMap<String, ClientLocking>();
+    private final Logger logger = LoggerFactory.getLogger(DeviceImpl.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceImpl.class);
     /**
      * The name of the tango device
      */
     private final String name;
-
-    /**
-     * to init the device
-     */
-    private InitImpl initImpl;
     /**
      * The implementation of the device
      */
     private final Object businessObject;
+    /**
+     * Manage device locking
+     */
+    private final DeviceLocker deviceLock;
+    /**
+     * the device's attributes
+     */
+    private final List<PipeImpl> pipeList = new ArrayList<PipeImpl>();
+    /**
+     * the device's attributes
+     */
+    private final List<AttributeImpl> attributeList = new ArrayList<AttributeImpl>();
+    /**
+     * the device's commands
+     */
+    private final List<CommandImpl> commandList = new ArrayList<CommandImpl>();
+
+    // default attributes
+    /**
+     * the device's properties
+     */
+    private final List<DevicePropertyImpl> devicePropertyList = new ArrayList<DevicePropertyImpl>();
+    /**
+     * the device class's properties
+     */
+    private final List<ClassPropertyImpl> classPropertyList = new ArrayList<ClassPropertyImpl>();
+    /**
+     * Black box. History of all client requests
+     */
+    // private final DeviceBlackBox blackBox = new DeviceBlackBox();
+    private final DeviceMonitoring deviceMonitoring;
+    /**
+     * The class name as defined in tango db
+     */
+    private final String className;
+    /**
+     * Manage lazy init
+     */
+    private final AtomicBoolean isCorrectlyInit = new AtomicBoolean(false);
+    /**
+     * client info of lastest command. Used for locking device from client
+     */
+    // private volatile ClntIdent clientIdentity;
+    private final ThreadLocal<ClntIdent> clientIdentity = new ThreadLocal<ClntIdent>();
+    /**
+     * Manage locking from client
+     */
+    private final ClientLocking clientLocking;
+    private final Map<String, Integer> pollAttributes = new HashMap<String, Integer>();
+    private final Map<String, Integer> minCommandPolling = new HashMap<String, Integer>();
+    private final Map<String, Integer> minAttributePolling = new HashMap<String, Integer>();
+    private final Map<String, Integer> cmdPollRingDepth = new HashMap<String, Integer>();
+    private final Map<String, Integer> attrPollRingDepth = new HashMap<String, Integer>();
+    private final String deviceType;
+    /**
+     * to init the device
+     */
+    private InitImpl initImpl;
     /**
      * The delete method. Called at each init
      */
@@ -181,100 +185,33 @@ public final class DeviceImpl extends Device_5POA {
      * Implementation of around invoke
      */
     private AroundInvokeImpl aroundInvokeImpl;
-
-    // default attributes
     /**
      * The state attribute
      */
     @Attribute(name = STATE_NAME)
     private DevState state = DevState.UNKNOWN;
-
     /**
      * The status attribute
      */
     @Attribute(name = STATUS_NAME)
     private String status = "default status";
-
     /**
      * CORBA id
      */
     private byte[] objId;
-
-    /**
-     * Manage device locking
-     */
-    private final DeviceLocker deviceLock;
-
-    /**
-     * the device's attributes
-     */
-    private final List<PipeImpl> pipeList = new ArrayList<PipeImpl>();
-
-    /**
-     * the device's attributes
-     */
-    private final List<AttributeImpl> attributeList = new ArrayList<AttributeImpl>();
-    /**
-     * the device's commands
-     */
-    private final List<CommandImpl> commandList = new ArrayList<CommandImpl>();
-    /**
-     * the device's properties
-     */
-    private final List<DevicePropertyImpl> devicePropertyList = new ArrayList<DevicePropertyImpl>();
-    /**
-     * the device class's properties
-     */
-    private final List<ClassPropertyImpl> classPropertyList = new ArrayList<ClassPropertyImpl>();
     /**
      * all the device's properties. To allow dynamic properties
      */
     private DevicePropertiesImpl deviceProperties;
     /**
-     * Black box. History of all client requests
-     */
-    // private final DeviceBlackBox blackBox = new DeviceBlackBox();
-    private final DeviceMonitoring deviceMonitoring;
-    /**
-     * The class name as defined in tango db
-     */
-    private final String className;
-    /**
      * Manage lazy init
      */
     private volatile boolean isInitializing;
     /**
-     * Manage lazy init
-     */
-    private final AtomicBoolean isCorrectlyInit = new AtomicBoolean(false);
-    /**
      * Check all attributes alarms while get state of the device
      */
     private boolean stateCheckAttrAlarm = false;
-    /**
-     * client info of lastest command. Used for locking device from client
-     */
-    // private volatile ClntIdent clientIdentity;
-    private final ThreadLocal<ClntIdent> clientIdentity = new ThreadLocal<ClntIdent>();
-
-    /**
-     * Recreating a device does not delete locking object. So maintain a
-     * reference
-     */
-    private static final Map<String, ClientLocking> CLIENT_LOCKING_MAP = new HashMap<String, ClientLocking>();
-    /**
-     * Manage locking from client
-     */
-    private final ClientLocking clientLocking;
-
-    private final Map<String, Integer> pollAttributes = new HashMap<String, Integer>();
-    private final Map<String, Integer> minCommandPolling = new HashMap<String, Integer>();
     private int minPolling = 0;
-    private final Map<String, Integer> minAttributePolling = new HashMap<String, Integer>();
-    private final Map<String, Integer> cmdPollRingDepth = new HashMap<String, Integer>();
-    private final Map<String, Integer> attrPollRingDepth = new HashMap<String, Integer>();
-    private final String deviceType;
-
     private DeviceScheduler deviceScheduler;
 
     private PollingManager pollingManager;
@@ -377,6 +314,20 @@ public final class DeviceImpl extends Device_5POA {
         logger.debug("Device {} of of {} created with tx type: {}",
                 new Object[] { deviceName, businessObject.getClass(), txType });
 
+    }
+
+    public static PipeImpl getPipe(final String name, final List<PipeImpl> pipeList) throws DevFailed {
+        PipeImpl result = null;
+        for (final PipeImpl pipe : pipeList) {
+            if (pipe.getName().equalsIgnoreCase(name)) {
+                result = pipe;
+                break;
+            }
+        }
+        if (result == null) {
+            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + " does not exists");
+        }
+        return result;
     }
 
     public void setStateCheckAttrAlarm(final boolean stateCheckAttrAlarm) {
@@ -2670,20 +2621,6 @@ public final class DeviceImpl extends Device_5POA {
             pipe.setConfiguration(config.label, config.description);
         }
         xlogger.exit();
-    }
-
-    public static PipeImpl getPipe(final String name, final List<PipeImpl> pipeList) throws DevFailed {
-        PipeImpl result = null;
-        for (final PipeImpl pipe : pipeList) {
-            if (pipe.getName().equalsIgnoreCase(name)) {
-                result = pipe;
-                break;
-            }
-        }
-        if (result == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + " does not exists");
-        }
-        return result;
     }
 
     @Override
