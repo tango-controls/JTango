@@ -1,0 +1,9 @@
+site_name: JTango User Manual
+repo_url: https://github.com/tango-controls/JTango
+
+pages:
+- Home: index.md
+- User Guide:
+    - Java Server User Manual: manual.md
+- Developer Guide:
+    - Design: design.md
