@@ -1,5 +1,3 @@
-# Annexes
-
 ## Full sample device code
 
 ```java
