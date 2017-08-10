@@ -10,4 +10,7 @@ pages:
     - Startup: manual/start.md
     - Annexes: manual/annexes.md
 - Developer Guide:
-    - Design: design.md
+    - Introduction: design.md
+    - Server architecture: design/architecture.md
+    - Logging: design/logging.md
+    - Miscelanious: design/misc.md
