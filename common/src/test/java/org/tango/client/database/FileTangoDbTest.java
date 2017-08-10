@@ -1,17 +1,16 @@
 package org.tango.client.database;
 
-import static org.junit.Assert.assertArrayEquals;
+import fr.esrf.Tango.DevFailed;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import fr.esrf.Tango.DevFailed;
+import static org.junit.Assert.assertArrayEquals;
 
 public class FileTangoDbTest {
 

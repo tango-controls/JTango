@@ -132,10 +132,6 @@
 	<dependencies>
         <dependency>
             <groupId>org.tango-controls</groupId>
-            <artifactId>TangORB</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.tango-controls</groupId>
             <artifactId>JTangoClientLang</artifactId>
         </dependency>
         <dependency>
