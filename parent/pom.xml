@@ -16,9 +16,6 @@
         <maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
         <maven.web.server>calypso</maven.web.server>
         <maven.web.home>/usr/Local/apache/docs</maven.web.home>
-        <sonar.jdbc.url>jdbc:mysql://sonardb.ica:3306/sonar?useUnicode=true&amp;characterEncoding=utf8</sonar.jdbc.url>
-        <sonar.jdbc.driver>com.mysql.jdbc.Driver</sonar.jdbc.driver>
-        <sonar.host.url>http://calypso.synchrotron-soleil.fr/sonar</sonar.host.url>
     </properties>
 
     <developers>
@@ -158,10 +155,10 @@
     </dependencyManagement>
 
     <distributionManagement>
-            <repository>
-                <id>bintray-tango-controls</id>
-                <url>https://api.bintray.com/maven/tango-controls/maven/${project.artifactId}/;publish=1</url>
-            </repository>
+        <repository>
+            <id>bintray-tango-controls</id>
+            <url>https://api.bintray.com/maven/tango-controls/maven/${project.artifactId}/;publish=1</url>
+        </repository>
     </distributionManagement>
 
     <!-- tango-controls bintray maven repo to resolve dependencies-->
@@ -174,11 +171,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>1.0-beta-2</version>
-            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
@@ -252,50 +244,36 @@
     <profiles>
         <profile>
             <id>travis</id>
+            <properties>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+                <sonar.organization>tango-controls</sonar.organization>
+                <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <version>2.7</version>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>3.2</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.7.7.201606060606</version>
                         <executions>
                             <execution>
-                                <id>codecov</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>cobertura</goal>
+                                    <goal>report</goal>
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <formats>
-                                <format>html</format>
-                                <format>xml</format>
-                            </formats>
-                            <check/>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.gavinmogan</groupId>
-                        <artifactId>codacy-maven-plugin</artifactId>
-                        <version>1.0.3</version>
-                        <!--<executions>
-                            <execution>
-                                <id>upload-coverage</id>
-                                &lt;!&ndash; TODO deploy &ndash;&gt;
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>coverage</goal>
-                                </goals>
-                            </execution>
-                        </executions>-->
-                        <configuration>
-                            <language>Java</language>
-                            <coverageReportFile>${project.build.directory}/cobertura/cobertura.ser</coverageReportFile>
-                            <projectToken>${env.CODACY_PROJECT_TOKEN}</projectToken>
-                            <apiToken>${env.CODACY_API_TOKEN}</apiToken>
-                            <failOnMissingReportFile>false</failOnMissingReportFile>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

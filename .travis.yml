@@ -7,3 +7,12 @@ jdk:
   - openjdk7
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - mvn sonar:sonar
+addons:
+  sonarcloud:
+    organization: "tango-controls"
+    token:
+      secure: $SONAR_TOKEN
+cache:
+  directories:
+    - '$HOME/.m2/repository'
