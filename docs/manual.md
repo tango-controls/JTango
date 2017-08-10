@@ -3,9 +3,13 @@
 # Introduction
 
 This paper is a documentation intended for developers. It described how to build a Java Tango Device. A background in the Java language is strongly recommended. The pre-requisites are:
+
 * The Tango concepts: attribute, command, device property…  Please read the Tango reference manual : [tango-controls.org](http://www.tango-controls.org/), [tango-controls documentation](http://tango-controls.readthedocs.io)
+
 * The Java language Standard Edition : http://www.oracle.com/technetwork/java/javase/documentation/index.html
+
 * The concept of annotations introduced in Java version 5: http://docs.oracle.com/javase/tutorial/java/javaOO/annotations.html
+
 * Java beans : http://en.wikipedia.org/wiki/JavaBeans
 
 # A first device
@@ -84,7 +88,9 @@ The newly added device must appear in the device tree:
 ![](manual/jive_result.png)
 
 As the TestDevice class of this device has a main method, it can be started as a standard Java program:
+
 1. A Java system property “TANGO_HOST” must be defined. For instance “tangodb:20001,tangodb:20002” , like in the Jive screenshot above.
+
 2. The mandatory program argument is the instance name (1 in above example).
 
 Once started, the device can be tested. Here is an example of the Tango generic client ATKPanel:
@@ -94,22 +100,29 @@ Once started, the device can be tested. Here is an example of the Tango generic 
 > NB: In Tango, the commands Init, State, Status and the attributes State, Status are created by default for any device.
 
 Here is a first code explanation:
+
 * The __@Device__ annotation on a class defines this class as a Tango Device.
+
 * The __@Attribute__ annotation defines a field as a Tango attribute: 
-  - The attribute type is defined by the field type;  
-  - If this field has a getter, it is a READ attribute; 
-  - If it has a setter, it is a WRITE attribute; 
-  - If it has both getter and setter, it is a READ/WRITE attribute.
+    - The attribute type is defined by the field type;  
+    - If this field has a getter, it is a READ attribute; 
+    - If it has a setter, it is a WRITE attribute; 
+    - If it has both getter and setter, it is a READ/WRITE attribute.
+
 * The annotation __@Command__ defines a method as a Tango command:
-  - The parameter type defines the input type
-  - The return type defines the output type
+    - The parameter type defines the input type
+    - The return type defines the output type
+
 * The __@Init__ annotation defines a method called:
-  - At server startup; 
-  - When “Init” command is called.
+    - At server startup; 
+    - When “Init” command is called.
+
 * The __@Delete__ annotation defines a method called:
-  - At server shutdown;
-  - At “Init” command, just before __@Init__.
+    - At server shutdown;
+    - At “Init” command, just before __@Init__.
+
 * The main method starts the server
+
 * The logger field is to log. 
 
 The following chapters will describes all this in details.
@@ -245,8 +258,11 @@ public void setEnumAttribute(TestType v){
 ```
 
 As defined by the Java bean convention, the setter and getter must contain the name of the field and manage the same type as the field (reminder: a getter for a boolean starts by “is”). The getter and setter have to be public while the field is private.
+
 * If this field has a getter, it is a READ attribute; 
+
 * If it has a setter, it is a WRITE attribute; 
+
 * If it has both, it is a READ/WRITE attribute.
 
 It is also possible to place the annotation on the getter method.
@@ -355,7 +371,9 @@ public void init() {
 ```
 
 This method must be public with no parameters. It is called:
+
 * At server startup 
+
 * And when “Init” command is called. 
 
 If this method throws an exception, the device will automatically switch to the “FAULT” state and the status will provide the stack trace.
@@ -373,7 +391,9 @@ public void delete() {
 ```
 
 Method must be public with no parameters. It is called:
+
 * When “Init” command is called before @Init method 
+
 * At server shutdown. 
 
 The delete method is generally used to close resources.
@@ -396,7 +416,9 @@ public void setState(final DeviceState state) {
 ```
 
 The state annotation defines the state of the device, which will appear in the default command and attribute “State”. The field can be fr.esrf.Tango.DevState or org.tango.DeviceState:
+
 * DevState is the Tango standard type defined by the IDL. 
+
 * DeviceState is java Enum that provides easiness to manage a State.
 
 Getter and setter are mandatory.
@@ -503,8 +525,11 @@ public void aroundInvoke(final InvocationContext ctxt) {
 _org.tango.server.annotation.StateMachine_
 
 The StateMachine annotation allows to define some denied states, and some state changes:
+
 * For an __@Init__, it is possible to define the state at the end of its execution
+
 * For a command, its execution can be disallowed for some states and the state at the end of its execution can be defined.
+
 * For an attribute, it can be disallowed to write it for some states and the state at the end of its execution.
 
 ```java
@@ -593,7 +618,9 @@ public CommandConfiguration getConfiguration() throws DevFailed {
 
 The command types may be declared in two different ways:
 
+
 * setInType(Class<?> type) or setOutType: as table in chapter “Command”, the java class defines the command type.
+
 * setTangoInType(int tangoType)or setTangoOutType: defines the type with an integer (constants are defined in class fr.esrf.TangoConst). This method is more flexible as some Tango types do not have equivalent in Java classes: DEVULONG, DEVULONG64, DEVUSHORT, DEVVARULONGARRAY, DEVVARULONG64ARRAY, and DEVVARUSHORTARRAY.
 
 ### StateMachine
@@ -645,7 +672,9 @@ public AttributeConfiguration getConfiguration() throws DevFailed {
 ```
 
 The attribute type and format may be declared in two different ways:
+
 * setType(Class<?>  type): as table in chapter “Attribute”, the java class defines the attribute type and format.
+
 * setTangoType(int tangoType, AttrDataFormat format): defines the type with an integer (constants are defined in class fr.esrf.TangoConst). The format is defined by the class fr.esrf.AttrDataFormat. This method is more flexible as some Tango types do not have equivalent in Java classes: DEVULONG, DEVULONG64, DEVUSHORT, DEVENUM. Example of DEVENUM:
 
 ```java
@@ -721,8 +750,11 @@ public void init() throws DevFailed {
 # Default dynamic attributes and commands
 
 Some default dynamic attributes and commands are already in the library JTangoServerLang, i.e.:
+
 * Attribute and command proxies
+
 * Group command
+
 * Log attribute to send logs to an attribute
 
 Example: _org.tango.server.dynamic.command.ProxyCommand_ will create a Command that is connected to another command. The input and output types will be calculated automatically.
@@ -732,22 +764,31 @@ Example: _org.tango.server.dynamic.command.ProxyCommand_ will create a Command t
 The detailed concepts of events are described in the Tango kernel documentation. This section is just a reminder of the key concepts and how to apply it in Java.
 
 An event is send from a device’s attribute to the clients that have subscribed to it. There are six different types of events:
+
 * CHANGE_EVENT:  Sends an event according to the criteria defined in the attribute properties “abs_change” and/or “rel_change”. Sends also an event if the attribute‘s quality changes.
+
 * PERIODIC_EVENT: Sends an event at the period specified by the attribute property “event_period”
+
 * ARCHIVE_EVENT: Archived event. Can either:
   - Sends a periodic event at period configured in the property “archive_period”. 
   - Or/and change event with values from “archive_rel_change” and/or “archive_abs_change”
+
 * USER_EVENT: The developer of the device can choose when to send this event.
+
 * ATT_CONF_EVENT: Attribute configuration event. Sends an event if an attribute's properties change.
+
 * DATA_READY_EVENT:  The developer of the device can choose when to send the event. It is used to notify the client that some data is ready.
+
 * INTERFACE_CHANGE: Each time the lists of commands or attributes change, an event is fire.
 
 There are two ways to send events from a server to clients:
 
 * Polled events: the cache mechanism will take care of sending events.
+
 * Pushed events: the events will be sent directly for the device’s code.
 
 ## Polled events
+
 To send a polled event, the polling has to be configured. Only CHANGE_EVENT, PERIODIC_EVENT and ARCHIVE_EVENT can be send by the polling mechanism. Some default values can be set directly in the device’s code. In the following example, the attribute ‘doubleAtt’ is polled at a 100 milliseconds rate and will send a change event if its value varies at least of 1 since the last time it was sent:
 
 ```java
@@ -758,6 +799,7 @@ private double doubleAtt = 0;
 
 
 ## Pushed events
+
 The event types that can be sent from the device’s code are CHANGE_EVENT, ARCHIVING_EVENT, DATA_READY_EVENT and USER_EVENT. For the CHANGE and ARCHIVING events types, it is possible to activate the check of the attribute properties criteria before firing it. In this case, it is done by the API before sending the event.
 
 In the following example, a change event is pushed on the attribute ‘doubleAttr’. The API will check if the event must be send according to the criteria ‘changeEventAbsolute’ and ‘changeEventRelative’:
@@ -815,7 +857,6 @@ public int off() throws DevFailed {
 }
 ```
 
-
 # Logging
 The Java Tango server API uses SLF4J (http://www.slf4j.org/). The underlying libraries use also SLF4J (i.e. jacorb, ehcache…).  Here is a declaration example of a logger class:
 
@@ -834,7 +875,9 @@ SLF4J is an abstraction layer for various logging frameworks (ie. logback, log4j
 A configuration file allows configuring the logging output to be directed to the console, files, e-mails… It also configures the logging level. This file has to be in the class path of the device. See annexes for an example of a logback configuration file and http://logback.qos.ch/ for details about configuration.
 
 LIMITATION: JTangoServer depends directly on logback, because it has to implement some particularities to configure it:
+
 * Configuration of the logging level
+
 * Configuration of logging into file or into another device (for logviewer application).
 
 So logback may be used to benefit from the above configuration topics (accessible through the administration device).
@@ -852,7 +895,9 @@ public static void main(final String[] args) {
 ```
 
 When using the Tango database, the java system property or environment variable TANGO_HOST must be defined to indicate the host and port of the database. The string array passed in the start method must contain at least the instance name as it has been previously defined in the Tango database. The other options are:
+
 * The "-h" option displays the list of instances declared in the tango database for the given server.
+
 * The “–v x“ option allows to override the default logging level (also called root level) of the logging configuration file where x is a integer value (possible values are OFF=0,  FATAL = 1, ERROR = 2, WARN = 3, INFO = 4, DEBUG = 5, TRACE = 6)
 
 It is possible to have several classes in a single server. Here is an example of a server started with two classes (org.tango.Motor and org.tango.PowerSupply): 
@@ -886,9 +931,12 @@ ServerManager.getInstance().start(new String[] { NO_DB_INSTANCE_NAME, "-nodb", "
 ```
 
 The start options are for a no db server:
-* -nodb to indicate a server without database
-* -dlist the list of devices in the server
-* -file= the properties file. As the device and class properties are normally defined in the Tango DB, a file can be specified to replace it. (Refer to annexes for an example).  If the device started without database is also defined in tango db, it is possible to generate its file with Jive. The “Save server data” menu is accessible by right-clicking on the instance name:
+
+* `-nodb` to indicate a server without database
+
+* `-dlist` the list of devices in the server
+
+* `-file=` the properties file. As the device and class properties are normally defined in the Tango DB, a file can be specified to replace it. (Refer to annexes for an example).  If the device started without database is also defined in tango db, it is possible to generate its file with Jive. The “Save server data” menu is accessible by right-clicking on the instance name:
 
 ![](manual/jive_3.png)
 
