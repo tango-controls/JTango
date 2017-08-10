@@ -275,6 +275,28 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>com.gavinmogan</groupId>
+                        <artifactId>codacy-maven-plugin</artifactId>
+                        <version>1.0.3</version>
+                        <!--<executions>
+                            <execution>
+                                <id>upload-coverage</id>
+                                &lt;!&ndash; TODO deploy &ndash;&gt;
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>coverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>-->
+                        <configuration>
+                            <language>Java</language>
+                            <coverageReportFile>${project.build.directory}/jacoco.exec</coverageReportFile>
+                            <projectToken>${env.CODACY_PROJECT_TOKEN}</projectToken>
+                            <apiToken>${env.CODACY_API_TOKEN}</apiToken>
+                            <failOnMissingReportFile>false</failOnMissingReportFile>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

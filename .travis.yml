@@ -8,6 +8,7 @@ jdk:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - mvn sonar:sonar
+  - mvn com.gavinmogan:codacy-maven-plugin:coverage
 addons:
   sonarcloud:
     organization: "tango-controls"
