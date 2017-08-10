@@ -1,5 +1,10 @@
 package org.tango.client.database;
 
+import fr.esrf.Tango.DevFailed;
+import org.apache.commons.lang3.ArrayUtils;
+import org.tango.utils.DevFailedUtils;
+import org.tango.utils.TangoUtil;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -7,12 +12,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.tango.utils.DevFailedUtils;
-import org.tango.utils.TangoUtil;
-
-import fr.esrf.Tango.DevFailed;
 
 /**
  * Manage tango db properties within a file

@@ -1,8 +1,8 @@
 package org.tango.client.database;
 
-import java.util.Map;
-
 import fr.esrf.Tango.DevFailed;
+
+import java.util.Map;
 
 public interface ITangoDB {
     /**

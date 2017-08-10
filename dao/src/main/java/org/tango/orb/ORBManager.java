@@ -24,28 +24,10 @@
  */
 package org.tango.orb;
 
-import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.NO_RESPONSE;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TRANSIENT;
+import fr.esrf.Tango.*;
+import org.omg.CORBA.*;
 import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.PortableServer.IdAssignmentPolicyValue;
-import org.omg.PortableServer.LifespanPolicyValue;
-import org.omg.PortableServer.POA;
-import org.omg.PortableServer.POAHelper;
-import org.omg.PortableServer.POAManager;
+import org.omg.PortableServer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -54,17 +36,11 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.client.database.DeviceImportInfo;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.Device;
-import fr.esrf.Tango.DeviceHelper;
-import fr.esrf.Tango.Device_2;
-import fr.esrf.Tango.Device_2Helper;
-import fr.esrf.Tango.Device_3;
-import fr.esrf.Tango.Device_3Helper;
-import fr.esrf.Tango.Device_4;
-import fr.esrf.Tango.Device_4Helper;
-import fr.esrf.Tango.Device_5;
-import fr.esrf.Tango.Device_5Helper;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Initialize, shutdown the ORB
@@ -74,9 +50,6 @@ import fr.esrf.Tango.Device_5Helper;
  */
 public final class ORBManager {
 
-    private static final String INIT_ERROR = "INIT_ERROR";
-    private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ORBManager.class);
-    private static final Logger LOGGER = LoggerFactory.getLogger(ORBManager.class);
     /**
      * POA for no db device
      */
@@ -89,6 +62,9 @@ public final class ORBManager {
      * A jacorb system property for IP address on multi-homed host
      */
     public static final String OAI_ADDR = System.getProperty("OAIAddr");
+    private static final String INIT_ERROR = "INIT_ERROR";
+    private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ORBManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ORBManager.class);
     private static ORB orb;
     private static POA poa;
     private static ExecutorService orbStart;
@@ -373,14 +349,6 @@ public final class ORBManager {
         LOGGER.debug("ORB started");
     }
 
-    private static class StartTask implements Callable<Void> {
-        @Override
-        public Void call() {
-            ORBManager.start();
-            return null;
-        }
-    }
-
     /**
      * Check if the checkORBgiopMaxMsgSize has been set. This environment
      * variable should be set in Mega bytes.
@@ -472,6 +440,14 @@ public final class ORBManager {
         if (orb != null) {
             orb.shutdown(true);
             LOGGER.debug("ORB shutdown");
+        }
+    }
+
+    private static class StartTask implements Callable<Void> {
+        @Override
+        public Void call() {
+            ORBManager.start();
+            return null;
         }
     }
 

@@ -30,36 +30,31 @@
 // $Revision: 25483 $
 //
 //-======================================================================
-
-
 package fr.esrf.TangoApi;
 
-
-/**
- *	This class is extends TangoApi.DeviceProxy 
- *	to manage Tango access device.
- *	 - Check if control access is requested.
- *	 - Check who is the user and the host.
- *	 - Check access for this user, this host and the specified device.
- *
- * @author verdier
- */
-
+import com.google.common.collect.Iterables;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Hashtable;
-import java.util.Vector;
 
 
-class AccessProxy extends DeviceProxy {
-    protected static String user = null;
-    protected static String hostAddr = null;
-    protected boolean forced = false;
-    private static boolean muliIP = true;
-    private static final Object monitor = new Object();
-
+/**
+ * This class is extends TangoApi.DeviceProxy
+ * to manage Tango access device.
+ * - Check if control access is requested.
+ * - Check who is the user and the host.
+ * - Check access for this user, this host and the specified device.
+ *
+ * @author verdier
+ */
+public class AccessProxy extends DeviceProxy {
+    protected final String user;
+    protected final boolean forced;
+    private final Logger logger = LoggerFactory.getLogger(AccessProxy.class);
     /**
      * Device rights table
      */
@@ -69,6 +64,7 @@ class AccessProxy extends DeviceProxy {
      */
     protected Hashtable<String, String[]> allowed_cmd_table = null;
     //===============================================================
+
     /**
      * Constructor for Access device proxy
      *
@@ -79,6 +75,7 @@ class AccessProxy extends DeviceProxy {
     AccessProxy(String devname) throws DevFailed {
         //	Build device proxy and check if present.
         super(devname, false);
+        user = System.getProperty("user.name").toLowerCase();
 
         //	Check if forced mode
         forced = TangoEnv.isSuperTango();
@@ -92,6 +89,7 @@ class AccessProxy extends DeviceProxy {
         }
     }
     //===============================================================
+
     /**
      * Check access for specified device
      *
@@ -104,69 +102,64 @@ class AccessProxy extends DeviceProxy {
         if (forced)
             return TangoConst.ACCESS_WRITE;
 
-        synchronized (monitor) {
+        //TODO do we really need to synchronize globally?
+        synchronized (AccessProxy.class) {
             //	Check if already tested.
+            //TODO rewrite with Future
+            //TODO flag to check every time
             String str = dev_right_table.get(devName);
             if (str != null) {
-                //System.out.println(devname + " AccessControl already checked.");
+                logger.debug("{} AccessControl already checked.", devName);
                 if (str.equals("write"))
                     return TangoConst.ACCESS_WRITE;
                 else
                     return TangoConst.ACCESS_READ;
             }
-            //else
-            //	System.out.println("Check AccessControl for " + devname);
-
+            logger.debug("Check AccessControl for {}", devName);
+            String rights = null;
+            DeviceData argin = new DeviceData();
             try {
-                //	If not already done check user name
-                if (user == null)
-                    user = System.getProperty("user.name").toLowerCase();
-                hostAddr = ApiUtil.getHostAddress();
-
-                DeviceData argin = new DeviceData();
-                String rights;
-                if (muliIP) {
-                    Vector<String> addresses = ApiUtil.getHostAddresses();
-                    String[] array = new String[addresses.size() + 2];
-                    int i = 0;
-                    array[i++] = user;
-                    array[i++] = devName;
-                    for (String address : addresses) {
-                        //System.out.println(" Checking for : " + address);
-                        array[i++] = address;
-                    }
-
-                    argin.insert(array);
-                    rights = command_inout("GetAccessForMultiIP", argin).extractString();
-                } else {
-                    argin.insert(new String[]{user, hostAddr, devName});
-                    rights = command_inout("GetAccess", argin).extractString();
+                Iterable<String> addresses = HostInfo.getAddresses();
+                String[] array = new String[Iterables.size(addresses) + 2];
+                int i = 0;
+                array[i++] = user;
+                array[i++] = devName;
+                for (String address : addresses) {
+                    logger.debug(" Checking for : {}", address);
+                    array[i++] = address;
                 }
-                //	Check for user and host rights on specified device
-                dev_right_table.put(devName, rights);
-                if (rights.equals("write")) {
-                    return TangoConst.ACCESS_WRITE;
-                } else {
-                    return TangoConst.ACCESS_READ;
-                }
+
+                argin.insert(array);
+                rights = command_inout("GetAccessForMultiIP", argin).extractString();
             } catch (DevFailed e) {
-                if (e.errors[0].reason.equals("TangoApi_DEVICE_NOT_EXPORTED"))
-                    Except.re_throw_exception(e,
-                            "TangoApi_CANNOT_CHECK_ACCESS_CONTROL",
-                            "Cannot import Access Control device !",
-                            "AccessProxy.checkAccessControl()");
-                else if (muliIP && e.errors[0].reason.equals("API_CommandNotFound")) {
-                    System.err.println(e.errors[0].desc + "  -  TAC server is an old version");
-                    muliIP = false;
-                    return checkAccessControl(devName);
-                } else
-                    throw e;
+                switch (e.errors[0].reason) {
+                    case "TangoApi_DEVICE_NOT_EXPORTED":
+                        Except.re_throw_exception(e,
+                                "TangoApi_CANNOT_CHECK_ACCESS_CONTROL",
+                                "Cannot import Access Control device !",
+                                "AccessProxy.checkAccessControl()");
+                        break;
+                    case "API_CommandNotFound":
+                        logger.warn("{}  -  TAC server is an old version", e.errors[0].desc);
+                        argin.insert(new String[]{user, get_host_name(), devName});
+                        rights = command_inout("GetAccess", argin).extractString();
+                        break;
+                    default:
+                        throw e;
+                }
+            }
+            //	Check for user and host rights on specified device
+            dev_right_table.put(devName, rights);
+            if (rights.equals("write")) {
+                return TangoConst.ACCESS_WRITE;
+            } else {
+                return TangoConst.ACCESS_READ;
             }
         }
-        return TangoConst.ACCESS_READ;
     }
 
     //===============================================================
+
     /**
      * Check for specified device, the specified command is allowed.
      *
@@ -193,6 +186,7 @@ class AccessProxy extends DeviceProxy {
         return false;
     }
     //===============================================================
+
     /**
      * query access device to know allowed commands for the device and for a specified class
      *

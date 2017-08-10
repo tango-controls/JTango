@@ -24,9 +24,7 @@
  */
 package org.tango.orb;
 
-import java.net.UnknownHostException;
-import java.util.List;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jacorb.orb.ParsedIOR;
@@ -36,7 +34,8 @@ import org.omg.CORBA.ORB;
 import org.omg.ETF.Profile;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.net.UnknownHostException;
+import java.util.List;
 
 /**
  * Tool to dump an IOR String
