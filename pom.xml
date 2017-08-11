@@ -86,7 +86,7 @@
                     <releaseProfiles>release</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <localCheckout>true</localCheckout>
-                    <tagNameFormat>JTango-${project.version}</tagNameFormat>
+                    <tagNameFormat>JTango-@{project.version}</tagNameFormat>
                     <checkModificationExcludes>
                         <checkModificationExclude>release-pom.xml</checkModificationExclude>
                     </checkModificationExcludes>
