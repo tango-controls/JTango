@@ -88,7 +88,7 @@
                     <localCheckout>true</localCheckout>
                     <tagNameFormat>JTango-@{project.version}</tagNameFormat>
                     <checkModificationExcludes>
-                        <checkModificationExclude>release-pom.xml</checkModificationExclude>
+                        <checkModificationExclude>*/release-pom.xml</checkModificationExclude>
                     </checkModificationExcludes>
                 </configuration>
             </plugin>
