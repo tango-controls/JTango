@@ -1,3 +1,10 @@
+9.3.3
+-----
+
+  Fix DevDbExportInfo
+  Fix EventManager socket binding
+  Fix timestamp in AttributeValue.setValue()
+
 9.3.2
 -----
 
