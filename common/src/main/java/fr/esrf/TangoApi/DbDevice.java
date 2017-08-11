@@ -50,9 +50,10 @@ import java.util.List;
  *
  * @author verdier
  * @version $Revision: 26454 $
+ * @deprecated use {@link org.tango.client.database.Database}
  */
 
-
+@Deprecated
 public class DbDevice implements java.io.Serializable {
     /**
      * Database object used for TANGO database access.
@@ -129,12 +130,12 @@ public class DbDevice implements java.io.Serializable {
     /**
      * Update the export info for this device in the database.
      *
-     * @param devinfo Device information to export.
+     * @param deviceExportInfo Device information to export.
      */
     //==========================================================================
-    public void export_device(DbDevExportInfo devinfo)
+    public void export_device(DbDevExportInfo deviceExportInfo)
             throws DevFailed {
-        database.export_device(devinfo);
+        database.export_device(deviceExportInfo);
     }
     //==========================================================================
     /**

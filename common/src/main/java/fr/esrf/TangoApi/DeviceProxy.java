@@ -542,9 +542,12 @@ public class DeviceProxy extends Connection implements ApiDefs {
      * Update the export info for this device in the database.
      *
      * @param devinfo Device information to export.
+     * @deprecated use {@link org.tango.client.database.Database#exportDevice}
      */
     // ==========================================================================
+    @Deprecated
     public void export_device(DbDevExportInfo devinfo) throws DevFailed {
+        //TODO delegate to Database
         deviceProxyDAO.export_device(this, devinfo);
     }
 
@@ -938,6 +941,18 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ==========================================================================
 
     /**
+     * Update the attributes info for the specified device.
+     *
+     * @param attr the attributes info.
+     */
+    // ==========================================================================
+    public void set_attribute_info(AttributeInfo[] attr) throws DevFailed {
+        deviceProxyDAO.set_attribute_info(this, attr);
+    }
+
+    // ==========================================================================
+
+    /**
      * Get all attributes info for the specified device.
      *
      * @return all attributes info.
@@ -970,18 +985,6 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ==========================================================================
     public void set_attribute_config(AttributeInfo[] attr) throws DevFailed {
-        deviceProxyDAO.set_attribute_info(this, attr);
-    }
-
-    // ==========================================================================
-
-    /**
-     * Update the attributes info for the specified device.
-     *
-     * @param attr the attributes info.
-     */
-    // ==========================================================================
-    public void set_attribute_info(AttributeInfo[] attr) throws DevFailed {
         deviceProxyDAO.set_attribute_info(this, attr);
     }
 
@@ -1832,6 +1835,34 @@ public class DeviceProxy extends Connection implements ApiDefs {
 
     /**
      * Set device pipe configuration
+     *
+     * @param pipeInfo info containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(PipeInfo pipeInfo) throws DevFailed {
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(1);
+        infoList.add(pipeInfo);
+        setPipeConfig(infoList);
+    }
+    // ===================================================================
+
+    /**
+     * Set device pipe configuration
+     *
+     * @param pipeInfoList info list containing pipe name, description, label,....
+     * @throws DevFailed if device connection failed
+     */
+    // ===================================================================
+    public void setPipeConfig(PipeInfo[] pipeInfoList) throws DevFailed {
+        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(pipeInfoList.length);
+        Collections.addAll(infoList, pipeInfoList);
+        setPipeConfig(infoList);
+    }
+    // ===================================================================
+
+    /**
+     * Set device pipe configuration
      * @param pipeInfoList info list containing pipe name, description, label,....
      * @throws DevFailed if device connection failed
      */
@@ -1858,6 +1889,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
             return infoList.get(0);
     }
     // ===================================================================
+    // ===================================================================
 
     /**
      * Query device for pipe configuration list
@@ -1871,7 +1903,6 @@ public class DeviceProxy extends Connection implements ApiDefs {
         Collections.addAll(list, pipeNames);
         return getPipeConfig(list);
     }
-    // ===================================================================
 
     /**
      * Query device for pipe configuration list
@@ -1882,32 +1913,6 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public List<PipeInfo> getPipeConfig(List<String> pipeNames) throws DevFailed {
         return deviceProxyDAO.getPipeConfig(this, pipeNames);
-    }
-    // ===================================================================
-    // ===================================================================
-
-    /**
-     * Set device pipe configuration
-     * @param pipeInfo info containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
-     */
-    // ===================================================================
-    public void setPipeConfig(PipeInfo pipeInfo) throws DevFailed {
-        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(1);
-        infoList.add(pipeInfo);
-        setPipeConfig(infoList);
-    }
-
-    /**
-     * Set device pipe configuration
-     * @param pipeInfoList info list containing pipe name, description, label,....
-     * @throws DevFailed if device connection failed
-     */
-    // ===================================================================
-    public void setPipeConfig(PipeInfo[] pipeInfoList) throws DevFailed {
-        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(pipeInfoList.length);
-        Collections.addAll(infoList, pipeInfoList);
-        setPipeConfig(infoList);
     }
 
     /**

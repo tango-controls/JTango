@@ -459,12 +459,12 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
     // ==========================================================================
     /**
      * Update the export info for this device in the database.
-     * 
-     * @param devinfo Device information to export.
+     *
+     * @param deviceExportInfo Device information to export.
      */
     // ==========================================================================
     public void export_device(final DeviceProxy deviceProxy,
-                              final DbDevExportInfo devinfo) throws DevFailed {
+                              final DbDevExportInfo deviceExportInfo) throws DevFailed {
         checkIfTango(deviceProxy, "export_device");
         checkIfUseDb(deviceProxy, "export_device()");
 
@@ -472,7 +472,7 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
             deviceProxy.setDb_dev(new DbDevice(deviceProxy.devname, deviceProxy.url.host,
                 deviceProxy.url.strPort));
         }
-        deviceProxy.getDb_dev().export_device(devinfo);
+        deviceProxy.getDb_dev().export_device(deviceExportInfo);
     }
 
     // ==========================================================================

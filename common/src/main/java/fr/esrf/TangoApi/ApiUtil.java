@@ -62,6 +62,7 @@ import java.util.StringTokenizer;
  * @version $Revision: 28157 $
  */
 
+@Deprecated
 public class ApiUtil {
     //TODO replace with package.getImplementationVersion
     public static String revNumber =
