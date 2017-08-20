@@ -1,8 +1,8 @@
 site_name: JTango User Manual
 repo_url: https://github.com/tango-controls/JTango
 
-theme: null
-theme_dir: 'docs/_theme/tango-cs'
+theme: readthedocs
+#theme_dir: 'docs/_theme/tango-cs'
 
 pages:
 - Home: index.md
