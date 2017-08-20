@@ -1,0 +1,32 @@
+.page-header {
+    width:100%;
+    vertical-align: middle;
+    horizontal-align: middle;
+    font-family: sans-serif;
+    text-align: center;
+    padding: 10px;
+    color: rgb(30,25,28);
+}
+
+.page-header h1 {
+    font-family: sans-serif;
+    display:inline;
+    vertical-align:middle;
+    padding-right: 10px;
+    margin:auto;
+}
+
+.page-header img {
+    vertical-align:middle;
+    display:inline;
+    margin:auto;
+    width: 200px;
+    padding: 10px;
+}
+
+.page-header span {
+  display: inline-block;
+  vertical-align: middle;
+  horizontal-align: center;
+  line-height: normal;
+}

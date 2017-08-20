@@ -1,0 +1,14 @@
+div.documentwrapper {
+    /* float: left; */
+    width: 100%;
+    margin-right: 0;
+}
+
+div.bodywrapper {
+    margin: 0 0 0 0;
+}
+
+img {
+    max-width: calc(100% - 10px);
+    clear: both;
+}

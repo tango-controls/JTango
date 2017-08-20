@@ -1,0 +1,12 @@
+div.sphinxsidebarwrapper {
+    border: 1px solid rgb(1, 145, 47);
+    padding: 10px;
+    margin: 10px 15px 10px 0;
+    background-color: rgb(250,250,250);
+}
+
+div.sphinxsidebar {
+    float: right;
+    margin-left: -350px;
+    width: 350px;
+}
