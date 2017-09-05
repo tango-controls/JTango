@@ -24,14 +24,8 @@
  */
 package org.tango.server.servant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import fr.esrf.Tango.*;
 import net.sf.ehcache.CacheException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -54,21 +48,16 @@ import org.tango.server.idl.CleverAttrValUnion;
 import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.AttributeValue_5;
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.MultiDevFailed;
-import fr.esrf.Tango.NamedDevError;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public final class AttributeGetterSetter {
 
-    private static final String ATTRIBUTE = "Attribute ";
     public static final String DOES_NOT_EXIST = " does not exist";
+    private static final String ATTRIBUTE = "Attribute ";
     private static final XLogger XLOGGER = XLoggerFactory.getXLogger(AttributeGetterSetter.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(AttributeGetterSetter.class);
 
