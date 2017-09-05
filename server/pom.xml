@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.tango-controls</groupId>
@@ -15,32 +16,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<header>src/main/template/header.txt</header>
-					<excludes>
-						<exclude>**/*.txt</exclude>
-						<exclude>**/*.doc*</exclude>
-						<exclude>**/*.pdf</exclude>
-						<exclude>**/*.xml</exclude>
-						<exclude>**/*.html</exclude>
-						<exclude>**/package-info.java</exclude>
-					</excludes>
-					<strictCheck>true</strictCheck>
-					<properties>
-						<year>${project.inceptionYear}</year>
-					</properties>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
