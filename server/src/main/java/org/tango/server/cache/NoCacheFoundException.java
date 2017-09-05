@@ -1,11 +1,11 @@
 /**
  * Copyright (C) :     2017
  *
- * Synchrotron Soleil
- * L'Orme des merisiers
- * Saint Aubin
- * BP48
- * 91192 GIF-SUR-YVETTE CEDEX
+ *     Synchrotron Soleil
+ *     L'Orme des merisiers
+ *     Saint Aubin
+ *     BP48
+ *     91192 GIF-SUR-YVETTE CEDEX
  *
  * This file is part of Tango.
  *
