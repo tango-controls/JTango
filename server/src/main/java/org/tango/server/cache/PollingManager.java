@@ -195,6 +195,8 @@ public final class PollingManager {
                 } else {
                     DevFailedUtils.throwDevFailed(e.getCause());
                 }
+            } catch (final NoCacheFoundException e) {
+                DevFailedUtils.throwDevFailed(e);
             }
         } else {
             checkPolling(objectName, cmd);

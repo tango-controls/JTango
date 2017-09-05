@@ -28,7 +28,7 @@ package org.tango.server.cache;
  * @author ingvord
  * @since 05.09.17.
  */
-class NoCacheFoundException extends RuntimeException {
+class NoCacheFoundException extends Exception {
     NoCacheFoundException(String message) {
         super(message);
     }
