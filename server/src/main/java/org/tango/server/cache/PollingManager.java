@@ -24,16 +24,9 @@
  */
 package org.tango.server.cache;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import fr.esrf.Tango.DevFailed;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DatabaseFactory;
@@ -50,7 +43,12 @@ import org.tango.server.servant.CommandGetter;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Manage all polling stuff of a device
@@ -66,20 +64,16 @@ public final class PollingManager {
      * Manage tango polling
      */
     private final TangoCacheManager cacheManager;
-
-    private Map<String, Integer> pollAttributes = new HashMap<String, Integer>();
     private final Map<String, Integer> minCommandPolling;
     private final int minPolling;
     private final Map<String, Integer> minAttributePolling;
     private final Map<String, Integer> cmdPollRingDepth;
     private final Map<String, Integer> attrPollRingDepth;
-    private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
-
     private final String deviceName;
-
     private final List<AttributeImpl> attributeList;
-
     private final List<CommandImpl> commandList;
+    private Map<String, Integer> pollAttributes = new HashMap<String, Integer>();
+    private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
 
     public PollingManager(final String deviceName, final TangoCacheManager cacheManager,
             final List<AttributeImpl> attributeList, final List<CommandImpl> commandList, final int minPolling,
@@ -381,9 +375,20 @@ public final class PollingManager {
         return ret;
     }
 
+    /**
+     * @param att the attribute
+     * @return element or null
+     * @throws IllegalStateException TODO description
+     * @throws CacheException        TODO description
+     */
     public AttributeValue getAttributeCacheElement(final AttributeImpl att) throws CacheException {
-        final Element element = cacheManager.getAttributeCache(att).get(att.getName().toLowerCase(Locale.ENGLISH));
-        return (AttributeValue) element.getValue();
+        final Element element;
+        try {
+            element = cacheManager.getAttributeCache(att).get(att.getName().toLowerCase(Locale.ENGLISH));
+            return (AttributeValue) element.getValue();
+        } catch (NoCacheFoundException e) {
+            return null;
+        }
     }
 
     public void setPollRingDepth(final int pollRingDepth) {

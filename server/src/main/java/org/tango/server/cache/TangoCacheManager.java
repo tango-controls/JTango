@@ -24,23 +24,12 @@
  */
 package org.tango.server.cache;
 
-import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import javax.management.MBeanServer;
-
-import net.sf.ehcache.CacheException;
+import fr.esrf.Tango.DevFailed;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import net.sf.ehcache.management.ManagementService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.client.database.DatabaseFactory;
@@ -52,7 +41,14 @@ import org.tango.server.device.DeviceLocker;
 import org.tango.server.properties.PropertiesUtils;
 import org.tango.server.servant.DeviceImpl;
 
-import fr.esrf.Tango.DevFailed;
+import javax.management.MBeanServer;
+import java.lang.management.ManagementFactory;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Manage cache for attributes/commands of a Tango device
@@ -70,7 +66,13 @@ public final class TangoCacheManager {
 
     private static volatile ScheduledExecutorService POLLING_POOL = new ScheduledThreadPoolExecutor(POOL_SIZE,
             new TangoCacheThreadFactory());
-
+    /**
+     * Maintains the ordered list of polled device of the server
+     */
+    private static List<String> polledDevices = new LinkedList<String>();
+    private volatile static CacheManager MANAGER;
+    private static int poolSize = POOL_SIZE;
+    private static Map<String, TangoCacheManager> cacheList = new HashMap<String, TangoCacheManager>();
     private final Map<AttributeImpl, AttributeCache> attributeCacheMap = new HashMap<AttributeImpl, AttributeCache>();
     private final Map<CommandImpl, CommandCache> commandCacheMap = new HashMap<CommandImpl, CommandCache>();
     /**
@@ -78,24 +80,13 @@ public final class TangoCacheManager {
      */
     private final Map<AttributeImpl, AttributeCache> extTrigAttributeCacheMap = new HashMap<AttributeImpl, AttributeCache>();
     private final Map<CommandImpl, CommandCache> extTrigCommandCacheMap = new HashMap<CommandImpl, CommandCache>();
-    /**
-     * Maintains the ordered list of polled device of the server
-     */
-    private static List<String> polledDevices = new LinkedList<String>();
-
-    private StateStatusCache stateCache;
-    private StateStatusCache statusCache;
-
-    private volatile static CacheManager MANAGER;
     private final DeviceLocker deviceLock;
 
     private final String deviceName;
 
     private final AroundInvokeImpl aroundInvoke;
-
-    private static int poolSize = POOL_SIZE;
-
-    private static Map<String, TangoCacheManager> cacheList = new HashMap<String, TangoCacheManager>();
+    private StateStatusCache stateCache;
+    private StateStatusCache statusCache;
 
     public TangoCacheManager(final String deviceName, final DeviceLocker deviceLock, final AroundInvokeImpl aroundInvoke) {
         this.deviceLock = deviceLock;
@@ -126,22 +117,6 @@ public final class TangoCacheManager {
         if (POLLING_POOL != null) {
             POLLING_POOL.shutdownNow();
             POLLING_POOL = null;
-        }
-    }
-
-    /**
-     * Add the current device in polled list and persist it as device property of admin device. This property is not
-     * used. Just here to have the same behavior as C++ Tango API.
-     *
-     * @throws DevFailed
-     */
-    private void updatePoolConf() throws DevFailed {
-        if (!polledDevices.contains(deviceName)) {
-            polledDevices.add(deviceName);
-            final Map<String, String[]> properties = new HashMap<String, String[]>();
-            properties.put(POLLING_THREADS_POOL_CONF, polledDevices.toArray(new String[polledDevices.size()]));
-            DatabaseFactory.getDatabase().setDeviceProperties(ServerManager.getInstance().getAdminDeviceName(),
-                    properties);
         }
     }
 
@@ -179,6 +154,30 @@ public final class TangoCacheManager {
                 cache.start();
             }
             LOGGER.debug("polling pool size is {}", poolSize);
+        }
+    }
+
+    public static int getPoolSize() {
+        return poolSize;
+    }
+
+    public static List<String> getPolledDevices() {
+        return polledDevices;
+    }
+
+    /**
+     * Add the current device in polled list and persist it as device property of admin device. This property is not
+     * used. Just here to have the same behavior as C++ Tango API.
+     *
+     * @throws DevFailed
+     */
+    private void updatePoolConf() throws DevFailed {
+        if (!polledDevices.contains(deviceName)) {
+            polledDevices.add(deviceName);
+            final Map<String, String[]> properties = new HashMap<String, String[]>();
+            properties.put(POLLING_THREADS_POOL_CONF, polledDevices.toArray(new String[polledDevices.size()]));
+            DatabaseFactory.getDatabase().setDeviceProperties(ServerManager.getInstance().getAdminDeviceName(),
+                    properties);
         }
     }
 
@@ -390,23 +389,26 @@ public final class TangoCacheManager {
      * @param attr
      *            the attribute
      * @return the attribute cache
+     * @throws NoCacheFoundException if cache for the attribute is not found
      */
-    public synchronized SelfPopulatingCache getAttributeCache(final AttributeImpl attr) {
-        SelfPopulatingCache cache = null;
+    public synchronized SelfPopulatingCache getAttributeCache(final AttributeImpl attr) throws NoCacheFoundException {
         if (attr.getName().equalsIgnoreCase(DeviceImpl.STATE_NAME)) {
-            cache = stateCache.getCache();
+            return stateCache.getCache();
         } else if (attr.getName().equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            cache = statusCache.getCache();
+            return statusCache.getCache();
         } else {
-            AttributeCache attrCache = attributeCacheMap.get(attr);
-            if (attrCache == null) {
-                attrCache = extTrigAttributeCacheMap.get(attr);
-                if (attrCache == null)
-                    throw new CacheException("No cache found for " + attr.getName());
-            }
-            cache = attrCache.getCache();
+            return tryGetAttributeCache(attr);
         }
-        return cache;
+    }
+
+    private SelfPopulatingCache tryGetAttributeCache(final AttributeImpl attr) throws NoCacheFoundException {
+        AttributeCache attrCache = attributeCacheMap.get(attr);
+        if (attrCache == null) {
+            attrCache = extTrigAttributeCacheMap.get(attr);
+            if (attrCache == null)
+                throw new NoCacheFoundException("No cache found for " + attr.getName());
+        }
+        return attrCache.getCache();
     }
 
     /**
@@ -430,14 +432,6 @@ public final class TangoCacheManager {
             cache = cmdCache.getCache();
         }
         return cache;
-    }
-
-    public static int getPoolSize() {
-        return poolSize;
-    }
-
-    public static List<String> getPolledDevices() {
-        return polledDevices;
     }
 
 }
