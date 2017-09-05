@@ -95,7 +95,8 @@ public final class DynamicManager {
      * @throws DevFailed
      */
     public void addAttribute(final IAttributeBehavior behavior) throws DevFailed {
-        final String attributeName = behavior.getConfiguration().getName();
+        final AttributeConfiguration configuration = behavior.getConfiguration();
+        final String attributeName = configuration.getName();
         xlogger.entry("adding dynamic attribute {}", attributeName);
         if (behavior instanceof ForwardedAttribute) {
             // init attribute with either the attribute property value, or the value defined in its constructor
@@ -123,13 +124,12 @@ public final class DynamicManager {
             }
         } else {
             // set default properties
-            final AttributeConfiguration config = behavior.getConfiguration();
-            final AttributePropertiesImpl prop = config.getAttributeProperties();
+            final AttributePropertiesImpl prop = configuration.getAttributeProperties();
             if (prop.getLabel().isEmpty()) {
-                prop.setLabel(config.getName());
+                prop.setLabel(configuration.getName());
             }
             if (prop.getFormat().equals(Constants.NOT_SPECIFIED)) {
-                prop.setDefaultFormat(config.getScalarType());
+                prop.setDefaultFormat(configuration.getScalarType());
             }
         }
         final AttributeImpl attrImpl = new AttributeImpl(behavior, deviceImpl.getName());
@@ -137,6 +137,9 @@ public final class DynamicManager {
         deviceImpl.addAttribute(attrImpl);
         dynamicAttributes.put(attributeName.toLowerCase(Locale.ENGLISH), attrImpl);
         deviceImpl.pushInterfaceChangeEvent(false);
+        if (configuration.isPolled() && configuration.getPollingPeriod()>0) {
+            deviceImpl.addAttributePolling(attributeName, configuration.getPollingPeriod());
+        }
         xlogger.exit();
     }
 

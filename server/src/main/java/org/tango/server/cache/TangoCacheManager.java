@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.management.MBeanServer;
 
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
@@ -400,6 +401,8 @@ public final class TangoCacheManager {
             AttributeCache attrCache = attributeCacheMap.get(attr);
             if (attrCache == null) {
                 attrCache = extTrigAttributeCacheMap.get(attr);
+                if (attrCache == null)
+                    throw new CacheException("No cache found for " + attr.getName());
             }
             cache = attrCache.getCache();
         }

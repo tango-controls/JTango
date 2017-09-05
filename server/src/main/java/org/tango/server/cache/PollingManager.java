@@ -366,7 +366,7 @@ public final class PollingManager {
             final Element element = cacheManager.getCommandCache(cmd).get(cmd.getName().toLowerCase(Locale.ENGLISH));
             final Serializable cmdValue = element.getValue();
             if (cmdValue instanceof org.tango.server.attribute.AttributeValue) {
-                // state or status are returned as attributevalue
+                // state or status are returned as attribute value
                 ret = ((org.tango.server.attribute.AttributeValue) cmdValue).getValue();
             } else {
                 ret = element.getValue();

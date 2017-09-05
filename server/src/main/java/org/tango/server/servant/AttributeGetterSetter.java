@@ -231,6 +231,10 @@ public final class AttributeGetterSetter {
                 if (e.getCause() instanceof DevFailed) {
                     back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], AttrDataFormat.FMT_UNKNOWN, 0,
                             (DevFailed) e.getCause());
+                } else {
+                    back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
+                            att.getTangoType(),
+                            DevFailedUtils.newDevFailed("CACHE_ERROR", names[i] + " not available from cache"));
                 }
             }
             // aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
