@@ -1,3 +1,9 @@
+9.3.4
+-----
+
+  Fix NPE when cache is unavailable
+  Start polling on dynamic attribute
+
 9.3.3
 -----
 
