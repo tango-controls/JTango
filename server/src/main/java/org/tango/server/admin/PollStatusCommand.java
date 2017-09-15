@@ -72,27 +72,26 @@ public class PollStatusCommand implements Callable<String[]> {
 
         final DeviceImpl device = tryFindDeviceByName(deviceName);
 
-        addPolledStatus(result, device, device.getCommandList());
+        result.addAll(getPolledStatuses(device, device.getCommandList()));
 
-        addPolledStatus(result, device, device.getAttributeList());
+        result.addAll(getPolledStatuses(device, device.getAttributeList()));
 
         return result.toArray(new String[result.size()]);
     }
 
-    private void addPolledStatus(List<String> pollStatus, final DeviceImpl device, List<? extends IPollable> pollableList) {
+    private Collection<String> getPolledStatuses(final DeviceImpl device, List<? extends IPollable> pollableList) {
         Collection<? extends IPollable> polledCommands = Collections2.filter(pollableList, new Predicate<IPollable>() {
             @Override
             public boolean apply(IPollable pollable) {
                 return pollable.isPolled();
             }
         });
-        pollStatus.addAll(
-                Collections2.transform(polledCommands, new Function<IPollable, String>() {
+        return Collections2.transform(polledCommands, new Function<IPollable, String>() {
                     @Override
                     public String apply(IPollable pollable) {
-                        return buildPollingStatus(device, pollable).toString();
+                        return buildPollingStatus(device, pollable);
                     }
-                }));
+                });
     }
 
     private DeviceImpl tryFindDeviceByName(final String deviceName) throws DevFailed {
@@ -131,44 +130,50 @@ public class PollStatusCommand implements Callable<String[]> {
         return device.get();
     }
 
-    private StringBuilder buildPollingStatus(final DeviceImpl device, final IPollable pollable) {
+    private static final String POLL_STATUS_OUTPUT_TEMPLATE =
+            "Polled %s name = %s\n" +
+            "%s\n" + //Polling period (mS) = %d or external triggering
+            "Polling ring buffer depth = %d\n" +
+            "%s\n" +   //No data recorded yet
+            "%s"; //Last attribute read failed or status
+    private static final String LAST_RECORDED_DATA_STATUS_TEMPLATE =
+            "Time needed for the last attribute reading (mS) = %.1f\n" +
+            "Data not updated since %d mS\n" +
+            "Delta between last records (in mS) = %.1f";
+
+
+    //TODO extract to a class
+    private String buildPollingStatus(final DeviceImpl device, final IPollable pollable) {
+        if(pollable instanceof AttributeImpl)
+            return buildPollingStatus(
+                    "attribute",
+                    device.getAttributeHistorySize((AttributeImpl) pollable) > 0,
+                    pollable);
+        else if(pollable instanceof CommandImpl)
+            return buildPollingStatus(
+                    "command",
+                    device.getCommandHistorySize((CommandImpl) pollable) > 0,
+                    pollable);
+        else
+            throw new AssertionError("Can not happen: pollable must be either AttributeImpl or CommandImpl");
+    }
+
+    private String buildPollingStatus(String entity, final boolean hasRecordedData, final IPollable pollable) {
         // XXX WARN!!! The string table is parsed by jive.Do not change a letter
         // of
         // the result!
-        //TODO do we need special output formatter for jive?
-        final StringBuilder buf;
-        if (pollable instanceof AttributeImpl) {
-            buf = new StringBuilder("Polled attribute name = ");
-        } else {
-            buf = new StringBuilder("Polled command name = ");
-        }
-
-        buf.append(pollable.getName());
-        if (pollable.getPollingPeriod() == 0) {
-            buf.append("\nPolling externally triggered");
-        } else {
-            buf.append("\nPolling period (mS) = ");
-            buf.append(pollable.getPollingPeriod());
-        }
-        buf.append("\nPolling ring buffer depth = ");
-        buf.append(pollable.getPollRingDepth());
-        if (pollable instanceof AttributeImpl && device.getAttributeHistorySize((AttributeImpl) pollable) == 0) {
-            buf.append("\nNo data recorded yet");
-        }
-        if (pollable instanceof CommandImpl && device.getCommandHistorySize((CommandImpl) pollable) == 0) {
-            buf.append("\nNo data recorded yet");
-        }
-
-        if (!pollable.getLastDevFailed().isEmpty()) {
-            buf.append("\nLast attribute read FAILED :\n").append(pollable.getLastDevFailed());
-        } else {
-            buf.append("\nTime needed for the last attribute reading (mS) = ");
-            buf.append(pollable.getExecutionDuration());
-            buf.append("\nData not updated since ");
-            buf.append(System.currentTimeMillis() - (long) pollable.getLastUpdateTime());
-            buf.append(" mS\nDelta between last records (in mS) = ");
-            buf.append(pollable.getDeltaTime());
-        }
-        return buf;
+        return String.format(POLL_STATUS_OUTPUT_TEMPLATE, entity, pollable.getName(),
+                pollable.getPollingPeriod() == 0 ?
+                        "Polling externally triggered" :
+                        String.format("Polling period (mS) = %d", pollable.getPollingPeriod()),
+                pollable.getPollRingDepth(),
+                hasRecordedData ? "" : "No data recorded yet",
+                pollable.getLastDevFailed().isEmpty() ?
+                        String.format(LAST_RECORDED_DATA_STATUS_TEMPLATE,
+                                pollable.getExecutionDuration(),
+                                System.currentTimeMillis() - (long) pollable.getLastUpdateTime(),
+                                pollable.getDeltaTime()):
+                        String.format("Last attribute read FAILED :\n%s", pollable.getLastDevFailed())
+            );
     }
 }
