@@ -844,10 +844,12 @@ Str[n] = Property value n (array case)
      *         3.22 for "3.2.2" or 0.0 if zmq not available
      *
      * @return the TangORB version as a String
+     * @deprecated use ZMQ.getFullVersion or others
      */
     //===================================================================
+    @Deprecated
     public static double getZmqVersion() {
-        return apiutilDAO.getZmqVersion();
+        throw new UnsupportedOperationException("ApiUtil.getZmqVersion() is deprecated. Use ZMQ.getFullVersion or others");
     }
     //===================================================================
 
