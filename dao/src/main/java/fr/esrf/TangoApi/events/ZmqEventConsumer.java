@@ -141,6 +141,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                                boolean stateless)
             throws DevFailed {
         //	Set the event name;
+        //TODO replace with enum
         String event_name = eventNames[event];
         logger.trace("=============> subscribing for {}.{}", device.name(), event_name);
 
