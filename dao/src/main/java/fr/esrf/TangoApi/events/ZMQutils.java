@@ -37,6 +37,8 @@ import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.jacorb.orb.CDRInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
@@ -74,6 +76,7 @@ public class ZMQutils {
             "ZMQ_RELEASE_EVENT",
     };
     private static final int HWM_DEFAULT = 1000;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZMQutils.class);
     private static ZMQ.Context context = ZMQ.context(1);
     private static ZMQutils instance = null;
 
@@ -702,29 +705,26 @@ public class ZMQutils {
     }
 
     static void zmqEventTrace(String s) {
-        String env = System.getenv("ZmqTrace");
-        if (env != null && env.equals("true"))
-            System.out.println(s);
+        LOGGER.trace(s);
     }
 
     public static void trace(DevVarLongStringArray lsa) {
-        System.out.println("Svalue");
+        LOGGER.trace("Svalue");
         for (String s : lsa.svalue)
-            System.out.println("	" + s);
-        System.out.println("Lvalue");
+            LOGGER.trace(s);
+        LOGGER.trace("Lvalue");
         for (int i : lsa.lvalue)
-            System.out.println("	" + i);
+            LOGGER.trace(String.valueOf(i));
     }
 
     public static void dump(byte[] rec) {
         for (int i = 0; i < rec.length; i++) {
 
             String s = String.format("%02x", (0xFF & rec[i]));
-            System.out.print("0x" + s + " ");
+            LOGGER.trace("0x {} ", s);
             if (((i + 1) % 16) == 0)
-                System.out.println();
+                LOGGER.trace("\n");
         }
-        System.out.println();
     }
 
     /**
@@ -801,7 +801,7 @@ public class ZMQutils {
             try {
                 return Integer.parseInt(envValue);
             } catch (NumberFormatException e) {
-                System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
+                LOGGER.error("TANGO_EVENT_BUFFER_HWM value ", e);
             }
         }
         //  Check if has been set by client

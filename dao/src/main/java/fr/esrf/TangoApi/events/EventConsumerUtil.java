@@ -39,6 +39,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 
 import java.util.Hashtable;
@@ -50,6 +52,7 @@ import java.util.Hashtable;
  */
 public class EventConsumerUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventConsumerUtil.class);
     private static EventConsumerUtil    instance = null;
     private static boolean zmqTested = false;
     private static boolean zmqLoadable = true;
@@ -99,28 +102,25 @@ public class EventConsumerUtil {
          /*******************/
         if (!zmqTested) {
 
-			String	zmqEnable = System.getenv("ZMQ_DISABLE");
-			if (zmqEnable==null)
-				zmqEnable = System.getProperty("ZMQ_DISABLE");
+            String zmqEnable = System.getProperty("ZMQ_DISABLE", System.getenv("ZMQ_DISABLE"));
 
 			if (zmqEnable==null || !zmqEnable.equals("true")) {
             	try {
                 	ZMQutils.getInstance();
-                    System.out.println("====================== ZMQ (" + ZMQ.getFullVersion() +
-                            ") event system is available ============================");
-                } catch (java.lang.NoClassDefFoundError | java.lang.UnsatisfiedLinkError error) {
-                    System.err.println("======================================================================");
-                	System.err.println("  "+error);
-                	System.err.println("  Event system will be available only for notifd notification system ");
-                	System.err.println("======================================================================");
+                    LOGGER.info("====================== ZMQ ({}) event system is available ============================",
+            	ZMQ.getFullVersion());} catch (java.lang.NoClassDefFoundError |java.lang.UnsatisfiedLinkError error) {
+                    LOGGER.info("======================================================================");
+                	LOGGER.error(error.getMessage(),error);
+                	LOGGER.info("  Event system will be available only for notifd notification system ");
+                	LOGGER.info("======================================================================");
                 	zmqLoadable = false;
             	}
 			}
 			else {
-                System.err.println("======================================================================");
-                System.err.println("  ZMQ event system not enabled");
-                System.err.println("  Event system will be available only for notifd notification system ");
-                System.err.println("======================================================================");
+                LOGGER.info("======================================================================");
+                LOGGER.info("  ZMQ event system not enabled");
+                LOGGER.info("  Event system will be available only for notifd notification system ");
+                LOGGER.info("======================================================================");
                 zmqLoadable = false;
 			}
             zmqTested = true;
