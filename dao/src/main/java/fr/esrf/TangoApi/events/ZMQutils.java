@@ -44,6 +44,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This class is a set of ZMQ low level utilities
@@ -704,20 +705,12 @@ public class ZMQutils {
         return type;
     }
 
-    static void zmqEventTrace(String s) {
-        LOGGER.trace(s);
-    }
-
     public static void trace(DevVarLongStringArray lsa) {
-        LOGGER.trace("Svalue");
-        for (String s : lsa.svalue)
-            LOGGER.trace(s);
-        LOGGER.trace("Lvalue");
-        for (int i : lsa.lvalue)
-            LOGGER.trace(String.valueOf(i));
+        LOGGER.trace("Svalue:\n\t{}", Arrays.toString(lsa.svalue));
+        LOGGER.trace("Lvalue:\n\t{}", Arrays.toString(lsa.lvalue));
     }
 
-    public static void dump(byte[] rec) {
+    static void dump(byte[] rec) {
         for (int i = 0; i < rec.length; i++) {
 
             String s = String.format("%02x", (0xFF & rec[i]));
@@ -752,7 +745,7 @@ public class ZMQutils {
                 controlStructure.endPoint = getString(bytes, idx++);
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx);
-                zmqEventTrace(controlStructure.toString());
+                LOGGER.trace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_HEARTBEAT:
@@ -770,12 +763,12 @@ public class ZMQutils {
                 idx += sizeOfInt;
                 int hwm = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                controlStructure.hwm = manageHwmValue(hwm);
+                controlStructure.hwm = getHwmValue(hwm);
                 controlStructure.rate = getInteger(bytes, idx);
                 idx += sizeOfInt;
                 controlStructure.ivl = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                zmqEventTrace(controlStructure.toString());
+                LOGGER.trace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_EVENT:
@@ -793,15 +786,14 @@ public class ZMQutils {
         return controlStructure;
     }
 
-    private int manageHwmValue(int ctrlValue) {
-
+    private int getHwmValue(int defaultValue) {
         //  Check if environment value is set
         String envValue = System.getenv("TANGO_EVENT_BUFFER_HWM");
         if (envValue != null) {
             try {
                 return Integer.parseInt(envValue);
             } catch (NumberFormatException e) {
-                LOGGER.error("TANGO_EVENT_BUFFER_HWM value ", e);
+                LOGGER.warn("env.TANGO_EVENT_BUFFER_HWM value is not an integer number: {}", envValue);
             }
         }
         //  Check if has been set by client
@@ -809,7 +801,7 @@ public class ZMQutils {
             return ApiUtil.getEventBufferHWM();
 
         //  Else return default value from input
-        return ctrlValue;
+        return defaultValue;
     }
 
     /**

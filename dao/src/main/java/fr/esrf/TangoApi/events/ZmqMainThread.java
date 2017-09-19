@@ -410,7 +410,7 @@ public class ZmqMainThread extends Thread {
             //  Manage ZMQ counter (queue has reached HWM ?)
             boolean pushTheEvent =
                     manageEventCounter(callBackStruct, eventName, eventCounter);
-            ZMQutils.zmqEventTrace("ZMQ event from " + eventName);
+            logger.trace("ZMQ event from {}", eventName);
 
             //  Check if Value part is a DevFailed
             if (isExcept) {
