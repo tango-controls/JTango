@@ -252,7 +252,7 @@ public class ZMQutils {
         if (resp.length > 0) {
             throw DevFailedUtils.newDevFailed("API_InternalCommunicationError", new String(resp));
         }
-        ApiUtil.printTrace("---> Message sent");
+        LOGGER.trace("---> Message sent");
     }
 
     /**

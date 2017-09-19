@@ -739,19 +739,6 @@ Str[n] = Property value n (array case)
     }
 	//===============================================================
 
-	//===============================================================
-	//===============================================================
-    public static void printTrace(String str) {
-        String  trace = System.getenv("ApiTrace");
-        if (trace!=null) {
-            if (trace.equals("true")) {
-                System.out.println(str);
-            }
-        }
-
-    }
-    //===============================================================
-
     /**
      * Write a trace file (used to debug).
      * It is used to debug, it does not throw DevFailed

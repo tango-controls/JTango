@@ -64,6 +64,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<>();
     //  Alternate tango hosts
     static ArrayList<String>  possibleTangoHosts = new ArrayList<>();
+    private Logger logger = LoggerFactory.getLogger(EventConsumer.class);
 
     //===============================================================
     //===============================================================
@@ -311,10 +312,9 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceData argIn = new DeviceData();
         argIn.insert(info);
         String cmdName = getEventSubscriptionCommandName();
-        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
-                    cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
+        logger.trace("{}.command_inout({}) for {}/{}.{}", device.get_adm_dev().name(), cmdName, device_name, attribute, eventType);
         DeviceData argOut = device.get_adm_dev().command_inout(cmdName, argIn);
-        ApiUtil.printTrace("    command_inout done.");
+        logger.trace("    command_inout done.");
 
         //	And then connect to device
         checkDeviceConnection(device, attribute, argOut, eventType);
@@ -356,21 +356,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
         //	Set the event name;
         String event_name = eventNames[event];
-        ApiUtil.printTrace("=============> subscribing for " + device.name() +
-                ((attribute==null)? "" : "/" + attribute) + "." +event_name);
+        logger.trace("=============> subscribing for {}{}.{}", device.name(), (attribute == null) ? "" : "/" + attribute, event_name);
 
         //	Check if already connected
         checkIfAlreadyConnected(device, attribute, event_name, callback, max_size, stateless);
 
         //	if no callback (null), create EventQueue
-        if (callback == null && max_size >= 0) {
-            //	Check if already created (in case of reconnection stateless mode)
-            if (device.getEventQueue() == null)
-                if (max_size > 0)
-                    device.setEventQueue(new EventQueue(max_size));
-                else
-                    device.setEventQueue(new EventQueue());
-        }
+        createEventQueueIfRequired(device, callback, max_size);
 
         String deviceName = device.fullName();
         String callback_key = deviceName.toLowerCase();
@@ -395,10 +387,10 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 callback_key += "/" + attribute + "." + event_name;
 
             //	Inform server that we want to subscribe and try to connect
-            ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
+            logger.trace("calling callEventSubscriptionAndConnect() method");
             String  att = (attribute==null)? null : attribute.toLowerCase();
             callEventSubscriptionAndConnect(device, att, event_name);
-            ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
+            logger.trace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
             if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
@@ -480,6 +472,17 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             new PushAttrValueLater(new_event_callback_struct).start();
         }
         return evnt_id;
+    }
+
+    void createEventQueueIfRequired(DeviceProxy device, CallBack callback, int max_size) {
+        if (callback == null && max_size >= 0) {
+            //	Check if already created (in case of reconnection stateless mode)
+            if (device.getEventQueue() == null)
+                if (max_size > 0)
+                    device.setEventQueue(new EventQueue(max_size));
+                else
+                    device.setEventQueue(new EventQueue());
+        }
     }
 
     //===============================================================

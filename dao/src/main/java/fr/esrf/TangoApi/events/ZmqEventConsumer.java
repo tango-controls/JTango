@@ -146,14 +146,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         logger.trace("=============> subscribing for {}.{}", device.name(), event_name);
 
         //	if no callback (null), create EventQueue
-        if (callback == null && max_size >= 0) {
-            //	Check if already created (in case of reconnection stateless mode)
-            if (device.getEventQueue() == null)
-                if (max_size > 0)
-                    device.setEventQueue(new EventQueue(max_size));
-                else
-                    device.setEventQueue(new EventQueue());
-        }
+        createEventQueueIfRequired(device, callback, max_size);
 
         String deviceName = device.fullName();
         String callback_key = deviceName.toLowerCase();

@@ -36,11 +36,11 @@ package fr.esrf.TangoApi.events;
 
 
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
 import java.util.Hashtable;
@@ -220,7 +220,7 @@ public class EventConsumerUtil {
                                int max_size,
                                String[] filters,
                                boolean stateless) throws DevFailed {
-        ApiUtil.printTrace("trying to subscribe_event to " + device.name() + "/" + attribute);
+        LOGGER.trace("trying to subscribe_event to {}/{}", device.name(), attribute);
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
@@ -238,7 +238,7 @@ public class EventConsumerUtil {
                         attribute, event, callback, max_size, filters, stateless);
             }
             catch (DevFailed e) {
-                ApiUtil.printTrace(e.errors[0].desc);
+                DevFailedUtils.logDevFailed(e, LOGGER);
                 if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                     //  If not a ZMQ server, try on notifd system.
                     id = subscribeEventWithNotifd(device, attribute,
@@ -275,7 +275,7 @@ public class EventConsumerUtil {
                                CallBack callback,
                                int max_size,
                                boolean stateless) throws DevFailed {
-        ApiUtil.printTrace("INTERFACE_CHANGE: trying to subscribe_event to " + device.name());
+        LOGGER.trace("INTERFACE_CHANGE: trying to subscribe_event to {}", device.name());
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
@@ -315,7 +315,7 @@ public class EventConsumerUtil {
         int id;
         id = NotifdEventConsumer.getInstance().subscribe_event(device,
                 attribute, event, callback, max_size, filters, stateless);
-        ApiUtil.printTrace(device.name() + "/" + attribute + "  connected to Notifd event system");
+        LOGGER.trace("{}/{} connected to Notifd event system", device.name(), attribute);
         return id;
     }
     //===============================================================

@@ -159,16 +159,15 @@ public class ZmqMainThread extends Thread {
                 //  read the speaking one
                 for (int i = 0; i < pollers.getSize(); i++) {
                     if (pollers.pollin(i)) {
+                        //TODO process in a worker thread
                         manageInputBuffer(i);
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } catch (Error e) {
-                e.printStackTrace();
+            } catch (Exception | Error e) {
+                logger.warn(e.getMessage(), e);
             }
         }
-        ApiUtil.printTrace("------------ End of ZmqMainThread ---------------");
+        logger.trace("------------ End of ZmqMainThread ---------------");
     }
     //===============================================================
 
@@ -643,7 +642,7 @@ public class ZmqMainThread extends Thread {
 
         ZMQutils.ControlStructure
                 controlStructure = ZMQutils.getInstance().decodeControlBuffer(messageBytes);
-        ApiUtil.printTrace("From Control:\n" + controlStructure);
+        logger.trace("From Control:\n{}", controlStructure);
         switch (controlStructure.commandCode) {
             case ZMQutils.ZMQ_END:
                 stop = true;
