@@ -37,11 +37,14 @@ import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.jacorb.orb.CDRInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This class is a set of ZMQ low level utilities
@@ -74,6 +77,7 @@ public class ZMQutils {
             "ZMQ_RELEASE_EVENT",
     };
     private static final int HWM_DEFAULT = 1000;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZMQutils.class);
     private static ZMQ.Context context = ZMQ.context(1);
     private static ZMQutils instance = null;
 
@@ -249,7 +253,7 @@ public class ZMQutils {
         if (resp.length > 0) {
             throw DevFailedUtils.newDevFailed("API_InternalCommunicationError", new String(resp));
         }
-        ApiUtil.printTrace("---> Message sent");
+        LOGGER.trace("---> Message sent");
     }
 
     /**
@@ -701,30 +705,19 @@ public class ZMQutils {
         return type;
     }
 
-    static void zmqEventTrace(String s) {
-        String env = System.getenv("ZmqTrace");
-        if (env != null && env.equals("true"))
-            System.out.println(s);
-    }
-
     public static void trace(DevVarLongStringArray lsa) {
-        System.out.println("Svalue");
-        for (String s : lsa.svalue)
-            System.out.println("	" + s);
-        System.out.println("Lvalue");
-        for (int i : lsa.lvalue)
-            System.out.println("	" + i);
+        LOGGER.trace("Svalue:\n\t{}", Arrays.toString(lsa.svalue));
+        LOGGER.trace("Lvalue:\n\t{}", Arrays.toString(lsa.lvalue));
     }
 
-    public static void dump(byte[] rec) {
+    static void dump(byte[] rec) {
         for (int i = 0; i < rec.length; i++) {
 
             String s = String.format("%02x", (0xFF & rec[i]));
-            System.out.print("0x" + s + " ");
+            LOGGER.trace("0x {} ", s);
             if (((i + 1) % 16) == 0)
-                System.out.println();
+                LOGGER.trace("\n");
         }
-        System.out.println();
     }
 
     /**
@@ -752,7 +745,7 @@ public class ZMQutils {
                 controlStructure.endPoint = getString(bytes, idx++);
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx);
-                zmqEventTrace(controlStructure.toString());
+                LOGGER.trace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_HEARTBEAT:
@@ -770,12 +763,12 @@ public class ZMQutils {
                 idx += sizeOfInt;
                 int hwm = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                controlStructure.hwm = manageHwmValue(hwm);
+                controlStructure.hwm = getHwmValue(hwm);
                 controlStructure.rate = getInteger(bytes, idx);
                 idx += sizeOfInt;
                 controlStructure.ivl = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                zmqEventTrace(controlStructure.toString());
+                LOGGER.trace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_EVENT:
@@ -793,15 +786,14 @@ public class ZMQutils {
         return controlStructure;
     }
 
-    private int manageHwmValue(int ctrlValue) {
-
+    private int getHwmValue(int defaultValue) {
         //  Check if environment value is set
         String envValue = System.getenv("TANGO_EVENT_BUFFER_HWM");
         if (envValue != null) {
             try {
                 return Integer.parseInt(envValue);
             } catch (NumberFormatException e) {
-                System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
+                LOGGER.warn("env.TANGO_EVENT_BUFFER_HWM value is not an integer number: {}", envValue);
             }
         }
         //  Check if has been set by client
@@ -809,7 +801,7 @@ public class ZMQutils {
             return ApiUtil.getEventBufferHWM();
 
         //  Else return default value from input
-        return ctrlValue;
+        return defaultValue;
     }
 
     /**
