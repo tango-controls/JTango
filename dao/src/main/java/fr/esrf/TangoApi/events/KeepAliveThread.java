@@ -71,6 +71,25 @@ class KeepAliveThread extends Thread implements TangoConst {
 
     //===============================================================
     //===============================================================
+    static KeepAliveThread getInstance() {
+        if (instance == null) {
+            instance = new KeepAliveThread();
+            instance.start();
+        }
+        return instance;
+    }
+
+    //===============================================================
+    //===============================================================
+    static boolean heartbeatHasBeenSkipped(EventChannelStruct eventChannelStruct) {
+        long now = System.currentTimeMillis();
+        //System.out.println(now + "-" + eventChannelStruct.last_heartbeat + "=" +
+        //        (now - eventChannelStruct.last_heartbeat));
+        return ((now - eventChannelStruct.last_heartbeat) > EVENT_HEARTBEAT_PERIOD);
+    }
+
+    //===============================================================
+    //===============================================================
     public void run() {
 
         while (!stop) {
@@ -93,15 +112,17 @@ class KeepAliveThread extends Thread implements TangoConst {
             waitNextLoop(msToSleep);
         }
     }
+
     //===============================================================
     //===============================================================
     private synchronized void waitNextLoop(long ms) {
         try {
             wait(ms);
         } catch (InterruptedException e) {
-            System.err.println(e);
+            Thread.currentThread().interrupt();
         }
     }
+
     //===============================================================
     //===============================================================
     synchronized void stopThread() {
@@ -112,26 +133,6 @@ class KeepAliveThread extends Thread implements TangoConst {
     }
     //===============================================================
     //===============================================================
-    static KeepAliveThread getInstance() {
-        if (instance==null) {
-            instance = new KeepAliveThread();
-            instance.start();
-        }
-        return instance;
-    }
-    //===============================================================
-    //===============================================================
-    static boolean heartbeatHasBeenSkipped(EventChannelStruct eventChannelStruct) {
-        long now = System.currentTimeMillis();
-        //System.out.println(now + "-" + eventChannelStruct.last_heartbeat + "=" +
-        //        (now - eventChannelStruct.last_heartbeat));
-        return ((now - eventChannelStruct.last_heartbeat) > EVENT_HEARTBEAT_PERIOD);
-    }
-    //===============================================================
-    //===============================================================
-
-
-
 
     //===============================================================
     //===============================================================
