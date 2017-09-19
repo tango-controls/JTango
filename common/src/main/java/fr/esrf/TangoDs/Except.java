@@ -78,9 +78,9 @@ import org.omg.CORBA.SystemException;
  * description :	This class is a container for all exceptions related
  *			methods to be used in aa Tango device server/client.
  *			Most of these methods are static.
+ *        @deprecated use DevFailedUtils instead
  */
-
-@SuppressWarnings("UnusedDeclaration")
+@Deprecated
 public class Except implements TangoConst, java.io.Serializable {
 
 

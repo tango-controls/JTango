@@ -1,16 +1,16 @@
 package org.tango.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.ErrSeverity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public final class DevFailedUtils {
+    public static final String TANGO_BUILD_FAILED = "TANGO_BUILD_FAILED";
     private static final String TANGO_ERROR = "TANGO_ERROR";
     private static final Logger LOGGER = LoggerFactory.getLogger(DevFailedUtils.class);
 
@@ -145,5 +145,10 @@ public final class DevFailedUtils {
         System.err.println(toString(e));
     }
 
-    public static final String TANGO_BUILD_FAILED = "TANGO_BUILD_FAILED";
+    public static DevFailed newDevFailed(String reason, String desc, Exception cause) {
+        final DevFailed e = new DevFailed(reason, buildDevError(cause.getClass().getSimpleName(), cause.getMessage(), 3));
+        LOGGER.error("{}, {}", reason, desc);
+        LOGGER.error(cause.getMessage(), cause);
+        return e;
+    }
 }
