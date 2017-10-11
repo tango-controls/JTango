@@ -1174,6 +1174,17 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     // ===================================================================
     public void writePipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
+    // ===================================================================
+    /**
+     * Write data in specified pipe
+     * @param deviceProxy device proxy object
+     * @param devicePipe data to be written
+	 * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe writeReadPipe(DeviceProxy deviceProxy, DevicePipe devicePipe) throws DevFailed;
+
 
 
 

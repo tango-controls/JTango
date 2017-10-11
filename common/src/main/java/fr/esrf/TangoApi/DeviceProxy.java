@@ -1949,8 +1949,36 @@ public class DeviceProxy extends Connection implements ApiDefs {
     public void writePipe(DevicePipe devicePipe) throws DevFailed {
         deviceProxyDAO.writePipe(this, devicePipe);
     }
-    // ==========================================================================
+    // ===================================================================
+    /**
+     * Write and Read data in specified pipe
+     * @param pipeName pipe name
+     * @param pipeBlob data to be written
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe writeReadPipe(String pipeName, PipeBlob pipeBlob) throws DevFailed {
+        return writeReadPipe(new DevicePipe(pipeName, pipeBlob));
+    }
+    // ===================================================================
+    /**
+     * Write and Read data in specified pipe
+     * @param devicePipe data to be written (contains the pipe name)
+     * @return data read from specified pipe.
+     * @throws DevFailed in case of device connection failed or pipe not found.
+     */
+    // ===================================================================
+    public DevicePipe writeReadPipe(DevicePipe devicePipe) throws DevFailed {
+        return deviceProxyDAO.writeReadPipe(this, devicePipe);
+    }
+    // ===================================================================
+    // ===================================================================
 
+
+
+    // ==========================================================================
+    // ==========================================================================
     private boolean useEvents() {
         if (!useEventsChecked) {
             String s = System.getenv("UseEvents");
