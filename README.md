@@ -13,15 +13,14 @@
 
 [![Lines Of Code](https://sonarcloud.io/api/badges/gate?key=org.tango-controls:JTango-root)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=ncloc)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=ncloc)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=coverage)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=coverage)
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=sqale_debt_ratio)
-
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=bugs)
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=vulnerabilities)
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=code_smells)
-![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=duplicated_lines_density)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=bugs)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
 # JTango
 
