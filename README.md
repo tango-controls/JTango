@@ -6,7 +6,8 @@
 [![Documentation Status](https://readthedocs.org/projects/jtango/badge/?version=latest)](http://jtango.readthedocs.io/en/latest/?badge=latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
 
-[![Download](https://api.bintray.com/packages/tango-controls/maven/JTango/images/download.svg) ](https://bintray.com/tango-controls/maven/JTango/_latestVersion)
+[![Download](https://api.bintray.com/packages/tango-controls/generic/JTango/images/download.svg) ](https://bintray.com/tango-controls/generic/JTango/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tango-controls/jtango/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.tango-controls/jtango)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/master/LICENSE)
 
 ## SonarCloud
