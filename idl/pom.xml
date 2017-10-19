@@ -1,25 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.tango-controls</groupId>
-		<artifactId>JTangoParent</artifactId>
-		<version>9.3.7-SNAPSHOT</version>
-		<relativePath>../parent/pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.tango-controls</groupId>
+        <artifactId>JTangoParent</artifactId>
+        <version>9.3.7-SNAPSHOT</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
 
 
-	<artifactId>JavaTangoIDL</artifactId>
-	<description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
-	<inceptionYear>2004</inceptionYear>
+    <artifactId>JavaTangoIDL</artifactId>
+    <description>Java Tango IDL (compiled with jacorb IDL compiler, http://www.jacorb.org)</description>
+    <inceptionYear>2004</inceptionYear>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jacorb</groupId>
-			<artifactId>jacorb-omgapi</artifactId>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.jacorb</groupId>
+            <artifactId>jacorb-omgapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jacorb</groupId>
+            <artifactId>jacorb-idl-compiler</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
-	<!-- TODO generate java from idl on generate-source -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-tango-idl</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.tango-controls</groupId>
+                                    <artifactId>tango-idl</artifactId>
+                                    <version>5</version>
+                                    <type>jar</type>
+                                    <includes>tango.idl</includes>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>idlj-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <executions>
+                    <execution>
+                        <id>compile-tango-idl</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <debug>true</debug>
+                            <compiler>jacorb</compiler>
+                            <sources>
+                                <source>
+                                    <additionalArguments>
+                                        <additionalArgument>-nofinal</additionalArgument>
+                                    </additionalArguments>
+                                    <packagePrefix>fr.esrf</packagePrefix>
+                                    <includes>
+                                        <include>tango.idl</include>
+                                    </includes>
+                                    <emitStubs>true</emitStubs>
+                                    <emitSkeletons>true</emitSkeletons>
+                                </source>
+                            </sources>
+                            <sourceDirectory>${project.build.directory}</sourceDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

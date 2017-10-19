@@ -54,6 +54,11 @@
         <dependencies>
             <dependency>
                 <groupId>org.jacorb</groupId>
+                <artifactId>jacorb-idl-compiler</artifactId>
+                <version>${jacorb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-omgapi</artifactId>
                 <version>${jacorb.version}</version>
             </dependency>
