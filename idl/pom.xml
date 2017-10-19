@@ -70,6 +70,9 @@
                             <compiler>jacorb</compiler>
                             <sources>
                                 <source>
+                                    <additionalArguments>
+                                        <additionalArgument>-nofinal</additionalArgument>
+                                    </additionalArguments>
                                     <packagePrefix>fr.esrf</packagePrefix>
                                     <includes>
                                         <include>tango.idl</include>
