@@ -89,70 +89,7 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <includeScope>compile</includeScope>
-                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>attached</goal>
-                                </goals>
-                                <configuration>
-                                    <finalName>JTango-${project.version}</finalName>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                                    </descriptors>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <finalName>JTango-${project.version}</finalName>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <!-- <shadedClassifierName>all</shadedClassifierName> -->
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.tango-controls</groupId>
