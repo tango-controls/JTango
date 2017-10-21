@@ -29,6 +29,7 @@
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoClientLang.svg?label=JTangoClientLang&color=blue)](http://javadoc.io/doc/org.tango-controls/JTangoClientLang)
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoCommons.svg?color=yellow&label=JTangoCommons)](http://javadoc.io/doc/org.tango-controls/JTangoCommons)
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/TangORB.svg?color=orange&label=TangORB)](http://javadoc.io/doc/org.tango-controls/TangORB)
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/JavaTangoIDL.svg?color=lightgrey&label=JavaTangoIDL)](http://javadoc.io/doc/org.tango-controls/JavaTangoIDL)
 
 # JTango
 
