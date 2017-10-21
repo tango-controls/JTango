@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.3.11-SNAPSHOT</version>
+        <version>10.0.0-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -73,6 +73,7 @@
 
     <properties>
         <shaded.outputFile>${project.build.directory}/JTango-${project.version}.jar</shaded.outputFile>
+        <sonar.skip>true</sonar.skip>
     </properties>
 
     <dependencies>
