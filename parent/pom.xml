@@ -281,7 +281,8 @@
             <id>travis</id>
             <properties>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-                <sonar.projectKey>org.tango-controls:jtango-9-lts</sonar.projectKey>
+                <sonar.organization>tango-controls</sonar.organization>
+                <sonar.branch>jtango-9-lts</sonar.branch>
                 <sonar.login>${env.SONAR_TOKEN}</sonar.login>
             </properties>
             <build>

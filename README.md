@@ -2,7 +2,7 @@
 
 
 
-[![Build Status](https://travis-ci.org/tango-controls/JTango.svg??branch=jtango-9-lts)](https://travis-ci.org/tango-controls/JTango)
+[![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=jtango-9-lts)](https://travis-ci.org/tango-controls/JTango)
 [![Documentation Status](https://readthedocs.org/projects/jtango/badge/?version=jtango-9-lts)](http://jtango.readthedocs.io/en/jtango-9-lts/?badge=jtango-9-lts)
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
 
@@ -11,16 +11,16 @@
 
 ## SonarCloud
 
-[![Lines Of Code](https://sonarcloud.io/api/badges/gate?key=org.tango-controls:jtango-9-lts)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Lines Of Code](https://sonarcloud.io/api/badges/gate?key=org.tango-controls:JTango-root:jtango-9-lts)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
 
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=ncloc)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=coverage)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=ncloc)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=coverage)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
 
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=bugs)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
-[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:jtango-9-lts&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=org.tango-controls%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=bugs)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
 
 # JTango
 

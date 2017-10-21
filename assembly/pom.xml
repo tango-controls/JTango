@@ -73,6 +73,7 @@
 
     <properties>
         <shaded.outputFile>${project.build.directory}/JTango-${project.version}.jar</shaded.outputFile>
+        <sonar.skip>true</sonar.skip>
     </properties>
 
     <dependencies>
