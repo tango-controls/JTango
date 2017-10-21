@@ -37,6 +37,8 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.events.EventConsumerUtil;
+import fr.esrf.TangoApi.events.ZMQutils;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.jacorb.orb.Delegate;
@@ -765,5 +767,16 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
         }
         return new String[] { host, strport };
     }
+    // ===================================================================
+    // ===================================================================
+    public double getZmqVersion() {
+        if (EventConsumerUtil.isZmqLoadable()) {
+            return ZMQutils.getZmqVersion();
+        }
+        else
+            return -1.0;
+    }
+    // ===================================================================
+    // ===================================================================
 }
 
