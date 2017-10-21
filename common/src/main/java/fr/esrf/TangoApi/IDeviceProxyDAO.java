@@ -221,10 +221,10 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 	//==========================================================================
 	/**
 	 *	Update the export info for this device in the database.
-	 * @param deviceExportInfo    Device information to export.
+	 *	@param devinfo	Device information to export.
 	 */
 	//==========================================================================
-	public abstract void export_device(DeviceProxy deviceProxy, DbDevExportInfo deviceExportInfo) throws DevFailed;
+	public abstract void export_device(DeviceProxy deviceProxy, DbDevExportInfo devinfo) throws DevFailed;
 
 	//==========================================================================
 	/**

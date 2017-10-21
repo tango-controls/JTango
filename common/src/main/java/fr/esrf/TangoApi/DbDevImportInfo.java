@@ -44,10 +44,9 @@ import fr.esrf.Tango.DevVarLongStringArray;
  *
  * @author verdier
  * @version $Revision: 25296 $
- * @deprecated use {@link org.tango.client.database.DeviceImportInfo}
  */
 
-@Deprecated
+
 public class DbDevImportInfo implements java.io.Serializable {
     /**
      * The devivce name.

@@ -40,7 +40,6 @@ import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.TangoApi.events.DbEventImportInfo;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import org.tango.client.database.DeviceExportInfo;
 
 import java.util.*;
 
@@ -59,10 +58,8 @@ import java.util.*;
  *
  * @author verdier
  * @version $Revision: 30265 $
- * @deprecated use {@link org.tango.client.database.Database}
  */
 
-@Deprecated
 public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements IDatabaseDAO {
 
     //===================================================================
@@ -516,11 +513,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_device(fr.esrf.TangoApi.DbDevExportInfo)
 	 */
     //==========================================================================
-    public void export_device(Database database, DeviceExportInfo deviceExportInfo)
+    public void export_device(Database database, DbDevExportInfo devinfo)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        String[] array = deviceExportInfo.toStringArray();
+        String[] array = devinfo.toStringArray();
         DeviceData argin = new DeviceData();
         argin.insert(array);
         command_inout(database, "DbExportDevice", argin);
@@ -667,16 +664,16 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_server(fr.esrf.TangoApi.DbDevExportInfo[])
 	 */
     //==========================================================================
-    public void export_server(Database database, DeviceExportInfo[] deviceExportInfos)
+    public void export_server(Database database, DbDevExportInfo[] devinfo)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Convert data from DbDevInfos to a string array
         //----------------------------------------------
         String[] array;
-        array = new String[6 * deviceExportInfos.length];
-        for (int i = 0; i < deviceExportInfos.length; i++) {
-            String[] one = deviceExportInfos[i].toStringArray();
+        array = new String[6 * devinfo.length];
+        for (int i = 0 ; i<devinfo.length ; i++) {
+            String[] one = devinfo[i].toStringArray();
             System.arraycopy(one, 0, array, 6 * i, 6);
         }
 
