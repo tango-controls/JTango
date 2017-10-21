@@ -7,7 +7,7 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba/badge.svg)](https://www.versioneye.com/user/projects/592bf58aa8a056006137f4ba)
 
 [![Download](https://api.bintray.com/packages/tango-controls/generic/JTango-9-LTS/images/download.svg) ](https://bintray.com/tango-controls/generic/JTango-9-LTS/_latestVersion)
-[![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/jtango-9-lts/LICENSE)
 
 ## SonarCloud
 
