@@ -24,8 +24,6 @@
  */
 package org.tango.server.events;
 
-import org.zeromq.ZMQ;
-
 /**
  * defines constants to manage ZMQ events
  * 
@@ -42,7 +40,7 @@ interface EventConstants {
 
     // Miscellaneous releases
     static final int TANGO_RELEASE = 900;
-    static final int ZMQ_RELEASE = ZMQ.getFullVersion();
+    static final int ZMQ_RELEASE = (int) (100.0 * EventUtilities.getZmqVersion());
 
     // Time to manage events
     static final long EVENT_RESUBSCRIBE_PERIOD = 600000;
