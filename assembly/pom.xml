@@ -150,7 +150,7 @@
                                         </argument>
                                         <argument>-u${bintray.user.name}:${bintray.user.apikey}</argument>
                                         <argument>
-                                            https://api.bintray.com/content/tango-controls/generic/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar
+                                            https://api.bintray.com/content/tango-controls/generic/JTango-9-LTS/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
                                         </argument>
                                         <argument>--verbose</argument>
                                     </arguments>
