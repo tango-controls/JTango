@@ -43,11 +43,19 @@ import org.zeromq.ZMQ;
 
 import java.util.Hashtable;
 
+
 /**
- * A class to manage NotifdEventConsumer and ZmqEventConsumer instances
- *
  * @author pascal_verdier
  */
+
+
+
+
+//===============================================================
+/**
+ * A class to manage NotifdEventConsumer and ZmqEventConsumer instances
+ */
+//===============================================================
 public class EventConsumerUtil {
 
     private static EventConsumerUtil    instance = null;
@@ -108,7 +116,13 @@ public class EventConsumerUtil {
                 	ZMQutils.getInstance();
                     System.out.println("====================== ZMQ (" + ZMQ.getFullVersion() +
                             ") event system is available ============================");
-                } catch (java.lang.NoClassDefFoundError | java.lang.UnsatisfiedLinkError error) {
+            	} catch (java.lang.NoClassDefFoundError error) {
+                    System.err.println("======================================================================");
+                	System.err.println("  "+error);
+                	System.err.println("  Event system will be available only for notifd notification system ");
+                	System.err.println("======================================================================");
+                	zmqLoadable = false;
+            	} catch (java.lang.UnsatisfiedLinkError error) {
                     System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
