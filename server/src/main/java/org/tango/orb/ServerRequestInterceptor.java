@@ -44,22 +44,20 @@ import java.net.Socket;
 public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject implements
         org.omg.PortableInterceptor.ServerRequestInterceptor {
     private static final String GIOP_TCP = "giop:tcp:";
+
+    private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
+
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
-    private final Logger logger = LoggerFactory.getLogger(ServerRequestInterceptor.class);
     private final ThreadLocal<String> clientHostName = new ThreadLocal<String>();
     private volatile ThreadLocal<String> giopHostAddress = new ThreadLocal<String>();
     private volatile ThreadLocal<String> clientIPAddress = new ThreadLocal<String>();
+    private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
 
     private ServerRequestInterceptor() {
 
-    }
-
-    public static ServerRequestInterceptor getInstance() {
-        return INSTANCE;
     }
 
     @Override
@@ -133,6 +131,10 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
 
     public String getGiopHostAddress() {
         return giopHostAddress.get();
+    }
+
+    public static ServerRequestInterceptor getInstance() {
+        return INSTANCE;
     }
 
 }

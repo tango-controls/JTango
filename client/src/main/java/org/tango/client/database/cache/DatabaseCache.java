@@ -23,11 +23,12 @@ import java.util.regex.Pattern;
 public final class DatabaseCache implements ICachableDatabase {
     private static final String RELEASE_1_X = "release 1\\.[7-9]";
     private final Logger logger = LoggerFactory.getLogger(ServerCache.class);
+    private ServerCache serverCache;
+
+    private boolean isCacheAvailable;
     private final NoCacheDatabase dbDevice;
     private final String version;
     private final Connection database;
-    private ServerCache serverCache;
-    private boolean isCacheAvailable;
 
     public DatabaseCache(final Connection database, final NoCacheDatabase dbDevice) throws DevFailed {
         this.dbDevice = dbDevice;

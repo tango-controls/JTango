@@ -50,6 +50,9 @@ import java.util.concurrent.ThreadFactory;
  */
 public final class ORBManager {
 
+    private static final String INIT_ERROR = "INIT_ERROR";
+    private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ORBManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ORBManager.class);
     /**
      * POA for no db device
      */
@@ -62,9 +65,6 @@ public final class ORBManager {
      * A jacorb system property for IP address on multi-homed host
      */
     public static final String OAI_ADDR = System.getProperty("OAIAddr");
-    private static final String INIT_ERROR = "INIT_ERROR";
-    private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ORBManager.class);
-    private static final Logger LOGGER = LoggerFactory.getLogger(ORBManager.class);
     private static ORB orb;
     private static POA poa;
     private static ExecutorService orbStart;
@@ -349,6 +349,14 @@ public final class ORBManager {
         LOGGER.debug("ORB started");
     }
 
+    private static class StartTask implements Callable<Void> {
+        @Override
+        public Void call() {
+            ORBManager.start();
+            return null;
+        }
+    }
+
     /**
      * Check if the checkORBgiopMaxMsgSize has been set. This environment
      * variable should be set in Mega bytes.
@@ -440,14 +448,6 @@ public final class ORBManager {
         if (orb != null) {
             orb.shutdown(true);
             LOGGER.debug("ORB shutdown");
-        }
-    }
-
-    private static class StartTask implements Callable<Void> {
-        @Override
-        public Void call() {
-            ORBManager.start();
-            return null;
         }
     }
 

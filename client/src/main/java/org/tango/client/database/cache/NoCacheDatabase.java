@@ -16,6 +16,10 @@ public final class NoCacheDatabase implements ICachableDatabase {
 
     private final fr.esrf.TangoApi.Database database;
 
+    private enum PropertyType {
+        Class, Device;
+    }
+
     /**
      * Ctr
      *
@@ -501,9 +505,5 @@ public final class NoCacheDatabase implements ICachableDatabase {
             }
         }
         return args;
-    }
-
-    private enum PropertyType {
-        Class, Device;
     }
 }

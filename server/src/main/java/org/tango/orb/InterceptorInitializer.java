@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public final class InterceptorInitializer extends org.omg.CORBA.LocalObject implements ORBInitializer {
+    private final Logger logger = LoggerFactory.getLogger(InterceptorInitializer.class);
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private final Logger logger = LoggerFactory.getLogger(InterceptorInitializer.class);
 
     public InterceptorInitializer() {
     }

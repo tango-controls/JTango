@@ -43,10 +43,7 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Class Description: This class manage a static vector of Database object. <Br>
@@ -54,7 +51,7 @@ import java.util.StringTokenizer;
  * <Br>
  * <b> Usage example: </b> <Br>
  * <ul>
- * <i> Databaspogoe dbase = ApiUtil.get_db_obj(); <Br>
+ * <i> Database dbase = ApiUtil.get_db_obj(); <Br>
  * </ul>
  * </i>
  * 
@@ -187,12 +184,10 @@ public class ApiUtil {
 
     /**
      * Return the host address.
-     *
-     * @deprecated use {@link HostInfo}
      */
-    @Deprecated
+    // ===================================================================
     public static String getHostAddress() throws DevFailed {
-		return HostInfo.getAddress();
+        return HostInfo.getAddress();
 	}
     // ===================================================================
     // ===================================================================
@@ -202,21 +197,17 @@ public class ApiUtil {
 
     /**
      * Return the host addresses.
-     *
-     * @deprecated use {@link HostInfo}
      */
-    @Deprecated
-    public static Iterable<String> getHostAddresses() throws DevFailed {
+    // ===================================================================
+    public static Vector<String> getHostAddresses() throws DevFailed {
         return HostInfo.getAddresses();
     }
     // ===================================================================
 
     /**
      * Return the host name.
-     *
-     * @deprecated use {@link HostInfo}
      */
-    @Deprecated
+    // ===================================================================
     public static String getHostName() throws DevFailed {
         return HostInfo.getName();
     }
