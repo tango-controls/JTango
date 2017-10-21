@@ -37,14 +37,11 @@ import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.jacorb.orb.CDRInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * This class is a set of ZMQ low level utilities
@@ -77,7 +74,6 @@ public class ZMQutils {
             "ZMQ_RELEASE_EVENT",
     };
     private static final int HWM_DEFAULT = 1000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZMQutils.class);
     private static ZMQ.Context context = ZMQ.context(1);
     private static ZMQutils instance = null;
 
@@ -253,7 +249,7 @@ public class ZMQutils {
         if (resp.length > 0) {
             throw DevFailedUtils.newDevFailed("API_InternalCommunicationError", new String(resp));
         }
-        LOGGER.trace("---> Message sent");
+        ApiUtil.printTrace("---> Message sent");
     }
 
     /**
@@ -705,19 +701,30 @@ public class ZMQutils {
         return type;
     }
 
-    public static void trace(DevVarLongStringArray lsa) {
-        LOGGER.trace("Svalue:\n\t{}", Arrays.toString(lsa.svalue));
-        LOGGER.trace("Lvalue:\n\t{}", Arrays.toString(lsa.lvalue));
+    static void zmqEventTrace(String s) {
+        String env = System.getenv("ZmqTrace");
+        if (env != null && env.equals("true"))
+            System.out.println(s);
     }
 
-    static void dump(byte[] rec) {
+    public static void trace(DevVarLongStringArray lsa) {
+        System.out.println("Svalue");
+        for (String s : lsa.svalue)
+            System.out.println("	" + s);
+        System.out.println("Lvalue");
+        for (int i : lsa.lvalue)
+            System.out.println("	" + i);
+    }
+
+    public static void dump(byte[] rec) {
         for (int i = 0; i < rec.length; i++) {
 
             String s = String.format("%02x", (0xFF & rec[i]));
-            LOGGER.trace("0x {} ", s);
+            System.out.print("0x" + s + " ");
             if (((i + 1) % 16) == 0)
-                LOGGER.trace("\n");
+                System.out.println();
         }
+        System.out.println();
     }
 
     /**
@@ -745,7 +752,7 @@ public class ZMQutils {
                 controlStructure.endPoint = getString(bytes, idx++);
                 idx += controlStructure.endPoint.length();
                 controlStructure.eventName = getString(bytes, idx);
-                LOGGER.trace(controlStructure.toString());
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_HEARTBEAT:
@@ -763,12 +770,12 @@ public class ZMQutils {
                 idx += sizeOfInt;
                 int hwm = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                controlStructure.hwm = getHwmValue(hwm);
+                controlStructure.hwm = manageHwmValue(hwm);
                 controlStructure.rate = getInteger(bytes, idx);
                 idx += sizeOfInt;
                 controlStructure.ivl = getInteger(bytes, idx);
                 idx += sizeOfInt;
-                LOGGER.trace(controlStructure.toString());
+                zmqEventTrace(controlStructure.toString());
                 break;
 
             case ZMQ_DISCONNECT_EVENT:
@@ -786,14 +793,15 @@ public class ZMQutils {
         return controlStructure;
     }
 
-    private int getHwmValue(int defaultValue) {
+    private int manageHwmValue(int ctrlValue) {
+
         //  Check if environment value is set
         String envValue = System.getenv("TANGO_EVENT_BUFFER_HWM");
         if (envValue != null) {
             try {
                 return Integer.parseInt(envValue);
             } catch (NumberFormatException e) {
-                LOGGER.warn("env.TANGO_EVENT_BUFFER_HWM value is not an integer number: {}", envValue);
+                System.err.println("TANGO_EVENT_BUFFER_HWM value " + e);
             }
         }
         //  Check if has been set by client
@@ -801,7 +809,7 @@ public class ZMQutils {
             return ApiUtil.getEventBufferHWM();
 
         //  Else return default value from input
-        return defaultValue;
+        return ctrlValue;
     }
 
     /**

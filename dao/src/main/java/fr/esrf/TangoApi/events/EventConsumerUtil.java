@@ -36,11 +36,9 @@ package fr.esrf.TangoApi.events;
 
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tango.utils.DevFailedUtils;
 import org.zeromq.ZMQ;
 
 import java.util.Hashtable;
@@ -52,7 +50,6 @@ import java.util.Hashtable;
  */
 public class EventConsumerUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventConsumerUtil.class);
     private static EventConsumerUtil    instance = null;
     private static boolean zmqTested = false;
     private static boolean zmqLoadable = true;
@@ -102,25 +99,28 @@ public class EventConsumerUtil {
          /*******************/
         if (!zmqTested) {
 
-            String zmqEnable = System.getProperty("ZMQ_DISABLE", System.getenv("ZMQ_DISABLE"));
+			String	zmqEnable = System.getenv("ZMQ_DISABLE");
+			if (zmqEnable==null)
+				zmqEnable = System.getProperty("ZMQ_DISABLE");
 
 			if (zmqEnable==null || !zmqEnable.equals("true")) {
             	try {
                 	ZMQutils.getInstance();
-                    LOGGER.info("====================== ZMQ ({}) event system is available ============================",
-            	ZMQ.getFullVersion());} catch (java.lang.NoClassDefFoundError |java.lang.UnsatisfiedLinkError error) {
-                    LOGGER.info("======================================================================");
-                	LOGGER.error(error.getMessage(),error);
-                	LOGGER.info("  Event system will be available only for notifd notification system ");
-                	LOGGER.info("======================================================================");
+                    System.out.println("====================== ZMQ (" + ZMQ.getFullVersion() +
+                            ") event system is available ============================");
+                } catch (java.lang.NoClassDefFoundError | java.lang.UnsatisfiedLinkError error) {
+                    System.err.println("======================================================================");
+                	System.err.println("  "+error);
+                	System.err.println("  Event system will be available only for notifd notification system ");
+                	System.err.println("======================================================================");
                 	zmqLoadable = false;
             	}
 			}
 			else {
-                LOGGER.info("======================================================================");
-                LOGGER.info("  ZMQ event system not enabled");
-                LOGGER.info("  Event system will be available only for notifd notification system ");
-                LOGGER.info("======================================================================");
+                System.err.println("======================================================================");
+                System.err.println("  ZMQ event system not enabled");
+                System.err.println("  Event system will be available only for notifd notification system ");
+                System.err.println("======================================================================");
                 zmqLoadable = false;
 			}
             zmqTested = true;
@@ -220,7 +220,7 @@ public class EventConsumerUtil {
                                int max_size,
                                String[] filters,
                                boolean stateless) throws DevFailed {
-        LOGGER.trace("trying to subscribe_event to {}/{}", device.name(), attribute);
+        ApiUtil.printTrace("trying to subscribe_event to " + device.name() + "/" + attribute);
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
@@ -238,7 +238,7 @@ public class EventConsumerUtil {
                         attribute, event, callback, max_size, filters, stateless);
             }
             catch (DevFailed e) {
-                DevFailedUtils.logDevFailed(e, LOGGER);
+                ApiUtil.printTrace(e.errors[0].desc);
                 if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                     //  If not a ZMQ server, try on notifd system.
                     id = subscribeEventWithNotifd(device, attribute,
@@ -275,7 +275,7 @@ public class EventConsumerUtil {
                                CallBack callback,
                                int max_size,
                                boolean stateless) throws DevFailed {
-        LOGGER.trace("INTERFACE_CHANGE: trying to subscribe_event to {}", device.name());
+        ApiUtil.printTrace("INTERFACE_CHANGE: trying to subscribe_event to " + device.name());
         int id;
         //  If already connected, subscribe directly on same channel
         EventConsumer   consumer = isChannelAlreadyConnected(device);
@@ -315,7 +315,7 @@ public class EventConsumerUtil {
         int id;
         id = NotifdEventConsumer.getInstance().subscribe_event(device,
                 attribute, event, callback, max_size, filters, stateless);
-        LOGGER.trace("{}/{} connected to Notifd event system", device.name(), attribute);
+        ApiUtil.printTrace(device.name() + "/" + attribute + "  connected to Notifd event system");
         return id;
     }
     //===============================================================

@@ -36,8 +36,6 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -54,9 +52,6 @@ import java.net.UnknownHostException;
  */
 
 public class TangoUrl implements ApiDefs, java.io.Serializable {
-    public static final String NO_DATABASE = "#dbase=no";
-    private static final Logger LOGGER = LoggerFactory.getLogger(TangoUrl.class);
-    static private boolean envRead = false;
     int protocol = TANGO;
     String host = null;
     String strPort = null;
@@ -64,6 +59,9 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
     String devname = null;
     boolean fromEnv = false;
     boolean use_db = true;
+    static private boolean envRead = false;
+
+    public static final String  NO_DATABASE = "#dbase=no";
     //===================================================================
     /**
      * Object Constructor.
@@ -236,7 +234,7 @@ public class TangoUrl implements ApiDefs, java.io.Serializable {
             //  Get FQDN for host and real name if alias used
             canonicalHostName = InetAddress.getByName(hostName).getCanonicalHostName();
             if (!canonicalHostName.contains(hostName))
-                LOGGER.trace("{} ========> {}", hostName, canonicalHostName);
+                ApiUtil.printTrace(hostName + " ========> " + canonicalHostName);
         }
         catch (UnknownHostException e) {
             Except.throw_exception("Api_GetCanonicalHostNameFailed", e.toString());

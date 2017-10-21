@@ -35,15 +35,11 @@
 package fr.esrf.TangoApi.events;
 
 
-import fr.esrf.Tango.DevError;
-import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 import org.omg.CosNotifyComm.StructuredPushConsumerPOA;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tango.utils.DevFailedUtils;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -56,154 +52,22 @@ import java.util.Hashtable;
 abstract public class EventConsumer extends StructuredPushConsumerPOA
         implements TangoConst, IEventConsumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventConsumer.class);
     protected static int subscribe_event_id = 0;
     protected static Hashtable<String, EventChannelStruct>   channel_map        = new Hashtable<>();
     protected static Hashtable<String, String>               device_channel_map = new Hashtable<>();
     protected static Hashtable<String, EventCallBackStruct>  event_callback_map = new Hashtable<>();
     protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<>();
+
     //  Alternate tango hosts
     static ArrayList<String>  possibleTangoHosts = new ArrayList<>();
-    private Logger logger = LoggerFactory.getLogger(EventConsumer.class);
-
-    //===============================================================
-    //===============================================================
-    protected EventConsumer() throws DevFailed {
-        //  Default constructor
-        //  Start the KeepAliveThread loop
-        KeepAliveThread.getInstance();
-    }
-
-    //===============================================================
-    //===============================================================
-    static Hashtable<String, EventChannelStruct> getChannelMap() {
-        return channel_map;
-    }
-
-    //===============================================================
-    //===============================================================
-    static Hashtable<String, EventCallBackStruct> getEventCallbackMap() {
-        return event_callback_map;
-    }
-
-    /**
-     * Try to connect if it failed at subscribe
-     */
-    //===============================================================
-    static void subscribeIfNotDone() {
-        Enumeration<String> callbackKeys = failed_event_callback_map.keys();
-        while (callbackKeys.hasMoreElements()) {
-            String callbackKey = callbackKeys.nextElement();
-            EventCallBackStruct eventCallBackStruct = failed_event_callback_map.get(callbackKey);
-            if (eventCallBackStruct.consumer != null) {
-                try {
-                    subscribeIfNotDone(eventCallBackStruct, callbackKey);
-                } catch (DevFailed e) {
-                    //	Send error to callback
-                    sendErrorToCallback(eventCallBackStruct, callbackKey, e);
-                }
-            } else {
-                if (EventConsumerUtil.isZmqLoadable()) {
-                    try {
-                        //  Try for zmq
-                        eventCallBackStruct.consumer = ZmqEventConsumer.getInstance();
-                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
-                        return;
-
-                    } catch (DevFailed e) {
-                        if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
-                            try {
-                                //  Try for notifd
-                                eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
-                                subscribeIfNotDone(eventCallBackStruct, callbackKey);
-                                return;
-                            } catch (DevFailed e2) {
-                                DevFailedUtils.logDevFailed(e2, LOGGER);
-                                //  reset if both have failed
-                                eventCallBackStruct.consumer = null;
-                                //	Send error to callback
-                                sendErrorToCallback(eventCallBackStruct, callbackKey, e2);
-                            }
-                        } else {
-                            //	Send error to callback
-                            eventCallBackStruct.consumer = null;
-                            sendErrorToCallback(eventCallBackStruct, callbackKey, e);
-                        }
-                    }
-                } else {
-                    try {
-                        //  Try for notifd
-                        eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
-                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
-                        return;
-                    } catch (DevFailed e) {
-                        DevFailedUtils.logDevFailed(e, LOGGER);
-                        //	Send error to callback
-                        sendErrorToCallback(eventCallBackStruct, callbackKey, e);
-                    }
-                }
-            }
-        }
-    }
-
-    //===============================================================
-    //===============================================================
-    private static void sendErrorToCallback(EventCallBackStruct cs, String callbackKey, DevFailed e) {
-
-        int source = (cs.consumer instanceof NotifdEventConsumer) ?
-                EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
-        EventData eventData =
-                new EventData(cs.device, callbackKey,
-                        cs.event_name, source,
-                        cs.event_type, null, null, null, null, null, e.errors);
-
-        if (cs.use_ev_queue) {
-            EventQueue ev_queue = cs.device.getEventQueue();
-            ev_queue.insert_event(eventData);
-        } else
-            cs.callback.push_event(eventData);
-    }
-
-    //===============================================================
-    //===============================================================
-    private static void subscribeIfNotDone(EventCallBackStruct eventCallBackStruct,
-                                           String callbackKey) throws DevFailed {
-
-        eventCallBackStruct.consumer.subscribe_event(
-                eventCallBackStruct.device,
-                eventCallBackStruct.attr_name,
-                eventCallBackStruct.event_type,
-                eventCallBackStruct.callback,
-                eventCallBackStruct.max_size,
-                eventCallBackStruct.filters,
-                false);
-        failed_event_callback_map.remove(callbackKey);
-    }
-
-    //===============================================================
-    //===============================================================
-    static EventCallBackStruct getCallBackStruct(Hashtable map, int id) {
-        Enumeration keys = map.keys();
-        while (keys.hasMoreElements()) {
-            String name = (String) keys.nextElement();
-            EventCallBackStruct callback_struct =
-                    (EventCallBackStruct) map.get(name);
-            if (callback_struct.id == id)
-                return callback_struct;
-        }
-        return null;
-    }
-
     //===============================================================
     //===============================================================
     abstract protected  void checkDeviceConnection(DeviceProxy device,
                         String attribute, DeviceData deviceData, String event_name) throws DevFailed;
 
     abstract protected void connect_event_channel(ConnectionStructure cs) throws DevFailed;
-
     abstract protected boolean reSubscribe(EventChannelStruct event_channel_struct,
                                   EventCallBackStruct callback_struct);
-
     abstract protected void removeFilters(EventCallBackStruct cb_struct) throws DevFailed;
 
     abstract protected String getEventSubscriptionCommandName();
@@ -222,20 +86,34 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     abstract protected void unsubscribeTheEvent(EventCallBackStruct callbackStruct) throws DevFailed;
 
     abstract protected void checkIfHeartbeatSkipped(String name, EventChannelStruct eventChannelStruct);
-
+    //===============================================================
+    //===============================================================
+    protected EventConsumer() throws DevFailed {
+        //  Default constructor
+        //  Start the KeepAliveThread loop
+        KeepAliveThread.getInstance();
+    }
+    //===============================================================
+    //===============================================================
+    static Hashtable<String, EventChannelStruct> getChannelMap() {
+        return channel_map;
+    }
+    //===============================================================
+    //===============================================================
+    static Hashtable<String, EventCallBackStruct>  getEventCallbackMap() {
+        return event_callback_map;
+    }
     //===============================================================
     //===============================================================
     public void disconnect_structured_push_consumer() {
         System.out.println("calling EventConsumer.disconnect_structured_push_consumer()");
     }
-
     //===============================================================
     //===============================================================
     public void offer_change(org.omg.CosNotification.EventType[] added, org.omg.CosNotification.EventType[] removed)
             throws org.omg.CosNotifyComm.InvalidEventType {
         System.out.println("calling EventConsumer.offer_change()");
     }
-
     //===============================================================
     //===============================================================
     private EventChannelStruct getEventChannelStruct(String channelName) {
@@ -254,7 +132,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         }
         return null;
     }
-
     //===============================================================
     //===============================================================
     protected void push_structured_event_heartbeat(String channelName) {
@@ -286,12 +163,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 }
             }
             if (!found)
-                LOGGER.warn("Channel[{}] Not found", channelName);
+                System.err.println(channelName + " Not found");
         } catch (Exception e) {
-            LOGGER.warn(e.getMessage(), e);
+            e.printStackTrace();
         }
     }
-    //===============================================================
 
     //===============================================================
     //===============================================================
@@ -312,14 +188,14 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         DeviceData argIn = new DeviceData();
         argIn.insert(info);
         String cmdName = getEventSubscriptionCommandName();
-        logger.trace("{}.command_inout({}) for {}/{}.{}", device.get_adm_dev().name(), cmdName, device_name, attribute, eventType);
+        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
+                    cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
         DeviceData argOut = device.get_adm_dev().command_inout(cmdName, argIn);
-        logger.trace("    command_inout done.");
+        ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
         checkDeviceConnection(device, attribute, argOut, eventType);
     }
-
     //===============================================================
     //===============================================================
     public int subscribe_event(DeviceProxy device,
@@ -356,13 +232,21 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             throws DevFailed {
         //	Set the event name;
         String event_name = eventNames[event];
-        logger.trace("=============> subscribing for {}{}.{}", device.name(), (attribute == null) ? "" : "/" + attribute, event_name);
+        ApiUtil.printTrace("=============> subscribing for " + device.name() +
+                ((attribute==null)? "" : "/" + attribute) + "." +event_name);
 
         //	Check if already connected
         checkIfAlreadyConnected(device, attribute, event_name, callback, max_size, stateless);
 
         //	if no callback (null), create EventQueue
-        createEventQueueIfRequired(device, callback, max_size);
+        if (callback == null && max_size >= 0) {
+            //	Check if already created (in case of reconnection stateless mode)
+            if (device.getEventQueue() == null)
+                if (max_size > 0)
+                    device.setEventQueue(new EventQueue(max_size));
+                else
+                    device.setEventQueue(new EventQueue());
+        }
 
         String deviceName = device.fullName();
         String callback_key = deviceName.toLowerCase();
@@ -387,10 +271,10 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 callback_key += "/" + attribute + "." + event_name;
 
             //	Inform server that we want to subscribe and try to connect
-            logger.trace("calling callEventSubscriptionAndConnect() method");
+            ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
             String  att = (attribute==null)? null : attribute.toLowerCase();
             callEventSubscriptionAndConnect(device, att, event_name);
-            logger.trace("call callEventSubscriptionAndConnect() method done");
+            ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
             if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
@@ -473,16 +357,119 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         }
         return evnt_id;
     }
+    //===============================================================
+    /**
+     * Try to connect if it failed at subscribe
+     */
+    //===============================================================
+    static void subscribeIfNotDone() {
+        Enumeration<String > callbackKeys = failed_event_callback_map.keys();
+        while (callbackKeys.hasMoreElements()) {
+            String callbackKey = callbackKeys.nextElement();
+            EventCallBackStruct eventCallBackStruct = failed_event_callback_map.get(callbackKey);
+            if (eventCallBackStruct.consumer!=null) {
+                try {
+                    subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                } catch (DevFailed e) {
+                    //	Send error to callback
+                    sendErrorToCallback(eventCallBackStruct, callbackKey, e);
+                }
+            }
+            else {
+                if (EventConsumerUtil.isZmqLoadable()) {
+                    try {
+                        //  Try for zmq
+                        eventCallBackStruct.consumer = ZmqEventConsumer.getInstance();
+                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                        return;
 
-    void createEventQueueIfRequired(DeviceProxy device, CallBack callback, int max_size) {
-        if (callback == null && max_size >= 0) {
-            //	Check if already created (in case of reconnection stateless mode)
-            if (device.getEventQueue() == null)
-                if (max_size > 0)
-                    device.setEventQueue(new EventQueue(max_size));
+                    }
+                    catch (DevFailed e) {
+                        if (e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
+                            try {
+                                //  Try for notifd
+                                eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
+                                subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                                return;
+                            }
+                            catch (DevFailed e2) {
+								//TODO use DevFailedUtils#printDevFailed from JTangoCommons
+                               System.err.println(e2.errors[0].desc);
+                                //  reset if both have failed
+                                eventCallBackStruct.consumer = null;
+                                //	Send error to callback
+                                sendErrorToCallback(eventCallBackStruct, callbackKey, e2);
+                            }
+                        }
+                        else {
+                            //	Send error to callback
+                            eventCallBackStruct.consumer = null;
+                            sendErrorToCallback(eventCallBackStruct, callbackKey, e);
+                        }
+                    }
+                }
                 else
-                    device.setEventQueue(new EventQueue());
+                {
+                    try {
+                        //  Try for notifd
+                        eventCallBackStruct.consumer = NotifdEventConsumer.getInstance();
+                        subscribeIfNotDone(eventCallBackStruct, callbackKey);
+                        return;
+                    }
+                    catch (DevFailed e) {
+						//TODO use DevFailedUtils#printDevFailed from JTangoCommons
+                        System.err.println(e.errors[0].desc);
+                        //	Send error to callback
+                        sendErrorToCallback(eventCallBackStruct, callbackKey, e);
+                    }
+                }
+            }
         }
+    }
+    //===============================================================
+    //===============================================================
+    private static void sendErrorToCallback(EventCallBackStruct cs, String callbackKey, DevFailed e) {
+
+        int source = (cs.consumer instanceof NotifdEventConsumer)?
+                EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
+        EventData eventData =
+                new EventData(cs.device, callbackKey,
+                        cs.event_name, source,
+                        cs.event_type, null, null, null, null, null, e.errors);
+
+        if (cs.use_ev_queue) {
+            EventQueue ev_queue = cs.device.getEventQueue();
+            ev_queue.insert_event(eventData);
+        } else
+            cs.callback.push_event(eventData);
+    }
+     //===============================================================
+    //===============================================================
+    private static void subscribeIfNotDone(EventCallBackStruct eventCallBackStruct,
+                                          String callbackKey) throws DevFailed{
+
+        eventCallBackStruct.consumer.subscribe_event(
+                eventCallBackStruct.device,
+                eventCallBackStruct.attr_name,
+                eventCallBackStruct.event_type,
+                eventCallBackStruct.callback,
+                eventCallBackStruct.max_size,
+                eventCallBackStruct.filters,
+                false);
+        failed_event_callback_map.remove(callbackKey);
+    }
+    //===============================================================
+    //===============================================================
+    static EventCallBackStruct getCallBackStruct(Hashtable map, int id) {
+        Enumeration keys = map.keys();
+        while (keys.hasMoreElements()) {
+            String name = (String) keys.nextElement();
+            EventCallBackStruct callback_struct =
+                    (EventCallBackStruct) map.get(name);
+            if (callback_struct.id == id)
+                return callback_struct;
+        }
+        return null;
     }
 
     //===============================================================
