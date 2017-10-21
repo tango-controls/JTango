@@ -39,7 +39,6 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.DeviceProxy;
-import org.zeromq.ZMQ;
 
 import java.util.Hashtable;
 
@@ -114,7 +113,7 @@ public class EventConsumerUtil {
 			if (zmqEnable==null || !zmqEnable.equals("true")) {
             	try {
                 	ZMQutils.getInstance();
-                    System.out.println("====================== ZMQ (" + ZMQ.getFullVersion() +
+                    System.out.println("====================== ZMQ (" + ZMQutils.getZmqVersion() +
                             ") event system is available ============================");
             	} catch (java.lang.NoClassDefFoundError error) {
                     System.err.println("======================================================================");
