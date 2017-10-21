@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.4.1-SNAPSHOT</version>
+        <version>9.4.2-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -73,6 +73,7 @@
 
     <properties>
         <shaded.outputFile>${project.build.directory}/JTango-${project.version}.jar</shaded.outputFile>
+        <sonar.skip>true</sonar.skip>
     </properties>
 
     <dependencies>
@@ -150,7 +151,7 @@
                                         </argument>
                                         <argument>-u${bintray.user.name}:${bintray.user.apikey}</argument>
                                         <argument>
-                                            https://api.bintray.com/content/tango-controls/generic/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar
+                                            https://api.bintray.com/content/tango-controls/generic/JTango-9-LTS/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
                                         </argument>
                                         <argument>--verbose</argument>
                                     </arguments>

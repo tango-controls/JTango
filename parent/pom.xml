@@ -4,7 +4,7 @@
 
     <groupId>org.tango-controls</groupId>
     <artifactId>JTangoParent</artifactId>
-    <version>9.4.1-SNAPSHOT</version>
+    <version>9.4.2-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -282,6 +282,7 @@
             <properties>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                 <sonar.organization>tango-controls</sonar.organization>
+                <sonar.branch>jtango-9-lts</sonar.branch>
                 <sonar.login>${env.SONAR_TOKEN}</sonar.login>
             </properties>
             <build>
