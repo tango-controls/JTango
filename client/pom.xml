@@ -4,13 +4,20 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.3.10-SNAPSHOT</version>
+        <version>9.3.9-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>JTangoClientLang</artifactId>
     <name>JTango Client Lang</name>
     <description>Tango client utilities</description>
     <url>https://github.com/tango-controls/JTango</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:tango-controls/JTango.git</connection>
+        <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
+        <url>https://github.com/tango-controls/JTango</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <issueManagement>
         <system>GitHub</system>
