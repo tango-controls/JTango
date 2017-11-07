@@ -45,7 +45,8 @@ import java.util.Hashtable;
 @SuppressWarnings({"UnusedDeclaration"})
 public class TangoEventsAdapter implements java.io.Serializable {
 
-    static final Object moni = new Object();
+    private DeviceProxy deviceProxy = null;
+    private String deviceName = null;
     /*
      * A static table for each event type
      */
@@ -67,8 +68,8 @@ public class TangoEventsAdapter implements java.io.Serializable {
             tango_data_ready_source = new Hashtable<String, TangoDataReady>();
     private static Hashtable<String, TangoInterfaceChange>
             tango_interface_change_source = new Hashtable<String, TangoInterfaceChange>();
-    private DeviceProxy deviceProxy = null;
-    private String deviceName = null;
+
+    static final Object moni = new Object();
     //=======================================================================
     /**
      * Creates a new instance of TangoEventsAdapter

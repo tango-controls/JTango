@@ -41,6 +41,6 @@ import java.util.EventListener;
  * @author  pascal_verdier
  */
 public interface ITangoQualityChangeListener extends EventListener {
-    public void qualityChange(TangoQualityChangeEvent e);
+    public void qualityChange( TangoQualityChangeEvent e);          
 }
 

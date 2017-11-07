@@ -41,6 +41,6 @@ import java.util.EventListener;
  * @author  pascal_verdier
  */
 public interface ITangoAttConfigListener extends EventListener {
-    public void attConfig(TangoAttConfigEvent e);
+    public void attConfig( TangoAttConfigEvent e);          
 }
 

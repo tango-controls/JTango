@@ -42,5 +42,5 @@ import java.util.EventListener;
  * @author  pascal_verdier
  */
 public interface ITangoDataReadyListener extends EventListener {
-    public void data_ready(TangoDataReadyEvent e);
+    public void data_ready( TangoDataReadyEvent e);    
 }

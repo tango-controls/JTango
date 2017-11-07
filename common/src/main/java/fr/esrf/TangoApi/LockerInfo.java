@@ -35,8 +35,8 @@
 package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.Tango.LockerLanguage;
+import fr.esrf.Tango.DevVarLongStringArray;
 import fr.esrf.TangoDs.Except;
 
 import java.util.UUID;
@@ -47,21 +47,23 @@ import java.util.UUID;
 
 public class LockerInfo
 {
+	private LockerLanguage	language;
+	private int				cpp_pid = 0;
+	private UUID			uuid;
+	private String			hostname;
+	private String			classname;
+	private String			status;
+	private boolean			locked;
+
 	//	String part
 	private static final int STATUS_IDX  = 0;
 	private static final int ADD_IDX     = 1;
 	private static final int CLASS_IDX   = 2;
+
 	//	Numeric part
 	private static final int LOCK_IDX    = 0;
 	private static final int PID_IDX     = 1;
 	private static final int UUID_IDX    = 2;
-    private LockerLanguage language;
-    private int cpp_pid = 0;
-    private UUID uuid;
-    private String hostname;
-    private String classname;
-    private String status;
-    private boolean locked;
 
 
 	//==========================================================================
@@ -151,8 +153,8 @@ public class LockerInfo
 	/**
 	 *	Returns the locker UUID if java
 	 *
-     *    @throws DevFailed if locker is not a java process.
-     */
+	 *	@throws	DevFailed if locker is not a java process.
+	 */
 	//==========================================================================
 	public UUID getJavaUUID() throws DevFailed
 	{
@@ -166,8 +168,8 @@ public class LockerInfo
 	/**
 	 *	Returns the locker Pricess ID if Cpp
 	 *
-     *    @throws DevFailed if locker is not a cpp process.
-     */
+	 *	@throws	DevFailed if locker is not a cpp process.
+	 */
 	//==========================================================================
 	public int getCppPID() throws DevFailed
 	{

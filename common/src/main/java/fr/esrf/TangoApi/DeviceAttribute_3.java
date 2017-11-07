@@ -34,7 +34,15 @@
 
 package fr.esrf.TangoApi;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.AttributeDim;
+import fr.esrf.Tango.AttributeValue;
+import fr.esrf.Tango.AttributeValue_3;
+import fr.esrf.Tango.DevError;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.TimeVal;
 import fr.esrf.Tango.factory.TangoFactory;
 
 /**
@@ -1424,7 +1432,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute quality
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1437,7 +1445,7 @@ public class DeviceAttribute_3 {
     /**
      * Return attribute data format (SCALR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1449,7 +1457,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1461,7 +1469,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1473,7 +1481,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1494,7 +1502,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data read.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1506,7 +1514,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number data read object.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1518,7 +1526,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data wwrite object.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1530,7 +1538,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return number of data written.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1542,7 +1550,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute dim_x.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1554,7 +1562,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute dim_y.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1566,7 +1574,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1578,7 +1586,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1608,7 +1616,7 @@ public class DeviceAttribute_3 {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */

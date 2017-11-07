@@ -54,11 +54,11 @@ import java.util.Vector;
 
 
 class AccessProxy extends DeviceProxy {
-    private static final Object monitor = new Object();
     protected static String user = null;
     protected static String hostAddr = null;
-    private static boolean muliIP = true;
     protected boolean forced = false;
+    private static boolean muliIP = true;
+    private static final Object monitor = new Object();
 
     /**
      * Device rights table
@@ -92,7 +92,6 @@ class AccessProxy extends DeviceProxy {
         }
     }
     //===============================================================
-
     /**
      * Check access for specified device
      *

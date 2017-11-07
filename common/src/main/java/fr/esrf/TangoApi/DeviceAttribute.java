@@ -1359,7 +1359,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute quality
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */
@@ -1396,7 +1396,7 @@ public class DeviceAttribute {
     /**
      * Return attribute data format (SCALAR, . * SPECTRUM, IMAGE or FMT_UNKNOWN)
      * If device is older than Device_4Impl, FMT_UNKNOWN is returned.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1407,7 +1407,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute time value.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1418,7 +1418,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute time value in seconds since EPOCH.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1429,7 +1429,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute time value in milli seconds since EPOCH.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1440,7 +1440,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute name.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1451,7 +1451,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return number of data read.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1462,7 +1462,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return number of data read.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     public AttributeDim getReadAttributeDim() throws DevFailed {
@@ -1472,7 +1472,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return number of data write.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     public AttributeDim getWriteAttributeDim() throws DevFailed {
@@ -1482,7 +1482,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return number of data written.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1493,7 +1493,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute dim_x.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1504,7 +1504,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute dim_y.
-     *
+     * 
      * @throws DevFailed in case of read_attribute failed
      */
     // ===========================================
@@ -1515,7 +1515,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute written dim_x.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1526,7 +1526,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return attribute written dim_y.
-     *
+     * 
      * @throws DevFailed  in case of read_attribute failed
      */
     // ===========================================
@@ -1537,7 +1537,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return AttributeValue IDL object.
-     *
+     * 
      * @throws DevFailed
      */
     // ===========================================
@@ -1548,7 +1548,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * Return AttributeValue IDL object.
-     *
+     * 
      * @throws DevFailed
      */
     // ===========================================
@@ -1577,7 +1577,7 @@ public class DeviceAttribute {
     // ===========================================
     /**
      * return time in milliseconds since 1/1/70
-     *
+     * 
      * @throws DevFailed
      *             in case of read_attribute failed
      */

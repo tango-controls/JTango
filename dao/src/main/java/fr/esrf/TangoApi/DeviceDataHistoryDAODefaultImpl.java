@@ -65,63 +65,12 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	private	Any					any;
 	private AttributeValue_3	attrval;
 	private TimeVal				tval;
-    /**
-     * Returns attribute Tango type.
-     */
-    //===========================================
-    private int setType = -1;
-
-    //===========================================
-    //==========================================================================
-    private boolean[] bool_data = null;
-    //===========================================
-    private short[] short_data = null;
-
-    //===========================================
-    private int[] int_data = null;
-    //===========================================
-    private long[] long_data = null;
-    //===========================================
-    private float[] float_data = null;
-
-    //===========================================
-    private double[] double_data = null;
-    //===========================================
-    private String[] string_data = null;
-    //===========================================
-    private DevState[] state_data = null;
-    //===========================================
-    private DevEncoded[] enc_data = null;
-    //===========================================
-    private DevVarLongStringArray long_string_data = null;
-    //===========================================
-    private DevVarDoubleStringArray double_string_data = null;
-
-    //===========================================
-    public DeviceDataHistoryDAODefaultImpl() {
-    }
-    //===========================================
-
-    /**
-     * return tru if any is an array
-     */
-    //===========================================
-    private static boolean isArray(org.omg.CORBA.Any local_any) {
-        boolean retval = true;
-
-        try {
-            TypeCode tc = local_any.type();
-            TypeCode tc_alias = tc.content_type();
-            //TypeCode        tc_seq   =
-            tc_alias.content_type();
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind e) {
-            //System.out.println(e);
-            retval = false;
-        }
-        return retval;
-    }
-    //===========================================
-
+	
+	public DeviceDataHistoryDAODefaultImpl()
+	{
+	}		
+	
+	//===========================================
 	/**
 	 *	Constructor from a DevCmdHistory.
 	 */
@@ -136,7 +85,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		deviceDataHistory.errors = cmd_hist.errors;
 	}
 	//===========================================
-
 	/**
 	 *	Constructor from an AttributeValue.
 	 */
@@ -145,8 +93,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	{
 		any                       = att_histo.value.value;
 		deviceDataHistory.source  = TangoConst.ATTRIBUTE;
-        attrval = new AttributeValue_3(any,
-                att_histo.value.quality,
+		attrval = new AttributeValue_3(any, 
+					att_histo.value.quality,
 					att_histo.value.time,
 					att_histo.value.name,
 					new AttributeDim(att_histo.value.dim_x, att_histo.value.dim_y),
@@ -157,8 +105,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		deviceDataHistory.failed  = att_histo.attr_failed;
 		deviceDataHistory.errors  = att_histo.errors;
 	}
-	//===========================================
 
+	//===========================================
 	/**
 	 *	Constructor from an AttributeValue for Device_3Impl.
 	 */
@@ -174,7 +122,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		deviceDataHistory.errors = att_histo.value.err_list;
 	}
 	//===========================================
-
 	/**
 	 *	Constructor from an AttributeValue for Device_4Impl.
 	 */
@@ -190,7 +137,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		deviceDataHistory.errors = null;
 	}
 	//===========================================
-
 	/**
 	 *	Constructor from an AttributeValue for Device_4Impl.
 	 */
@@ -208,9 +154,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		deviceDataHistory.failed = false;
 		deviceDataHistory.errors = null;
 	}
-
+		
 	//===========================================
-
 	/**
 	 *	Set attribute time value.
 	 */
@@ -219,7 +164,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	{
 		this.tval = tval;
 	}
-
+	//===========================================
 	/**
 	 *	Return attribute time value.
 	 */
@@ -229,7 +174,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return tval;
 	}
 	//===========================================
-
 	/**
 	 *	Return attribute time value in seconds since EPOCH.
 	 */
@@ -239,7 +183,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return (long)tval.tv_sec;
 	}
 	//===========================================
-
 	/**
 	 *	return time in milliseconds since EPOCH
 	 *	to build a Date class.
@@ -250,7 +193,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return  (long)tval.tv_sec * 1000 + tval.tv_usec/1000;
 	}
 	//===========================================
-
 	/**
 	 *	Set AttrQuality if from attribute.
 	 */
@@ -260,7 +202,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.quality = q;
 	}
 	//===========================================
-
 	/**
 	 *	return AttrQuality if from attribute.
 	 */
@@ -274,7 +215,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.quality;
 	}
 	//===========================================
-
 	/**
 	 *	Ret Seturn attribute dim_x if from attribute.
 	 */
@@ -287,7 +227,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.r_dim.dim_y = 1;
 	}
 	//===========================================
-
 	/**
 	 *	Ret Seturn attribute dim_y if from attribute.
 	 */
@@ -299,34 +238,20 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.r_dim.dim_y = ((dim==0)? 1:dim);
 	}
 	//===========================================
-    //===========================================
-
-
-    //===========================================
-    //===========================================
-
-
-    //===========================================
-
 	/**
 	 *	Return attribute dim_x if from attribute.
 	 */
 	//===========================================
-	public int getDimX(DeviceDataHistory deviceDataHistory) throws DevFailed {
-        if (deviceDataHistory.source==TangoConst.COMMAND &&
-                attrval.r_dim==null)
-            Except.throw_non_supported_exception("TangoApi_NOT_AVAILABLE",
-                    "Method not avalaible for command",
-                    "DeviceDataHistory.getDimX()");
-        return attrval.r_dim.dim_x;
-    }
-
-
-    //**********	Extract Methods for basic types	*********************
-
-
+	public int getDimX(DeviceDataHistory deviceDataHistory) throws DevFailed
+	{
+		if (deviceDataHistory.source==TangoConst.COMMAND &&
+			attrval.r_dim==null)
+			Except.throw_non_supported_exception("TangoApi_NOT_AVAILABLE",
+									"Method not avalaible for command",
+									"DeviceDataHistory.getDimX()");
+		return attrval.r_dim.dim_x;
+	}
 	//===========================================
-
 	/**
 	 *	Return attribute dim_y if from attribute.
 	 */
@@ -341,7 +266,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.r_dim.dim_y;
 	}
 	//===========================================
-
 	/**
 	 *	Returns true is attribute failed
 	 */
@@ -351,7 +275,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return deviceDataHistory.failed;
 	}
 	//===========================================
-
 	/**
 	 *	Set the attribute errors list
 	 */
@@ -362,7 +285,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.err_list = err;
 	}
 	//===========================================
-
 	/**
 	 *	Returns the attribute errors list
 	 */
@@ -371,8 +293,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	{
 		return attrval.err_list;
 	}
-	//===========================================
 
+	//===========================================
 	/**
 	 *	Return attribute name.
 	 */
@@ -382,14 +304,12 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.name;
 	}
 	//===========================================
-
-    //===========================================
-    //===========================================
-    private int DIM_MINI(int x) {
-        return (x==0) ? 1 : x;
-    }
 	//===========================================
-
+	private int DIM_MINI(int x)
+	{
+		return (x==0) ? 1 : x;
+	}
+	//===========================================
 	/**
 	 *	Return number of data read.
 	 */
@@ -399,7 +319,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.r_dim.dim_x * DIM_MINI(attrval.r_dim.dim_y);
 	}
 	//===========================================
-
 	/**
 	 *	Return number of data written.
 	 */
@@ -409,7 +328,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.w_dim.dim_x * DIM_MINI(attrval.w_dim.dim_y);
 	}
 	//===========================================
-
 	/**
 	 *	Set attribute written dim_x.
 	 */
@@ -421,9 +339,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.w_dim.dim_x = dim;
 		attrval.w_dim.dim_y = 1;
 	}
-
 	//===========================================
-
 	/**
 	 *	Set attribute written dim_y.
 	 */
@@ -435,7 +351,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		attrval.w_dim.dim_y = ((dim==0)? 1:dim);
 	}
 	//===========================================
-
 	/**
 	 *	Return attribute written dim_x.
 	 */
@@ -444,9 +359,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	{
 		return attrval.w_dim.dim_x;
 	}
-
 	//===========================================
-
 	/**
 	 *	Return attribute written dim_y.
 	 */
@@ -456,12 +369,28 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return attrval.w_dim.dim_y;
 	}
 	//===========================================
+	//===========================================
 
+
+
+
+
+
+
+
+	//===========================================
+	//===========================================
+
+
+
+
+
+	//===========================================
 	/**
 	 *	Throws exception if err_list not null.
-     *
-     *    @throws DevFailed in case of read_attribute failed
-     */
+	 *
+	 *	@throws	DevFailed in case of read_attribute failed
+	 */
 	//===========================================
 	private void manageExceptions(String method_name) throws DevFailed
 	{
@@ -473,22 +402,25 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 							"Attribute quality factor is INVALID",
 							"DeviceAttributeHistory." + method_name + "()");
 	}
-	//===========================================
 
+
+
+
+
+
+	//**********	Extract Methods for basic types	*********************
+
+
+	//===========================================
 	/**
 	 *	extract method for a CORBA Any.
 	 */
 	//===========================================
-	public Any extractAny(DeviceDataHistory deviceDataHistory) throws DevFailed {
-        return any;
-    }
-
-
-    //**********	Extract Methods for sequence types	*********************
-
-
+	public Any extractAny(DeviceDataHistory deviceDataHistory) throws DevFailed
+	{
+		return any;
+	}
 	//===========================================
-
 	/**
 	 *	extract method for a boolean.
 	 */
@@ -502,7 +434,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevBooleanHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned char.
 	 *	@return	the extracted value.
@@ -520,7 +451,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return extractUChar(deviceDataHistory);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a short.
 	 */
@@ -537,7 +467,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevShortHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned short.
 	 */
@@ -547,7 +476,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return DevUShortHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a long.
 	 */
@@ -564,7 +492,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevLongHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned long.
 	 */
@@ -581,13 +508,12 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevULongHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a long.
 	 *
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public long extractLong64(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -599,13 +525,12 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return extractLong64Array(deviceDataHistory)[0];
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a long.
 	 *
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public long extractULong64(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -616,8 +541,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return extractULong64Array(deviceDataHistory)[0];
 	}
-	//===========================================
 
+	//===========================================
 	/**
 	 *	extract method for a float.
 	 */
@@ -634,7 +559,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevFloatHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a double.
 	 */
@@ -650,8 +574,8 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevDoubleHelper.extract(any);
 	}
-	//===========================================
 
+	//===========================================
 	/**
 	 *	extract method for a String.
 	 */
@@ -667,14 +591,12 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevStringHelper.extract(any);
 	}
-
 	//===========================================
-
 	/**
 	 *	extract method for an DevState.
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public DevState extractDevState(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -690,12 +612,11 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevStateHelper.extract(attrval.value);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an DevEncoded
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public DevEncoded extractDevEncoded(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -711,8 +632,11 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevEncodedHelper.extract(any);
 	}
 
-	//===========================================
 
+	//**********	Extract Methods for sequence types	*********************
+
+
+	//===========================================
 	/**
 	 *	extract method for a byte Array.
 	 */
@@ -726,7 +650,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevVarBooleanArrayHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for a byte Array.
 	 */
@@ -737,7 +660,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return DevVarCharArrayHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned char Array.
 	 *
@@ -760,11 +682,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		}
 	}
 	//===========================================
-    //===========================================
-
-
-    //===========================================
-
 	/**
 	 *	extract method for a short Array.
 	 */
@@ -778,7 +695,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevVarShortArrayHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned short Array.
 	 */
@@ -788,7 +704,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		manageExceptions("extractUShortArray()");
 		return DevVarUShortArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a long Array.
 	 */
@@ -802,7 +718,6 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevVarLongArrayHelper.extract(any);
 	}
 	//===========================================
-
 	/**
 	 *	extract method for an unsigned long Array.
 	 */
@@ -815,13 +730,13 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarULongArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a long Array.
 	 *
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public long[] extractLong64Array(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -831,21 +746,14 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return long_data;
 		else
 			return DevVarLong64ArrayHelper.extract(any);
-    }
-
-
-    //==========================================================================
-    /*
-	 *	Insert methods used since Device_4Impl
-	 */
-    //==========================================================================
-
+	}
+	//===========================================
 	/**
 	 *	extract method for a long Array.
 	 *
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public long[] extractULong64Array(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -856,7 +764,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarULong64ArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a float Array.
 	 */
@@ -869,7 +777,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarFloatArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a double Array.
 	 */
@@ -883,6 +791,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			return DevVarDoubleArrayHelper.extract(any);
 	}
 
+	//===========================================
 	/**
 	 *	extract method for a String Array.
 	 */
@@ -896,13 +805,13 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarStringArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for an DevState Array.
 	 *
 	 *	@return	the extracted value.
-     *	@throws DevFailed in case of read_attribute failed
-     *				or if AttrQuality is ATTR_INVALID.
+	 *	@throws	DevFailed in case of read_attribute failed
+	 *				or if AttrQuality is ATTR_INVALID.
 	 */
 	//===========================================
 	public DevState[] extractDevStateArray(DeviceDataHistory deviceDataHistory) throws DevFailed
@@ -929,6 +838,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return new DevState[0];//	never used
 	}
 
+	//===========================================
 	/**
 	 *	extract method for a DevEncoded Array.
 	 */
@@ -941,7 +851,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarEncodedArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a DevVarLongStringArray.
 	 */
@@ -953,7 +863,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarLongStringArrayHelper.extract(any);
 	}
-
+	//===========================================
 	/**
 	 *	extract method for a DevVarDoubleStringArray.
 	 */
@@ -965,7 +875,16 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		else
 			return DevVarDoubleStringArrayHelper.extract(any);
 	}
+	//===========================================
+	//===========================================
 
+
+
+
+
+
+
+	//===========================================
 	/**
 	 *	Returns the attribute type
 	 */
@@ -974,13 +893,41 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 	{
 		return any.type();
 	}
-
+	//===========================================
+	/**
+	 *	return tru if any is an array
+	 */
+	//===========================================
+	private static boolean isArray(org.omg.CORBA.Any local_any)
+	{ 
+		boolean retval = true; 
+		    
+		try 
+		{ 
+			TypeCode        tc = local_any.type(); 
+			TypeCode        tc_alias = tc.content_type(); 
+			//TypeCode        tc_seq   =
+					tc_alias.content_type();
+		} 
+		catch(org.omg.CORBA.TypeCodePackage.BadKind e) 
+		{ 
+			//System.out.println(e); 
+			retval = false; 
+		} 
+		return retval; 
+	} 
 	//===========================================
 	//===========================================
-    private boolean isArray() {
+	private boolean isArray() 
+	{
 		return isArray(any);
-    }
-
+	} 
+	//===========================================
+	/**
+	 *	Returns attribute Tango type.
+	 */
+	//===========================================
+	private int	setType = -1;
 	public int getType(DeviceDataHistory deviceDataHistory) throws DevFailed
 	{
 		if (setType!=-1)
@@ -998,7 +945,7 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 			//	Special case for state
 			if (tc.kind().value()==TCKind._tk_enum)
 				return TangoConst.Tango_DEV_STATE;
-
+			
 			TypeCode	tc_alias = tc.content_type();
 			TypeCode	tc_seq   = tc_alias.content_type();
 			TCKind		kind = tc_seq.kind();
@@ -1036,13 +983,13 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 				break;
 			case TCKind._tk_string:
 				type = TangoConst.Tango_DEV_STRING;
-                break;
-                case TCKind._tk_enum:
-                    type = TangoConst.Tango_DEV_STATE;
-                    break;
+				break;
+			case TCKind._tk_enum: 
+				type = TangoConst.Tango_DEV_STATE; 
+				break; 
 			case TCKind._tk_struct:
-                type = TangoConst.Tango_DEV_ENCODED;
-                break;
+				type = TangoConst.Tango_DEV_ENCODED; 
+				break; 
 			}
 		}
 		catch(org.omg.CORBA.TypeCodePackage.BadKind e)
@@ -1054,6 +1001,25 @@ public class DeviceDataHistoryDAODefaultImpl implements IDeviceDataHistoryDAO
 		return type;
 	}
 
+
+	//==========================================================================
+	/*
+	 *	Insert methods used since Device_4Impl
+	 */
+	//==========================================================================
+
+	//==========================================================================
+	private boolean[]		bool_data   = null;
+	private short[]			short_data  = null;
+	private int[]			int_data    = null;
+	private long[]			long_data   = null;
+	private float[]			float_data  = null;
+	private double[]		double_data = null;
+	private String[]		string_data = null;
+	private DevState[]		state_data  = null;
+	private DevEncoded[]	enc_data    = null;
+	private DevVarLongStringArray	long_string_data = null;
+	private DevVarDoubleStringArray	double_string_data = null;
 	//==========================================================================
 	//==========================================================================
 	public int getDataLength(DeviceDataHistory ddh) throws DevFailed

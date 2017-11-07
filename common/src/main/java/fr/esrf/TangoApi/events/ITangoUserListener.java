@@ -42,5 +42,5 @@ import java.util.EventListener;
  * @author  pascal_verdier
  */
 public interface ITangoUserListener extends EventListener {
-    public void user(TangoUserEvent e);
+    public void user( TangoUserEvent e);    
 }

@@ -27,49 +27,68 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 25297 $
+// $Revision: 25723 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
+
 /**
- * This class get the asynchronous call result and send it to a CallBack object.
+ *	Class Description:
+ *	This class manage data object for Tango forwarded attribute information.
+ *
+ * @author  verdier
+ * @version  $Revision: 25723 $
  */
 
-public class CallbackThread extends Thread implements ApiDefs {
-    private final AsyncCallObject aco;
+public class ForwardedAttributeDatum implements java.io.Serializable
+{
+	/**
+	 *	The device name.
+	 */
+	private String deviceName;
+	/**
+	 *	The forwarded attribute name.
+	 */
+	private String forwardedAttributeName;
+	/**
+	 *	root attribute name
+	 */
+	private String rootAttributeName;
 
-    // ===============================================================
-    /**
-     * Object constructor
-     * 
-     * @param aco
-     *            Asynchronous call object
-     */
-    // ===============================================================
-    public CallbackThread(final AsyncCallObject aco) {
-	super("Async callaback");
-	this.aco = aco;
-    }
-
-    // ===============================================================
-    /**
-     * Start thread.
-     */
-    // ===============================================================
-    @Override
-    public void run() {
-	// System.out.println("I am in thread!");
-
-	// All info are in AsyncCallObjec. It does everything itself
-	try {
-	    aco.manage_reply(0);
-	} catch (final Exception e) {
-	    System.err.println(e);
+	ForwardedAttributeDatum(String deviceName, String forwardedAttributeName, String rootAttributeName) {
+		this.deviceName = deviceName;
+		this.forwardedAttributeName = forwardedAttributeName;
+		this.rootAttributeName = rootAttributeName;
 	}
-    }
-    // ===============================================================
-    // ===============================================================
+
+	/**
+	 *
+	 * @return the device name which owns the forwarded attribute
+	 */
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	/**
+	 *
+	 * @return the forwarded attribute name
+	 */
+	public String getForwardedAttributeName() {
+		return forwardedAttributeName;
+	}
+
+	/**
+	 *
+	 * @return the root attribute (__root_att) .
+	 */
+	public String getRootAttributeName() {
+		return rootAttributeName;
+	}
+
+	public String toString() {
+		return deviceName + "/" + forwardedAttributeName + " (__root_att) is " + rootAttributeName;
+	}
 }

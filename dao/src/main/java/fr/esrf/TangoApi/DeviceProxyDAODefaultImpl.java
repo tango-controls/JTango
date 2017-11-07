@@ -36,11 +36,12 @@ package fr.esrf.TangoApi;
 
 import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.events.EventConsumerUtil;
+import org.omg.CORBA.*;
+
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.NamedDevFailed;
 import fr.esrf.TangoDs.NamedDevFailedList;
 import fr.esrf.TangoDs.TangoConst;
-import org.omg.CORBA.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -2290,7 +2291,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     data = deviceProxy.command_inout(command);
                 else
                     data = deviceProxy.command_inout(command, argin);
-            } catch (org.omg.CORBA.Bounds e1) {
+            }
+            catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }
@@ -2459,7 +2461,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                                     + "." + idl_cmd + "_reply("
                                     + get_asynch_idl_cmd(deviceProxy, request, idl_cmd) + ")", false);
                     }
-                    else if (except instanceof org.omg.CORBA.TIMEOUT) {
+                    else
+                    if (except instanceof org.omg.CORBA.TIMEOUT) {
                         throw_dev_failed(deviceProxy, except,
                                 deviceProxy.getFull_class_name()
                                     + "." + idl_cmd + "_reply("
@@ -2467,8 +2470,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                     }
                     else
                     // Check if user exception (DevFailed).
-                        if (except instanceof org.omg.CORBA.UnknownUserException) {
-                            final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
+                    if (except instanceof org.omg.CORBA.UnknownUserException) {
+                        final Any any = ((org.omg.CORBA.UnknownUserException) except).except;
                         MultiDevFailed ex = null;
                         try {
                             //noinspection ThrowableResultOfMethodCallIgnored
@@ -2610,7 +2613,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
 
                 //  And do the synchronous read_attributes
                 data = deviceProxy.read_attribute(attributeNames);
-            } catch (org.omg.CORBA.Bounds e1) {
+            }
+            catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
 				if (e instanceof DevFailed)
 	                throw (DevFailed)e;
@@ -2840,7 +2844,8 @@ public class DeviceProxyDAODefaultImpl extends ConnectionDAODefaultImpl implemen
                 }
                 else
                     throw e;
-            } catch (org.omg.CORBA.Bounds e1) {
+            }
+            catch (org.omg.CORBA.Bounds e1) {
                 System.err.println(e1);
                 throw e;
             }

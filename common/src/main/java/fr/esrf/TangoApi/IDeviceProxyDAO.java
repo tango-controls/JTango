@@ -27,17 +27,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 26454 $
+// $Revision: 29386 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
+import org.omg.CORBA.Request;
+
 import fr.esrf.Tango.AttributeValue;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import org.omg.CORBA.Request;
 
 import java.util.List;
 
@@ -597,7 +598,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     // ==========================================================================
     public DeviceAttribute[] write_read_attribute(DeviceProxy deviceProxy,
-                                                  DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
+                    DeviceAttribute[] deviceAttributes, String[] readNames) throws DevFailed;
 
 	//==========================================================================
 	//==========================================================================
@@ -1187,7 +1188,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
 
 
 
-
 	//===============================================================
     /*
      *  Event related methods
@@ -1235,7 +1235,7 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-                                        int event, CallBack callback, boolean stateless) throws DevFailed;
+                                int event, CallBack callback, boolean stateless) throws DevFailed;
     //==========================================================================
     /**
      *	Subscribe to event to be stored in an event queue.
@@ -1246,6 +1246,6 @@ public interface IDeviceProxyDAO extends IConnectionDAO{
      */
     //==========================================================================
     public abstract int subscribe_event(DeviceProxy deviceProxy,
-                                        int event, int max_size, boolean stateless) throws DevFailed;
+                                int event, int max_size, boolean stateless) throws DevFailed;
 
 }

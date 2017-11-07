@@ -63,6 +63,18 @@ public class EventConsumerUtil {
 
     //===============================================================
     /**
+     * Create a singleton if not already done
+     * @return an instance on this singleton
+     */
+    //===============================================================
+    public static EventConsumerUtil getInstance() {
+        if (instance==null) {
+            instance = new EventConsumerUtil();
+        }
+        return instance;
+    }
+    //===============================================================
+    /**
      * Default constructor
      */
     //===============================================================
@@ -78,20 +90,28 @@ public class EventConsumerUtil {
         */
     }
     //===============================================================
-
     /**
-     * Create a singleton if not already done
-     * @return an instance on this singleton
+     *
+     * @param deviceProxy device to be connected
+     * @return consumer if already connected, otherwise return null
      */
     //===============================================================
-    public static EventConsumerUtil getInstance() {
-        if (instance == null) {
-            instance = new EventConsumerUtil();
+    private EventConsumer isChannelAlreadyConnected(DeviceProxy deviceProxy) {
+        try {
+            String adminName = deviceProxy.adm_name();
+            EventChannelStruct eventChannelStruct = EventConsumer.getChannelMap().get(adminName);
+            if (eventChannelStruct==null) {
+                return null;
+            }
+            else {
+                return eventChannelStruct.consumer;
+            }
         }
-        return instance;
+        catch (DevFailed e) {
+            return null;
+        }
     }
     //===============================================================
-
     /**
      * Check if zmq is loadable:
      *  - JNI library must be in LD_LIBRARY_PATH
@@ -105,7 +125,7 @@ public class EventConsumerUtil {
         //return false;
          /*******************/
         if (!zmqTested) {
-
+		
 			String	zmqEnable = System.getenv("ZMQ_DISABLE");
 			if (zmqEnable==null)
 				zmqEnable = System.getProperty("ZMQ_DISABLE");
@@ -115,14 +135,16 @@ public class EventConsumerUtil {
                 	ZMQutils.getInstance();
                     System.out.println("====================== ZMQ (" + ZMQutils.getZmqVersion() +
                             ") event system is available ============================");
-            	} catch (java.lang.NoClassDefFoundError error) {
+            	}
+            	catch(java.lang.NoClassDefFoundError error) {
                     System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
                 	System.err.println("======================================================================");
                 	zmqLoadable = false;
-            	} catch (java.lang.UnsatisfiedLinkError error) {
-                    System.err.println("======================================================================");
+            	}
+            	catch(java.lang.UnsatisfiedLinkError error) {
+                	System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
                 	System.err.println("======================================================================");
@@ -141,29 +163,8 @@ public class EventConsumerUtil {
         return zmqLoadable;
         /********************/
    }
-    //===============================================================
-
-    /**
-     * @param deviceProxy device to be connected
-     * @return consumer if already connected, otherwise return null
-     */
-    //===============================================================
-    private EventConsumer isChannelAlreadyConnected(DeviceProxy deviceProxy) {
-        try {
-            String adminName = deviceProxy.adm_name();
-            EventChannelStruct eventChannelStruct = EventConsumer.getChannelMap().get(adminName);
-            if (eventChannelStruct == null) {
-                return null;
-            } else {
-                return eventChannelStruct.consumer;
-            }
-        } catch (DevFailed e) {
-            return null;
-        }
-    }
 
     //===============================================================
-
     /**
      * Subscribe on specified event
      *

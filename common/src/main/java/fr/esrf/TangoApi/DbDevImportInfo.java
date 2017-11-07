@@ -27,7 +27,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 25296 $
+// $Revision: 30274 $
 //
 //-======================================================================
 
@@ -43,13 +43,13 @@ import fr.esrf.Tango.DevVarLongStringArray;
  * This class is an object containing the imported device information.
  *
  * @author verdier
- * @version $Revision: 25296 $
+ * @version $Revision: 30274 $
  */
 
 
 public class DbDevImportInfo implements java.io.Serializable {
     /**
-     * The devivce name.
+     * The device name.
      */
     public String name = null;
     /**
@@ -171,6 +171,39 @@ public class DbDevImportInfo implements java.io.Serializable {
         }
     }
 
+    //===============================================
+    //===============================================
+    public String toString() {
+        String result;
+        if (is_taco) {
+            result = taco_info;
+        } else
+            try {
+                //	Return info in ior
+                IORdump id = new IORdump(name, ior);
+                result = id.toString();
+                result += "\nServer:          " + server;
+                if (classname != null && !classname.equals("unknown"))
+                    result += "\nClass:           " + classname;
+                if (pid != 0)
+                    result += "\nServer PID:      " + pid;
+                result += "\nExported:        " + exported;
+
+            } catch (DevFailed e) {
+                //	return full exception string
+                StringBuilder sb = new StringBuilder(e.toString() + ":\n");
+                for (int i = 0; i < e.errors.length; i++) {
+                    sb.append(e.errors[i].reason).append(" from ");
+                    sb.append(e.errors[i].origin).append("\n");
+                    sb.append(e.errors[i].desc).append("\n");
+                    if (i < e.errors.length - 1)
+                        sb.append("-------------------------------------------------------------\n");
+                }
+                result = sb.toString();
+            }
+        return result;
+    }
+
     //===============================================================
 //===============================================================
     public static void main(String[] args) {
@@ -192,39 +225,5 @@ public class DbDevImportInfo implements java.io.Serializable {
             System.exit(1);
         }
         System.exit(0);
-    }
-
-    //===============================================
-    //===============================================
-    public String toString() {
-        String result;
-        if (is_taco) {
-            result = taco_info;
-        } else
-            try {
-                //	Return info in ior
-                IORdump id = new IORdump(name, ior);
-                result = id.toString();
-                result += "\nServer:          " + server;
-                if (classname != null && !classname.equals("unknown"))
-                    result += "\nClass:           " + classname;
-                if (pid != 0)
-                    result += "\nServer PID:      " + pid;
-                result += "\nExported:        " + exported;
-
-            } catch (DevFailed e) {
-                //	return full exception string
-                //-----------------------------------
-                StringBuilder sb = new StringBuilder(e.toString() + ":\n");
-                for (int i = 0; i < e.errors.length; i++) {
-                    sb.append(e.errors[i].reason).append(" from ");
-                    sb.append(e.errors[i].origin).append("\n");
-                    sb.append(e.errors[i].desc).append("\n");
-                    if (i < e.errors.length - 1)
-                        sb.append("-------------------------------------------------------------\n");
-                }
-                result = sb.toString();
-            }
-        return result;
     }
 }

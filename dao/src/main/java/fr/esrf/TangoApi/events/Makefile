@@ -5,7 +5,7 @@
 #
 # Description:  Makefile to generate the JAVA Tango classes package
 #
-# $Author$
+# $Author: pascal_verdier $
 #
 # $Version$
 #

@@ -57,15 +57,7 @@ public class ZmqMainThread extends Thread {
     private static final int    HearBeatSock = 0;
     private static final int    EventSock    = 1;
     private static final int    ControlSock  = 2;
-    private static final int NameIdx = 0;
-    private static final int EndianIdx = 1;
-    private static final int ZmqInfoIdx = 2;
-    private static final int ValueIdx = 3;
-    private static final int NbFields = ValueIdx + 1;
-    private static final long SendHwmSocket = 10000;
-    //===============================================================
-    //===============================================================
-    private static int zmqSubscribeCounter = 0;
+
     private ZMQ.Socket  controlSocket;
     private ZMQ.Socket  heartbeatSocket;
     private ZMQ.Socket  eventSocket;
@@ -75,13 +67,24 @@ public class ZmqMainThread extends Thread {
      * Map<endPoint, eventList>
      */
     private Hashtable<String,EventList> connectedMap = new Hashtable<String, EventList>();
+
     private int heartbeatDrift = 0;
     private int eventDrift     = 0;
+
+    private static final int NameIdx    = 0;
+    private static final int EndianIdx  = 1;
+    private static final int ZmqInfoIdx = 2;
+    private static final int ValueIdx   = 3;
+    private static final int NbFields   = ValueIdx+1;
+
+    private static final long SendHwmSocket = 10000;
     //===============================================================
+    private class ZmqPollers extends ZMQ.Poller {
+        private ZmqPollers(ZMQ.Context context, int size) {
+            super(context, size);
+        }
+    }
     //===============================================================
-    private boolean traceZmqSub = false;
-    //===============================================================
-    private boolean traceZmqSubRead = false;
     //===============================================================
     /**
      * Default constructor
@@ -122,25 +125,6 @@ public class ZmqMainThread extends Thread {
         pollers.register(controlSocket, ZMQ.Poller.POLLIN);
     }
     //===============================================================
-
-    //===============================================================
-    //===============================================================
-    private static String formatTime(long ms) {
-        StringTokenizer st = new StringTokenizer(new Date(ms).toString());
-        ArrayList<String> arrayList = new ArrayList<String>();
-        while (st.hasMoreTokens())
-            arrayList.add(st.nextToken());
-
-        String time = arrayList.get(3);
-        double d = (double) ms / 1000;
-        long l = ms / 1000;
-        d = (d - l) * 1000;
-        ms = (long) d;
-
-        return time + "." + ms;
-    }
-    //===============================================================
-
     /**
      * The thread infinite loop.
      * Wait on sockets, and dispatch when message has been received
@@ -170,7 +154,6 @@ public class ZmqMainThread extends Thread {
         ApiUtil.printTrace("------------ End of ZmqMainThread ---------------");
     }
     //===============================================================
-
     /**
      * Read messages on socket
      * @param socket    specified socket
@@ -207,7 +190,7 @@ public class ZmqMainThread extends Thread {
         }
         return inputs;
     }
-
+    //===============================================================
     /**
      * Manage received messages (depends on socket)
      * @param source specified socket
@@ -258,7 +241,6 @@ public class ZmqMainThread extends Thread {
         }
     }
     //===============================================================
-
     /**
      * Extract device name from event name
      * @param eventName Specified event
@@ -269,7 +251,7 @@ public class ZmqMainThread extends Thread {
         int pos = eventName.lastIndexOf('.');
         return eventName.substring(0, pos);
     }
-
+    //===============================================================
     /**
      * Extract event name from input byte buffer
      * @param inputs byte buffer
@@ -285,7 +267,6 @@ public class ZmqMainThread extends Thread {
             pos = s.lastIndexOf('/', pos-1);
         return s.substring(pos+1);
     }
-
     //===============================================================
     //===============================================================
     private void checkEventMessage(byte[][] inputs) throws Exception {
@@ -329,7 +310,6 @@ public class ZmqMainThread extends Thread {
         }
     }
     //===============================================================
-
     /**
      * Manage events. Extract data and push to callback
      * @param inputs received messages
@@ -368,7 +348,6 @@ public class ZmqMainThread extends Thread {
                     "ZmqMainThread.manageEvent()");
         }
     }
-
     //===============================================================
     //===============================================================
     private EventCallBackStruct getEventCallBackStruct(String eventName) {
@@ -391,7 +370,7 @@ public class ZmqMainThread extends Thread {
 
         //  Not found
         /*  Display table content
-        if (eventName.contains("maxtempchange")) {
+		if (eventName.contains("maxtempchange")) {
 			System.err.println("===============================================================");
 			System.err.println(eventName + " NOT FOUND");
 			System.err.println("keys are:");
@@ -403,8 +382,6 @@ public class ZmqMainThread extends Thread {
         */
         return null;
     }
-    //===============================================================
-
     //===============================================================
     //===============================================================
     private void manageEventValue(String eventName,
@@ -430,7 +407,8 @@ public class ZmqMainThread extends Thread {
             //  Check if Value part is a DevFailed
             if (isExcept) {
                 devErrorList = ZMQutils.deMarshallErrorList(recData, littleEndian);
-            } else {
+            }
+            else {
                 Hashtable<String, EventChannelStruct> channelMap = EventConsumer.getChannelMap();
                 EventChannelStruct eventChannelStruct = channelMap.get(callBackStruct.channel_name);
                 if (eventChannelStruct!=null) {
@@ -455,8 +433,9 @@ public class ZmqMainThread extends Thread {
                                 break;
                             default:
                                 attributeValue = ZMQutils.deMarshallAttribute(recData, littleEndian, idl);
-                        }
-                    } catch(DevFailed e) {
+                         }
+                    }
+                    catch(DevFailed e) {
                         //  convert de marshall
                         devErrorList = e.errors;
                     }
@@ -473,10 +452,11 @@ public class ZmqMainThread extends Thread {
                                 attributeConfig, dataReady,
                                 deviceInterface, devErrorList));
             }
-        } else
+        }
+        else
             System.err.println(eventName + " ?  NOT FOUND");
     }
-
+    //===============================================================
     /**
      * Manage the event counter
      * @param callBackStruct    the event callback structure
@@ -555,7 +535,6 @@ public class ZmqMainThread extends Thread {
         callBackStruct.setZmqCounter(eventCounter);
         return true;
     }
-
     //===============================================================
     //===============================================================
     private void pushEventData(EventCallBackStruct callBackStruct, EventData eventData) {
@@ -567,7 +546,7 @@ public class ZmqMainThread extends Thread {
             callBackStruct.callback.push_event(eventData);
         }
     }
-
+    //===============================================================
     /**
      * Manage heartbeat
      * @param inputs received messages
@@ -613,8 +592,6 @@ public class ZmqMainThread extends Thread {
         */
     }
     //===============================================================
-
-    //===============================================================
     //===============================================================
     private String getConnectedEndPoint(String eventName) {
         //  Returns endpoint for specified eventName
@@ -630,7 +607,6 @@ public class ZmqMainThread extends Thread {
         }
         return null;
     }
-
     //===============================================================
     //===============================================================
     @SuppressWarnings("unused")
@@ -652,7 +628,7 @@ public class ZmqMainThread extends Thread {
     private boolean alreadyConnected(String endPoint) {
         return connectedMap.containsKey(endPoint);
     }
-
+    //===============================================================
     /**
      * Manage control socket messages
      * @param messageBytes received messages
@@ -691,7 +667,6 @@ public class ZmqMainThread extends Thread {
 
         }
     }
-
     //===============================================================
     //===============================================================
     private void connectIfNotDone(ZMQ.Socket socket, ZMQutils.ControlStructure controlStructure){
@@ -742,7 +717,6 @@ public class ZmqMainThread extends Thread {
                     " already connected to " + controlStructure.endPoint);
         }
     }
-
     //===============================================================
     //===============================================================
     private void disconnect(ZMQ.Socket socket, String eventName){
@@ -760,7 +734,11 @@ public class ZmqMainThread extends Thread {
             }
         }
     }
-
+    //===============================================================
+    //===============================================================
+    private static int zmqSubscribeCounter = 0;
+    private boolean traceZmqSub = false;
+    private boolean traceZmqSubRead = false;
     private void traceZmqSubscription(String eventName, boolean increase) {
         if (!traceZmqSubRead) {
             String s = System.getenv("TraceSubscribe");
@@ -780,13 +758,24 @@ public class ZmqMainThread extends Thread {
                     zmqSubscribeCounter + " -> " + action + " eventSocket to " + eventName);
         }
     }
-
     //===============================================================
-    private class ZmqPollers extends ZMQ.Poller {
-        private ZmqPollers(ZMQ.Context context, int size) {
-            super(context, size);
-        }
+    //===============================================================
+    private static String formatTime(long ms)
+    {
+        StringTokenizer st = new StringTokenizer(new Date(ms).toString());
+        ArrayList<String>	arrayList = new ArrayList<String>();
+        while (st.hasMoreTokens())
+            arrayList.add(st.nextToken());
+
+        String  time  = arrayList.get(3);
+        double d = (double)ms/1000;
+        long   l = ms/1000;
+        d = (d - l) * 1000;
+        ms = (long) d;
+
+        return time + "." + ms;
     }
+
 
     //===============================================================
     //===============================================================

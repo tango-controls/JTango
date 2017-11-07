@@ -259,7 +259,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                         callback_key += "." + event_name;
                         break;
                     case "pipe":
-                        //  No IDL for pipe
+                        //    No IDL for pipe
                         callback_key += "/" + attribute + "." + event_name;
                         break;
                     default:

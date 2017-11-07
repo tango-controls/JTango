@@ -34,11 +34,13 @@
 
 package fr.esrf.TangoApi;
 
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Request;
+
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.Request;
+import fr.esrf.TangoApi.events.IEventConsumer;
 
 public interface IApiUtilDAO {
     // ===================================================================
@@ -157,7 +159,7 @@ public interface IApiUtilDAO {
     // ==========================================================================
     /**
      * Return the request in hash table for the id
-     *
+     * 
      * @throws DevFailed
      */
     // ==========================================================================
@@ -211,7 +213,15 @@ public interface IApiUtilDAO {
     public int pending_asynch_call(int reply_model);
 
     // ==========================================================================
+    /**
+     * Return the callback sub model used.
+     * 
+     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
+     */
+    // ==========================================================================
+    public void set_asynch_cb_sub_model(int model);
 
+    // ==========================================================================
     /**
      * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
      * ApiDefs.PULL_CALLBACK).
@@ -220,17 +230,6 @@ public interface IApiUtilDAO {
     public int get_asynch_cb_sub_model();
 
     // ==========================================================================
-
-    /**
-     * Return the callback sub model used.
-     *
-     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
-     */
-    // ==========================================================================
-    public void set_asynch_cb_sub_model(int model);
-
-    // ==========================================================================
-
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.

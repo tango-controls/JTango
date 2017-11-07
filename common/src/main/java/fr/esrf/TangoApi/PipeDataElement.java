@@ -35,7 +35,7 @@ package fr.esrf.TangoApi;
 import fr.esrf.Tango.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import org.tango.utils.ArrayUtils;
+import fr.esrf.utils.ArrayUtils;
 
 import java.lang.reflect.Array;
 
@@ -46,6 +46,8 @@ import java.lang.reflect.Array;
 
 public class  PipeDataElement{
     private DevPipeDataElt element;
+    private static final String SCALAR = "Scalar";
+    private static final String ARRAY  = "Array";
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -63,7 +65,9 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, boolean value) {
-        this(name, new boolean[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.bool_att_value(new boolean[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
     // ===================================================================
     /**
@@ -75,7 +79,7 @@ public class  PipeDataElement{
     public PipeDataElement(String name, boolean[] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.bool_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
 
     // ===================================================================
@@ -86,7 +90,9 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, short value) {
-        this(name, new short[]{value}, false);
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.short_att_value(new short[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
     // ===================================================================
     /**
@@ -96,7 +102,9 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, short[] value) {
-        this(name, value, false);
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.short_att_value(value);
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
     // ===================================================================
     /**
@@ -117,11 +125,10 @@ public class  PipeDataElement{
         }
         else
             attrValUnion.short_att_value(value); // as short
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
 
     // ===================================================================
-
     /**
      * Create the PipeDataElement
      * @param name     data element name
@@ -129,9 +136,11 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, int value) {
-        this(name, new int[]{value}, false);
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.long_att_value(new int[] {value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-
+    // ===================================================================
     /**
      * Create the PipeDataElement
      * @param name     data element name
@@ -139,7 +148,9 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, int[] value) {
-        this(name, value, false);
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.long_att_value(value);
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
     // ===================================================================
     /**
@@ -156,21 +167,11 @@ public class  PipeDataElement{
             for (int i = 0; i < value.length; i++) {
                 unsigned[i] = (short) (value[i] & 0xFFFF);
             }
-            attrValUnion.ushort_att_value(unsigned); //  as unsigned char
+            attrValUnion.ushort_att_value(unsigned); //  as unsigned short
         }
         else
-            attrValUnion.long_att_value(value); // as short
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
-    }
-    // ===================================================================
-    /**
-     * Create the PipeDataElement
-     * @param name     data element name
-     * @param value    data element value
-     */
-    // ===================================================================
-    public PipeDataElement(String name, long value) {
-        this(name, new long[]{value}, false);
+            attrValUnion.long_att_value(value); // as DevLong
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
 
     // ===================================================================
@@ -180,8 +181,22 @@ public class  PipeDataElement{
      * @param value    data element value
      */
     // ===================================================================
+    public PipeDataElement(String name, long value) {
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.long64_att_value(new long[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
+    }
+    // ===================================================================
+    /**
+     * Create the PipeDataElement
+     * @param name     data element name
+     * @param value    data element value
+     */
+    // ===================================================================
     public PipeDataElement(String name, long[] value) {
-        this(name, value, false);
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.long64_att_value(value);
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
     // ===================================================================
     /**
@@ -198,12 +213,13 @@ public class  PipeDataElement{
             for (int i = 0; i < value.length; i++) {
                 unsigned[i] = (int) value[i];
             }
-            attrValUnion.ulong_att_value(unsigned); //  as unsigned char
+            attrValUnion.ulong_att_value(unsigned); //  as unsigned long
         }
         else
-            attrValUnion.long64_att_value(value); // as short
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+            attrValUnion.long64_att_value(value); // as long64
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -212,9 +228,10 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, float value) {
-        this(name, new float[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.float_att_value(new float[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -225,8 +242,9 @@ public class  PipeDataElement{
     public PipeDataElement(String name, float[] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.float_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -235,9 +253,10 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, double value) {
-        this(name, new double[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.double_att_value(new double[] {value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -248,8 +267,9 @@ public class  PipeDataElement{
     public PipeDataElement(String name, double [] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.double_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -258,9 +278,10 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, String value) {
-        this(name, new String[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.string_att_value(new String[] {value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -271,8 +292,11 @@ public class  PipeDataElement{
     public PipeDataElement(String name, String[] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.string_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+    // ===================================================================
+    // ===================================================================
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -281,11 +305,10 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, DevState value) {
-        this(name, new DevState[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.state_att_value(new DevState[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-    // ===================================================================
-    // ===================================================================
-
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -296,8 +319,9 @@ public class  PipeDataElement{
     public PipeDataElement(String name, DevState[] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.state_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -306,9 +330,10 @@ public class  PipeDataElement{
      */
     // ===================================================================
     public PipeDataElement(String name, DevEncoded value) {
-        this(name, new DevEncoded[]{value});
+        AttrValUnion    attrValUnion = new AttrValUnion();
+        attrValUnion.encoded_att_value(new DevEncoded[]{value});
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], SCALAR);
     }
-
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -319,8 +344,11 @@ public class  PipeDataElement{
     public PipeDataElement(String name, DevEncoded[] value) {
         AttrValUnion    attrValUnion = new AttrValUnion();
         attrValUnion.encoded_att_value(value);
-        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], "");
+        this.element = new DevPipeDataElt(name, attrValUnion, new DevPipeDataElt[0], ARRAY);
     }
+    // ===================================================================
+    // ===================================================================
+
     // ===================================================================
     /**
      * Create the PipeDataElement
@@ -338,10 +366,6 @@ public class  PipeDataElement{
                 pipeBlob.getDevPipeBlobObject().name);
     }
     // ===================================================================
-    // ===================================================================
-
-    // ===================================================================
-
     /**
      * Create from an array of values
      * <p/>
@@ -371,7 +395,7 @@ public class  PipeDataElement{
         if (componentType == Boolean.class || componentType == Short.class ||
                 componentType == Integer.class || componentType == Long.class ||
                 componentType == Float.class || componentType == Double.class) {
-            return newInstance(name, ArrayUtils.toPrimitiveArray(data));
+            return newInstance(name, ArrayUtils.toPrimitiveArray(data, componentType));
         }
 
         if (componentType.isArray()) {
@@ -405,7 +429,11 @@ public class  PipeDataElement{
             throw new IllegalArgumentException("An array of ComponentType is not supported: " + componentType.getSimpleName());
         }
     }
+
     // ===================================================================
+    /*
+     *  Miscellaneous getters
+     */
     // ===================================================================
 
     // ===================================================================
@@ -474,21 +502,7 @@ public class  PipeDataElement{
         }
         return type;
     }
-
     // ===================================================================
-    /*
-     *  Miscellaneous getters
-     */
-    // ===================================================================
-
-    // ===================================================================
-
-    @Override
-    public String toString() {
-        return "[" + element.name + '=' + element.value + ']';
-    }
-    // ===================================================================
-
     /**
      * @return the name of data element at index
      */
@@ -518,15 +532,12 @@ public class  PipeDataElement{
      */
     // ===================================================================
 
-    // ===========================================
-
     // ===================================================================
     // ===================================================================
     DevPipeDataElt getDevPipeDataEltObject() {
         return element;
     }
     // ===========================================
-
     /**
      * extract method for a boolean Array.
      *
@@ -537,7 +548,6 @@ public class  PipeDataElement{
         return element.value.bool_att_value();
     }
     // ===========================================
-
     /**
      * extract method for an unsigned char Array.
      *
@@ -554,7 +564,6 @@ public class  PipeDataElement{
         return val;
     }
     // ===========================================
-
     /**
      * extract method for an unsigned char Array as a char array.
      *
@@ -565,7 +574,6 @@ public class  PipeDataElement{
         return element.value.uchar_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a short Array.
      *
@@ -576,7 +584,6 @@ public class  PipeDataElement{
         return element.value.short_att_value();
     }
     // ===========================================
-
     /**
      * extract method for an unsigned short Array.
      *
@@ -592,7 +599,6 @@ public class  PipeDataElement{
         return val;
     }
     // ===========================================
-
     /**
      * extract method for a long Array.
      *
@@ -603,7 +609,6 @@ public class  PipeDataElement{
         return element.value.long_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a unsigned long.array
      *
@@ -621,7 +626,6 @@ public class  PipeDataElement{
         return result;
     }
     // ===========================================
-
     /**
      * extract method for a long Array.
      *
@@ -632,7 +636,6 @@ public class  PipeDataElement{
         return element.value.long64_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a long Array.
      *
@@ -643,7 +646,6 @@ public class  PipeDataElement{
         return element.value.ulong64_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a float Array.
      *
@@ -654,7 +656,6 @@ public class  PipeDataElement{
         return element.value.float_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a double Array.
      *
@@ -665,7 +666,6 @@ public class  PipeDataElement{
         return element.value.double_att_value();
     }
     // ===========================================
-
     /**
      * extract method for a double Array.
      *

@@ -27,20 +27,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Tango.  If not, see <http://www.gnu.org/licenses/>.
 //
-// $Revision: 28157 $
+// $Revision: 30280 $
 //
 //-======================================================================
 
 
 package fr.esrf.TangoApi;
 
+import fr.esrf.TangoDs.Except;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Request;
+
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.Tango.factory.TangoFactory;
-import fr.esrf.TangoDs.Except;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.Request;
 
 import java.io.FileOutputStream;
 import java.util.*;
@@ -56,20 +57,32 @@ import java.util.*;
  * </i>
  * 
  * @author verdier
- * @version $Revision: 28157 $
+ * @version $Revision: 30280 $
  */
 
 public class ApiUtil {
-    //TODO replace with package.getImplementationVersion
     public static String revNumber =
-            "9.1.0  -  Wed Jun 24 14:15:07 CEST 2015";
+            "9.1.3  -  Mon Apr 25 13:04:57 CEST 2016";
+    
+    private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
+    private static int  hwmValue = 0;
+
+
     /**
      * ORB object reference for connection.
      */
     static protected ORB orb = null;
-    private static IApiUtilDAO apiutilDAO = TangoFactory.getSingleton().getApiUtilDAO();
-    private static int hwmValue = 0;
 
+    // ===================================================================
+    // ===================================================================
+    public IApiUtilDAO getApiUtilDAO() {
+        return apiutilDAO;
+    }
+    // ===================================================================
+    // ===================================================================
+    public void setApiUtilDAO(final IApiUtilDAO databaseDAO) {
+    }
+    // ===================================================================
     /**
      * @return true if use the default factory (new ObjectDAODefaultImpl or
      *         false if introspection factory (mainly used when from web)
@@ -79,9 +92,10 @@ public class ApiUtil {
 	    return TangoFactory.getSingleton().isDefaultFactory();
     }
 
+    // ===================================================================
     /**
      * Return the database object created for specified host and port.
-     *
+     * 
      * @param tango_host
      *            host and port (hostname:portnumber) where database is running.
      */
@@ -89,8 +103,8 @@ public class ApiUtil {
     public static Database get_db_obj(final String tango_host) throws DevFailed {
 	    return apiutilDAO.get_db_obj(tango_host);
     }
-    // ===================================================================
 
+    // ===================================================================
     /**
      * Return the database object created with TANGO_HOST environment variable .
      */
@@ -98,9 +112,7 @@ public class ApiUtil {
     public static Database get_default_db_obj() throws DevFailed {
 	    return apiutilDAO.get_default_db_obj();
     }
-
     // ===================================================================
-
     /**
      * Return tru if the database object has been created.
      */
@@ -110,7 +122,6 @@ public class ApiUtil {
     }
 
     // ===================================================================
-
     /**
      * Return the database object created with TANGO_HOST environment variable .
      */
@@ -118,11 +129,11 @@ public class ApiUtil {
     public static synchronized Database get_db_obj() throws DevFailed {
 	    return apiutilDAO.get_db_obj();
     }
-    // ===================================================================
 
+    // ===================================================================
     /**
      * Return the database object created for specified host and port.
-     *
+     * 
      * @param host host where database is running.
      * @param port port for database connection.
      */
@@ -132,11 +143,10 @@ public class ApiUtil {
     }
 
     // ===================================================================
-
     /**
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
-     *
+     * 
      * @param host host where database is running.
      * @param port port for database connection.
      */
@@ -144,13 +154,11 @@ public class ApiUtil {
     public static Database change_db_obj(final String host, final String port) throws DevFailed {
 	    return apiutilDAO.change_db_obj(host, port);
     }
-
     // ===================================================================
-
     /**
      * Return the database object created for specified host and port, and set
      * this database object for all following uses..
-     *
+     * 
      * @param host host where database is running.
      * @param port port for database connection.
      */
@@ -158,12 +166,10 @@ public class ApiUtil {
     public static Database set_db_obj(final String host, final String port) throws DevFailed {
 	    return apiutilDAO.set_db_obj(host, port);
     }
-
     // ===================================================================
-
     /**
      * Return the database object created for specified host and port.
-     *
+     * 
      * @param tango_host
      *            host and port (hostname:portnumber) where database is running.
      */
@@ -172,7 +178,12 @@ public class ApiUtil {
 	    return apiutilDAO.set_db_obj(tango_host);
     }
     // ===================================================================
+    // ===================================================================
 
+
+
+
+    // ===================================================================
     /**
      * Return the orb object
      */
@@ -181,38 +192,30 @@ public class ApiUtil {
 	return apiutilDAO.get_orb();
     }
     // ===================================================================
-
     /**
      * Return the host address.
      */
     // ===================================================================
-    public static String getHostAddress() throws DevFailed {
-        return HostInfo.getAddress();
+	public static String getHostAddress() throws DevFailed {
+		return HostInfo.getAddress();
 	}
     // ===================================================================
-    // ===================================================================
-
-
-    // ===================================================================
-
     /**
      * Return the host addresses.
      */
     // ===================================================================
-    public static Vector<String> getHostAddresses() throws DevFailed {
-        return HostInfo.getAddresses();
-    }
-    // ===================================================================
-
+	public static Vector<String> getHostAddresses() throws DevFailed {
+		return HostInfo.getAddresses();
+	}
+     // ===================================================================
     /**
      * Return the host name.
      */
     // ===================================================================
-    public static String getHostName() throws DevFailed {
-        return HostInfo.getName();
-    }
+	public static String getHostName() throws DevFailed {
+		return HostInfo.getName();
+	}
     // ===================================================================
-
     /**
      * Return the orb object
      */
@@ -220,8 +223,8 @@ public class ApiUtil {
     public static void set_in_server(final boolean val) {
     	apiutilDAO.set_in_server(val);
     }
-    // ===================================================================
 
+    // ===================================================================
     /**
      * Return true if in server code or false if in client code.
      */
@@ -229,31 +232,10 @@ public class ApiUtil {
     public static boolean in_server() {
 	    return apiutilDAO.in_server();
     }
-    // ===================================================================
 
     public static int getReconnectionDelay() {
 	    return apiutilDAO.getReconnectionDelay();
 
-    }
-
-    // ===================================================================
-
-    /**
-     * Add request in hash table and return id
-     */
-    // ==========================================================================
-    public static int put_async_request(final AsyncCallObject aco) {
-	    return apiutilDAO.put_async_request(aco);
-    }
-
-    /**
-     * Return the request in hash table for the id
-     *
-     * @throws DevFailed
-     */
-    // ==========================================================================
-    public static Request get_async_request(final int id) throws DevFailed {
-    	return apiutilDAO.get_async_request(id);
     }
 
     // ==========================================================================
@@ -262,7 +244,26 @@ public class ApiUtil {
      */
     // ==========================================================================
     // ==========================================================================
+    /**
+     * Add request in hash table and return id
+     */
+    // ==========================================================================
+    public static int put_async_request(final AsyncCallObject aco) {
+	    return apiutilDAO.put_async_request(aco);
+    }
 
+    // ==========================================================================
+    /**
+     * Return the request in hash table for the id
+     * 
+     * @throws DevFailed
+     */
+    // ==========================================================================
+    public static Request get_async_request(final int id) throws DevFailed {
+    	return apiutilDAO.get_async_request(id);
+    }
+
+    // ==========================================================================
     /**
      * Return the Asynch Object in hash table for the id
      */
@@ -272,7 +273,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Remove asynchronous call request and id from hashtable.
      */
@@ -282,7 +282,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Set the reply_model in AsyncCallObject for the id key.
      */
@@ -292,7 +291,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Set the Callback object in AsyncCallObject for the id key.
      */
@@ -302,10 +300,9 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * return the still pending asynchronous call for a reply model.
-     *
+     * 
      * @param dev DeviceProxy object.
      * @param reply_model ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
      */
@@ -315,10 +312,9 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * return the still pending asynchronous call for a reply model.
-     *
+     * 
      * @param reply_model ApiDefs.ALL_ASYNCH, POLLING or CALLBACK.
      */
     // ==========================================================================
@@ -327,7 +323,17 @@ public class ApiUtil {
     }
 
     // ==========================================================================
+    /**
+     * Return the callback sub model used.
+     * 
+     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
+     */
+    // ==========================================================================
+    public static void set_asynch_cb_sub_model(final int model) {
+	    apiutilDAO.set_asynch_cb_sub_model(model);
+    }
 
+    // ==========================================================================
     /**
      * Set the callback sub model used (ApiDefs.PUSH_CALLBACK or
      * ApiDefs.PULL_CALLBACK).
@@ -338,19 +344,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
-    /**
-     * Return the callback sub model used.
-     *
-     * @param model ApiDefs.PUSH_CALLBACK or ApiDefs.PULL_CALLBACK.
-     */
-    // ==========================================================================
-    public static void set_asynch_cb_sub_model(final int model) {
-        apiutilDAO.set_asynch_cb_sub_model(model);
-    }
-
-    // ==========================================================================
-
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.
@@ -361,7 +354,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.
@@ -372,7 +364,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.
@@ -383,7 +374,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Fire callback methods for all (any device) asynchronous requests(cmd and
      * attr) with already arrived replies.
@@ -394,7 +384,11 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
+    /*
+     * Methods to convert data.
+     */
+    // ==========================================================================
+    // ==========================================================================
     /**
      * Convert arguments to one String array
      */
@@ -407,7 +401,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Convert arguments to one String array
      */
@@ -420,12 +413,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-    /*
-     * Methods to convert data.
-     */
-    // ==========================================================================
-    // ==========================================================================
-
     /**
      * Convert arguments to one String array
      */
@@ -437,7 +424,6 @@ public class ApiUtil {
     }
 
     // ==========================================================================
-
     /**
      * Convert a DbAttribute class array to a StringArray.
      *
@@ -474,9 +460,7 @@ public class ApiUtil {
         }
         return array;
     }
-
     // ==========================================================================
-
     /**
      * Convert a DbPipe class array to a StringArray for DB command.
      *
@@ -507,12 +491,22 @@ public class ApiUtil {
         }
         return array;
     }
-
+    /*
+    Argin description:
+Str[0] = Device name
+Str[1] = Pipe number
+Str[2] = Pipe name
+Str[3] = Property number
+Str[4] = Property name
+Str[5] = Property value number (array case)
+Str[6] = Property value 1
+Str[n] = Property value n (array case)
+     */
     // ==========================================================================
-
+    // ==========================================================================
     /**
      * Convert a StringArray to a DbAttribute class array
-     *
+     * 
      * @param array String array to be converted
      * @param mode decode argout params mode (mode=2 added 26/10/04)
      * @return the DbAtribute class array created from input argument.
@@ -562,7 +556,6 @@ public class ApiUtil {
         return attr;
     }
     // ==========================================================================
-
     /**
      * Convert a StringArray to a DbPipe
      *
@@ -592,26 +585,12 @@ public class ApiUtil {
         }
         return dbPipe;
     }
-    /*
-    Argin description:
-Str[0] = Device name
-Str[1] = Pipe number
-Str[2] = Pipe name
-Str[3] = Property number
-Str[4] = Property name
-Str[5] = Property value number (array case)
-Str[6] = Property value 1
-Str[n] = Property value n (array case)
-     */
-    // ==========================================================================
-    // ==========================================================================
 
     // ==========================================================================
     // ==========================================================================
     public static String stateName(final DevState state) {
 	    return apiutilDAO.stateName(state);
     }
-    // ==========================================================================
 
     // ==========================================================================
     // ==========================================================================
@@ -631,6 +610,7 @@ Str[n] = Property value n (array case)
 	    return apiutilDAO.qualityName(att_q_val);
     }
 
+    // ===================================================================
     /**
      * Parse Tango host (check multi Tango_host)
      */
@@ -641,11 +621,12 @@ Str[n] = Property value n (array case)
 
     // ===================================================================
     // ===================================================================
+
+    // ===================================================================
+    // ===================================================================
     public static ORB getOrb() {
     	return orb;
     }
-
-    // ===================================================================
 
     // ===================================================================
     // ===================================================================
@@ -656,6 +637,7 @@ Str[n] = Property value n (array case)
     // ===================================================================
     // ===================================================================
 
+    // ===================================================================
     /**
      * Returns the TANGO_HOST found in JVM, environment, tangorc file,....
      */
@@ -664,6 +646,7 @@ Str[n] = Property value n (array case)
 	    return TangoEnv.getTangoHost();
     }
 
+    // ===================================================================
     /**
      * Returns the SUPER_TANGO found in JVM, environment, tangorc file,....
      */
@@ -673,10 +656,6 @@ Str[n] = Property value n (array case)
     }
 
     // ===================================================================
-    // ===================================================================
-
-    // ===================================================================
-
     /**
      * Returns the ACCESS_DEVNAME found in JVM, environment, tangorc file,....
      */
@@ -686,7 +665,6 @@ Str[n] = Property value n (array case)
     }
 
     // ===================================================================
-
     /**
      * Returns the TANGO_TIMEOUT found in JVM, environment, tangorc file,....
      */
@@ -696,7 +674,6 @@ Str[n] = Property value n (array case)
     }
 
     // ===================================================================
-
     /**
      * @return the ORBgiopMaxMsgSize found in JVM, environment, tangorb file,....
      */
@@ -704,21 +681,7 @@ Str[n] = Property value n (array case)
     public static String getORBgiopMaxMsgSize() {
 	    return TangoEnv.getORBgiopMaxMsgSize();
     }
-
-    // ===================================================================
-
-    /**
-     * Get the ZMQ high water mark buffer size.
-     *
-     * @return the expected buffer size.
-     */
-    //===============================================================
-    public static int getEventBufferHWM() {
-        return hwmValue;
-    }
-
-    // ===================================================================
-
+	//===============================================================
     /**
      * Set the ZMQ high water mark buffer size.
      * @param bufferSize the expected buffer size.
@@ -728,7 +691,14 @@ Str[n] = Property value n (array case)
         hwmValue = bufferSize;
     }
 	//===============================================================
-
+    /**
+     * Get the ZMQ high water mark buffer size.
+     * @return the expected buffer size.
+     */
+	//===============================================================
+    public static int getEventBufferHWM() {
+        return hwmValue;
+    }
 	//===============================================================
 	//===============================================================
     public static void printTrace(String str) {
@@ -741,7 +711,6 @@ Str[n] = Property value n (array case)
 
     }
     //===============================================================
-
     /**
      * Write a trace file (used to debug).
      * It is used to debug, it does not throw DevFailed
@@ -766,7 +735,7 @@ Str[n] = Property value n (array case)
             sb.append(stackTraceElement).append('\n');
         writeFile(filename, sb.toString());
     }
-
+    //===============================================================
     /**
      * Write a trace file (used to debug).
      * It is used to debug, it does not throw DevFailed
@@ -783,8 +752,7 @@ Str[n] = Property value n (array case)
             System.err.println(e);
         }
     }
-    //===============================================================
-
+    //===================================================================
     /**
      * Return the TangORB version as an integer like
      *      803  for "Release 8.0.3"
@@ -815,8 +783,7 @@ Str[n] = Property value n (array case)
         }
         return version;
     }
-    //===============================================================
-
+    //===================================================================
     /**
      * Return the TangORB version as a String like
      *      "Release 8.0.3  -  Thu Oct 11 15:39:36 CEST 2012"
@@ -828,7 +795,6 @@ Str[n] = Property value n (array case)
          return revNumber;
     }
     //===================================================================
-
     /**
      * Return the zmq version as a double like
      *         3.22 for "3.2.2" or 0.0 if zmq not available
@@ -840,7 +806,6 @@ Str[n] = Property value n (array case)
         return apiutilDAO.getZmqVersion();
     }
     //===================================================================
-
     /**
      * Convert a signed int to a unsigned value in a long
      * @param intValue    signed integer value to convert
@@ -851,19 +816,6 @@ Str[n] = Property value n (array case)
         long mask = 0x7fffffff;
         mask += (long) 1 << 31;
         return (intValue & mask);
-    }
-    //===================================================================
-
-    // ===================================================================
-    // ===================================================================
-    public IApiUtilDAO getApiUtilDAO() {
-        return apiutilDAO;
-    }
-    //===================================================================
-
-    // ===================================================================
-    // ===================================================================
-    public void setApiUtilDAO(final IApiUtilDAO databaseDAO) {
     }
     //===================================================================
     //===================================================================
