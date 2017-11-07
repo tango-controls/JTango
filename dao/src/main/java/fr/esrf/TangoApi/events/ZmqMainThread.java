@@ -31,16 +31,7 @@
 //
 //-======================================================================
 
-
 package fr.esrf.TangoApi.events;
-
-
-
-/** 
- *	This class is a thread class to manage ZMQ event receptions
- *
- * @author  verdier
- */
 
 import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.*;
@@ -50,9 +41,11 @@ import org.zeromq.ZMQ;
 
 import java.util.*;
 
-
-//===============================================================
-//===============================================================
+/**
+ *	This class is a thread class to manage ZMQ event receptions
+ *
+ * @author  verdier
+ */
 public class ZmqMainThread extends Thread {
     private static final int    HearBeatSock = 0;
     private static final int    EventSock    = 1;
@@ -63,10 +56,8 @@ public class ZmqMainThread extends Thread {
     private ZMQ.Socket  eventSocket;
     private ZmqPollers pollers;
     private boolean     stop = false;
-    /**
-     * Map<endPoint, eventList>
-     */
-    private Hashtable<String,EventList> connectedMap = new Hashtable<String, EventList>();
+    /** Map<endPoint, eventList> */
+    private Hashtable<String,EventList> connectedMap = new Hashtable<>();
 
     private int heartbeatDrift = 0;
     private int eventDrift     = 0;
@@ -144,10 +135,7 @@ public class ZmqMainThread extends Thread {
                     }
                 }
             }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            catch (Error e) {
+            catch (Error | Exception e) {
                 e.printStackTrace();
             }
         }
@@ -351,7 +339,7 @@ public class ZmqMainThread extends Thread {
     //===============================================================
     //===============================================================
     private EventCallBackStruct getEventCallBackStruct(String eventName) {
-        ArrayList<String> possibleTangoHosts = EventConsumer.possibleTangoHosts;
+        List<String> possibleTangoHosts = EventConsumer.possibleTangoHosts;
         Hashtable<String, EventCallBackStruct> callbackMap = ZmqEventConsumer.getEventCallbackMap();
         if (callbackMap.containsKey(eventName)) {
             return callbackMap.get(eventName);
@@ -763,7 +751,7 @@ public class ZmqMainThread extends Thread {
     private static String formatTime(long ms)
     {
         StringTokenizer st = new StringTokenizer(new Date(ms).toString());
-        ArrayList<String>	arrayList = new ArrayList<String>();
+        ArrayList<String>	arrayList = new ArrayList<>();
         while (st.hasMoreTokens())
             arrayList.add(st.nextToken());
 

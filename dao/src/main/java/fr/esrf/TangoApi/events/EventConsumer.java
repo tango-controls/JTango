@@ -44,6 +44,7 @@ import org.omg.CosNotifyComm.StructuredPushConsumerPOA;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 
 /**
@@ -59,7 +60,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     protected static Hashtable<String, EventCallBackStruct>  failed_event_callback_map = new Hashtable<>();
 
     //  Alternate tango hosts
-    static ArrayList<String>  possibleTangoHosts = new ArrayList<>();
+    static List<String> possibleTangoHosts = new ArrayList<>();
     //===============================================================
     //===============================================================
     abstract protected  void checkDeviceConnection(DeviceProxy device,

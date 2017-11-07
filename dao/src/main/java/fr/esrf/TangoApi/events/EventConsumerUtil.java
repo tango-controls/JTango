@@ -34,7 +34,6 @@
 
 package fr.esrf.TangoApi.events;
 
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.CallBack;
@@ -42,17 +41,11 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 import java.util.Hashtable;
 
-
-/**
- * @author pascal_verdier
- */
-
-
-
-
 //===============================================================
 /**
  * A class to manage NotifdEventConsumer and ZmqEventConsumer instances
+ *
+ * @author pascal_verdier
  */
 //===============================================================
 public class EventConsumerUtil {
@@ -121,11 +114,7 @@ public class EventConsumerUtil {
      */
     //===============================================================
     public static boolean isZmqLoadable(){
-        //  ToDo invalid ZMQ
-        //return false;
-         /*******************/
-        if (!zmqTested) {
-		
+         if (!zmqTested) {
 			String	zmqEnable = System.getenv("ZMQ_DISABLE");
 			if (zmqEnable==null)
 				zmqEnable = System.getProperty("ZMQ_DISABLE");
@@ -136,15 +125,8 @@ public class EventConsumerUtil {
                     System.out.println("========== ZMQ (" + ZMQutils.getZmqVersion() +
                             ") event system is available ============");
             	}
-            	catch(java.lang.NoClassDefFoundError error) {
+            	catch(UnsatisfiedLinkError | NoClassDefFoundError error) {
                     System.err.println("======================================================================");
-                	System.err.println("  "+error);
-                	System.err.println("  Event system will be available only for notifd notification system ");
-                	System.err.println("======================================================================");
-                	zmqLoadable = false;
-            	}
-            	catch(java.lang.UnsatisfiedLinkError error) {
-                	System.err.println("======================================================================");
                 	System.err.println("  "+error);
                 	System.err.println("  Event system will be available only for notifd notification system ");
                 	System.err.println("======================================================================");
@@ -161,7 +143,6 @@ public class EventConsumerUtil {
             zmqTested = true;
         }
         return zmqLoadable;
-        /********************/
    }
 
     //===============================================================
@@ -242,8 +223,6 @@ public class EventConsumerUtil {
             id = consumer.subscribe_event(device,
                     attribute, event, callback, max_size, filters, stateless);
         }
-        //  ToDo invalid ZMQ
-        /*******************/
         else
         if (isZmqLoadable()) {
             try {
@@ -262,7 +241,6 @@ public class EventConsumerUtil {
                     throw e;
             }
         }
-        /*************************/
         else {
             //  If there is no ZMQ jni library loadable, try on notifd system.
             id = subscribeEventWithNotifd(device, attribute,
@@ -350,7 +328,8 @@ public class EventConsumerUtil {
                 EventConsumer.getCallBackStruct(callBackMap, event_id);
 
         //  Unsubscribe on EventConsumer object
-        callbackStruct.consumer.unsubscribe_event(event_id);
+        if (callbackStruct!=null)
+            callbackStruct.consumer.unsubscribe_event(event_id);
     }
     //===============================================================
     //===============================================================

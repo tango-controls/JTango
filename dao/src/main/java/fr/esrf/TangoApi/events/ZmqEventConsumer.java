@@ -642,8 +642,6 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     private boolean reconnectToChannel(String name) {
         boolean reConnected = false;
-
-
         Enumeration callbackStructs = event_callback_map.elements();
         while (callbackStructs.hasMoreElements()) {
             EventCallBackStruct eventCallBackStruct = (EventCallBackStruct) callbackStructs.nextElement();
