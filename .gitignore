@@ -54,3 +54,11 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+
+# target directories
+assembly/target/
+client/target/
+common/target/
+dao/target/
+idl/target/
+server/target/
