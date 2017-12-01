@@ -2460,7 +2460,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         DeviceData argIn = new DeviceData();
         argIn.insert(new String[]{deviceName, wildcard});
         DeviceData argOut = database.command_inout("DbGetDevicePipeList", argIn);
-        System.out.println("database.command_inout(\"DbGetDevicePipeList\", argIn)");
+        //System.out.println("database.command_inout(\"DbGetDevicePipeList\", argIn)");
 
         String[] array = argOut.extractStringArray();
         ArrayList<String> list = new ArrayList<String>();
