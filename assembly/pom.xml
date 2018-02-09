@@ -126,12 +126,6 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>bintray-tango-controls</id>
-            <url>https://api.bintray.com/content/tango-controls/JTango/${project.version}/${project.artifactId}-${project.version}.jar;publish=1</url>
-        </repository>
-    </distributionManagement>
     <profiles>
         <profile>
             <id>release</id>
@@ -157,7 +151,7 @@
                                         </argument>
                                         <argument>-u${bintray.user.name}:${bintray.user.apikey}</argument>
                                         <argument>
-                                            https://api.bintray.com/content/tango-controls/JTango/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
+                                            https://api.bintray.com/content/tango-controls/generic/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar
                                         </argument>
                                         <argument>--verbose</argument>
                                     </arguments>
