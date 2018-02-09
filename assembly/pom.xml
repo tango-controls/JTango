@@ -151,7 +151,7 @@
                                         </argument>
                                         <argument>-u${bintray.user.name}:${bintray.user.apikey}</argument>
                                         <argument>
-                                            https://api.bintray.com/content/tango-controls/jtango/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
+                                            https://api.bintray.com/content/tango-controls/JTango/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
                                         </argument>
                                         <argument>--verbose</argument>
                                     </arguments>
