@@ -188,7 +188,12 @@ final class EventImpl {
                 }
             }
             logger.debug("sent event: {}", fullName);
-        } catch (final org.zeromq.ZMQException e) {
+        } catch (final org.zeromq.ZMQException | ArrayIndexOutOfBoundsException e) {
+            // ToDo
+            if (e instanceof ArrayIndexOutOfBoundsException) {
+                System.err.println(e.toString() +
+                        "\nAt: org.tango.server.events.EventImpl.sendAttributeEvent(EventImpl.java:177)\nfullName: " + fullName);
+            }
             throw DevFailedUtils.newDevFailed(e);
         }
 

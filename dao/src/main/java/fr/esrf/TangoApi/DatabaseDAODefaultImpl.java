@@ -134,7 +134,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             database.setAccess_checked(true);
             //	Initialize value.
             ApiUtil.getReconnectionDelay();
-            //System.out.println(this + "." + database.devname + " -> " +
+            //System.out.println(this + "." + database.deviceName + " -> " +
             //		((database.access==TangoConst.ACCESS_READ)? "Read" : "Write"));
         }
     }
@@ -154,8 +154,8 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argout = command_inout(database, "DbInfo");
-        String[] info = argout.extractStringArray();
+        DeviceData argOut = command_inout(database, "DbInfo");
+        String[] info = argOut.extractStringArray();
 
         //	format result as string
         return stringArray2String(info);
@@ -170,10 +170,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert("*");
-        DeviceData argout = command_inout(database, "DbGetHostList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert("*");
+        DeviceData argOut = command_inout(database, "DbGetHostList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -185,10 +185,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetHostList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetHostList", argIn);
+        return argOut.extractStringArray();
     }
 
 
@@ -201,13 +201,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_server_class_list(java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_server_class_list(Database database, String servname) throws DevFailed {
+    public String[] get_server_class_list(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        DeviceData argout = command_inout(database, "DbGetDeviceServerClassList", argin);
-        String[] list = argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        DeviceData argOut = command_inout(database, "DbGetDeviceServerClassList", argIn);
+        String[] list = argOut.extractStringArray();
         //	Extract DServer class
         int nb_classes;
         if (list.length==0)
@@ -230,10 +230,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert("*");
-        DeviceData argout = command_inout(database, "DbGetServerNameList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert("*");
+        DeviceData argOut = command_inout(database, "DbGetServerNameList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -241,13 +241,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_instance_name_list(java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_instance_name_list(Database database, String servname) throws DevFailed {
+    public String[] get_instance_name_list(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        DeviceData argout = command_inout(database, "DbGetInstanceNameList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        DeviceData argOut = command_inout(database, "DbGetInstanceNameList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -259,10 +259,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert("*");
-        DeviceData argout = command_inout(database, "DbGetServerList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert("*");
+        DeviceData argOut = command_inout(database, "DbGetServerList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -274,10 +274,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetServerList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetServerList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -289,10 +289,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(hostname);
-        DeviceData argout = command_inout(database, "DbGetHostServerList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(hostname);
+        DeviceData argOut = command_inout(database, "DbGetHostServerList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -300,14 +300,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_server_info(java.lang.String)
 	 */
     //==========================================================================
-    public DbServInfo get_server_info(Database database, String servname) throws DevFailed {
+    public DbServInfo get_server_info(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        DeviceData argout = command_inout(database, "DbGetServerInfo", argin);
-        String[] info = argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        DeviceData argOut = command_inout(database, "DbGetServerInfo", argIn);
+        String[] info = argOut.extractStringArray();
         return new DbServInfo(info);
     }
 
@@ -332,9 +332,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 		*/
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutServerInfo", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutServerInfo", argIn);
     }
 
     //==========================================================================
@@ -342,12 +342,12 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_server_info(java.lang.String)
 	 */
     //==========================================================================
-    public void delete_server_info(Database database, String servname) throws DevFailed {
+    public void delete_server_info(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        command_inout(database, "DbDeleteServerInfo", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        command_inout(database, "DbDeleteServerInfo", argIn);
     }
 
     // ==========================================================================
@@ -363,9 +363,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{srcServerName, newServerName});
-        command_inout(database, "DbRenameServer", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{srcServerName, newServerName});
+        command_inout(database, "DbRenameServer", argIn);
     }
 
     //**************************************
@@ -380,9 +380,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public void add_device(Database database, DbDevInfo devinfo) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devinfo.toStringArray());
-        command_inout(database, "DbAddDevice", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(devinfo.toStringArray());
+        command_inout(database, "DbAddDevice", argIn);
         //System.out.println(devinfo.name + " created");
     }
 
@@ -391,14 +391,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#add_device(java.lang.String, java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public void add_device(Database database, String devname, String classname, String servname)
+    public void add_device(Database database, String deviceName, String classname, String serverName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DbDevInfo devinfo = new DbDevInfo(devname, classname, servname);
-        DeviceData argin = new DeviceData();
-        argin.insert(devinfo.toStringArray());
-        command_inout(database, "DbAddDevice", argin);
+        DbDevInfo devinfo = new DbDevInfo(deviceName, classname, serverName);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(devinfo.toStringArray());
+        command_inout(database, "DbAddDevice", argIn);
         //System.out.println(devinfo.name + " created");
     }
 
@@ -407,14 +407,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device(java.lang.String)
 	 */
     //==========================================================================
-    public void delete_device(Database database, String devname) throws DevFailed {
+    public void delete_device(Database database, String deviceName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         boolean delete = true;
         try {
             //	Check if device alive before delete
             //------------------------------------------
-            String fullDeviceName = "tango://" + database.get_tango_host() + "/" + devname;
+            String fullDeviceName = "tango://" + database.get_tango_host() + "/" + deviceName;
             DeviceProxy d = new DeviceProxy(fullDeviceName);
             d.ping();
             //	If device alive do not delete
@@ -423,10 +423,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         } catch (DevFailed e) { /* */ }
 
         if (delete) {
-            DeviceData argin = new DeviceData();
-            argin.insert(devname);
-            command_inout(database, "DbDeleteDevice", argin);
-            //System.out.println(devname + " deleted");
+            DeviceData argIn = new DeviceData();
+            argIn.insert(deviceName);
+            command_inout(database, "DbDeleteDevice", argIn);
+            //System.out.println(deviceName + " deleted");
         } else
             Except.throw_connection_failed("TangoApi_DEVICE_ALIVE",
                     "Cannot delete a device which is ALIVE.", "delete_device()");
@@ -437,14 +437,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_info(java.lang.String)
 	 */
     //==========================================================================
-    public DeviceInfo get_device_info(Database database, String devname)
+    public DeviceInfo get_device_info(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        DeviceData argout = command_inout(database, "DbGetDeviceInfo", argin);
-        DevVarLongStringArray info = argout.extractLongStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        DeviceData argOut = command_inout(database, "DbGetDeviceInfo", argIn);
+        DevVarLongStringArray info = argOut.extractLongStringArray();
         return new DeviceInfo(info);
     }
 
@@ -458,10 +458,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceWideList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceWideList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -469,7 +469,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#import_device(java.lang.String)
 	 */
     //==========================================================================
-    public DbDevImportInfo import_device(Database database, String devname)
+    public DbDevImportInfo import_device(Database database, String deviceName)
             throws DevFailed {
         DevVarLongStringArray info;
 
@@ -477,11 +477,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         int tmp_access = database.access;
         database.access = TangoConst.ACCESS_WRITE;
         try {
-            DeviceData argin = new DeviceData();
-            argin.insert(devname);
-            //System.out.println("DbImportDevice " + devname);
-            DeviceData argout = command_inout(database, "DbImportDevice", argin);
-            info = argout.extractLongStringArray();
+            DeviceData argIn = new DeviceData();
+            argIn.insert(deviceName);
+            //System.out.println("DbImportDevice " + deviceName);
+            DeviceData argOut = command_inout(database, "DbImportDevice", argIn);
+            info = argOut.extractLongStringArray();
             database.access = tmp_access;
         } catch (DevFailed e) {
             database.access = tmp_access;
@@ -495,13 +495,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#unexport_device(java.lang.String)
 	 */
     //==========================================================================
-    public void unexport_device(Database database, String devname)
+    public void unexport_device(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        command_inout(database, "DbUnExportDevice", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        command_inout(database, "DbUnExportDevice", argIn);
     }
 
     //==========================================================================
@@ -509,14 +509,19 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_device(fr.esrf.TangoApi.DbDevExportInfo)
 	 */
     //==========================================================================
-    public void export_device(Database database, DbDevExportInfo devinfo)
+    public void export_device(Database database, DbDevExportInfo devExportInfo)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        String[] array = devinfo.toStringArray();
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbExportDevice", argin);
+        //  Check for MySql 5.6 and higher compatibility
+        if (devExportInfo.host.isEmpty())    devExportInfo.host = "null";
+        if (devExportInfo.ior.isEmpty())     devExportInfo.ior = "null";
+        if (devExportInfo.version.isEmpty()) devExportInfo.version = "null";
+
+        String[] array = devExportInfo.toStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbExportDevice", argIn);
     }
 
 
@@ -528,14 +533,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_class_list(java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_device_class_list(Database database, String servname) throws DevFailed {
+    public String[] get_device_class_list(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        DeviceData argout = command_inout(database, "DbGetDeviceClassList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        DeviceData argOut = command_inout(database, "DbGetDeviceClassList", argIn);
+        return argOut.extractStringArray();
     }
 
 
@@ -544,19 +549,19 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_name(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_device_name(Database database, String servname, String classname)
+    public String[] get_device_name(Database database, String serverName, String classname)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array;
         array = new String[2];
-        array[0] = servname;
+        array[0] = serverName;
         array[1] = classname;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        DeviceData argout = command_inout(database, "DbGetDeviceList", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        DeviceData argOut = command_inout(database, "DbGetDeviceList", argIn);
 
-        return argout.extractStringArray();
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -568,10 +573,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceDomainList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceDomainList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -583,10 +588,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceFamilyList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceFamilyList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -598,10 +603,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceMemberList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceMemberList", argIn);
+        return argOut.extractStringArray();
     }
 
 
@@ -614,17 +619,17 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#add_server(java.lang.String, fr.esrf.TangoApi.DbDevInfo[])
 	 */
     //==========================================================================
-    public void add_server(Database database, String servname, DbDevInfo[] devinfo)
+    public void add_server(Database database, String serverName, DbDevInfo[] devinfo)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Convert data from DbDevInfos to a string array
         //----------------------------------------------
-        //System.out.println("creating " + servname);
+        //System.out.println("creating " + serverName);
         String[] array;
         array = new String[1 + 2 * devinfo.length];
 
-        array[0] = servname;
+        array[0] = serverName;
         for (int i = 0 ; i<devinfo.length ; i++) {
             array[2 * i + 1] = devinfo[i].name;
             array[2 * i + 2] = devinfo[i]._class;
@@ -632,9 +637,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //	Send command
         //-----------------------
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbAddServer", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbAddServer", argIn);
     }
 
     //==========================================================================
@@ -642,13 +647,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_server(java.lang.String)
 	 */
     //==========================================================================
-    public void delete_server(Database database, String devname)
+    public void delete_server(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        command_inout(database, "DbDeleteServer", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        command_inout(database, "DbDeleteServer", argIn);
     }
 
     //==========================================================================
@@ -656,24 +661,24 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#export_server(fr.esrf.TangoApi.DbDevExportInfo[])
 	 */
     //==========================================================================
-    public void export_server(Database database, DbDevExportInfo[] devinfo)
+    public void export_server(Database database, DbDevExportInfo[] devExportInfos)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Convert data from DbDevInfos to a string array
         //----------------------------------------------
         String[] array;
-        array = new String[6 * devinfo.length];
-        for (int i = 0 ; i<devinfo.length ; i++) {
-            String[] one = devinfo[i].toStringArray();
+        array = new String[6 * devExportInfos.length];
+        for (int i = 0 ; i<devExportInfos.length ; i++) {
+            String[] one = devExportInfos[i].toStringArray();
             System.arraycopy(one, 0, array, 6 * i, 6);
         }
 
         //	Send command
         //-----------------------
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbExportServer", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbExportServer", argIn);
     }
 
     //==========================================================================
@@ -681,13 +686,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#unexport_server(java.lang.String)
 	 */
     //==========================================================================
-    public void unexport_server(Database database, String devname)
+    public void unexport_server(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        command_inout(database, "DbUnExportServer", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        command_inout(database, "DbUnExportServer", argIn);
     }
 
 
@@ -858,10 +863,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //	Read Database
         //---------------------
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        DeviceData argout = command_inout(database, cmd, argin);
-        String[] result = argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        DeviceData argOut = command_inout(database, cmd, argIn);
+        String[] result = argOut.extractStringArray();
 
         //	And convert to DbDatum array before returning
         //-------------------------------------------------
@@ -943,17 +948,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         //---------------------------------------------------
         String cmd = "DbDelete" + type + "Property";
 
-        /****
-         for (int i=0 ; i<array.length ; i++)
-         System.out.println("array -> " + array[i]);
-         System.out.println("cmd -> " + cmd);
-         *********/
-
         //	Send it to  Database
         //------------------------------
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, cmd, argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, cmd, argIn);
     }
 
     //==========================================================================
@@ -965,10 +964,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetObjectList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetObjectList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -983,10 +982,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String[] array = new String[2];
         array[0] = objname;
         array[1] = wildcard;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        DeviceData argout = command_inout(database, "DbGetPropertyList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        DeviceData argOut = command_inout(database, "DbGetPropertyList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1037,10 +1036,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
             //	Read Database
             //---------------------
-            DeviceData argin = new DeviceData();
-            argin.insert(array);
-            DeviceData argout = command_inout(database, "DbGetProperty", argin);
-            String[] result = argout.extractStringArray();
+            DeviceData argIn = new DeviceData();
+            argIn.insert(array);
+            DeviceData argOut = command_inout(database, "DbGetProperty", argIn);
+            String[] result = argOut.extractStringArray();
 
             //	And convert to DbDatum array before returning
             datum = stringArray2DbDatum(result)[0];
@@ -1073,9 +1072,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array = dbdatum2StringArray(name, properties);
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutProperty", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutProperty", argIn);
     }
 
     //==========================================================================
@@ -1120,10 +1119,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(classname);
-        DeviceData argout = command_inout(database, "DbGetClassPropertyList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(classname);
+        DeviceData argOut = command_inout(database, "DbGetClassPropertyList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1131,17 +1130,17 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_property_list(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_device_property_list(Database database, String devname, String wildcard)
+    public String[] get_device_property_list(Database database, String deviceName, String wildcard)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array = new String[2];
-        array[0] = devname;
+        array[0] = deviceName;
         array[1] = wildcard;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        DeviceData argout = command_inout(database, "DbGetDevicePropertyList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        DeviceData argOut = command_inout(database, "DbGetDevicePropertyList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1149,14 +1148,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_class_for_device(java.lang.String)
 	 */
-    public String get_class_for_device(Database database, String devname)
+    public String get_class_for_device(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        DeviceData argout = command_inout(database, "DbGetClassForDevice", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        DeviceData argOut = command_inout(database, "DbGetClassForDevice", argIn);
+        return argOut.extractString();
     }
 
     //==========================================================================
@@ -1164,16 +1163,16 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	/* (non-Javadoc)
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_class_inheritance_for_device(java.lang.String)
 	 */
-    public String[] get_class_inheritance_for_device(Database database, String devname)
+    public String[] get_class_inheritance_for_device(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] result = {"Device_3Impl"};
         try {
-            DeviceData argin = new DeviceData();
-            argin.insert(devname);
-            DeviceData argout = command_inout(database, "DbGetClassInheritanceForDevice", argin);
-            result = argout.extractStringArray();
+            DeviceData argIn = new DeviceData();
+            argIn.insert(deviceName);
+            DeviceData argOut = command_inout(database, "DbGetClassInheritanceForDevice", argIn);
+            result = argOut.extractStringArray();
         } catch (DevFailed e) {
             //	Check if an old API else re-throw
             if (!e.errors[0].reason.equals("API_CommandNotFound"))
@@ -1230,9 +1229,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array = dbdatum2StringArray(name, properties);
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutDeviceProperty", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutDeviceProperty", argIn);
     }
 
     //==========================================================================
@@ -1278,14 +1277,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_attribute_list(java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_device_attribute_list(Database database, String devname)
+    public String[] get_device_attribute_list(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{devname, "*"});
-        DeviceData argout = command_inout(database, "DbGetDeviceAttributeList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{deviceName, "*"});
+        DeviceData argOut = command_inout(database, "DbGetDeviceAttributeList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1293,27 +1292,27 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_attribute_property(java.lang.String, java.lang.String[])
 	 */
     //==========================================================================
-    public DbAttribute[] get_device_attribute_property(Database database, String devname, String[] attnames)
+    public DbAttribute[] get_device_attribute_property(Database database, String deviceName, String[] attnames)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        DeviceData argout;
+        DeviceData argIn = new DeviceData();
+        DeviceData argOut;
         int mode = 2;
 
         try {
             //	value is an array
-            argin.insert(ApiUtil.toStringArray(devname, attnames));
-            argout = command_inout(database, "DbGetDeviceAttributeProperty2", argin);
+            argIn.insert(ApiUtil.toStringArray(deviceName, attnames));
+            argOut = command_inout(database, "DbGetDeviceAttributeProperty2", argIn);
         } catch (DevFailed e) {
             if (e.errors[0].reason.equals("API_CommandNotFound")) {
                 //	Value is just one element
-                argout = command_inout(database, "DbGetDeviceAttributeProperty", argin);
+                argOut = command_inout(database, "DbGetDeviceAttributeProperty", argIn);
                 mode = 1;
             } else
                 throw e;
         }
-        return ApiUtil.toDbAttributeArray(argout.extractStringArray(), mode);
+        return ApiUtil.toDbAttributeArray(argOut.extractStringArray(), mode);
     }
 
     //==========================================================================
@@ -1321,11 +1320,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_attribute_property(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public DbAttribute get_device_attribute_property(Database database, String devname, String attname)
+    public DbAttribute get_device_attribute_property(Database database, String deviceName, String attname)
             throws DevFailed {
         String[] attnames = new String[1];
         attnames[0] = attname;
-        return get_device_attribute_property(database, devname, attnames)[0];
+        return get_device_attribute_property(database, deviceName, attnames)[0];
     }
 
     //==========================================================================
@@ -1333,20 +1332,20 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#put_device_attribute_property(java.lang.String, fr.esrf.TangoApi.DbAttribute[])
 	 */
     //==========================================================================
-    public void put_device_attribute_property(Database database, String devname, DbAttribute[] attr)
+    public void put_device_attribute_property(Database database, String deviceName, DbAttribute[] attr)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
+        DeviceData argIn = new DeviceData();
         try {
             //	value is an array
-            argin.insert(ApiUtil.toStringArray(devname, attr, 2));
-            command_inout(database, "DbPutDeviceAttributeProperty2", argin);
+            argIn.insert(ApiUtil.toStringArray(deviceName, attr, 2));
+            command_inout(database, "DbPutDeviceAttributeProperty2", argIn);
         } catch (DevFailed e) {
             if (e.errors[0].reason.equals("API_CommandNotFound")) {
                 //	Value is just one element
-                argin.insert(ApiUtil.toStringArray(devname, attr, 1));
-                command_inout(database, "DbPutDeviceAttributeProperty", argin);
+                argIn.insert(ApiUtil.toStringArray(deviceName, attr, 1));
+                command_inout(database, "DbPutDeviceAttributeProperty", argIn);
             } else
                 throw e;
         }
@@ -1357,11 +1356,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#put_device_attribute_property(java.lang.String, fr.esrf.TangoApi.DbAttribute)
 	 */
     //==========================================================================
-    public void put_device_attribute_property(Database database, String devname, DbAttribute attr)
+    public void put_device_attribute_property(Database database, String deviceName, DbAttribute attr)
             throws DevFailed {
         DbAttribute[] da = new DbAttribute[1];
         da[0] = attr;
-        put_device_attribute_property(database, devname, da);
+        put_device_attribute_property(database, deviceName, da);
     }
 
     //==========================================================================
@@ -1369,9 +1368,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute_property(java.lang.String, fr.esrf.TangoApi.DbAttribute)
 	 */
     //==========================================================================
-    public void delete_device_attribute_property(Database database, String devname, DbAttribute attr)
+    public void delete_device_attribute_property(Database database, String deviceName, DbAttribute attr)
             throws DevFailed {
-        delete_device_attribute_property(database, devname,
+        delete_device_attribute_property(database, deviceName,
                 attr.name, attr.get_property_list());
     }
 
@@ -1380,10 +1379,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute_property(java.lang.String, fr.esrf.TangoApi.DbAttribute[])
 	 */
     //==========================================================================
-    public void delete_device_attribute_property(Database database, String devname, DbAttribute[] attribute)
+    public void delete_device_attribute_property(Database database, String deviceName, DbAttribute[] attribute)
             throws DevFailed {
         for (DbAttribute att : attribute)
-            delete_device_attribute_property(database, devname,
+            delete_device_attribute_property(database, deviceName,
                     att.name, att.get_property_list());
     }
 
@@ -1392,7 +1391,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute_property(java.lang.String, java.lang.String, java.lang.String[])
 	 */
     //==========================================================================
-    public void delete_device_attribute_property(Database database, String devname, String attname, String[] propnames)
+    public void delete_device_attribute_property(Database database, String deviceName, String attname, String[] propnames)
             throws DevFailed {
         if (propnames.length==0)
             return;
@@ -1401,13 +1400,13 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //	Build a String array before command
         String[] array = new String[2 + propnames.length];
-        array[0] = devname;
+        array[0] = deviceName;
         array[1] = attname;
         System.arraycopy(propnames, 0, array, 2, propnames.length);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbDeleteDeviceAttributeProperty", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbDeleteDeviceAttributeProperty", argIn);
     }
 
     //==========================================================================
@@ -1415,11 +1414,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute_property(java.lang.String, java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public void delete_device_attribute_property(Database database, String devname, String attname, String propname)
+    public void delete_device_attribute_property(Database database, String deviceName, String attname, String propname)
             throws DevFailed {
         String[] array = new String[1];
         array[0] = propname;
-        delete_device_attribute_property(database, devname, attname, array);
+        delete_device_attribute_property(database, deviceName, attname, array);
     }
 
 
@@ -1428,15 +1427,15 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#delete_device_attribute(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public void delete_device_attribute(Database database, String devname, String attname) throws DevFailed {
+    public void delete_device_attribute(Database database, String deviceName, String attname) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array = new String[2];
-        array[0] = devname;
+        array[0] = deviceName;
         array[1] = attname;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbDeleteDeviceAttribute", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbDeleteDeviceAttribute", argIn);
     }
 
 
@@ -1448,14 +1447,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_class_list(java.lang.String)
 	 */
     //==========================================================================
-    public String[] get_class_list(Database database, String servname) throws DevFailed {
+    public String[] get_class_list(Database database, String serverName) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
         //	Query info from database
-        DeviceData argin = new DeviceData();
-        argin.insert(servname);
-        DeviceData argout = command_inout(database, "DbGetClassList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(serverName);
+        DeviceData argOut = command_inout(database, "DbGetClassList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1501,9 +1500,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         if (!database.isAccess_checked()) checkAccess(database);
 
         String[] array = dbdatum2StringArray(name, properties);
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutClassProperty", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutClassProperty", argIn);
     }
 
     //==========================================================================
@@ -1551,10 +1550,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public String[] get_class_attribute_list(Database database, String classname, String wildcard) throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(ApiUtil.toStringArray(classname, wildcard));
-        DeviceData argout = command_inout(database, "DbGetClassAttributeList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(ApiUtil.toStringArray(classname, wildcard));
+        DeviceData argOut = command_inout(database, "DbGetClassAttributeList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1577,23 +1576,23 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        DeviceData argout;
+        DeviceData argIn = new DeviceData();
+        DeviceData argOut;
         int mode = 2;
 
         try {
             //	value is an array
-            argin.insert(ApiUtil.toStringArray(classname, attnames));
-            argout = command_inout(database, "DbGetClassAttributeProperty2", argin);
+            argIn.insert(ApiUtil.toStringArray(classname, attnames));
+            argOut = command_inout(database, "DbGetClassAttributeProperty2", argIn);
         } catch (DevFailed e) {
             if (e.errors[0].reason.equals("API_CommandNotFound")) {
                 //	Value is just one element
-                argout = command_inout(database, "DbGetClassAttributeProperty", argin);
+                argOut = command_inout(database, "DbGetClassAttributeProperty", argIn);
                 mode = 1;
             } else
                 throw e;
         }
-        return ApiUtil.toDbAttributeArray(argout.extractStringArray(), mode);
+        return ApiUtil.toDbAttributeArray(argOut.extractStringArray(), mode);
     }
 
     //==========================================================================
@@ -1605,9 +1604,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(ApiUtil.toStringArray(classname, attr, 2));
-        command_inout(database, "DbPutClassAttributeProperty2", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(ApiUtil.toStringArray(classname, attr, 2));
+        command_inout(database, "DbPutClassAttributeProperty2", argIn);
     }
 
     //==========================================================================
@@ -1648,9 +1647,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         array[1] = attname;
         System.arraycopy(propnames, 0, array, 2, propnames.length);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbDeleteClassAttributeProperty", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbDeleteClassAttributeProperty", argIn);
     }
 
     //==========================================================================
@@ -1662,11 +1661,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceExportedList", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceExportedList", argIn);
 
-        return argout.extractStringArray();
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1678,11 +1677,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(classname);
-        DeviceData argout = command_inout(database, "DbGetExportdDeviceListForClass", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(classname);
+        DeviceData argOut = command_inout(database, "DbGetExportdDeviceListForClass", argIn);
 
-        return argout.extractStringArray();
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1701,10 +1700,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      */
     // ==========================================================================
     public String getAliasFromDevice(Database database, String deviceName) throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(deviceName);
-        DeviceData argout = command_inout(database, "DbGetDeviceAlias", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        DeviceData argOut = command_inout(database, "DbGetDeviceAlias", argIn);
+        return argOut.extractString();
     }
 
     // ==========================================================================
@@ -1719,10 +1718,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      */
     // ==========================================================================
     public String getDeviceFromAlias(Database database, String alias) throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(alias);
-        DeviceData argout = command_inout(database, "DbGetAliasDevice", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(alias);
+        DeviceData argOut = command_inout(database, "DbGetAliasDevice", argIn);
+        return argOut.extractString();
     }
 
     // ==========================================================================
@@ -1737,10 +1736,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      */
     // ==========================================================================
     public String getAliasFromAttribute(Database database, String attName) throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(attName);
-        DeviceData argout = command_inout(database, "DbGetAttributeAlias2", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(attName);
+        DeviceData argOut = command_inout(database, "DbGetAttributeAlias2", argIn);
+        return argOut.extractString();
     }
 
     // ==========================================================================
@@ -1755,10 +1754,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      */
     // ==========================================================================
     public String getAttributeFromAlias(Database database, String alias) throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(alias);
-        DeviceData argout = command_inout(database, "DbGetAliasAttribute", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(alias);
+        DeviceData argOut = command_inout(database, "DbGetAliasAttribute", argIn);
+        return argOut.extractString();
     }
 
     //==========================================================================
@@ -1768,10 +1767,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     //==========================================================================
     public String[] get_device_alias_list(Database database, String wildcard)
             throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetDeviceAliasList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetDeviceAliasList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1779,14 +1778,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_alias(java.lang.String)
 	 */
     //==========================================================================
-    public String get_device_alias(Database database, String devname)
+    public String get_device_alias(Database database, String deviceName)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(devname);
-        DeviceData argout = command_inout(database, "DbGetDeviceAlias", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(deviceName);
+        DeviceData argOut = command_inout(database, "DbGetDeviceAlias", argIn);
+        return argOut.extractString();
     }
 
     //==========================================================================
@@ -1798,10 +1797,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(alias);
-        DeviceData argout = command_inout(database, "DbGetAliasDevice", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(alias);
+        DeviceData argOut = command_inout(database, "DbGetAliasDevice", argIn);
+        return argOut.extractString();
     }
 
     //==========================================================================
@@ -1809,14 +1808,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#put_device_alias(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public void put_device_alias(Database database, String devname, String aliasname)
+    public void put_device_alias(Database database, String deviceName, String aliasname)
             throws DevFailed {
         String[] array = new String[2];
-        array[0] = devname;
+        array[0] = deviceName;
         array[1] = aliasname;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutDeviceAlias", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutDeviceAlias", argIn);
     }
 
     //==========================================================================
@@ -1828,9 +1827,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(alias);
-        command_inout(database, "DbDeleteDeviceAlias", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(alias);
+        command_inout(database, "DbDeleteDeviceAlias", argIn);
     }
 
 
@@ -1841,10 +1840,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     //==========================================================================
     public String[] get_attribute_alias_list(Database database, String wildcard)
             throws DevFailed {
-        DeviceData argin = new DeviceData();
-        argin.insert(wildcard);
-        DeviceData argout = command_inout(database, "DbGetAttributeAliasList", argin);
-        return argout.extractStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(wildcard);
+        DeviceData argOut = command_inout(database, "DbGetAttributeAliasList", argIn);
+        return argOut.extractStringArray();
     }
 
     //==========================================================================
@@ -1856,10 +1855,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(attname);
-        DeviceData argout = command_inout(database, "DbGetAttributeAlias", argin);
-        return argout.extractString();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(attname);
+        DeviceData argOut = command_inout(database, "DbGetAttributeAlias", argIn);
+        return argOut.extractString();
     }
 
     //==========================================================================
@@ -1872,9 +1871,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         String[] array = new String[2];
         array[0] = attname;
         array[1] = aliasname;
-        DeviceData argin = new DeviceData();
-        argin.insert(array);
-        command_inout(database, "DbPutAttributeAlias", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(array);
+        command_inout(database, "DbPutAttributeAlias", argIn);
     }
 
     //==========================================================================
@@ -1886,9 +1885,9 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(alias);
-        command_inout(database, "DbDeleteAttributeAlias", argin);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(alias);
+        command_inout(database, "DbDeleteAttributeAlias", argIn);
     }
 
     //==========================================================================
@@ -1952,10 +1951,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //  Check if channel name i a full url
         channel_name = new TangoUrl(channel_name).devname;
-        DeviceData argin = new DeviceData();
-        argin.insert(channel_name);
-        DeviceData argout = command_inout(database, "DbImportEvent", argin);
-        DevVarLongStringArray info = argout.extractLongStringArray();
+        DeviceData argIn = new DeviceData();
+        argIn.insert(channel_name);
+        DeviceData argOut = command_inout(database, "DbImportEvent", argIn);
+        DevVarLongStringArray info = argOut.extractLongStringArray();
         return new DbEventImportInfo(info);
     }
 
@@ -2016,14 +2015,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_property_history(java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public DbHistory[] get_device_property_history(Database database, String devname, String propname)
+    public DbHistory[] get_device_property_history(Database database, String deviceName, String propname)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{devname, propname});
-        DeviceData argout = command_inout(database, "DbGetDevicePropertyHist", argin);
-        List<DbHistory> dbHistories = convertPropertyHistory(argout.extractStringArray(), false);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{deviceName, propname});
+        DeviceData argOut = command_inout(database, "DbGetDevicePropertyHist", argIn);
+        List<DbHistory> dbHistories = convertPropertyHistory(argOut.extractStringArray(), false);
         DbHistory[] array = new DbHistory[dbHistories.size()];
         for (int i=0 ; i<array.length ; i++)
             array[i] = dbHistories.get(i);
@@ -2035,14 +2034,14 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#get_device_attribute_property_history(java.lang.String, java.lang.String, java.lang.String)
 	 */
     //==========================================================================
-    public DbHistory[] get_device_attribute_property_history(Database database, String devname, String attname, String propname)
+    public DbHistory[] get_device_attribute_property_history(Database database, String deviceName, String attname, String propname)
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{devname, attname, propname});
-        DeviceData argout = command_inout(database, "DbGetDeviceAttributePropertyHist", argin);
-        List<DbHistory> dbHistories =  convertPropertyHistory(argout.extractStringArray(), true);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{deviceName, attname, propname});
+        DeviceData argOut = command_inout(database, "DbGetDeviceAttributePropertyHist", argIn);
+        List<DbHistory> dbHistories =  convertPropertyHistory(argOut.extractStringArray(), true);
         DbHistory[] array = new DbHistory[dbHistories.size()];
         for (int i=0 ; i<array.length ; i++)
             array[i] = dbHistories.get(i);
@@ -2058,10 +2057,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{classname, propname});
-        DeviceData argout = command_inout(database, "DbGetClassPropertyHist", argin);
-        List<DbHistory> dbHistories =  convertPropertyHistory(argout.extractStringArray(), false);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{classname, propname});
+        DeviceData argOut = command_inout(database, "DbGetClassPropertyHist", argIn);
+        List<DbHistory> dbHistories =  convertPropertyHistory(argOut.extractStringArray(), false);
         DbHistory[] array = new DbHistory[dbHistories.size()];
         for (int i=0 ; i<array.length ; i++)
             array[i] = dbHistories.get(i);
@@ -2077,10 +2076,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{classname, attname, propname});
-        DeviceData argout = command_inout(database, "DbGetClassAttributePropertyHist", argin);
-        List<DbHistory> dbHistories =  convertPropertyHistory(argout.extractStringArray(), true);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{classname, attname, propname});
+        DeviceData argOut = command_inout(database, "DbGetClassAttributePropertyHist", argIn);
+        List<DbHistory> dbHistories =  convertPropertyHistory(argOut.extractStringArray(), true);
         DbHistory[] array = new DbHistory[dbHistories.size()];
         for (int i=0 ; i<array.length ; i++)
             array[i] = dbHistories.get(i);
@@ -2097,10 +2096,10 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             throws DevFailed {
         if (!database.isAccess_checked()) checkAccess(database);
 
-        DeviceData argin = new DeviceData();
-        argin.insert(new String[]{objname, propname});
-        DeviceData argout = command_inout(database, "DbGetPropertyHist", argin);
-        List<DbHistory> dbHistories =  convertPropertyHistory(argout.extractStringArray(), false);
+        DeviceData argIn = new DeviceData();
+        argIn.insert(new String[]{objname, propname});
+        DeviceData argOut = command_inout(database, "DbGetPropertyHist", argIn);
+        List<DbHistory> dbHistories =  convertPropertyHistory(argOut.extractStringArray(), false);
         DbHistory[] array = new DbHistory[dbHistories.size()];
         for (int i=0 ; i<array.length ; i++)
             array[i] = dbHistories.get(i);
@@ -2155,7 +2154,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#registerService(java.lang.String, java.lang.String, java.lang.String)
 	 */
     //===============================================================
-    public void registerService(Database database, String serviceName, String instanceName, String devname)
+    public void registerService(Database database, String serviceName, String instanceName, String deviceName)
             throws DevFailed {
         String[] services = new String[0];
 
@@ -2168,7 +2167,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         //	Build what to be inserted and searched
         String new_line = serviceName + "/" + instanceName;
         String target = new_line.toLowerCase();
-        new_line += ":" + devname;
+        new_line += ":" + deviceName;
 
         //	Search if already exists
         boolean exists = false;
@@ -2204,7 +2203,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 	 * @see fr.esrf.TangoApi.IDatabaseDAO#unregisterService(java.lang.String, java.lang.String, java.lang.String)
 	 */
     //===============================================================
-    public void unregisterService(Database database, String serviceName, String instanceName, String devname)
+    public void unregisterService(Database database, String serviceName, String instanceName, String deviceName)
             throws DevFailed {
         String[] services = new String[0];
 
@@ -2259,25 +2258,25 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      * - Check access for this user, this host and the specified device.
      *
      * @param database used database object
-     * @param devname  Specified device name.
+     * @param deviceName  Specified device name.
      * @param devUrl   Specified device url
-     * @return The Tango access controle found.
+     * @return The Tango access control found.
      */
     //===================================================================
-    public int checkAccessControl(Database database, String devname, TangoUrl devUrl) {
+    public int checkAccessControl(Database database, String deviceName, TangoUrl devUrl) {
         int access = TangoConst.ACCESS_WRITE;
         synchronized (monitor) {
             if (database.devname==null)
                 database.devname = database.device.name();
-            if (devname.equals(database.devname) && database.isAccess_checked())
+            if (deviceName.equals(database.devname) && database.isAccess_checked())
                 return database.access;
             try {
                 //	Else create proxy
                 //	Check if AccessProxy object already exists
                 if (/*!database.isAccess_checked() &&*/ database.getAccess_proxy()==null) {
-                    //	Check if access devname is from env (for tests)
-                    String access_devname = ApiUtil.getAccessDevname();
-                    if (access_devname==null || access_devname.length()==0) {
+                    //	Check if access deviceName is from env (for tests)
+                    String access_deviceName = ApiUtil.getAccessDevname();
+                    if (access_deviceName==null || access_deviceName.length()==0) {
                         if (access_service_read)
                             if (!database.check_access)
                                 return TangoConst.ACCESS_WRITE;
@@ -2286,7 +2285,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
                         String[] services =
                                 getServices(database, TangoConst.ACCESS_SERVICE, "*");
                         if (services.length>0)
-                            access_devname = services[0];
+                            access_deviceName = services[0];
                         else {
                             //	if not set --> No check
                             //System.out.println("No Access Service Found !");
@@ -2296,20 +2295,20 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
                         }
                     }
                     // If tango_host not from env -> add tango_host as header for access device name
-                    //  Check if header not already in access_devname :-)
-                    if (!devUrl.fromEnv && !access_devname.startsWith("tango://"))
-                        access_devname = "tango://" + devUrl.host + ":" + devUrl.port + "/" + access_devname;
+                    //  Check if header not already in access_deviceName :-)
+                    if (!devUrl.fromEnv && !access_deviceName.startsWith("tango://"))
+                        access_deviceName = "tango://" + devUrl.host + ":" + devUrl.port + "/" + access_deviceName;
 
                     //	Then build Tango Access Control Proxy
-                    database.setAccess_proxy(new AccessProxy(access_devname));
+                    database.setAccess_proxy(new AccessProxy(access_deviceName));
                 }
                 if (database.getAccess_proxy()!=null) {
-                    access = database.getAccess_proxy().checkAccessControl(devname);
+                    access = database.getAccess_proxy().checkAccessControl(deviceName);
                 }
 
                 //	if database access not already checked, and not first import -> do it now
                 if (!database.isAccess_checked())
-                    if (!devname.equals(database.device.name()))
+                    if (!deviceName.equals(database.device.name()))
                         checkAccess(database);
 
             } catch (DevFailed e) {

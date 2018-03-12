@@ -447,37 +447,37 @@ public class Database extends Connection {
 	/**
 	 * Query the database for the export info of the specified device.
 	 * 
-	 * @param devname The device name.
+	 * @param deviceName The device name.
 	 * @return the information in a DbDevImportInfo.
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
-	public DbDevImportInfo import_device(String devname) throws DevFailed {
-		return databaseDAO.import_device(this, devname);
+	public DbDevImportInfo import_device(String deviceName) throws DevFailed {
+		return databaseDAO.import_device(this, deviceName);
 	}
 
 	// ==========================================================================
 	/**
 	 * Mark the specified server as unexported in the database.
 	 * 
-	 * @param devname The device name.
+	 * @param deviceName The device name.
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
-	public void unexport_device(String devname) throws DevFailed {
-		databaseDAO.unexport_device(this, devname);
+	public void unexport_device(String deviceName) throws DevFailed {
+		databaseDAO.unexport_device(this, deviceName);
 	}
 
 	// ==========================================================================
 	/**
 	 * Update the export info fort this device in the database.
 	 * 
-	 * @param devinfo Device information to export.
+	 * @param devExportInfo Device information to export.
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
-	public void export_device(DbDevExportInfo devinfo) throws DevFailed {
-		databaseDAO.export_device(this, devinfo);
+	public void export_device(DbDevExportInfo devExportInfo) throws DevFailed {
+		databaseDAO.export_device(this, devExportInfo);
 	}
 
 	// **************************************
@@ -487,14 +487,14 @@ public class Database extends Connection {
 	/**
 	 * Query the database for server devices and classes.
 	 * 
-	 * @param servname The specified server name.
+	 * @param serverName The specified server name.
 	 * @return The devices and classes (e.g. "id11/motor/1", "StepperMotor",
 	 *         "id11/motor/2", "StepperMotor",....)
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
-	public String[] get_device_class_list(String servname) throws DevFailed {
-		return databaseDAO.get_device_class_list(this, servname);
+	public String[] get_device_class_list(String serverName) throws DevFailed {
+		return databaseDAO.get_device_class_list(this, serverName);
 	}
 
 	// ==========================================================================
@@ -502,14 +502,14 @@ public class Database extends Connection {
 	 * Query the database for a list of devices served by the specified server
 	 * and of the specified class.
 	 * 
-	 * @param servname The server name.
-	 * @param classname The class name
+	 * @param serverName The server name.
+	 * @param className The class name
 	 * @return the device names are stored in an array of strings.
      * @throws DevFailed in case of database access failed
 	 */
 	// ==========================================================================
-	public String[] get_device_name(String servname, String classname) throws DevFailed {
-		return databaseDAO.get_device_name(this, servname, classname);
+	public String[] get_device_name(String serverName, String className) throws DevFailed {
+		return databaseDAO.get_device_name(this, serverName, className);
 	}
 
 	// ==========================================================================
