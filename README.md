@@ -22,6 +22,15 @@
 [![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
 [![Lines Of Code](https://sonarcloud.io/api/badges/measure?key=org.tango-controls:JTango-root:jtango-9-lts&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
 
+# JavaDoc
+
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoServer.svg?color=yellowgreen&label=JTangoServer)](http://javadoc.io/doc/org.tango-controls/JTangoServer)
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoClientLang.svg?label=JTangoClientLang&color=blue)](http://javadoc.io/doc/org.tango-controls/JTangoClientLang)
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoCommons.svg?color=yellow&label=JTangoCommons)](http://javadoc.io/doc/org.tango-controls/JTangoCommons)
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/TangORB.svg?color=orange&label=TangORB)](http://javadoc.io/doc/org.tango-controls/TangORB)
+[![Javadocs](http://javadoc.io/badge/org.tango-controls/JavaTangoIDL.svg?color=lightgrey&label=JavaTangoIDL)](http://javadoc.io/doc/org.tango-controls/JavaTangoIDL)
+
+
 # JTango
 
 TANGO kernel Java implementation
