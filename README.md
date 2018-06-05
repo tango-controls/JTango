@@ -24,6 +24,8 @@
 
 # JavaDoc
 
+You can choose the specific version of the library via drop down box after following the links below:
+
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoServer.svg?color=yellowgreen&label=JTangoServer)](http://javadoc.io/doc/org.tango-controls/JTangoServer)
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoClientLang.svg?label=JTangoClientLang&color=blue)](http://javadoc.io/doc/org.tango-controls/JTangoClientLang)
 [![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoCommons.svg?color=yellow&label=JTangoCommons)](http://javadoc.io/doc/org.tango-controls/JTangoCommons)
