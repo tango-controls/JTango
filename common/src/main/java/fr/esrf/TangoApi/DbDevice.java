@@ -454,7 +454,11 @@ public class DbDevice implements java.io.Serializable {
         //	Get the polling property
         String propname = (src==TangoConst.ATTRIBUTE) ? "polled_attr" : "polled_cmd";
         DbDatum datum = get_property(propname);
-        if (datum.is_empty()) Except.throw_exception("NOT_POLLED",         ((src==TangoConst.ATTRIBUTE) ? "Attribute " : "Command ") +                 name + " not polled",         "DbDevice.get_polling_period()");
+        if (datum.is_empty())
+            Except.throw_exception("NOT_POLLED",
+                    ((src==TangoConst.ATTRIBUTE) ? "Attribute " : "Command ") +
+                            name + " not polled",
+                    "DbDevice.get_polling_period()");
 
 
         String[] str = datum.extractStringArray();
