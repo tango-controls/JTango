@@ -45,6 +45,7 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
+import ch.qos.logback.core.util.FileSize;
 import fr.esrf.Tango.DevFailed;
 
 /**
@@ -233,7 +234,7 @@ public final class LoggingManager {
             rollingPolicy.start();
 
             final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-            triggeringPolicy.setMaxFileSize("5MB");
+            triggeringPolicy.setMaxFileSize(FileSize.valueOf("5 mb"));
             triggeringPolicy.setContext(loggerContext);
             triggeringPolicy.start();
 

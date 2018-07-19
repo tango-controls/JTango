@@ -222,6 +222,8 @@ public class DeviceImpl extends Device_5POA {
      */
     private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
 
+    private final Map<String, String> contextMap;
+
     /**
      * Ctr
      *
@@ -237,6 +239,9 @@ public class DeviceImpl extends Device_5POA {
      */
     public DeviceImpl(final String deviceName, final String className, final TransactionType txType,
             final Object businessObject, final String deviceType) throws DevFailed {
+        MDC.put(MDC_KEY, deviceName);
+        contextMap = MDC.getCopyOfContextMap();
+
         name = deviceName;
         this.className = className;
         this.deviceType = deviceType;
@@ -309,8 +314,6 @@ public class DeviceImpl extends Device_5POA {
         } catch (final NoSuchMethodException e) {
             DevFailedUtils.throwDevFailed(e);
         }
-
-        MDC.put(MDC_KEY, name);
         logger.debug("Device {} of of {} created with tx type: {}",
                 new Object[] { deviceName, businessObject.getClass(), txType });
 
@@ -422,7 +425,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Command(name = STATE_NAME, outTypeDesc = "Device state")
     public DevState executeStateCmd() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         xlogger.exit();
         return getState();
@@ -437,7 +440,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Command(name = STATUS_NAME, outTypeDesc = "Device status")
     public String executeStatusCmd() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         xlogger.exit();
         return getStatus();
@@ -653,7 +656,7 @@ public class DeviceImpl extends Device_5POA {
      * </ul>
      */
     public synchronized void initDevice() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (stateImpl == null) {
             stateImpl = new StateImpl(businessObject, null, null);
@@ -691,7 +694,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public void deleteDevice() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         PropertiesUtils.clearCache();
         PropertiesUtils.clearDeviceCache(name);
@@ -746,7 +749,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevInfo info() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation info");
         final DevInfo info = new DevInfo();
@@ -767,7 +770,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevInfo_3 info_3() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation info_3");
         final DevInfo_3 info3 = new DevInfo_3();
@@ -789,7 +792,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void ping() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation ping");
         xlogger.exit();
@@ -800,7 +803,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String adm_name() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Attribute adm_name");
         xlogger.exit();
@@ -820,7 +823,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String[] black_box(final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // deviceMonitoring.addRequest("black_box");
         if (maxSize <= 0) {
@@ -837,7 +840,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String description() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Attribute description requested ");
         String desc = "A TANGO device";
@@ -854,7 +857,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String name() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         deviceMonitoring.startRequest("Device name");
         xlogger.entry();
         return name;
@@ -872,7 +875,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory[] read_attribute_history_2(final String attributeName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_2");
@@ -892,7 +895,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_3[] read_attribute_history_3(final String attributeName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // TODO read_attribute_history_3
         checkInitialization();
@@ -912,7 +915,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_4 read_attribute_history_4(final String attributeName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_4");
@@ -946,7 +949,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes(final String[] attributeNames) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (attributeNames.length != 1 || !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -986,7 +989,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes_2(final String[] names, final DevSource source) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1029,7 +1032,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_3[] read_attributes_3(final String[] names, final DevSource source) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1076,7 +1079,7 @@ public class DeviceImpl extends Device_5POA {
             throws DevFailed {
         // final Profiler profilerPeriod = new Profiler("period");
         // profilerPeriod.start(Arrays.toString(names));
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1126,7 +1129,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
             throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
         // final Profiler profiler = new Profiler("read time");
         // profiler.start(Arrays.toString(names));
@@ -1180,7 +1183,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes(final AttributeValue[] values) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("write_attributes");
@@ -1217,7 +1220,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_3(final AttributeValue[] values) throws MultiDevFailed, DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("write_attributes_3");
@@ -1257,7 +1260,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
             DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         final String[] names = new String[values.length];
@@ -1300,7 +1303,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_4[] write_read_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent)
             throws MultiDevFailed, DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
 
@@ -1422,7 +1425,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo[] command_list_query() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_list_query");
@@ -1453,7 +1456,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo_2[] command_list_query_2() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_list_query_2");
@@ -1487,7 +1490,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo command_query(final String commandName) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_query " + commandName);
@@ -1512,7 +1515,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo_2 command_query_2(final String commandName) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_query_2 " + commandName);
@@ -1540,7 +1543,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout(final String command, final Any argin) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
@@ -1580,7 +1583,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout_2(final String command, final Any argin, final DevSource source) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
@@ -1621,7 +1624,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public Any command_inout_4(final String commandName, final Any argin, final DevSource source,
             final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(commandName);
         if (!commandName.equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !commandName.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1664,7 +1667,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdHistory[] command_inout_history_2(final String commandName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("command_inout_history_2 " + commandName);
@@ -1685,7 +1688,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdHistory_4 command_inout_history_4(final String commandName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         final long request = deviceMonitoring.startRequest("command_inout_history_4 " + commandName);
@@ -1784,7 +1787,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_5[] get_attribute_config_5(final String[] attributeNames) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_5 " + Arrays.toString(attributeNames));
@@ -1837,7 +1840,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_3[] get_attribute_config_3(final String[] attributeNames) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_3 " + Arrays.toString(attributeNames));
@@ -1887,7 +1890,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_2[] get_attribute_config_2(final String[] attributeNames) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_2 " + Arrays.toString(attributeNames));
@@ -1939,7 +1942,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig[] get_attribute_config(final String[] attributeNames) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config " + Arrays.toString(attributeNames));
@@ -1984,7 +1987,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void set_attribute_config_5(final AttributeConfig_5[] newConf, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2031,7 +2034,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config_4(final AttributeConfig_3[] newConf, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2053,7 +2056,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config_3(final AttributeConfig_3[] newConf) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("set_attribute_config_3");
@@ -2086,7 +2089,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config(final AttributeConfig[] newConf) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("set_attribute_config");
@@ -2253,7 +2256,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevState state() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         try {
             state = getState();
@@ -2277,7 +2280,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String status() {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         try {
             status = getStatus();
@@ -2361,7 +2364,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public DevState getState() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         if (isCorrectlyInit.get() && initImpl.isInitDoneCorrectly()) {
             state = stateImpl.updateState();
@@ -2417,7 +2420,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public String getStatus() throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
 
         if (initImpl.isInitInProgress()) {
@@ -2543,7 +2546,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_5 read_attribute_history_5(final String attributeName, final int maxSize) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_5");
@@ -2609,7 +2612,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void set_pipe_config_5(final PipeConfig[] newConf, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2625,7 +2628,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public DevPipeData read_pipe_5(final String name, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         deviceMonitoring.startRequest("read_pipe_5 " + name, clIdent);
@@ -2654,7 +2657,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void write_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(value.name);
         final PipeImpl pipe = getPipe(value.name, pipeList);
         deviceMonitoring.startRequest("write_pipe_5 " + value.name, clIdent);
@@ -2680,7 +2683,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public DevPipeData write_read_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
-        MDC.put(MDC_KEY, name);
+       MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         deviceMonitoring.startRequest("write_read_pipe_5 " + name, clIdent);

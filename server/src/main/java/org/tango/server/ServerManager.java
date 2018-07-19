@@ -62,7 +62,7 @@ import fr.esrf.Tango.DevFailed;
  *
  */
 public final class ServerManager {
-    private static final String SERVER_NAME_LOGGING = "serverName";
+    public static final String SERVER_NAME_LOGGING = "serverName";
     private static final String NODB = "-nodb";
     /**
      * maximun length for device server name (255 characters)

@@ -64,6 +64,7 @@ import fr.esrf.Tango.DevFailed;
  */
 public final class DeviceBuilder {
 
+    private static final String MDC_DEVICE_NAME_KEY = "deviceName";
     private static final String MUST_BE_UNIQUE = " must be unique";
     private final Logger logger = LoggerFactory.getLogger(DeviceBuilder.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(DeviceBuilder.class);
@@ -81,7 +82,7 @@ public final class DeviceBuilder {
     }
 
     public DeviceImpl createDevice() throws DevFailed {
-        MDC.put("deviceName", name);
+        MDC.put(MDC_DEVICE_NAME_KEY, name);
         xlogger.entry();
 
         checkIsTangoDevice(clazz, name);

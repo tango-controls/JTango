@@ -37,11 +37,7 @@
 
     <properties>
         <jacorb.version>3.8</jacorb.version>
-        <!-- TODO remove -->
-        <maven.repositories.server>calypso</maven.repositories.server>
-        <maven.repositories.home>/nexus/content/repositories</maven.repositories.home>
-        <maven.web.server>calypso</maven.web.server>
-        <maven.web.home>/usr/Local/apache/docs</maven.web.home>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <developers>
@@ -153,17 +149,17 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.4</version>
+                <version>3.5</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.5</version>
+                <version>1.7.6</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-ext</artifactId>
-                <version>1.7.5</version>
+                <version>1.7.6</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

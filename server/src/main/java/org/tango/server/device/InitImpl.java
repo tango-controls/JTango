@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,6 +40,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.tango.DeviceState;
 import org.tango.server.Constants;
 import org.tango.server.DeviceBehaviorObject;
@@ -80,6 +82,7 @@ public final class InitImpl extends DeviceBehaviorObject {
     private Future<Void> future;
     private final AtomicBoolean isInitDoneCorrectly = new AtomicBoolean(false);
     private PollingManager pollingManager;
+    private final Map<String, String> contextMap;
 
     public void setPollingManager(final PollingManager pollingManager) {
         this.pollingManager = pollingManager;
@@ -92,9 +95,11 @@ public final class InitImpl extends DeviceBehaviorObject {
      * @param isLazy
      * @param businessObject
      */
+    @SuppressWarnings("unchecked")
     public InitImpl(final String deviceName, final Method initMethod, final boolean isLazy,
             final Object businessObject, final PollingManager pollingManager) {
         super();
+        contextMap = MDC.getCopyOfContextMap();
         this.initMethod = initMethod;
         this.isLazy = isLazy;
         this.businessObject = businessObject;
@@ -115,6 +120,7 @@ public final class InitImpl extends DeviceBehaviorObject {
                 @Override
                 public Void call() throws DevFailed {
                     logger.debug("Lazy init in");
+                    MDC.setContextMap(contextMap);
                     doInit(stateImpl, statusImpl);
                     logger.debug("Lazy init out");
                     return null;
@@ -153,7 +159,6 @@ public final class InitImpl extends DeviceBehaviorObject {
      *
      * @param stateImpl
      * @param statusImpl
-     * @param finishedHandler
      */
     private void doInit(final StateImpl stateImpl, final StatusImpl statusImpl) {
         isInitDoneCorrectly.set(false);
