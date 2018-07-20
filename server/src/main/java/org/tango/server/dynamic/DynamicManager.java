@@ -1,35 +1,30 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.dynamic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -49,14 +44,17 @@ import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Manage dynamic commands and attributes. The creation of commands and attributes should done in {@link Init}. Don't
  * forget to delete them in {@link Delete} This class is injected by {@link DynamicManagement}
  *
  * @author ABEILLE
- *
  */
 public final class DynamicManager {
 
@@ -81,8 +79,7 @@ public final class DynamicManager {
     /**
      * Ctr
      *
-     * @param deviceImpl
-     *            the associated device
+     * @param deviceImpl the associated device
      */
     public DynamicManager(final DeviceImpl deviceImpl) {
         this.deviceImpl = deviceImpl;
@@ -137,7 +134,7 @@ public final class DynamicManager {
         deviceImpl.addAttribute(attrImpl);
         dynamicAttributes.put(attributeName.toLowerCase(Locale.ENGLISH), attrImpl);
         deviceImpl.pushInterfaceChangeEvent(false);
-        if (configuration.isPolled() && configuration.getPollingPeriod()>0) {
+        if (configuration.isPolled() && configuration.getPollingPeriod() > 0) {
             deviceImpl.addAttributePolling(attributeName, configuration.getPollingPeriod());
         }
         xlogger.exit();
@@ -146,13 +143,12 @@ public final class DynamicManager {
     /**
      * remove a dynamic attribute
      *
-     * @param attributeName
-     *            attribute name
+     * @param attributeName attribute name
      * @throws DevFailed
      */
     public void removeAttribute(final String attributeName) throws DevFailed {
         final AttributeImpl toRemove = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH));
-        if (toRemove==null)
+        if (toRemove == null)
             throw DevFailedUtils.newDevFailed("API_AttributeNotFound", "Attribute \'" + attributeName + "\' not found");
         if (toRemove.getBehavior() instanceof ForwardedAttribute) {
             final ForwardedAttribute att = (ForwardedAttribute) toRemove.getBehavior();
@@ -167,8 +163,7 @@ public final class DynamicManager {
     /**
      * remove a dynamic attribute
      *
-     * @param attributeName
-     *            attribute name
+     * @param attributeName attribute name
      * @throws DevFailed
      */
     public void removeAttribute(final String attributeName, final boolean clearAttributeProperties) throws DevFailed {
@@ -189,13 +184,10 @@ public final class DynamicManager {
         for (int i = 0; i < toExclude.length; i++) {
             toExclude[i] = exclude[i].toLowerCase(Locale.ENGLISH);
         }
-        final List<String> toRemove = new ArrayList<String>();
         for (final String attributeName : dynamicAttributes.keySet()) {
             if (!ArrayUtils.contains(toExclude, attributeName)) {
+                removeAttribute(attributeName);
             }
-        }
-        for (final String attributeName : toRemove) {
-            removeAttribute(attributeName);
         }
     }
 
@@ -215,8 +207,7 @@ public final class DynamicManager {
     /**
      * Remove all dynamic attributes
      *
-     * @param clearAttributeProperties
-     *            true to remove all attributes properties from tango db
+     * @param clearAttributeProperties true to remove all attributes properties from tango db
      * @throws DevFailed
      */
     public void clearAttributes(final boolean clearAttributeProperties) throws DevFailed {
@@ -242,12 +233,15 @@ public final class DynamicManager {
     /**
      * Get a dynamic attribute
      *
-     * @param attributeName
-     *            the attribute name
+     * @param attributeName the attribute name
      * @return The dynamic attribute
      */
     public IAttributeBehavior getAttribute(final String attributeName) {
-        return dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH)).getBehavior();
+        IAttributeBehavior attributeBehavior = null;
+        if (dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH)) != null) {
+            attributeBehavior = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH)).getBehavior();
+        }
+        return  attributeBehavior;
     }
 
     /**
@@ -270,8 +264,7 @@ public final class DynamicManager {
     /**
      * Remove a command
      *
-     * @param commandName
-     *            command name
+     * @param commandName command name
      * @throws DevFailed
      */
     public void removeCommand(final String commandName) throws DevFailed {
@@ -284,8 +277,7 @@ public final class DynamicManager {
     /**
      * Get a dynamic command
      *
-     * @param commandName
-     *            command name
+     * @param commandName command name
      * @return The dynamic command
      */
     public ICommandBehavior getCommand(final String commandName) {
@@ -339,7 +331,6 @@ public final class DynamicManager {
      * Remove all dynamic attributes and commands
      *
      * @throws DevFailed
-     *
      */
     public void clearAll() throws DevFailed {
         clearCommands();
@@ -349,8 +340,7 @@ public final class DynamicManager {
     /**
      * Remove all dynamic attributes and commands
      *
-     * @param clearAttributeProperties
-     *            to remove attributes properties from tango db
+     * @param clearAttributeProperties to remove attributes properties from tango db
      * @throws DevFailed
      */
     public void clearAll(final boolean clearAttributeProperties) throws DevFailed {
