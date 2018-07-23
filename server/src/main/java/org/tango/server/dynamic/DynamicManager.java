@@ -237,11 +237,9 @@ public final class DynamicManager {
      * @return The dynamic attribute
      */
     public IAttributeBehavior getAttribute(final String attributeName) {
-        IAttributeBehavior attributeBehavior = null;
-        if (dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH)) != null) {
-            attributeBehavior = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH)).getBehavior();
-        }
-        return  attributeBehavior;
+        AttributeImpl attr = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH));
+        if (attr == null) return null;
+        else return attr.getBehavior();
     }
 
     /**
