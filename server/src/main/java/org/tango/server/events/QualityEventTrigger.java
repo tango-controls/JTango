@@ -69,7 +69,6 @@ public class QualityEventTrigger implements IEventTrigger {
         if (!previousInitialized) {
             previousValue = value;
             previousInitialized = true;
-            hasChanged = false;
         } else {
             if (previousValue != null) {
                 final AttrQuality previousQuality = previousValue.getQuality();
