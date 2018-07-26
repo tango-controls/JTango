@@ -416,9 +416,9 @@ class EventUtilities {
     }
 
     /**
-     * Send data so ZMQ Socket. Since ZMQ Sockets are not thread safe, add synchronisation. <br>
-     * See http://zeromq.org/area:faq. "ZeroMQ sockets are not thread-safe.<br>
-     *  The short version is that sockets should not be shared between threads. We recommend creating a dedicated socket for each thread. <br>
+     * Send data so ZMQ Socket. <br>
+     * Warning. See http://zeromq.org/area:faq. "ZeroMQ sockets are not thread-safe.<br>
+     * The short version is that sockets should not be shared between threads. We recommend creating a dedicated socket for each thread. <br>
      * For those situations where a dedicated socket per thread is infeasible, a socket may be shared if and only if each thread executes a full memory barrier before accessing the socket.
      * Most languages support a Mutex or Spinlock which will execute the full memory barrier on your behalf."
      *
@@ -431,10 +431,8 @@ class EventUtilities {
      */
     static void sendToSocket(final ZMQ.Socket eventSocket, final String fullName, int counter, boolean isException, byte[] data) throws DevFailed {
         XLOGGER.entry();
-        synchronized (eventSocket) {
-            sendContextData(eventSocket, fullName, counter, isException);
-            eventSocket.send(data);
-        }
+        sendContextData(eventSocket, fullName, counter, isException);
+        eventSocket.send(data);
         LOGGER.debug("event {} sent", fullName);
         XLOGGER.exit();
     }

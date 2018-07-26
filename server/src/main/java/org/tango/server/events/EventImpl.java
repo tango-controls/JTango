@@ -52,6 +52,8 @@ final class EventImpl {
     private final IEventTrigger eventTrigger;
     private final EventType eventType;
     private final boolean islatestIDLVersion;
+    private final ZMQ.Socket eventSocket;
+    private final String fullName;
     private AttributeImpl attribute;
     private long subscribeTime;
     private int counter = 0;
@@ -59,16 +61,18 @@ final class EventImpl {
     /**
      * Create a Event object based on an AttributeImpl with its event parameters.
      *
-     * @param attribute the attribute for specified event
-     * @param eventType the event type
+     * @param attribute  the attribute for specified event
+     * @param eventType  the event type
      * @param idlVersion the event IDL version
      * @throws DevFailed
      */
 
-    EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion) throws DevFailed {
+    EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
         this.attribute = attribute;
         this.eventType = eventType;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
+        this.fullName = fullName;
+        this.eventSocket = eventSocket;
         eventTrigger = EventTriggerFactory.createEventTrigger(eventType, attribute);
         logger.debug("event trigger for {} type is {}", attribute.getName(), eventTrigger.getClass());
         updateSubscribeTime();
@@ -81,9 +85,11 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final PipeImpl pipe, final int idlVersion) throws DevFailed {
+    EventImpl(final PipeImpl pipe, final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
         this.eventType = EventType.PIPE_EVENT;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
+        this.eventSocket = eventSocket;
+        this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
         logger.debug("event trigger for {} type is {}", pipe.getName(), eventTrigger.getClass());
         updateSubscribeTime();
@@ -95,11 +101,13 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final int idlVersion) throws DevFailed {
+    EventImpl(final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
         this.eventType = EventType.INTERFACE_CHANGE_EVENT;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
+        this.eventSocket = eventSocket;
+        this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
-        logger.debug("event trigger for {} type is {}", eventTrigger.getClass());
+        logger.debug("event trigger for Device, type is {}", eventTrigger.getClass());
         updateSubscribeTime();
     }
 
@@ -124,29 +132,31 @@ final class EventImpl {
     /**
      * Fire an event containing a value is condition is valid.
      *
-     * @param eventSocket the socket to send event
-     * @param fullName event full name
      * @throws DevFailed
      */
 
-    void pushAttributeValueEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    void pushAttributeValueEvent() throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
         if (isSendEvent()) {
-            sendAttributeValueEvent(eventSocket, fullName);
+            sendAttributeValueEvent();
         }
         xlogger.exit();
     }
 
 
-    private void sendAttributeValueEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
+    private void sendAttributeValueEvent() throws DevFailed {
         xlogger.entry();
         try {
             if (islatestIDLVersion) {
-                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5(attribute));
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5(attribute));
+                }
             } else {
-                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL4(attribute));
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL4(attribute));
+                }
             }
         } catch (final org.zeromq.ZMQException | ArrayIndexOutOfBoundsException e) {
             if (e instanceof ArrayIndexOutOfBoundsException) {
@@ -157,10 +167,12 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    public void pushAttributeIDL5Event(final ZMQ.Socket eventSocket, final String fullName, AttributeValue_5 value) throws DevFailed {
+    public void pushAttributeIDL5Event(AttributeValue_5 value) throws DevFailed {
         xlogger.entry();
         try {
-            EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5(value));
+            synchronized (eventSocket) {
+                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5(value));
+            }
         } catch (final org.zeromq.ZMQException | ArrayIndexOutOfBoundsException e) {
             if (e instanceof ArrayIndexOutOfBoundsException) {
                 logger.error(fullName, e);
@@ -173,17 +185,17 @@ final class EventImpl {
     /**
      * Send a data ready event
      *
-     * @param eventSocket the socket to send event
-     * @param fullName event full name
-     * @param counter a counter value
+     * @param counter  a counter value
      * @throws DevFailed
      */
-    void pushAttributeDataReadyEvent(final ZMQ.Socket eventSocket, final String fullName, final int counter)
+    void pushAttributeDataReadyEvent(final int counter)
             throws DevFailed {
         xlogger.entry();
         try {
             final AttDataReady dataReady = new AttDataReady(attribute.getName(), attribute.getTangoType(), counter);
-            EventUtilities.sendToSocket(eventSocket, fullName, counter, EventUtilities.marshall(dataReady));
+            synchronized (eventSocket) {
+                EventUtilities.sendToSocket(eventSocket, fullName, counter, EventUtilities.marshall(dataReady));
+            }
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
@@ -191,23 +203,11 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigIDL5Event(final ZMQ.Socket eventSocket, final String fullName, AttributeConfig_5 config) throws DevFailed {
+    void pushAttributeConfigIDL5Event(AttributeConfig_5 config) throws DevFailed {
         xlogger.entry();
         try {
-            EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5Config(config));
-        } catch (final org.zeromq.ZMQException e) {
-            throw DevFailedUtils.newDevFailed(e);
-        }
-        xlogger.exit();
-    }
-
-    void pushAttributeConfigEvent(final ZMQ.Socket eventSocket, final String fullName) throws DevFailed {
-        xlogger.entry();
-        try {
-            if (islatestIDLVersion) {
-                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5Config(attribute));
-            } else {
-                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL4Config(attribute));
+            synchronized (eventSocket) {
+                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5Config(config));
             }
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
@@ -215,22 +215,44 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushInterfaceChangeEvent(final ZMQ.Socket eventSocket, final String fullName,
-                                  final DevIntrChange deviceInterface) throws DevFailed {
+    void pushAttributeConfigEvent() throws DevFailed {
         xlogger.entry();
         try {
-            EventUtilities.sendToSocket(eventSocket, fullName, counter++,EventUtilities.marshall(deviceInterface));
+            if (islatestIDLVersion) {
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL5Config(attribute));
+                }
+            } else {
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshallIDL4Config(attribute));
+                }
+            }
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
         xlogger.exit();
     }
 
-    void pushPipeEvent(final ZMQ.Socket eventSocket, final String fullName, final DevPipeData pipeData)
+    void pushInterfaceChangeEvent(
+            final DevIntrChange deviceInterface) throws DevFailed {
+        xlogger.entry();
+        try {
+            synchronized (eventSocket) {
+                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshall(deviceInterface));
+            }
+        } catch (final org.zeromq.ZMQException e) {
+            throw DevFailedUtils.newDevFailed(e);
+        }
+        xlogger.exit();
+    }
+
+    void pushPipeEvent(final DevPipeData pipeData)
             throws DevFailed {
         xlogger.entry();
         try {
-            EventUtilities.sendToSocket(eventSocket, fullName, counter++,EventUtilities.marshall(pipeData));
+            synchronized (eventSocket) {
+                EventUtilities.sendToSocket(eventSocket, fullName, counter++, EventUtilities.marshall(pipeData));
+            }
         } catch (final org.zeromq.ZMQException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
@@ -240,18 +262,18 @@ final class EventImpl {
     /**
      * Fire an event containing a DevFailed.
      *
-     * @param eventSocket the socket to send event
-     * @param fullName event full name
      * @param devFailed the failed object to be sent.
      * @throws DevFailed
      */
-    void pushDevFailedEvent(final ZMQ.Socket eventSocket, final String fullName, final DevFailed devFailed) throws DevFailed {
+    void pushDevFailedEvent(final DevFailed devFailed) throws DevFailed {
         xlogger.entry();
         eventTrigger.updateProperties();
         eventTrigger.setError(devFailed);
         if (isSendEvent()) {
             try {
-                EventUtilities.sendToSocket(eventSocket, fullName, counter++,true, EventUtilities.marshall(devFailed));
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, true, EventUtilities.marshall(devFailed));
+                }
             } catch (final org.zeromq.ZMQException e) {
                 throw DevFailedUtils.newDevFailed(e);
             }
@@ -261,11 +283,12 @@ final class EventImpl {
 
     /**
      * check if send event
+     *
      * @return
      */
     private boolean isSendEvent() throws DevFailed {
         boolean send = false;
-        if ((eventTrigger.doCheck() && eventTrigger.isSendEvent())||! eventTrigger.doCheck()) {
+        if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
             send = true;
         }
         return send;

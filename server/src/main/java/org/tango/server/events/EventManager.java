@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -72,13 +72,13 @@ public final class EventManager {
     public static final String IDL_REGEX = "idl[0-9]_[a-z]*";
     public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
     private static final EventManager INSTANCE = new EventManager();
+    private final Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
+    private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
     private ZContext context;
     private ScheduledExecutorService heartBeatExecutor;
     private int serverHWM;
     private int clientHWN;
-    private final Logger logger = LoggerFactory.getLogger(EventManager.class);
-    private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
-    private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
     private ZMQ.Socket heartbeatSocket;
     private ZMQ.Socket eventSocket;
     private boolean isInitialized = false;
@@ -314,10 +314,10 @@ public final class EventManager {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         // longStringArray.lvalue = new int[0];
-        longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
-                EventConstants.ZMQ_RELEASE };
+        longStringArray.lvalue = new int[]{EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
+                EventConstants.ZMQ_RELEASE};
         if (heartbeatEndpoint == null || eventEndpoint == null) {
-            longStringArray.svalue = new String[] { "No ZMQ event yet !" };
+            longStringArray.svalue = new String[]{"No ZMQ event yet !"};
         } else {
             longStringArray.svalue = new String[]{heartbeatEndpoint, eventEndpoint};
         }
@@ -331,7 +331,7 @@ public final class EventManager {
      * returns the connection parameters for specified event.
      *
      * @param deviceName The specified event device name
-     * @param pipe The specified event pipe
+     * @param pipe       The specified event pipe
      * @return the connection parameters for specified event.
      */
     public DevVarLongStringArray subscribe(final String deviceName, final PipeImpl pipe) throws DevFailed {
@@ -346,7 +346,7 @@ public final class EventManager {
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(pipe, DeviceImpl.SERVER_VERSION);
+            eventImpl = new EventImpl(pipe, DeviceImpl.SERVER_VERSION, fullName, eventSocket);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -361,12 +361,12 @@ public final class EventManager {
      * returns the connection parameters for specified event.
      *
      * @param deviceName The specified event device name
-     * @param attribute The specified event attribute
-     * @param eventType The specified event type
+     * @param attribute  The specified event attribute
+     * @param eventType  The specified event type
      * @return the connection parameters for specified event.
      */
     public DevVarLongStringArray subscribe(final String deviceName, final AttributeImpl attribute,
-            final EventType eventType, final int idlVersion) throws DevFailed {
+                                           final EventType eventType, final int idlVersion) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -383,7 +383,7 @@ public final class EventManager {
                 fwdAttr.subscribe(eventType);
             }
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(attribute, eventType, idlVersion);
+            eventImpl = new EventImpl(attribute, eventType, idlVersion, fullName, eventSocket);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -412,7 +412,7 @@ public final class EventManager {
         EventImpl eventImpl = eventImplMap.get(fullName);
         if (eventImpl == null) {
             // If not already manage, create EventImpl object and add it to the map
-            eventImpl = new EventImpl(DeviceImpl.SERVER_VERSION);
+            eventImpl = new EventImpl(DeviceImpl.SERVER_VERSION, fullName, eventSocket);
             eventImplMap.put(fullName, eventImpl);
         } else {
             eventImpl.updateSubscribeTime();
@@ -424,8 +424,8 @@ public final class EventManager {
     private DevVarLongStringArray buildConnectionParameters(final String fullName) {
         // Build the connection parameters object
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
-        longStringArray.lvalue = new int[] { EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
-                EventConstants.ZMQ_RELEASE };
+        longStringArray.lvalue = new int[]{EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
+                EventConstants.ZMQ_RELEASE};
         longStringArray.svalue = new String[]{heartbeatEndpoint, eventEndpoint};
         logger.debug("event registered for {}", fullName);
         return longStringArray;
@@ -435,7 +435,7 @@ public final class EventManager {
      * Check if the event must be sent and fire it if must be done
      *
      * @param attributeName specified event attribute
-     * @param devFailed the attribute failed error to be sent as event
+     * @param devFailed     the attribute failed error to be sent as event
      * @throws fr.esrf.Tango.DevFailed
      * @throws DevFailed
      */
@@ -443,10 +443,10 @@ public final class EventManager {
             throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
-            final String fullName5 = EventUtilities.buildEventName(deviceName, attributeName, eventType);
-            final EventImpl eventImpl5 = getEventImpl(fullName5);
-            if (eventImpl5 != null) {
-                eventImpl5.pushDevFailedEvent(eventSocket, fullName5, devFailed);
+            final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
+            final EventImpl eventImpl = getEventImpl(fullName);
+            if (eventImpl != null) {
+                eventImpl.pushDevFailedEvent(devFailed);
             }
         }
         xlogger.exit();
@@ -465,7 +465,7 @@ public final class EventManager {
                 final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
                 final EventImpl eventImpl = getEventImpl(fullName);
                 if (eventImpl != null) {
-                    eventImpl.pushAttributeValueEvent(eventSocket, fullName);
+                    eventImpl.pushAttributeValueEvent();
                 }
             }
         }
@@ -475,9 +475,9 @@ public final class EventManager {
     /**
      * fire event
      *
-     * @param deviceName Specified event device
+     * @param deviceName    Specified event device
      * @param attributeName specified event attribute name
-     * @param eventType specified event type.
+     * @param eventType     specified event type.
      * @throws DevFailed
      */
     public void pushAttributeValueEvent(final String deviceName, final String attributeName, final EventType eventType)
@@ -487,7 +487,7 @@ public final class EventManager {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeValueEvent(eventSocket, fullName);
+                eventImpl.pushAttributeValueEvent();
             }
         }
         xlogger.exit();
@@ -496,9 +496,9 @@ public final class EventManager {
     /**
      * fire event with AttDataReady
      *
-     * @param deviceName Specified event device
+     * @param deviceName    Specified event device
      * @param attributeName specified event attribute name
-     * @param counter a counter value
+     * @param counter       a counter value
      * @throws DevFailed
      */
     public void pushAttributeDataReadyEvent(final String deviceName, final String attributeName, final int counter)
@@ -507,7 +507,7 @@ public final class EventManager {
         final String fullName = EventUtilities.buildEventName(deviceName, attributeName, EventType.DATA_READY_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushAttributeDataReadyEvent(eventSocket, fullName, counter);
+            eventImpl.pushAttributeDataReadyEvent(counter);
         }
         xlogger.exit();
     }
@@ -519,7 +519,7 @@ public final class EventManager {
                     idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeConfigEvent(eventSocket, fullName);
+                eventImpl.pushAttributeConfigEvent();
             }
         }
         xlogger.exit();
@@ -531,7 +531,7 @@ public final class EventManager {
         final String fullName = EventUtilities.buildDeviceEventName(deviceName, EventType.INTERFACE_CHANGE_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushInterfaceChangeEvent(eventSocket, fullName, deviceInterface);
+            eventImpl.pushInterfaceChangeEvent(deviceInterface);
         }
         xlogger.exit();
     }
@@ -541,7 +541,7 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushPipeEvent(eventSocket, fullName,
+            eventImpl.pushPipeEvent(
                     new DevPipeData(pipeName, TangoIDLUtil.getTime(blob.getTime()), blob.getValue()
                             .getDevPipeBlobObject()));
         }
@@ -554,28 +554,28 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushDevFailedEvent(eventSocket, fullName, devFailed);
+            eventImpl.pushDevFailedEvent(devFailed);
         }
         xlogger.exit();
     }
 
 
-    public void  pushAttributeValueIDL5Event(final String deviceName, final String attributeName, AttributeValue_5 value,EventType evtType) throws DevFailed {
+    public void pushAttributeValueIDL5Event(final String deviceName, final String attributeName, AttributeValue_5 value, EventType evtType) throws DevFailed {
         xlogger.entry();
-        final String fullName = EventUtilities.buildEventName(deviceName, attributeName,evtType);
+        final String fullName = EventUtilities.buildEventName(deviceName, attributeName, evtType);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushAttributeIDL5Event(eventSocket,fullName, value);
+            eventImpl.pushAttributeIDL5Event(value);
         }
         xlogger.exit();
     }
 
-    public void  pushAttributeConfigIDL5Event(final String deviceName, final String attributeName, AttributeConfig_5 config) throws DevFailed {
+    public void pushAttributeConfigIDL5Event(final String deviceName, final String attributeName, AttributeConfig_5 config) throws DevFailed {
         xlogger.entry();
-        final String fullName = EventUtilities.buildEventName(deviceName, attributeName,EventType.ATT_CONF_EVENT);
+        final String fullName = EventUtilities.buildEventName(deviceName, attributeName, EventType.ATT_CONF_EVENT);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushAttributeConfigIDL5Event(eventSocket,fullName, config);
+            eventImpl.pushAttributeConfigIDL5Event(config);
         }
         xlogger.exit();
     }
