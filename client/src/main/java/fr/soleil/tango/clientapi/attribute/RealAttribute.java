@@ -107,7 +107,7 @@ public final class RealAttribute implements ITangoAttribute {
     @Override
     public void insertImage(final int dimX, final int dimY, final Object values) throws DevFailed {
         if (!dataFormat.equals(AttrDataFormat.IMAGE)) {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "this attribute is spectrum");
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "this attribute is spectrum");
         }
         InsertExtractUtils.insert(deviceAttribute, values, dimX, dimY);
     }

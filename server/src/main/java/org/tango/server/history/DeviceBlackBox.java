@@ -51,7 +51,7 @@ public final class DeviceBlackBox {
 
     public String[] toArray(final int size) throws DevFailed {
         if (blackbox.size() == 0) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.BLACK_BOX_EMPTY, "blackbox is emty");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.BLACK_BOX_EMPTY, "blackbox is emty");
         }
         final String[] blackboxArray = blackbox.toArray(new String[blackbox.size()]);
         String[] result;

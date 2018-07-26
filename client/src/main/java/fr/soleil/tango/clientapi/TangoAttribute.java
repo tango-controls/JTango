@@ -266,7 +266,7 @@ public final class TangoAttribute {
         logger.debug(LOG_EXTRACTING, this);
         final Object result = attributeImpl.extract();
         if (!Number.class.isAssignableFrom(result.getClass())) {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
         }
         return (Number) result;
     }
@@ -300,7 +300,7 @@ public final class TangoAttribute {
         logger.debug(LOG_EXTRACTING, this);
         final Object result = attributeImpl.extractWritten();
         if (!Number.class.isAssignableFrom(result.getClass())) {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
         }
         return (Number) result;
     }
@@ -320,7 +320,7 @@ public final class TangoAttribute {
         }
         final Object result = attributeImpl.extractArray();
         if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
         }
         return (Number[]) result;
     }
@@ -340,7 +340,7 @@ public final class TangoAttribute {
         }
         final Object result = attributeImpl.extractWrittenArray();
         if (!Number.class.isAssignableFrom(result.getClass().getComponentType())) {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, THIS_ATTRIBUTE_MUST_BE_A_JAVA_LANG_NUMBER);
         }
         return (Number[]) result;
     }

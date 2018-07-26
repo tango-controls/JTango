@@ -72,12 +72,12 @@ final class StatusBuilder {
             throw DevFailedUtils.newDevFailed(e);
         }
         if (getter.getParameterTypes().length != 0) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
         }
 
         logger.debug("Has an status : {}", field.getName());
         if (getter.getReturnType() != String.class) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
                     + String.class);
         }
         Method setter;

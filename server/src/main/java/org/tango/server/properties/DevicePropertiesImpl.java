@@ -60,13 +60,13 @@ public final class DevicePropertiesImpl {
 	    try {
 		propertyMethod.invoke(businessObject, property);
 	    } catch (final IllegalArgumentException e) {
-		DevFailedUtils.throwDevFailed(e);
+		throw DevFailedUtils.newDevFailed(e);
 	    } catch (final IllegalAccessException e) {
-		DevFailedUtils.throwDevFailed(e);
+		throw DevFailedUtils.newDevFailed(e);
 	    } catch (final SecurityException e) {
-		DevFailedUtils.throwDevFailed(e);
+		throw DevFailedUtils.newDevFailed(e);
 	    } catch (final InvocationTargetException e) {
-		DevFailedUtils.throwDevFailed(e);
+		throw DevFailedUtils.newDevFailed(e);
 	    }
 	}
 	xlogger.exit();

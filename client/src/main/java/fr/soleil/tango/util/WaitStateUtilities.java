@@ -135,7 +135,7 @@ public class WaitStateUtilities {
 	    final DevState waitState, final long timeout, final long polling) throws DevFailed, TimeoutException {
 	waitWhileState(deviceProxy, waitState, timeout, polling);
 	if (!expected.equals(deviceProxy.state())) {
-	    DevFailedUtils.throwDevFailed("State not reach", "fail to reach state "
+		throw DevFailedUtils.newDevFailed("State not reach", "fail to reach state "
 		    + TangoConst.Tango_DevStateName[expected.value()] + " after wait "
 		    + TangoConst.Tango_DevStateName[waitState.value()]);
 	}

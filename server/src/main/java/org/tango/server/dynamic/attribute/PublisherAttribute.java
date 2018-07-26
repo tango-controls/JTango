@@ -95,7 +95,7 @@ public final class PublisherAttribute implements IAttributeBehavior, ISetValueUp
             configAttr.setName(config[0]);
         } else {
             configAttr.setName("");
-            DevFailedUtils.throwDevFailed("DEVICE_PROP_ERROR", "unknown attribute config");
+            throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute config");
         }
         if (config.length == 2) {
             final Class<?> c = JAVA_TYPES_MAP.get(config[1].toLowerCase());
@@ -115,10 +115,10 @@ public final class PublisherAttribute implements IAttributeBehavior, ISetValueUp
             } else if (config[2].equalsIgnoreCase("IMAGE")) {
                 configAttr.setTangoType(typeAttr, AttrDataFormat.IMAGE);
             } else {
-                DevFailedUtils.throwDevFailed("DEVICE_PROP_ERROR", "unknown attribute format: " + config[1]);
+                throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute format: " + config[1]);
             }
         } else {
-            DevFailedUtils.throwDevFailed("DEVICE_PROP_ERROR", "unknown attribute config: " + config[1]);
+            throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute config: " + config[1]);
         }
     }
 

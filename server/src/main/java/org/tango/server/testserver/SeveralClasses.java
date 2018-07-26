@@ -50,7 +50,7 @@ public class SeveralClasses {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            DevFailedUtils.throwDevFailed("msg");
+            throw DevFailedUtils.newDevFailed("msg");
         }
 
     }

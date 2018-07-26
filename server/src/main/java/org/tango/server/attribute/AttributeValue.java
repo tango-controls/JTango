@@ -115,14 +115,14 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
             if (!value.getClass().isArray()) { // SCALAR
                 // check if this value can be an attribute value
                 if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass())) {
-                    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                    throw DevFailedUtils.newDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
                 }
                 setXDim(1);
                 setYDim(0);
             } else if (!value.getClass().getComponentType().isArray()) {// SPECTRUM
                 // check if this value can be an attribute value
                 if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(value.getClass().getComponentType())) {
-                    DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                    throw DevFailedUtils.newDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
                 }
                 setXDim(Array.getLength(value));
                 setYDim(0);
@@ -135,7 +135,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
                         y = 0;
                         // check if this value can be an attribute value
                     } else if (!AttributeTangoType.ATTRIBUTE_CLASSES.contains(xArray.getClass().getComponentType())) {
-                        DevFailedUtils.throwDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
+                        throw DevFailedUtils.newDevFailed(value.getClass().getCanonicalName() + CANNOT_BE_AN_ATTRIBUTE);
                     }
                     setXDim(x);
                 } else {

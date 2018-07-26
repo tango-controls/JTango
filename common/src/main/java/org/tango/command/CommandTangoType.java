@@ -203,7 +203,7 @@ public enum CommandTangoType {
     public static CommandTangoType getTypeFromClass(final Class<?> clazz) throws DevFailed {
         final CommandTangoType type = CLASS_TYPE_MAP.get(clazz);
         if (type == null) {
-            DevFailedUtils.throwDevFailed("TYPE_ERROR", clazz.getCanonicalName() + " is not a command type");
+            throw DevFailedUtils.newDevFailed("TYPE_ERROR", clazz.getCanonicalName() + " is not a command type");
         }
         return type;
     }
@@ -211,7 +211,7 @@ public enum CommandTangoType {
     public static CommandTangoType getTypeFromTango(final int tangoType) throws DevFailed {
         final CommandTangoType result = TANGO_TYPE_MAP.get(tangoType);
         if (result == null) {
-            DevFailedUtils.throwDevFailed("TYPE_ERROR", tangoType + " is not an command type");
+            throw DevFailedUtils.newDevFailed("TYPE_ERROR", tangoType + " is not an command type");
         }
         return result;
     }

@@ -296,8 +296,7 @@ public class ChangeEventTrigger implements IEventTrigger {
         final EventProperties props = attribute.getProperties().getEventProp();
         if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
                 && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-            DevFailedUtils
-                    .throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
                             "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
                                     + " are not set");
         }

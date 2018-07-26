@@ -84,14 +84,14 @@ public final class StatusImpl {
             try {
                 status = (String) getStatusMethod.invoke(businessObject);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed("INVOCATION_ERROR", ExceptionUtils.getStackTrace(e.getCause())
+                    throw DevFailedUtils.newDevFailed("INVOCATION_ERROR", ExceptionUtils.getStackTrace(e.getCause())
                             + " InvocationTargetException");
                 }
             }
@@ -122,14 +122,14 @@ public final class StatusImpl {
                 try {
                     setStatusMethod.invoke(businessObject, status);
                 } catch (final IllegalArgumentException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 } catch (final IllegalAccessException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 } catch (final InvocationTargetException e) {
                     if (e.getCause() instanceof DevFailed) {
                         throw (DevFailed) e.getCause();
                     } else {
-                        DevFailedUtils.throwDevFailed(e.getCause());
+                        throw DevFailedUtils.newDevFailed(e.getCause());
                     }
                 }
             }

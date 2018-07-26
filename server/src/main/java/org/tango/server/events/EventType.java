@@ -115,7 +115,7 @@ public enum EventType {
     public static EventType getEvent(final String string) throws DevFailed {
         final EventType result = EVENT_TYPE_MAP.get(string);
         if (result == null) {
-            DevFailedUtils.throwDevFailed(string + " is not an event type");
+            throw DevFailedUtils.newDevFailed(string + " is not an event type");
         }
         return result;
 
@@ -131,7 +131,7 @@ public enum EventType {
     public static EventType getEvent(final int eventValue) throws DevFailed {
         final EventType result = EVENT_TYPE_INT_MAP.get(eventValue);
         if (result == null) {
-            DevFailedUtils.throwDevFailed(eventValue + " is not an event type");
+            throw DevFailedUtils.newDevFailed(eventValue + " is not an event type");
         }
         return result;
 

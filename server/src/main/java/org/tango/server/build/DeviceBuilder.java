@@ -120,9 +120,9 @@ public final class DeviceBuilder {
             createBusinessObjectState(boScanner);
 
         } catch (final InstantiationException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final IllegalAccessException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         device.initDevice();
         xlogger.exit();
@@ -171,7 +171,7 @@ public final class DeviceBuilder {
         // Init
         final Set<Method> initM = scanner.getMethodsAnnotatedWith(Init.class);
         if (initM != null && initM.size() > 1) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Init.class + MUST_BE_UNIQUE);
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Init.class + MUST_BE_UNIQUE);
         }
         if (initM != null && initM.size() == 1) {
             new InitBuilder().build(initM.iterator().next(), device, businessObject);
@@ -179,7 +179,7 @@ public final class DeviceBuilder {
         // Delete
         final Set<Method> deleteM = scanner.getMethodsAnnotatedWith(Delete.class);
         if (deleteM != null && deleteM.size() > 1) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Delete.class + MUST_BE_UNIQUE);
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Delete.class + MUST_BE_UNIQUE);
         }
 
         if (deleteM != null && deleteM.size() == 1) {
@@ -196,7 +196,7 @@ public final class DeviceBuilder {
         // AroundInvoke
         final Set<Method> invokeM = scanner.getMethodsAnnotatedWith(AroundInvoke.class);
         if (invokeM != null && invokeM.size() > 1) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, AroundInvoke.class + MUST_BE_UNIQUE);
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, AroundInvoke.class + MUST_BE_UNIQUE);
         }
         if (invokeM != null && invokeM.size() == 1) {
             new AroundInvokeBuilder().build(invokeM.iterator().next(), device, businessObject);
@@ -233,7 +233,7 @@ public final class DeviceBuilder {
         final Set<Field> dynF = scanner.getFieldsAnnotatedWith(DynamicManagement.class);
         if (dynF != null) {
             if (dynF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DynamicManagement.class
                         + MUST_BE_UNIQUE);
             }
             if (dynF.size() == 1) {
@@ -245,7 +245,7 @@ public final class DeviceBuilder {
         final Set<Field> deviceF = scanner.getFieldsAnnotatedWith(DeviceManagement.class);
         if (deviceF != null) {
             if (deviceF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceManagement.class
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceManagement.class
                         + MUST_BE_UNIQUE);
             }
             if (deviceF.size() == 1) {
@@ -261,7 +261,7 @@ public final class DeviceBuilder {
         if (stateF != null) {
             final StateBuilder stateB = new StateBuilder();
             if (stateF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, State.class + MUST_BE_UNIQUE);
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, State.class + MUST_BE_UNIQUE);
             }
             if (stateF.size() == 1) {
                 stateB.build(clazz, stateF.iterator().next(), device, businessObject);
@@ -272,7 +272,7 @@ public final class DeviceBuilder {
         if (statusF != null) {
             final StatusBuilder statusB = new StatusBuilder();
             if (statusF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Status.class + MUST_BE_UNIQUE);
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, Status.class + MUST_BE_UNIQUE);
             }
             if (statusF.size() == 1) {
                 statusB.build(clazz, statusF.iterator().next(), device, businessObject);
@@ -288,7 +288,7 @@ public final class DeviceBuilder {
         if (devicePropsF != null) {
             final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
             if (devicePropsF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceProperties.class
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceProperties.class
                         + MUST_BE_UNIQUE);
             }
             if (devicePropsF.size() == 1) {
@@ -304,7 +304,7 @@ public final class DeviceBuilder {
         if (devicePropsF != null) {
             final DevicePropertiesBuilder devicePropsB = new DevicePropertiesBuilder();
             if (devicePropsF.size() > 1) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceProperties.class
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, DeviceProperties.class
                         + MUST_BE_UNIQUE);
             }
             if (devicePropsF.size() == 1) {
@@ -331,10 +331,10 @@ public final class DeviceBuilder {
 
     private void checkIsTangoDevice(final Class<?> clazz, final String name) throws DevFailed {
         if (clazz == null) {
-            DevFailedUtils.throwDevFailed("INIT_FAILED", "create device " + name + " - is not a tango device");
+            throw DevFailedUtils.newDevFailed("INIT_FAILED", "create device " + name + " - is not a tango device");
         }
         if (clazz.getAnnotation(Device.class) == null) {
-            DevFailedUtils.throwDevFailed("INIT_FAILED", "create device " + name + " of class " + clazz.getName()
+            throw DevFailedUtils.newDevFailed("INIT_FAILED", "create device " + name + " of class " + clazz.getName()
                     + " - is not a tango device");
         }
     }

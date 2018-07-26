@@ -100,7 +100,7 @@ public final class DeviceScheduler {
                         quartz.start();
                     }
                 } catch (final SchedulerException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 }
 
                 // get cron parameters from device property
@@ -124,7 +124,7 @@ public final class DeviceScheduler {
                         trigger = newTrigger().withSchedule(cronSchedule(cronExpression)).build();
                     }
                 } catch (final RuntimeException e) {
-                    DevFailedUtils.throwDevFailed("unable to start device scheduler for " + method + " - error is: "
+                    throw DevFailedUtils.newDevFailed("unable to start device scheduler for " + method + " - error is: "
                             + e.getMessage());
                 }
 
@@ -146,7 +146,7 @@ public final class DeviceScheduler {
                     quartz.scheduleJob(job, trigger);
                     logger.debug("start job on {} started with {}", method, cronExpression);
                 } catch (final SchedulerException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 }
             }
         }
@@ -165,7 +165,7 @@ public final class DeviceScheduler {
                 }
             }
         } catch (final SchedulerException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
     }
 }

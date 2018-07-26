@@ -15,7 +15,7 @@ public final class TangoTypeUtils {
 	try {
 	    result = AttributeTangoType.valueOf(string.toUpperCase());
 	} catch (final IllegalArgumentException e) {
-	    DevFailedUtils.throwDevFailed("TYPE_ERROR", string + " is not supported");
+		throw DevFailedUtils.newDevFailed("TYPE_ERROR", string + " is not supported");
 	}
 	return result.getTangoIDLType();
     }
@@ -25,7 +25,7 @@ public final class TangoTypeUtils {
 	try {
 	    result = CommandTangoType.valueOf(string.toUpperCase());
 	} catch (final IllegalArgumentException e) {
-	    DevFailedUtils.throwDevFailed("TYPE_ERROR", string + " is not supported");
+		throw DevFailedUtils.newDevFailed("TYPE_ERROR", string + " is not supported");
 	}
 	return result.getTangoIDLType();
     }

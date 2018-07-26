@@ -75,7 +75,7 @@ public final class TypeConversionUtil {
 		result = transmorph.convert(array1D, typeConv);
 	    } catch (final ConverterException e) {
 		LOGGER.error("convertion error", e);
-		DevFailedUtils.throwDevFailed(e);
+		throw DevFailedUtils.newDevFailed(e);
 	    }
 	}
 	return result;

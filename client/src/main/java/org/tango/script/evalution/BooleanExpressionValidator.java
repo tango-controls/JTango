@@ -73,7 +73,7 @@ public final class BooleanExpressionValidator {
                 context = (Boolean) ScriptableObject.getProperty(scope, RESULT_VARIABLE);
                 logger.debug("result is {}", context);
             } catch (final EcmaError e) {
-                DevFailedUtils.throwDevFailed("EVALUATION_ERROR", e.details());
+                throw DevFailedUtils.newDevFailed("EVALUATION_ERROR", e.details());
             } finally {
                 Context.exit();
             }

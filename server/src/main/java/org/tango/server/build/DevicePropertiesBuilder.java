@@ -72,7 +72,7 @@ final class DevicePropertiesBuilder {
 	try {
 	    setter = businessObject.getClass().getMethod(setterName, field.getType());
 	} catch (final NoSuchMethodException e) {
-	    DevFailedUtils.throwDevFailed(e);
+	    throw DevFailedUtils.newDevFailed(e);
 	}
 	final DevicePropertiesImpl property = new DevicePropertiesImpl(setter, businessObject, device.getName());
 	device.setDeviceProperties(property);

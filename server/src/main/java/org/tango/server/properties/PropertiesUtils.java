@@ -246,7 +246,7 @@ public final class PropertiesUtils {
                     if (property[0].isEmpty()) {
                         LOGGER.debug("{} is empty", propertyName);
                     } else {
-                        DevFailedUtils.throwDevFailed("PROPERTY_ERROR", errorMsg);
+                        throw DevFailedUtils.newDevFailed("PROPERTY_ERROR", errorMsg);
                     }
                 }
             }
@@ -256,11 +256,11 @@ public final class PropertiesUtils {
                     propMethod.invoke(businessObject, propConverted);
                 }
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
     }
@@ -306,7 +306,7 @@ public final class PropertiesUtils {
             if (property.length == 1 && property[0].isEmpty()) {
                 LOGGER.error(errorMsg);
             } else {
-                DevFailedUtils.throwDevFailed("PROPERTY_ERROR", errorMsg);
+                throw DevFailedUtils.newDevFailed("PROPERTY_ERROR", errorMsg);
             }
         }
 
@@ -315,14 +315,14 @@ public final class PropertiesUtils {
                 propMethod.invoke(businessObject, propConverted);
             }
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final IllegalAccessException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final InvocationTargetException e) {
             if (e.getCause() instanceof DevFailed) {
                 throw (DevFailed) e.getCause();
             } else {
-                DevFailedUtils.throwDevFailed(e.getCause());
+                throw DevFailedUtils.newDevFailed(e.getCause());
             }
         }
     }

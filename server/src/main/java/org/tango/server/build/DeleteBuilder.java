@@ -52,10 +52,10 @@ final class DeleteBuilder {
 	logger.debug("Has a delete method: {}", method.getName());
 
 	if (method.getParameterTypes().length != 0 && !method.getReturnType().equals(void.class)) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
+	    throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
 	}
 	if (Modifier.isStatic(method.getModifiers())) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
+	    throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
 	}
 	device.setDeleteMethod(method);
 	xlogger.exit();

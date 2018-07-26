@@ -96,7 +96,7 @@ public final class GroupCommand implements ICommandBehavior {
                     }
                 }
                 if (found != k + 1) {
-                    DevFailedUtils.throwDevFailed("INIT_ERROR", "Cannot create command " + name
+                    throw DevFailedUtils.newDevFailed("INIT_ERROR", "Cannot create command " + name
                             + ", it does not exist on " + tmpProxy.get_name());
                 }
                 // else {

@@ -138,7 +138,7 @@ public final class ServerManager {
 
     public void startDevice(final String deviceName, final Class<?> deviceClass) throws DevFailed {
         if (!isStarted.get()) {
-            DevFailedUtils.throwDevFailed("the server must be started");
+            throw DevFailedUtils.newDevFailed("the server must be started");
         }
         if (tangoExporter != null) {
             if (tangoClasses.containsValue(deviceClass)) {
@@ -149,7 +149,7 @@ public final class ServerManager {
 
     public void stopDevice(final String deviceName) throws DevFailed {
         if (!isStarted.get()) {
-            DevFailedUtils.throwDevFailed("the server must be started");
+            throw DevFailedUtils.newDevFailed("the server must be started");
         }
         if (tangoExporter != null) {
             tangoExporter.unexportDevice(deviceName);
@@ -194,7 +194,7 @@ public final class ServerManager {
      */
     public synchronized void startError(final String[] args, final String execName) throws DevFailed {
         if (isStarted.get()) {
-            DevFailedUtils.throwDevFailed("this server is already started");
+            throw DevFailedUtils.newDevFailed("this server is already started");
         }
         init(args, execName);
     }
@@ -250,7 +250,7 @@ public final class ServerManager {
 
         // Check that the server name is not too long
         if (tmp.length() > SERVER_NAME_MAX_LENGTH) {
-            DevFailedUtils.throwDevFailed(INIT_ERROR, "The device server name is too long! Max length is "
+            throw DevFailedUtils.newDevFailed(INIT_ERROR, "The device server name is too long! Max length is "
                     + SERVER_NAME_MAX_LENGTH + " characters.");
         }
         isStarted.set(true);
@@ -314,7 +314,7 @@ public final class ServerManager {
      */
     private void checkArgs(final String[] argv) throws DevFailed {
         if (argv.length < 1) {
-            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+            throw DevFailedUtils.newDevFailed(INIT_ERROR, getUsage());
         }
         instanceName = argv[0];
         useDb = true;
@@ -331,7 +331,7 @@ public final class ServerManager {
                     LoggingManager.getInstance().setLoggingLevel(level,
                             tangoClasses.values().toArray(new Class<?>[tangoClasses.size()]));
                 } catch (final NumberFormatException e) {
-                    DevFailedUtils.throwDevFailed("Logging level error. Must be a number");
+                    throw DevFailedUtils.newDevFailed("Logging level error. Must be a number");
                 }
             } else if (arg.startsWith("-dlist")) {
                 noDbDevices = configureNoDB(argv, i);
@@ -354,7 +354,7 @@ public final class ServerManager {
     private List<String> configureNoDB(final String argv[], final int currentIdx) throws DevFailed {
         final List<String> noDbDevices = new ArrayList<String>();
         if (!ArrayUtils.contains(argv, NODB)) {
-            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+            throw DevFailedUtils.newDevFailed(INIT_ERROR, getUsage());
         } else {
             for (int j = currentIdx + 1; j < argv.length; j++) {
                 if (!argv[j].startsWith("-")) {
@@ -391,12 +391,12 @@ public final class ServerManager {
     private void configureNoDBFile(final String argv[], final String arg, final List<String> noDbDevices)
             throws DevFailed {
         if (!ArrayUtils.contains(argv, NODB)) {
-            DevFailedUtils.throwDevFailed(INIT_ERROR, getUsage());
+            throw DevFailedUtils.newDevFailed(INIT_ERROR, getUsage());
         } else {
             final String name = arg.split("=")[1];
             final File file = new File(name);
             if (!file.exists() && !file.isFile()) {
-                DevFailedUtils.throwDevFailed(INIT_ERROR, name + " does not exists or is not a file");
+                throw DevFailedUtils.newDevFailed(INIT_ERROR, name + " does not exists or is not a file");
             }
             logger.warn("Tango Database is not used - with file {} ", file.getPath());
             DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
@@ -440,7 +440,7 @@ public final class ServerManager {
             }
             hostName = addr.getCanonicalHostName();
         } catch (final UnknownHostException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
 
         logger.debug("pid: " + pid);

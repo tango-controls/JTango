@@ -46,7 +46,7 @@ final class DeviceSchedulerBuilder {
 
         for (final Method method : methods) {
             if (method.getParameterTypes().length != 0 && !method.getReturnType().equals(void.class)) {
-                DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
+                throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be void void");
             }
         }
 

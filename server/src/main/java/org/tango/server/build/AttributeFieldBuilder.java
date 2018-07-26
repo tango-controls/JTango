@@ -98,14 +98,14 @@ final class AttributeFieldBuilder {
                 try {
                     setter = businessObject.getClass().getMethod(setterName, type);
                 } catch (final NoSuchMethodException e1) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 }
             }
             // attribute is read only
         }
 
         if (setter == null && getter == null) {
-            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
+            throw DevFailedUtils.newDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
                     + BuilderUtils.METHOD_NOT_FOUND);
         }
 

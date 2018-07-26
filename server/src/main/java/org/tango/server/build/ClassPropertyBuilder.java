@@ -79,7 +79,7 @@ final class ClassPropertyBuilder {
 	try {
 	    setter = businessObject.getClass().getMethod(setterName, field.getType());
 	} catch (final NoSuchMethodException e) {
-	    DevFailedUtils.throwDevFailed(e);
+	    throw DevFailedUtils.newDevFailed(e);
 	}
 	final ClassPropertyImpl property = new ClassPropertyImpl(propName, annot.description(), setter, businessObject,
 		device.getClassName(), annot.defaultValue());

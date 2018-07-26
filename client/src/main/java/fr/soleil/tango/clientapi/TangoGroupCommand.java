@@ -35,7 +35,7 @@ public final class TangoGroupCommand {
         for (int i = 0; i < group.get_size(true); i++) {
             final DeviceProxy dev = group.get_device(i + 1);
             if (dev == null) {
-                DevFailedUtils.throwDevFailed("impossible to create " + commandName);
+                throw DevFailedUtils.newDevFailed("impossible to create " + commandName);
             }
             dev.command_query(commandName);
         }
@@ -95,8 +95,7 @@ public final class TangoGroupCommand {
             }
         } else {
             if (value.length != group.get_size(true)) {
-                DevFailedUtils
-                        .throwDevFailed(TANGO_WRONG_DATA_ERROR, group.get_size(true) + " values must be provided");
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, group.get_size(true) + " values must be provided");
             }
             for (int i = 0; i < group.get_size(true); i++) {
                 final int arginType = group.get_device(i + 1).command_query(commandName).in_type;
@@ -113,7 +112,7 @@ public final class TangoGroupCommand {
             final DeviceProxy dev = group.get_device(i + 1);
             arginType = dev.command_query(commandName).in_type;
             if (i > 0 && arginType != previousType) {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, ALL_INPUT_TYPES_MUST_BE_THE_SAME);
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, ALL_INPUT_TYPES_MUST_BE_THE_SAME);
             }
         }
         if (arginType == TangoConst.Tango_DEVVAR_DOUBLESTRINGARRAY) {
@@ -131,7 +130,7 @@ public final class TangoGroupCommand {
                 inData[i].insert(dvlsa);
             }
         } else {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "input type " + " not supported");
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "input type " + " not supported");
         }
     }
 
@@ -143,7 +142,7 @@ public final class TangoGroupCommand {
             final DeviceProxy dev = group.get_device(i + 1);
             arginType = dev.command_query(commandName).in_type;
             if (i > 0 && arginType != previousType) {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, ALL_INPUT_TYPES_MUST_BE_THE_SAME);
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, ALL_INPUT_TYPES_MUST_BE_THE_SAME);
             }
         }
 
@@ -166,7 +165,7 @@ public final class TangoGroupCommand {
                 inData[i].insert(dvlsa);
             }
         } else {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "input type " + " not supported");
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "input type " + " not supported");
         }
     }
 

@@ -72,9 +72,9 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
                 logger.debug("read pipe {} from method '{}'", config.getName(), getter);
                 result = (PipeValue) getter.invoke(businessObject);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 throwDevFailed(e);
             }
@@ -88,9 +88,9 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
             try {
                 setter.invoke(businessObject, value);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 throwDevFailed(e);
             }
@@ -107,7 +107,7 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
         if (e.getCause() instanceof DevFailed) {
             throw (DevFailed) e.getCause();
         } else {
-            DevFailedUtils.throwDevFailed(e.getCause());
+            throw DevFailedUtils.newDevFailed(e.getCause());
         }
     }
 

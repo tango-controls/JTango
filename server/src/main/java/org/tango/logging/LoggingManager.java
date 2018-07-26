@@ -203,13 +203,12 @@ public final class LoggingManager {
                 try {
                     f.createNewFile();
                 } catch (final IOException e) {
-                    DevFailedUtils.throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file "
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file "
                             + fileName);
                 }
             }
             if (!f.canWrite()) {
-                DevFailedUtils
-                .throwDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.CANNOT_OPEN_FILE, "impossible to open file " + fileName);
             }
             // debug level by default
             // setLoggingLevel(deviceName, LoggingLevel.DEBUG.toInt());

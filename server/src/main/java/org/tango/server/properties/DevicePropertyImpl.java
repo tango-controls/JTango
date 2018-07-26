@@ -61,7 +61,7 @@ public final class DevicePropertyImpl {
         xlogger.entry(name);
         final String[] property = PropertiesUtils.getDeviceProperty(deviceName, className, name);
         if (isMandatory && (property.length == 0 || property[0].isEmpty())) {
-            DevFailedUtils.throwDevFailed(name + " device property is mandatory");
+            throw DevFailedUtils.newDevFailed(name + " device property is mandatory");
         }
         PropertiesUtils.injectProperty(name, propertyMethod, property, businessObject, defaultValue);
         xlogger.exit();

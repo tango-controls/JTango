@@ -48,11 +48,10 @@ public final class TangoHostManager {
             LOGGER.debug("TANGO_HOST is {} ", TANGO_HOST);
             if (TANGO_HOST_PORT_MAP.isEmpty()) {
                 if (TANGO_HOST == null) {
-                    DevFailedUtils.throwDevFailed("CONFIG_ERROR", "tango host not defined");
+                    throw DevFailedUtils.newDevFailed("CONFIG_ERROR", "tango host not defined");
                 }
                 if (TANGO_HOST.indexOf(':') < 0) {
-                    DevFailedUtils
-                            .throwDevFailed("CONFIG_ERROR", "tango host not defined correctly. Must be host:port");
+                    throw DevFailedUtils.newDevFailed("CONFIG_ERROR", "tango host not defined correctly. Must be host:port");
                 }
                 // Check if there is more than one Tango Host
                 StringTokenizer stk;
@@ -113,7 +112,7 @@ public final class TangoHostManager {
             final InetAddress iadd = InetAddress.getByName(host);
             host = iadd.getCanonicalHostName();
         } catch (final UnknownHostException e) {
-            DevFailedUtils.throwDevFailed(TANGO_HOST_ERROR, e.toString());
+            throw DevFailedUtils.newDevFailed(TANGO_HOST_ERROR, e.toString());
         }
 
         return host + ':' + getFirstPort();

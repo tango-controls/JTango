@@ -221,7 +221,7 @@ public final class AdminDevice implements TangoMXBean {
             nbClasses++;
         }
         if (nbClasses == classList.size()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
         }
     }
 
@@ -296,13 +296,13 @@ public final class AdminDevice implements TangoMXBean {
     @Command(name = "AddLoggingTarget", inTypeDesc = "Str[i]=Device-name. Str[i+1]=Target-type::Target-name")
     public void addLoggingTarget(final String[] argin) throws DevFailed {
         if (argin.length % 2 != 0) {
-            DevFailedUtils.throwDevFailed(INPUT_ERROR, "argin must be of even size");
+            throw DevFailedUtils.newDevFailed(INPUT_ERROR, "argin must be of even size");
         }
         for (int i = 0; i < argin.length - 1; i = i + 2) {
             final String deviceName = argin[i];
             final String[] config = argin[i + 1].split(LoggingManager.LOGGING_TARGET_SEPARATOR);
             if (config.length != 2) {
-                DevFailedUtils.throwDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
+                throw DevFailedUtils.newDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
             }
             if (config[0].equalsIgnoreCase(LoggingManager.LOGGING_TARGET_DEVICE)) {
                 Class<?> className = null;
@@ -331,13 +331,13 @@ public final class AdminDevice implements TangoMXBean {
     @Command(name = "RemoveLoggingTarget", inTypeDesc = "Str[i]=Device-name. Str[i+1]=Target-type::Target-name")
     public void removeLoggingTarget(final String[] argin) throws DevFailed {
         if (argin.length % 2 != 0) {
-            DevFailedUtils.throwDevFailed(INPUT_ERROR, "argin must be of even size");
+            throw DevFailedUtils.newDevFailed(INPUT_ERROR, "argin must be of even size");
         }
         for (int i = 0; i < argin.length - 1; i = i + 2) {
             final String deviceName = argin[i];
             final String[] config = argin[i + 1].split(LoggingManager.LOGGING_TARGET_SEPARATOR);
             if (config.length != 2) {
-                DevFailedUtils.throwDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
+                throw DevFailedUtils.newDevFailed(INPUT_ERROR, "config must be of size 2: targetType::targetName");
             }
             LoggingManager.getInstance().removeAppender(deviceName, config[0]);
         }
@@ -383,7 +383,7 @@ public final class AdminDevice implements TangoMXBean {
         final int[] levels = dvlsa.lvalue;
         final String[] deviceNames = dvlsa.svalue;
         if (deviceNames.length != levels.length) {
-            DevFailedUtils.throwDevFailed(INPUT_ERROR, "argin must be of same size for string and long ");
+            throw DevFailedUtils.newDevFailed(INPUT_ERROR, "argin must be of same size for string and long ");
         }
         for (int i = 0; i < levels.length; i++) {
             LoggingManager.getInstance().setLoggingLevel(deviceNames[i], levels[i]);
@@ -449,7 +449,7 @@ public final class AdminDevice implements TangoMXBean {
         xlogger.entry();
         // Check that parameters number is correct
         if (dvlsa.svalue.length != 3 || dvlsa.lvalue.length != 1) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
         }
         final String deviceName = dvlsa.svalue[0];
         final String type = dvlsa.svalue[1];
@@ -495,7 +495,7 @@ public final class AdminDevice implements TangoMXBean {
     public void removePolling(final String[] devices) throws DevFailed {
         xlogger.entry();
         if (devices.length < 3) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
         }
         final String deviceName = devices[0];
         final String type = devices[1];
@@ -619,14 +619,14 @@ public final class AdminDevice implements TangoMXBean {
             if (argin[0].equals("info")) {
                 return EventManager.getInstance().getInfo();
             } else {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                         "Command ZmqEventSubscriptionChange expect 4 input arguments");
             }
         }
 
         // Normal usage: Subscribe to the specified event
         if (argin.length < 4) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS,
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS,
                     "Command ZmqEventSubscriptionChange expect 4 input arguments");
         }
         final String deviceName = argin[0].toLowerCase(Locale.ENGLISH);
@@ -761,7 +761,7 @@ public final class AdminDevice implements TangoMXBean {
 
                                     }
                                     if (throwError) {
-                                        DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
+                                        throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
                                                 "The polling (necessary to send events) for the attribute " + objName
                                                         + " is not started");
                                     } else {
@@ -777,14 +777,14 @@ public final class AdminDevice implements TangoMXBean {
         } // end for
         if (eventType.equals(EventType.PIPE_EVENT)) {
             if (pipe == null) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Pipe " + objName + " not found");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Pipe " + objName + " not found");
             }
         } else if (!eventType.equals(EventType.INTERFACE_CHANGE_EVENT) && attribute == null) { // Not
             // found
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + objName + " not found");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute " + objName + " not found");
         }
         if (device == null) { // Not found
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, "Device " + deviceName + " not found");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, "Device " + deviceName + " not found");
         }
         return ImmutablePair.of(pipe, attribute);
     }
@@ -820,13 +820,13 @@ public final class AdminDevice implements TangoMXBean {
     @Command(name = "LockDevice", inTypeDesc = "Str[0] = Device name. Lg[0] = Lock validity")
     public void lockDevice(final DevVarLongStringArray argin) throws DevFailed {
         if (argin.svalue.length != 1 && argin.lvalue.length != 1) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.WRONG_NR_ARGS, "Incorrect number of inout arguments");
         }
         final String deviceName = argin.svalue[0];
         final int validity = argin.lvalue[0];
         logger.debug("locking {} with {}", deviceName, validity);
         if (deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_UNLOCKABLE, deviceName + " not lockable");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_UNLOCKABLE, deviceName + " not lockable");
         }
 
         // identify the client who's asking to lock
@@ -848,7 +848,7 @@ public final class AdminDevice implements TangoMXBean {
             nbClasses++;
         }
         if (nbClasses == classList.size()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
         }
     }
 
@@ -878,7 +878,7 @@ public final class AdminDevice implements TangoMXBean {
                 nbClasses++;
             }
             if (nbClasses == classList.size()) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
             }
         }
         return 0;
@@ -894,7 +894,7 @@ public final class AdminDevice implements TangoMXBean {
         for (final String deviceName : deviceNames) {
             logger.debug("re locking {} ", deviceName);
             if (deviceName.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_UNLOCKABLE, deviceName + " not lockable");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_UNLOCKABLE, deviceName + " not lockable");
             }
             for (final DeviceClassBuilder deviceClass : classList) {
                 if (deviceClass.containsDevice(deviceName)) {
@@ -927,7 +927,7 @@ public final class AdminDevice implements TangoMXBean {
             nbClasses++;
         }
         if (nbClasses == classList.size()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
+           throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
         }
         logger.debug("DevLockStatus {} {}", Arrays.toString(result.lvalue), Arrays.toString(result.svalue));
         return result;

@@ -53,7 +53,7 @@ final class PipeBuilder {
 
         final Class<?> type = field.getType();
         if (!type.equals(PipeValue.class)) {
-            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, fieldName + " must be a PipeValue");
+            throw DevFailedUtils.newDevFailed(BuilderUtils.INIT_ERROR, fieldName + " must be a PipeValue");
         }
         final String getterName = BuilderUtils.GET + fieldName.substring(0, 1).toUpperCase(Locale.ENGLISH)
                 + fieldName.substring(1);
@@ -75,7 +75,7 @@ final class PipeBuilder {
         }
 
         if (setter == null && getter == null) {
-            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
+            throw DevFailedUtils.newDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
                     + BuilderUtils.METHOD_NOT_FOUND);
         }
 

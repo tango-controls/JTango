@@ -49,7 +49,7 @@ public final class InitErrorServer {
 	}
 	if (throwError) {
 	    throwError = false;
-	    DevFailedUtils.throwDevFailed("fake error");
+	    throw DevFailedUtils.newDevFailed("fake error");
 	}
     }
 }

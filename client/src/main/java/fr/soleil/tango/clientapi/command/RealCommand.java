@@ -121,7 +121,7 @@ public final class RealCommand implements ITangoCommand {
             final DevVarLongStringArray dvlsa = new DevVarLongStringArray(in, stringArgin);
             inData.insert(dvlsa);
         } else {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
         }
     }
 
@@ -135,7 +135,7 @@ public final class RealCommand implements ITangoCommand {
             final DevVarLongStringArray dvlsa = new DevVarLongStringArray(in, stringArgin);
             inData.insert(dvlsa);
         } else {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
         }
     }
 
@@ -146,7 +146,7 @@ public final class RealCommand implements ITangoCommand {
             final DevVarLongStringArray dvlsa = new DevVarLongStringArray(in, stringArgin);
             inData.insert(dvlsa);
         } else {
-            DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+            throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
         }
     }
 

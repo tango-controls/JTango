@@ -259,7 +259,7 @@ public enum AttributeTangoType {
             // specific case for enum attributes that are short in API
             result = AttributeTangoType.DEVENUM;
         } else if (result == null) {
-            DevFailedUtils.throwDevFailed("TYPE_ERROR", clazz + " is not an attribute type");
+            throw DevFailedUtils.newDevFailed("TYPE_ERROR", clazz + " is not an attribute type");
         }
         return result;
     }
@@ -267,7 +267,7 @@ public enum AttributeTangoType {
     public static AttributeTangoType getTypeFromTango(final int tangoType) throws DevFailed {
         final AttributeTangoType result = TANGO_TYPE_MAP.get(tangoType);
         if (result == null) {
-            DevFailedUtils.throwDevFailed("TYPE_ERROR", tangoType + " is not an attribute type");
+            throw DevFailedUtils.newDevFailed("TYPE_ERROR", tangoType + " is not an attribute type");
         }
         return result;
     }

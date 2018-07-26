@@ -85,9 +85,9 @@ public final class ORBUtils {
         try {
             dev.setObjId(poa.reference_to_id(d));
         } catch (final WrongAdapter e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final WrongPolicy e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
 
         final DeviceExportInfo info = new DeviceExportInfo(dev.getName(), orb.object_to_string(d), hostName,
@@ -111,11 +111,11 @@ public final class ORBUtils {
         try {
             poa.activate_object_with_id(oid, dev);
         } catch (final ServantAlreadyActive e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final ObjectAlreadyActive e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final WrongPolicy e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         // Get the object id and store it
         dev._this(ORBManager.getOrb());
@@ -139,9 +139,9 @@ public final class ORBUtils {
         try {
             poa.deactivate_object(device.getObjId());
         } catch (final ObjectNotActive e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final WrongPolicy e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         XLOGGER.exit();
     }

@@ -76,14 +76,14 @@ public final class AroundInvokeImpl {
             try {
                 aroundInvokeMethod.invoke(businessObject, ctx);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
+                    throw DevFailedUtils.newDevFailed(e.getCause());
                 }
             }
         }

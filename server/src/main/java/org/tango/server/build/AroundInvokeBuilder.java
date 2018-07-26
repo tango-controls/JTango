@@ -54,11 +54,11 @@ final class AroundInvokeBuilder {
 	xlogger.entry();
 	if (method.getParameterTypes().length != 1 || !method.getParameterTypes()[0].equals(InvocationContext.class)
 		|| !method.getReturnType().equals(void.class)) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method
+	    throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method
 		    + " be like: void invoke(InvocationContext ctx)");
 	}
 	if (Modifier.isStatic(method.getModifiers())) {
-	    DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
+	    throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, method + " must not be static");
 	}
 	logger.debug("has an AroundInvoke method {} ", method.getName());
 	device.setAroundInvokeImpl(new AroundInvokeImpl(businessObject, method));

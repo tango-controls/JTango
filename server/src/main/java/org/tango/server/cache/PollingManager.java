@@ -183,7 +183,7 @@ public final class PollingManager {
                 att = AttributeGetterSetter.getAttribute(objectName, attributeList);
             } catch (final DevFailed e) {
                 logger.error(Constants.POLLED_OBJECT + objectName + " not found");
-                DevFailedUtils.throwDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, Constants.POLLED_OBJECT
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, Constants.POLLED_OBJECT
                         + objectName + " not found");
             }
             checkPolling(objectName, att);
@@ -193,10 +193,10 @@ public final class PollingManager {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
+                    throw DevFailedUtils.newDevFailed(e.getCause());
                 }
             } catch (final NoCacheFoundException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         } else {
             checkPolling(objectName, cmd);
@@ -206,7 +206,7 @@ public final class PollingManager {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
+                    throw DevFailedUtils.newDevFailed(e.getCause());
                 }
             }
         }
@@ -214,10 +214,10 @@ public final class PollingManager {
 
     private void checkPolling(final String objectName, final IPollable pollable) throws DevFailed {
         if (pollable.isPolled() && pollable.getPollingPeriod() > 0) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.NOT_SUPPORTED, Constants.POLLED_OBJECT + objectName
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.NOT_SUPPORTED, Constants.POLLED_OBJECT + objectName
                     + " cannot be trigger externally");
         } else if (!pollable.isPolled()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, Constants.POLLED_OBJECT + objectName
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.POLL_OBJ_NOT_FOUND, Constants.POLLED_OBJECT + objectName
                     + " not polled");
         }
     }
@@ -256,11 +256,11 @@ public final class PollingManager {
             final Map<String, Integer> minPollingValues) throws DevFailed {
         if (pollingPeriod != 0) {
             if (pollingPeriod < minPolling) {
-                DevFailedUtils.throwDevFailed(Constants.MIN_POLLING_PERIOD_IS + minPolling);
+                throw DevFailedUtils.newDevFailed(Constants.MIN_POLLING_PERIOD_IS + minPolling);
             }
             if (minPollingValues.containsKey(commandName.toLowerCase(Locale.ENGLISH))
                     && pollingPeriod < minPollingValues.get(commandName.toLowerCase(Locale.ENGLISH))) {
-                DevFailedUtils.throwDevFailed(Constants.MIN_POLLING_PERIOD_IS + minPolling);
+                throw DevFailedUtils.newDevFailed(Constants.MIN_POLLING_PERIOD_IS + minPolling);
             }
         }
     }

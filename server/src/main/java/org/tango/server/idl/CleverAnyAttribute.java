@@ -119,15 +119,15 @@ public final class CleverAnyAttribute {
                 final Method method = extractorClass.getMethod("extract", Any.class);
                 result = method.invoke(null, any);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
-                DevFailedUtils.throwDevFailed(e.getCause());
+                throw DevFailedUtils.newDevFailed(e.getCause());
             } catch (final SecurityException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final NoSuchMethodException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
             if (format.equals(AttrDataFormat.SCALAR)) {
                 // for scalar except state, get only first value
@@ -164,16 +164,16 @@ public final class CleverAnyAttribute {
                 method = inserterClass.getMethod("insert", Any.class, PARAM_MAP.get(tangoType));
                 method.invoke(null, any, array);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
                         + " is not of the good type, should be " + method);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
-                DevFailedUtils.throwDevFailed(e.getCause());
+                throw DevFailedUtils.newDevFailed(e.getCause());
             } catch (final SecurityException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final NoSuchMethodException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return any;

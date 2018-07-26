@@ -451,7 +451,7 @@ public final class JTangoTest {
     public long[] getPollSpectrum() throws DevFailed {
         error2 = !error2;
         if (error2) {
-            DevFailedUtils.throwDevFailed("error pollSpectrum");
+            throw DevFailedUtils.newDevFailed("error pollSpectrum");
         }
 
         return new long[] { 1, 2 };
@@ -737,7 +737,7 @@ public final class JTangoTest {
         final double value = 12;
         error = !error;
         if (error) {
-            DevFailedUtils.throwDevFailed("error");
+            throw DevFailedUtils.newDevFailed("error");
         }
 
         return value;

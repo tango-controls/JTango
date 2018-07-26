@@ -94,7 +94,7 @@ public final class MockCommand implements ITangoCommand {
                 final int[] in = TypeConversionUtil.castToType(int[].class, numberArgin);
                 returnMockValue = new DevVarLongStringArray(in, stringArgin);
             } else {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
             }
         }
     }
@@ -109,7 +109,7 @@ public final class MockCommand implements ITangoCommand {
                 final int[] in = TypeConversionUtil.castToType(int[].class, numberArgin);
                 returnMockValue = new DevVarLongStringArray(in, Arrays.copyOf(stringArgin, stringArgin.length));
             } else {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
             }
         }
     }
@@ -124,7 +124,7 @@ public final class MockCommand implements ITangoCommand {
                 returnMockValue = new DevVarLongStringArray(Arrays.copyOf(numberArgin, numberArgin.length),
                         Arrays.copyOf(stringArgin, stringArgin.length));
             } else {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, DESC);
             }
         }
     }

@@ -110,15 +110,15 @@ public final class CleverAttrValUnion {
                 final Method method = union.getClass().getMethod(METHOD_MAP.get(discriminator));
                 result = method.invoke(union);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
-                DevFailedUtils.throwDevFailed(e.getCause());
+                throw DevFailedUtils.newDevFailed(e.getCause());
             } catch (final SecurityException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final NoSuchMethodException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
             if (format.equals(AttrDataFormat.SCALAR) && !discriminator.equals(AttributeDataType.DEVICE_STATE)) {
                 // for scalar except state, get only first value
@@ -149,7 +149,7 @@ public final class CleverAttrValUnion {
             try {
                 Array.set(array, 0, value);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
                         + " is not of the good type");
             }
         }
@@ -158,16 +158,16 @@ public final class CleverAttrValUnion {
                     PARAM_MAP.get(discriminator));
             method.invoke(union, array);
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, value.getClass().getCanonicalName()
                     + " is not of the good type");
         } catch (final IllegalAccessException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final InvocationTargetException e) {
-            DevFailedUtils.throwDevFailed(e.getCause());
+            throw DevFailedUtils.newDevFailed(e.getCause());
         } catch (final SecurityException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final NoSuchMethodException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         return union;
     }

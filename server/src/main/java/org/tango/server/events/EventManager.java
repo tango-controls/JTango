@@ -145,7 +145,7 @@ public final class EventManager {
             context = new ZContext();
             logger.info("ZMQ ({}) SERVER event system started", EventUtilities.getZmqVersion());
         } catch (final Throwable e) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_NOT_AVAILABLE,
                     "ZMQ classes not found. Event system is not available: " + e.getMessage());
         }
 
@@ -185,15 +185,15 @@ public final class EventManager {
             ss1.setReuseAddress(true);
             port = ss1.getLocalPort();
         } catch (final SocketException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final IOException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } finally {
             if (ss1 != null) {
                 try {
                     ss1.close();
                 } catch (final IOException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 }
             }
         }

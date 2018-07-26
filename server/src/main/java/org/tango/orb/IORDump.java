@@ -69,7 +69,7 @@ public final class IORDump {
      */
     private void iorAnalysis() throws DevFailed {
         if (!iorString.startsWith("IOR:")) {
-            DevFailedUtils.throwDevFailed("CORBA_ERROR", iorString + " not an IOR");
+            throw DevFailedUtils.newDevFailed("CORBA_ERROR", iorString + " not an IOR");
         }
         final ORB orb = ORBManager.getOrb();
         final ParsedIOR pior = new ParsedIOR((org.jacorb.orb.ORB) orb, iorString);
@@ -85,7 +85,7 @@ public final class IORDump {
                 try {
                     iadd = java.net.InetAddress.getByName(name);
                 } catch (final UnknownHostException e) {
-                    DevFailedUtils.throwDevFailed(e);
+                   throw DevFailedUtils.newDevFailed(e);
                 }
                 hostName = iadd.getHostName();
 
@@ -95,7 +95,7 @@ public final class IORDump {
                 }
 
             } else {
-                DevFailedUtils.throwDevFailed("CORBA_ERROR", iorString + " not an IOR");
+                throw DevFailedUtils.newDevFailed("CORBA_ERROR", iorString + " not an IOR");
             }
         }
         // code for old jacorb 2.3
@@ -109,7 +109,7 @@ public final class IORDump {
         // try {
         // iadd = java.net.InetAddress.getByName(name);
         // } catch (final UnknownHostException e) {
-        // DevFailedUtils.throwDevFailed(e);
+        // throw DevFailedUtils.newDevFailed(e);
         // }
         // hostName = iadd.getHostName();
         //

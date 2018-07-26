@@ -76,7 +76,7 @@ public final class StateStatusCache {
             final boolean isCancelled = result.cancel(true);
             if (!isCancelled) {
                 logger.error("stop refresh NOT CANCELLED");
-                // DevFailedUtils.throwDevFailed("STOP_REFRESH",
+                // throw DevFailedUtils.newDevFailed("STOP_REFRESH",
                 // "error stopping refresh of "
                 // + attribute.getName());
             }

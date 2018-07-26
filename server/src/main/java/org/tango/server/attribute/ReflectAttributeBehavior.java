@@ -84,9 +84,9 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
                 logger.debug("read attribute {} from method '{}'", config.getName(), getter);
                 value = getter.invoke(businessObject);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 throwDevFailed(e);
             }
@@ -99,7 +99,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
         if (e.getCause() instanceof DevFailed) {
             throw (DevFailed) e.getCause();
         } else {
-            DevFailedUtils.throwDevFailed(e.getCause());
+            throw DevFailedUtils.newDevFailed(e.getCause());
         }
     }
 
@@ -152,9 +152,9 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
                     setter.invoke(businessObject, value.getValue());
                 }
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 throwDevFailed(e);
             }
@@ -165,7 +165,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
     private void checkParamTypes(final AttributeValue value, final Class<?> paramSetter, final Class<?> input)
             throws DevFailed {
         if (!paramSetter.isAssignableFrom(input)) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_OPT_PROP,
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP,
                     "type mismatch, expected was " + setter.getParameterTypes()[0].getCanonicalName() + ", input is "
                             + value.getValue().getClass().getCanonicalName());
         }

@@ -158,13 +158,13 @@ public final class ClientLocking {
                     && !lockerHost.equalsIgnoreCase(ServerRequestInterceptor.getInstance().getGiopHostAddress())
                     && !ClientIDUtil.clientIdentEqual(clIdent, clientIdentityLock)) {
                 // device is locked
-                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_LOCKED, "device is locked by " + lockerHost
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_LOCKED, "device is locked by " + lockerHost
                         + "- " + ClientIDUtil.toString(clIdent));
             } else if (hasBeenForced && ClientIDUtil.clientIdentEqual(clIdent, previousLocker)) {
                 // if was unlock by client
                 hasBeenForced = false;
                 // lockingCounter = 0;
-                DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_UNLOCKED, "device unlock was forced");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_UNLOCKED, "device unlock was forced");
             }
         }
     }

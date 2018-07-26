@@ -67,7 +67,7 @@ final class CommandBuilder {
         // retrieve parameter type
         final Class<?>[] paramTypeTable = m.getParameterTypes();
         if (paramTypeTable.length > 1) {
-            DevFailedUtils.throwDevFailed("INIT_FAILED", "Command can have only one parameter");
+            throw DevFailedUtils.newDevFailed("INIT_FAILED", "Command can have only one parameter");
         }
         Class<?> paramType;
         if (paramTypeTable.length == 0) {

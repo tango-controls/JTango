@@ -142,7 +142,7 @@ public final class StateResolver {
                 // not important, could failed if some devices are down
             }
         } else {
-            DevFailedUtils.throwDevFailed("INIT_ERROR", "property DeviceNameList is not configured");
+            throw DevFailedUtils.newDevFailed("INIT_ERROR", "property DeviceNameList is not configured");
         }
     }
 

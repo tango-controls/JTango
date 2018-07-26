@@ -403,7 +403,7 @@ public final class TangoUtil {
 
     private static void checkNullOrEmptyString(final String s) throws DevFailed {
         if (s == null || s.isEmpty()) {
-            DevFailedUtils.throwDevFailed("string is null or empty");
+            throw DevFailedUtils.newDevFailed("string is null or empty");
         }
     }
 

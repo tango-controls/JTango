@@ -85,17 +85,17 @@ final class DevicePropertyBuilder {
                     try {
                         setter = businessObject.getClass().getMethod(setterName, field.getType());
                     } catch (final NoSuchMethodException e1) {
-                        DevFailedUtils.throwDevFailed(e);
+                        throw DevFailedUtils.newDevFailed(e);
                     }
                 } else {
-                    DevFailedUtils.throwDevFailed(e);
+                    throw DevFailedUtils.newDevFailed(e);
                 }
             }
             final DevicePropertyImpl property = new DevicePropertyImpl(propName, annot.description(), setter,
                     businessObject, device.getName(), device.getClassName(), annot.isMandatory(), annot.defaultValue());
             device.addDeviceProperty(property);
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         xlogger.exit();
     }

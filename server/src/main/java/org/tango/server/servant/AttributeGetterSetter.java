@@ -75,7 +75,7 @@ public final class AttributeGetterSetter {
             }
         }
         if (result == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + DOES_NOT_EXIST);
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + DOES_NOT_EXIST);
         }
         return result;
     }
@@ -97,7 +97,7 @@ public final class AttributeGetterSetter {
                 // Check if the attribute is allowed
                 final DevState s = stateImpl.updateState();
                 if (!att.isAllowed(DeviceState.getDeviceState(s))) {
-                    DevFailedUtils.throwDevFailed(ExceptionMessages.COMMAND_NOT_ALLOWED, ATTRIBUTE + att.getName()
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.COMMAND_NOT_ALLOWED, ATTRIBUTE + att.getName()
                             + " not allowed when the device is in " + DeviceState.toString(s));
                 }
                 final Object obj = CleverAttrValUnion.get(value4.value, att.getFormat());
@@ -129,7 +129,7 @@ public final class AttributeGetterSetter {
             final String name = value3.name;
             final AttributeImpl att = getAttribute(name, attributeList);
             if (!att.getFormat().equals(AttrDataFormat.SCALAR)) {
-                DevFailedUtils.throwDevFailed("write only supported for SCALAR attributes");
+                throw DevFailedUtils.newDevFailed("write only supported for SCALAR attributes");
             }
             // Call the always executed method
             aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_ATTRIBUTE, CallType.UNKNOWN,
@@ -138,7 +138,7 @@ public final class AttributeGetterSetter {
             // Check if the attribute is allowed
             final DevState s = stateImpl.updateState();
             if (!att.isAllowed(DeviceState.getDeviceState(s))) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.COMMAND_NOT_ALLOWED, ATTRIBUTE + att.getName()
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.COMMAND_NOT_ALLOWED, ATTRIBUTE + att.getName()
                         + " not allowed when the device is in " + DeviceState.toString(s));
             }
             final Object obj = CleverAnyAttribute.get(value3.value, att.getTangoType(), att.getFormat());

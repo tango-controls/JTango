@@ -128,7 +128,7 @@ public final class TangoUtil {
      */
     public static String getfullNameForDevice(final String deviceName) throws DevFailed {
         if (deviceName == null) {
-            DevFailedUtils.throwDevFailed("cannot retrieve device name", "device name is empty");
+            throw DevFailedUtils.newDevFailed("cannot retrieve device name", "device name is empty");
         }
         String result;
         final String[] fields = deviceName.split("/");

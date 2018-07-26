@@ -108,7 +108,7 @@ final class BuilderUtils {
      */
     static void checkStatic(final Field field) throws DevFailed {
         if (Modifier.isStatic(field.getModifiers())) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, field + MUST_NOT_BE_STATIC);
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, field + MUST_NOT_BE_STATIC);
         }
     }
 

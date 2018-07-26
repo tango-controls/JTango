@@ -310,9 +310,9 @@ public class DeviceImpl extends Device_5POA {
             // TODO "logging_rft
 
         } catch (final SecurityException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final NoSuchMethodException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         logger.debug("Device {} of of {} created with tx type: {}",
                 new Object[] { deviceName, businessObject.getClass(), txType });
@@ -328,7 +328,7 @@ public class DeviceImpl extends Device_5POA {
             }
         }
         if (result == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + " does not exists");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_FOUND, name + " does not exists");
         }
         return result;
     }
@@ -711,14 +711,14 @@ public class DeviceImpl extends Device_5POA {
             try {
                 deleteMethod.invoke(businessObject);
             } catch (final IllegalArgumentException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
                 if (e.getCause() instanceof DevFailed) {
                     throw (DevFailed) e.getCause();
                 } else {
-                    DevFailedUtils.throwDevFailed(e.getCause());
+                    throw DevFailedUtils.newDevFailed(e.getCause());
                 }
             }
         }
@@ -737,7 +737,7 @@ public class DeviceImpl extends Device_5POA {
             isInitializing = false;
         }
         if (isInitializing) {
-            DevFailedUtils.throwDevFailed("CONCURRENT_ERROR", name + " in Init command ");
+            throw DevFailedUtils.newDevFailed("CONCURRENT_ERROR", name + " in Init command ");
         }
     }
 
@@ -827,7 +827,7 @@ public class DeviceImpl extends Device_5POA {
         xlogger.entry();
         // deviceMonitoring.addRequest("black_box");
         if (maxSize <= 0) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.BLACK_BOX_ARG, maxSize + " is not a good size");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.BLACK_BOX_ARG, maxSize + " is not a good size");
         }
         xlogger.exit();
         return deviceMonitoring.getBlackBox(maxSize);
@@ -933,7 +933,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return result;
@@ -971,7 +971,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return result;
@@ -1012,7 +1012,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
 
@@ -1054,7 +1054,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
 
         }
@@ -1106,7 +1106,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1163,7 +1163,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         } finally {
             deviceMonitoring.endRequest(request);
@@ -1205,7 +1205,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1242,7 +1242,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1285,7 +1285,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1329,7 +1329,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1387,7 +1387,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return resultValues;
@@ -1560,7 +1560,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         } finally {
             deviceMonitoring.endRequest(request);
@@ -1600,7 +1600,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -1646,7 +1646,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         } finally {
             deviceMonitoring.endRequest(request);
@@ -1704,7 +1704,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         } finally {
             deviceMonitoring.endRequest(request);
@@ -1742,14 +1742,14 @@ public class DeviceImpl extends Device_5POA {
         if (!name.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName()) && source.equals(DevSource.CACHE)
                 && !cmd.isPolled()) {
             // command is not polled, so throw exception except for admin device
-            DevFailedUtils.throwDevFailed(ExceptionMessages.CMD_NOT_POLLED, "Command " + commandName + " not polled");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.CMD_NOT_POLLED, "Command " + commandName + " not polled");
         }
 
         // Check if the command is allowed
         if (!cmd.getName().equals(STATUS_NAME) && !cmd.getName().equals(STATE_NAME) && !cmd.getName().equals(INIT_CMD)) {
             final DeviceState currentState = DeviceState.getDeviceState(stateImpl.updateState());
             if (!cmd.isAllowed(currentState)) {
-                DevFailedUtils.throwDevFailed("API_CommandNotAllowed", "Command " + commandName
+                throw DevFailedUtils.newDevFailed("API_CommandNotAllowed", "Command " + commandName
                         + " not allowed when the device is in " + currentState + " state");
             }
         }
@@ -2001,13 +2001,13 @@ public class DeviceImpl extends Device_5POA {
 
             final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
             if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                DevFailedUtils.throwDevFailed("set attribute is not possible for " + attribute.getName());
+                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
             }
             if (!attribute.getFormat().equals(attributeConfig.data_format)
                     || !attribute.getWritable().equals(attributeConfig.writable)
                     || !attribute.getDispLevel().equals(attributeConfig.level)
                     || attribute.getTangoType() != attributeConfig.data_type) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
             }
 
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
@@ -2065,13 +2065,13 @@ public class DeviceImpl extends Device_5POA {
 
             final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
             if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                DevFailedUtils.throwDevFailed("set attribute is not possible for " + attribute.getName());
+                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
             }
             if (!attribute.getFormat().equals(attributeConfig.data_format)
                     || !attribute.getWritable().equals(attributeConfig.writable)
                     || !attribute.getDispLevel().equals(attributeConfig.level)
                     || attribute.getTangoType() != attributeConfig.data_type) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
             }
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
             logger.debug("set_attribute_config_3: {}", props);
@@ -2097,12 +2097,12 @@ public class DeviceImpl extends Device_5POA {
             final String attributeName = attributeConfig.name;
             final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
             if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                DevFailedUtils.throwDevFailed("set attribute is not possible for " + attribute.getName());
+                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
             }
             if (!attribute.getFormat().equals(attributeConfig.data_format)
                     || !attribute.getWritable().equals(attributeConfig.writable)
                     || attribute.getTangoType() != attributeConfig.data_type) {
-                DevFailedUtils.throwDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
             }
             final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
             logger.debug("set_attribute_config: {}", props);
@@ -2570,7 +2570,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         return result;
@@ -2648,7 +2648,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -2675,7 +2675,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();
@@ -2704,7 +2704,7 @@ public class DeviceImpl extends Device_5POA {
             } else {
                 // with CORBA, the stack trace is not visible by the client if
                 // not inserted in DevFailed.
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
         xlogger.exit();

@@ -86,14 +86,14 @@ public class GroupAttribute implements IAttributeBehavior {
             final AttributeInfo info = attributeGroup.getGroup().getDevice(attributeNames[i])
                     .get_attribute_info(TangoUtil.getAttributeName(attributeNames[i]));
             if (info.data_type == TangoConst.Tango_DEV_STRING) {
-                DevFailedUtils.throwDevFailed(attributeNames[i] + " is a String, not supported");
+                throw DevFailedUtils.newDevFailed(attributeNames[i] + " is a String, not supported");
             }
             if (i == 0) {
                 attributeFormat = info.data_format;
 
             } else {
                 if (!info.data_format.equals(attributeFormat)) {
-                    DevFailedUtils.throwDevFailed("All attributes must have the same format");
+                    throw DevFailedUtils.newDevFailed("All attributes must have the same format");
                 }
                 if (!info.writable.equals(AttrWriteType.READ)) {
                     // this attribute will be writable if at least one attribute is writable

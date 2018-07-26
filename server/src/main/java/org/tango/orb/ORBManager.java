@@ -120,11 +120,11 @@ public final class ORBManager {
             // boot_manager =
             // BootManagerHelper.narrow(orb.resolve_initial_references("BootManager"));
         } catch (final InvalidName e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final INITIALIZE e) {
             // ignore, occurs when starting several times a server that failed
             if (!useDb) {
-                DevFailedUtils.throwDevFailed(e);
+                throw DevFailedUtils.newDevFailed(e);
             }
         }
 
@@ -139,16 +139,16 @@ public final class ORBManager {
                 poa = poa.create_POA(NODB_POA, manager, policies);
             }
         } catch (final org.omg.PortableServer.POAPackage.AdapterAlreadyExists e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final org.omg.PortableServer.POAPackage.InvalidPolicy e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
 
         final POAManager manager = poa.the_POAManager();
         try {
             manager.activate();
         } catch (final org.omg.PortableServer.POAManagerPackage.AdapterInactive ex) {
-            DevFailedUtils.throwDevFailed("API_CantActivatePOAManager", "The POA activate method throws an exception");
+            throw DevFailedUtils.newDevFailed("API_CantActivatePOAManager", "The POA activate method throws an exception");
         }
 
         if (useDb) {
@@ -213,7 +213,7 @@ public final class ORBManager {
                                 devIDL1 = narrowIDL1(importInfo);
                             } catch (final BAD_PARAM e3) {
                                 // may not occur, unknown CORBA server
-                                DevFailedUtils.throwDevFailed(e);
+                                throw DevFailedUtils.newDevFailed(e);
                             }
                         }
                     }
@@ -229,7 +229,7 @@ public final class ORBManager {
             LOGGER.debug("out on TIMEOUT");
         } catch (final BAD_OPERATION e) {
             // System.err.println("Can't pack/unpack data sent to/from database in/to Any object");
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final TRANSIENT e) {
             LOGGER.debug("out on TRANSIENT, device is not running");
         } catch (final OBJECT_NOT_EXIST e) {
@@ -260,7 +260,7 @@ public final class ORBManager {
             }
 
         } catch (final NO_RESPONSE e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } catch (final COMM_FAILURE e) {
             LOGGER.debug("out on COMM_FAILURE, device is not running");
         } catch (final OBJECT_NOT_EXIST e) {
@@ -275,7 +275,7 @@ public final class ORBManager {
     private static void checkDev(final String toBeImported, final String deviceName, final String version)
             throws DevFailed {
         if (deviceName.equals(toBeImported)) {
-            DevFailedUtils.throwDevFailed(INIT_ERROR, "This server is already running in IDL" + version + ", exiting!");
+            throw DevFailedUtils.newDevFailed(INIT_ERROR, "This server is already running in IDL" + version + ", exiting!");
         }
     }
 
@@ -420,7 +420,7 @@ public final class ORBManager {
      */
     public static ORB getOrb() throws DevFailed {
         if (orb == null) {
-            DevFailedUtils.throwDevFailed("ORB not initialized");
+            throw DevFailedUtils.newDevFailed("ORB not initialized");
         }
         return orb;
     }
@@ -433,7 +433,7 @@ public final class ORBManager {
      */
     public static POA getPoa() throws DevFailed {
         if (poa == null) {
-            DevFailedUtils.throwDevFailed("ORB not initialized");
+            throw DevFailedUtils.newDevFailed("ORB not initialized");
         }
         return poa;
     }

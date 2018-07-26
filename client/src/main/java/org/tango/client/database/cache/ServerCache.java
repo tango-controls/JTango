@@ -57,7 +57,7 @@ public final class ServerCache {
             logger.debug("filling cache of server {} with host name {}", serverName, hostName);
             final String[] out = database.command_inout("DbGetDataForServerCache", in).extractStringArray();
             if (out.length == 2) {
-                DevFailedUtils.throwDevFailed("cache for " + serverName + " not found");
+                throw DevFailedUtils.newDevFailed("cache for " + serverName + " not found");
             }
             int i = 0;
             // 1 - Admin device import paramters (2 or 8 elts - 2 when admin

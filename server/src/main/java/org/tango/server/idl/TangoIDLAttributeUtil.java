@@ -81,7 +81,7 @@ public final class TangoIDLAttributeUtil {
             value2.dim_x = value.getXDim();
             value2.dim_y = value.getYDim();
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         XLOGGER.exit();
         return value2;
@@ -112,7 +112,7 @@ public final class TangoIDLAttributeUtil {
             value3.r_dim.dim_y = read.getYDim();
             value3.err_list = new DevError[0];
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         XLOGGER.exit();
         return value3;
@@ -163,7 +163,7 @@ public final class TangoIDLAttributeUtil {
             // LOGGER.debug("get attr dim {} {}", value4.r_dim.dim_x, value4.r_dim.dim_y);
             value.err_list = new DevError[0];
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         XLOGGER.exit();
         return value;
@@ -200,7 +200,7 @@ public final class TangoIDLAttributeUtil {
             // LOGGER.debug("get attr dim {} {}", value4.r_dim.dim_x, value4.r_dim.dim_y);
             value4.err_list = new DevError[0];
         } catch (final IllegalArgumentException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         }
         XLOGGER.exit();
         return value4;

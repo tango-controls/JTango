@@ -111,7 +111,7 @@ public final class TangoExporter implements IExporter {
             final String[] deviceList = DatabaseFactory.getDatabase().getDeviceList(serverName, tangoClass);
             logger.debug("devices found  {}", Arrays.toString(deviceList));
             // if (deviceList.length == 0) {
-            // DevFailedUtils.throwDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
+            // throw DevFailedUtils.newDevFailed(ExceptionMessages.DB_ACCESS, "No device defined in database for class "
             // + tangoClass);
             // }
             for (final String deviceName : deviceList) {
@@ -234,7 +234,7 @@ public final class TangoExporter implements IExporter {
     @Override
     public DeviceImpl getDevice(final String className, final String deviceName) throws DevFailed {
         if (!className.equalsIgnoreCase(Constants.ADMIN_SERVER_CLASS_NAME) && !tangoClasses.containsKey(className)) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, className
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.CLASS_NOT_FOUND, className
                     + " does not exists on this server");
         }
         DeviceImpl device = null;
@@ -245,7 +245,7 @@ public final class TangoExporter implements IExporter {
             }
         }
         if (device == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName
                     + " does not exists on this server");
         }
         return device;
@@ -261,7 +261,7 @@ public final class TangoExporter implements IExporter {
      */
     public String[] getDevicesOfClass(final String tangoClass) throws DevFailed {
         if (!tangoClasses.containsKey(tangoClass)) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.CLASS_NOT_FOUND, tangoClass
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.CLASS_NOT_FOUND, tangoClass
                     + " does not exists on this server");
         }
         String[] deviceNames = new String[] {};

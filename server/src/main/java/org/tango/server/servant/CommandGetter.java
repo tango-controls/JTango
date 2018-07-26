@@ -50,7 +50,7 @@ public class CommandGetter {
             }
         }
         if (result == null) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.COMMAND_NOT_FOUND, "Command " + name + " not found");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.COMMAND_NOT_FOUND, "Command " + name + " not found");
         }
         return result;
     }

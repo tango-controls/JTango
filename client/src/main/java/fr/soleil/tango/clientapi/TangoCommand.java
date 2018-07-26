@@ -140,7 +140,7 @@ public final class TangoCommand {
         Number returnVal = null;
         if (Array.getLength(result) >= 1) {
             if (Array.get(result, 0) instanceof String || Array.get(result, 0) instanceof Boolean) {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
             }
             returnVal = (Number) Array.get(result, 0);
         }
@@ -171,7 +171,7 @@ public final class TangoCommand {
         Number returnVal = null;
         if (Array.getLength(result) >= 1) {
             if (Array.get(result, 0) instanceof String || Array.get(result, 0) instanceof Boolean) {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
             }
             returnVal = (Number) Array.get(result, 0);
         }
@@ -224,7 +224,7 @@ public final class TangoCommand {
         Number[] returned = null;
         if (Array.getLength(result) >= 1) {
             if (Array.get(result, 0) instanceof String || Array.get(result, 0) instanceof Boolean) {
-                DevFailedUtils.throwDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
+                throw DevFailedUtils.newDevFailed(TANGO_WRONG_DATA_ERROR, "this command must return a java.lang.Number");
             }
             returned = new Number[Array.getLength(result)];
             for (int i = 0; i < returned.length; i++) {

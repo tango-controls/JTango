@@ -99,7 +99,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
         if (props.arch_event.period.equals(Constants.NOT_SPECIFIED)
                 && props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
                 && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
                     "Archive event properties (archive_abs_change or "
                             + "archive_rel_change or archive_period) for attribute " + attribute.getName()
                             + " are not set");

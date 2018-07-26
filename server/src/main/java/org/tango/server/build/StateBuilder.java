@@ -75,12 +75,12 @@ final class StateBuilder {
             throw DevFailedUtils.newDevFailed(e);
         }
         if (getter.getParameterTypes().length != 0) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must not have a parameter");
         }
 
         logger.debug("Has an state : {}", field.getName());
         if (getter.getReturnType() != DeviceState.class && getter.getReturnType() != DevState.class) {
-            DevFailedUtils.throwDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
+            throw DevFailedUtils.newDevFailed(DevFailedUtils.TANGO_BUILD_FAILED, getter + " must have a return type of  "
                     + DeviceState.class.getCanonicalName() + " or " + DevState.class.getCanonicalName());
         }
         Method setter;

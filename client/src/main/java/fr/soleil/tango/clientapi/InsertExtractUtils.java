@@ -29,7 +29,7 @@ public final class InsertExtractUtils {
      */
     public static Object extract(final DeviceAttribute da) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+		throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return InsertExtractFactory.getAttributeExtractor(da.getType()).extract(da);
     }
@@ -43,7 +43,7 @@ public final class InsertExtractUtils {
      */
     public static Object extractRead(final DeviceAttribute da, final AttrDataFormat format) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+		throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return InsertExtractFactory.getAttributeExtractor(da.getType()).extractRead(da, format);
     }
@@ -57,7 +57,7 @@ public final class InsertExtractUtils {
      */
     public static Object extractReadArray(final DeviceAttribute da, final AttrDataFormat format) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+		throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return InsertExtractFactory.getAttributeExtractor(da.getType()).extractReadArray(da, format);
     }
@@ -72,7 +72,7 @@ public final class InsertExtractUtils {
     public static Object extractWrite(final DeviceAttribute da, final AttrWriteType writeType,
 	    final AttrDataFormat format) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+		throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return InsertExtractFactory.getAttributeExtractor(da.getType()).extractWrite(da, writeType, format);
     }
@@ -87,7 +87,7 @@ public final class InsertExtractUtils {
     public static Object extractWriteArray(final DeviceAttribute da, final AttrWriteType writeType,
 	    final AttrDataFormat format) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return InsertExtractFactory.getAttributeExtractor(da.getType()).extractWriteArray(da, writeType, format);
     }
@@ -105,7 +105,7 @@ public final class InsertExtractUtils {
      */
     public static <T> T extract(final DeviceAttribute da, final Class<T> type) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return TypeConversionUtil.castToType(type, extract(da));
     }
@@ -124,7 +124,7 @@ public final class InsertExtractUtils {
     public static <T> T extractRead(final DeviceAttribute da, final AttrDataFormat format, final Class<T> type)
 	    throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return TypeConversionUtil.castToType(type, extractRead(da, format));
     }
@@ -142,7 +142,7 @@ public final class InsertExtractUtils {
     public static <T> T extractReadArray(final DeviceAttribute da, final AttrDataFormat format, final Class<T> type)
 	    throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return TypeConversionUtil.castToType(type, extractReadArray(da, format));
     }
@@ -161,7 +161,7 @@ public final class InsertExtractUtils {
     public static <T> T extractWrite(final DeviceAttribute da, final AttrDataFormat format,
 	    final AttrWriteType writeType, final Class<T> type) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return TypeConversionUtil.castToType(type, extractWrite(da, writeType, format));
     }
@@ -179,21 +179,21 @@ public final class InsertExtractUtils {
     public static <T> T extractWriteArray(final DeviceAttribute da, final AttrWriteType writeType,
 	    final AttrDataFormat format, final Class<T> type) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	return TypeConversionUtil.castToType(type, extractWriteArray(da, writeType, format));
     }
 
     public static Object extract(final DeviceData dd) throws DevFailed {
 	if (dd == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DD);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DD);
 	}
 	return InsertExtractFactory.getCommandExtractor(dd.getType()).extract(dd);
     }
 
     public static <T> T extract(final DeviceData dd, final Class<T> type) throws DevFailed {
 	if (dd == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DD);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DD);
 	}
 	final Object r = extract(dd);
 	return TypeConversionUtil.castToType(type, r);
@@ -201,7 +201,7 @@ public final class InsertExtractUtils {
 
     public static void insert(final DeviceAttribute da, final Object value) throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	InsertExtractFactory.getAttributeInserter(da.getType()).insert(da, value);
     }
@@ -209,14 +209,14 @@ public final class InsertExtractUtils {
     public static void insert(final DeviceAttribute da, final Object value, final int dimX, final int dimY)
 	    throws DevFailed {
 	if (da == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DA);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DA);
 	}
 	InsertExtractFactory.getAttributeInserter(da.getType()).insert(da, value, dimX, dimY);
     }
 
     public static void insert(final DeviceData dd, final int dataType, final Object value) throws DevFailed {
 	if (dd == null) {
-	    DevFailedUtils.throwDevFailed(ERROR_MSG_DD);
+	    throw DevFailedUtils.newDevFailed(ERROR_MSG_DD);
 	}
 	InsertExtractFactory.getCommandInserter(dataType).insert(dd, value);
     }

@@ -117,7 +117,7 @@ public final class TangoGroupAttribute {
             deviceAttributes = group.read();
         }
         if (value.length != deviceAttributes.length) {
-            DevFailedUtils.throwDevFailed("WRITE_ERROR", deviceAttributes.length + " values must be provided");
+            throw DevFailedUtils.newDevFailed("WRITE_ERROR", deviceAttributes.length + " values must be provided");
         }
         int i = 0;
         for (final DeviceAttribute deviceAttribute : deviceAttributes) {

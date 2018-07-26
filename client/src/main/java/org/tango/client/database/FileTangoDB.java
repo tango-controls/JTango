@@ -240,10 +240,10 @@ public final class FileTangoDB implements ITangoDB {
                                     final Object[] array = ArrayUtils.add(props.get(propertyName), propertyValue);
                                     props.put(propertyName, (String[]) array);
                                 } else {
-                                    DevFailedUtils.throwDevFailed(ERROR_PARSING_FILE_PROP);
+                                    throw DevFailedUtils.newDevFailed(ERROR_PARSING_FILE_PROP);
                                 }
                             } else {
-                                DevFailedUtils.throwDevFailed(ERROR_PARSING_FILE_PROP);
+                                throw DevFailedUtils.newDevFailed(ERROR_PARSING_FILE_PROP);
                             }
                         } else if (previousLine.startsWith("CLASS")) {
                             if (classProperties.containsKey(className)) {
@@ -252,17 +252,17 @@ public final class FileTangoDB implements ITangoDB {
                                     final Object[] array = ArrayUtils.add(props.get(propertyName), propertyValue);
                                     props.put(propertyName, (String[]) array);
                                 } else {
-                                    DevFailedUtils.throwDevFailed(ERROR_PARSING_FILE_PROP);
+                                    throw DevFailedUtils.newDevFailed(ERROR_PARSING_FILE_PROP);
                                 }
                             } else {
-                                DevFailedUtils.throwDevFailed(ERROR_PARSING_FILE_PROP);
+                                throw DevFailedUtils.newDevFailed(ERROR_PARSING_FILE_PROP);
                             }
                         }
                     }
                 }
             }
         } catch (final IOException e) {
-            DevFailedUtils.throwDevFailed(e);
+            throw DevFailedUtils.newDevFailed(e);
         } finally {
             if (in != null) {
                 try {

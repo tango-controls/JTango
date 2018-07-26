@@ -149,7 +149,7 @@ final class AttributeMethodBuilder {
     private void checkNull(final String getterName, final String setterName, final Method setter, final Method getter)
             throws DevFailed {
         if (setter == null && getter == null) {
-            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
+            throw DevFailedUtils.newDevFailed(BuilderUtils.INIT_ERROR, getterName + " or " + setterName
                     + BuilderUtils.METHOD_NOT_FOUND);
         }
     }
@@ -157,7 +157,7 @@ final class AttributeMethodBuilder {
     private void checkSyntax(final Method method) throws DevFailed {
         if (!method.getName().startsWith(BuilderUtils.GET) && !method.getName().startsWith(BuilderUtils.IS)
                 && !method.getName().startsWith(BuilderUtils.SET)) {
-            DevFailedUtils.throwDevFailed(BuilderUtils.INIT_ERROR, method + " can only be a get/set method");
+            throw DevFailedUtils.newDevFailed(BuilderUtils.INIT_ERROR, method + " can only be a get/set method");
         }
     }
 

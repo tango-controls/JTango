@@ -126,7 +126,7 @@ public class PollStatusCommand implements Callable<String[]> {
             });
         }
         if (!device.isPresent()) {
-            DevFailedUtils.throwDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + AdminDevice.DOES_NOT_EXIST);
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + AdminDevice.DOES_NOT_EXIST);
         }
         return device.get();
     }
