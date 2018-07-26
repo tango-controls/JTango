@@ -30,8 +30,6 @@ package org.tango.server.events;
  * @author verdier
  */
 interface EventConstants {
-    // Always in big endian (Jacorb ?)
-    static final byte[] LITTLE_ENDIAN = { 0 };
 
     // Communication constants
     static final int HWM_DEFAULT = 1000;

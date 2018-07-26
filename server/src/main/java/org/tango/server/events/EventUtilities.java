@@ -64,7 +64,8 @@ import java.util.StringTokenizer;
  */
 
 class EventUtilities {
-
+    // Always in big endian (Jacorb ?)
+    private static final byte[] LITTLE_ENDIAN = {0};
     private static final String HEARTBEAT = ".heartbeat";
     private static final String TANGO = "tango://";
     private static final String IDL_VERSION = "idlversion_";
@@ -408,10 +409,17 @@ class EventUtilities {
 
     static void sendContextData(final ZMQ.Socket eventSocket, final String fullName, int counter, boolean isException) throws DevFailed {
         XLOGGER.entry();
-        System.out.println("send counter " + counter);
         eventSocket.sendMore(fullName);
-        eventSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
+        eventSocket.send(LITTLE_ENDIAN, ZMQ.SNDMORE);
         eventSocket.send(EventUtilities.marshall(counter, isException), ZMQ.SNDMORE);
+        XLOGGER.exit();
+    }
+
+    static void sendHeartbeat(final ZMQ.Socket heartbeatSocket, final String fullName) throws DevFailed {
+        XLOGGER.entry();
+        heartbeatSocket.sendMore(fullName);
+        heartbeatSocket.send(LITTLE_ENDIAN, ZMQ.SNDMORE);
+        heartbeatSocket.send(EventUtilities.marshall(0, false));
         XLOGGER.exit();
     }
 

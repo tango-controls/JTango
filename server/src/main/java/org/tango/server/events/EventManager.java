@@ -602,10 +602,7 @@ public final class EventManager {
             if (!eventImplMap.isEmpty()) {
                 // Fire heartbeat
                 try {
-                    heartbeatSocket.sendMore(heartbeatName);
-                    heartbeatSocket.send(EventConstants.LITTLE_ENDIAN, ZMQ.SNDMORE);
-                    heartbeatSocket.send(EventUtilities.marshall(0, false), 0);
-                    // heartbeatSocket.send("0");
+                    EventUtilities.sendHeartbeat(heartbeatSocket, heartbeatName);
                 } catch (final DevFailed e) {
                     DevFailedUtils.logDevFailed(e, logger);
                 }
