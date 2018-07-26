@@ -11,7 +11,7 @@
 	with Tango. If not, see <http://www.gnu.org/licenses/>. -->
 <configuration>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.FileAppender">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <file>target/logback.out</file>
         <immediateFlush>true</immediateFlush>
         <encoder>
@@ -19,7 +19,7 @@
         </encoder>
     </appender>
 
-    <appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.FileAppender">
+    <appender name="CONSOLE-REQUEST" class="ch.qos.logback.core.ConsoleAppender">
         <file>target/logback.out</file>
         <immediateFlush>true</immediateFlush>
         <encoder>
@@ -28,7 +28,8 @@
     </appender>
 
     <logger name="org.jacorb" level="OFF"/>
-    <logger name="org.tango" level="DEBUG"/>
+    <logger name="org.tango" level="INFO"/>
+    <logger name="org.tango.server.events" level="INFO"/>
     <logger name="org.quartz" level="OFF"/>
     <logger name="net.sf.ehcache" level="OFF"/>
     <logger name="ch.qos.logback" level="OFF"/>

@@ -24,8 +24,10 @@
  */
 package org.tango.server.events;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.tango.utils.DevFailedUtils;
@@ -87,6 +89,14 @@ public enum EventType {
         }
     }
 
+    private static final List<EventType> EVENT_ATTR_VALUE_TYPE_LIST = new ArrayList<>();
+    static {
+        EVENT_ATTR_VALUE_TYPE_LIST.add(CHANGE_EVENT);
+        EVENT_ATTR_VALUE_TYPE_LIST.add(PERIODIC_EVENT);
+        EVENT_ATTR_VALUE_TYPE_LIST.add(ARCHIVE_EVENT);
+        EVENT_ATTR_VALUE_TYPE_LIST.add(USER_EVENT);
+    }
+
     private int value;
     private String string;
 
@@ -125,6 +135,14 @@ public enum EventType {
         }
         return result;
 
+    }
+
+    /**
+     * Get event types used only for attribute value events
+     * @return
+     */
+    public static List<EventType> getEventAttrValueTypeList() {
+        return EVENT_ATTR_VALUE_TYPE_LIST;
     }
 
     /**

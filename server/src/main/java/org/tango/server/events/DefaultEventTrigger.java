@@ -50,7 +50,7 @@ public class DefaultEventTrigger implements IEventTrigger {
 
     @Override
     public boolean doCheck() {
-        return true;
+        return false;
     }
 
 }

@@ -32,7 +32,7 @@
 		<appender-ref ref="CONSOLE-REQUEST" />
 	</logger>
 
-	<root level="ERROR">
+	<root level="DEBUG">
 		<appender-ref ref="CONSOLE" />
 	</root>
 </configuration>

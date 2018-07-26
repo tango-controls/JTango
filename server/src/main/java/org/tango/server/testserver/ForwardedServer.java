@@ -42,6 +42,7 @@ public class ForwardedServer {
     // private static String fwdAttributeName = JTangoTest.NO_DB_DEVICE_NAME + "/doubleScalar";
     private static String fwdAttributeName = "";
     private static String fwdAttributeName2 = "";
+    private static String fwdAttributeName3 = "";
 
     @DynamicManagement
     DynamicManager dynMger;
@@ -54,6 +55,10 @@ public class ForwardedServer {
         fwdAttributeName2 = name;
     }
 
+    public static void setNoDbFwdAttributeName3(final String name) {
+        fwdAttributeName3 = name;
+    }
+
     @Init
     public void init() throws DevFailed {
         if (!fwdAttributeName.isEmpty()) {
@@ -61,6 +66,9 @@ public class ForwardedServer {
         }
         if (!fwdAttributeName2.isEmpty()) {
             dynMger.addAttribute(new ForwardedAttribute(fwdAttributeName2, "testfowarded2", "testfowarded2"));
+        }
+        if (!fwdAttributeName3.isEmpty()) {
+            dynMger.addAttribute(new ForwardedAttribute(fwdAttributeName3, "testfowarded3", "testfowarded3"));
         }
     }
 

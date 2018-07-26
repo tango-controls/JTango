@@ -112,7 +112,7 @@ public class ForwardedAttributeTest {
             public void run() {
                 final Scanner sc = new Scanner(src);
                 while (sc.hasNextLine()) {
-                    dest.println(sc.nextLine());
+                    dest.println("//forked process// "+ sc.nextLine());
                 }
                 dest.flush();
                 sc.close();

@@ -30,6 +30,8 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -48,7 +50,7 @@ import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
 
-@Ignore("TODO: tests not fully stable (work 99% of time)")
+@Ignore("Tests need a tangdb")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EventTest {
 // XXX dependency to tangodb
@@ -73,7 +75,7 @@ public class EventTest {
 //                ss1.close();
 
         EventServer.start();
-
+        System.out.println("event server started");
     }
 
     @AfterClass
@@ -95,8 +97,9 @@ public class EventTest {
             // TangoConst.NOT_STATELESS);
             final int id = dev.subscribe_event(TangoConst.INTERFACE_CHANGE, 100, TangoConst.NOT_STATELESS);
             int eventsNb = 0;
-            dev.command_inout("Init");
+
             while (eventsNb < 3) {
+                dev.command_inout("Init");
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
                     if (eventData.event_type == EventType.INTERFACE_CHANGE_EVENT.getValue()) {
@@ -730,15 +733,16 @@ public class EventTest {
             while (eventCount < 3) {
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
-                    if (eventData.name.contains("doubleatt")) {
+                    if ( eventData.name.contains("doubleatt")) {
                         previousValue = value;
-                        value = eventData.attr_config.events.arch_event.abs_change;
-                        // System.out.println("read value " + eventData.attr_config.name);
-                        eventCount++;
+                       if(eventData.event_type == EventType.ATT_CONF_EVENT.getValue()) {
+                           value = eventData.attr_config.events.arch_event.abs_change;
+                           System.out.println(eventCount+ " read value " + value);
+                           eventCount++;
+                       }
                     }
                 }
             }
-
             assertThat(Double.parseDouble(value), equalTo(Double.parseDouble(previousValue) + 1));
 
         } finally {

@@ -24,6 +24,8 @@
  */
 package org.tango.server.events;
 
+import fr.esrf.Tango.AttributeConfig_5;
+import fr.esrf.Tango.AttributeValue_5;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevIntrChange;
 import fr.esrf.Tango.DevPipeData;
@@ -70,10 +72,10 @@ public final class EventManager {
     public static final String IDL_REGEX = "idl[0-9]_[a-z]*";
     public static final String IDL_LATEST = "idl" + DeviceImpl.SERVER_VERSION + "_";
     private static final EventManager INSTANCE = new EventManager();
-    private static ZContext context;
-    private static ScheduledExecutorService heartBeatExecutor;
-    private static int serverHWM;
-    private static int clientHWN;
+    private ZContext context;
+    private ScheduledExecutorService heartBeatExecutor;
+    private int serverHWM;
+    private int clientHWN;
     private final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
     private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
@@ -243,7 +245,6 @@ public final class EventManager {
      * @return the specified EventImpl object if found, otherwise returns null.
      */
     private EventImpl getEventImpl(final String fullName) {
-
         if (!isInitialized) {
             return null;
         }
@@ -333,7 +334,7 @@ public final class EventManager {
      * @param pipe The specified event pipe
      * @return the connection parameters for specified event.
      */
-    public DevVarLongStringArray subcribe(final String deviceName, final PipeImpl pipe) throws DevFailed {
+    public DevVarLongStringArray subscribe(final String deviceName, final PipeImpl pipe) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -364,7 +365,7 @@ public final class EventManager {
      * @param eventType The specified event type
      * @return the connection parameters for specified event.
      */
-    public DevVarLongStringArray subcribe(final String deviceName, final AttributeImpl attribute,
+    public DevVarLongStringArray subscribe(final String deviceName, final AttributeImpl attribute,
             final EventType eventType, final int idlVersion) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
@@ -399,7 +400,7 @@ public final class EventManager {
      * @param deviceName The specified event device name
      * @return the connection parameters.
      */
-    public DevVarLongStringArray subcribe(final String deviceName) throws DevFailed {
+    public DevVarLongStringArray subscribe(final String deviceName) throws DevFailed {
         xlogger.entry();
         // If first time start the ZMQ management
         if (!isInitialized) {
@@ -438,14 +439,14 @@ public final class EventManager {
      * @throws fr.esrf.Tango.DevFailed
      * @throws DevFailed
      */
-    public void pushAttributeEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
+    public void pushAttributeErrorEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
             throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
             final String fullName5 = EventUtilities.buildEventName(deviceName, attributeName, eventType);
             final EventImpl eventImpl5 = getEventImpl(fullName5);
             if (eventImpl5 != null) {
-                eventImpl5.pushEvent(eventSocket, fullName5, devFailed);
+                eventImpl5.pushDevFailedEvent(eventSocket, fullName5, devFailed);
             }
         }
         xlogger.exit();
@@ -457,14 +458,14 @@ public final class EventManager {
      * @param attributeName specified event attribute
      * @throws DevFailed
      */
-    public void pushAttributeEvent(final String deviceName, final String attributeName) throws DevFailed {
+    public void pushAttributeValueEvent(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
-        for (final EventType eventType : EventType.values()) {
+        for (final EventType eventType : EventType.getEventAttrValueTypeList()) {
             for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
                 final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
                 final EventImpl eventImpl = getEventImpl(fullName);
                 if (eventImpl != null) {
-                    eventImpl.pushAttributeEvent(eventSocket, fullName);
+                    eventImpl.pushAttributeValueEvent(eventSocket, fullName);
                 }
             }
         }
@@ -479,34 +480,15 @@ public final class EventManager {
      * @param eventType specified event type.
      * @throws DevFailed
      */
-    public void pushAttributeEvent(final String deviceName, final String attributeName, final EventType eventType)
+    public void pushAttributeValueEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         xlogger.entry();
         for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeEvent(eventSocket, fullName);
+                eventImpl.pushAttributeValueEvent(eventSocket, fullName);
             }
-        }
-        xlogger.exit();
-    }
-
-    /**
-     * fire event without check
-     *
-     * @param deviceName Specified event device
-     * @param attributeName specified event attribute name
-     * @param eventType specified event type.
-     * @throws DevFailed
-     */
-    public void forceAttributePushEvent(final String deviceName, final String attributeName, final EventType eventType)
-            throws DevFailed {
-        xlogger.entry();
-        final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
-        final EventImpl eventImpl = getEventImpl(fullName);
-        if (eventImpl != null) {
-            eventImpl.forcePushEvent(eventSocket, fullName);
         }
         xlogger.exit();
     }
@@ -572,7 +554,28 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushEvent(eventSocket, fullName, devFailed);
+            eventImpl.pushDevFailedEvent(eventSocket, fullName, devFailed);
+        }
+        xlogger.exit();
+    }
+
+
+    public void  pushAttributeValueIDL5Event(final String deviceName, final String attributeName, AttributeValue_5 value,EventType evtType) throws DevFailed {
+        xlogger.entry();
+        final String fullName = EventUtilities.buildEventName(deviceName, attributeName,evtType);
+        final EventImpl eventImpl = getEventImpl(fullName);
+        if (eventImpl != null) {
+            eventImpl.pushAttributeIDL5Event(eventSocket,fullName, value);
+        }
+        xlogger.exit();
+    }
+
+    public void  pushAttributeConfigIDL5Event(final String deviceName, final String attributeName, AttributeConfig_5 config) throws DevFailed {
+        xlogger.entry();
+        final String fullName = EventUtilities.buildEventName(deviceName, attributeName,EventType.ATT_CONF_EVENT);
+        final EventImpl eventImpl = getEventImpl(fullName);
+        if (eventImpl != null) {
+            eventImpl.pushAttributeConfigIDL5Event(eventSocket,fullName, config);
         }
         xlogger.exit();
     }
@@ -581,12 +584,10 @@ public final class EventManager {
         HEARTBEAT, EVENTS
     }
 
-    // ===================================================
 
     /**
      * This class is a thread to send a heartbeat
      */
-    // ===================================================
     class HeartbeatThread implements Runnable {
 
         private final String heartbeatName;

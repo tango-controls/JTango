@@ -1,29 +1,32 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.testserver;
 
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevEncoded;
+import fr.esrf.Tango.DevFailed;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
 import org.tango.server.annotation.Attribute;
@@ -39,15 +42,11 @@ import org.tango.server.device.DeviceManager;
 import org.tango.server.events.EventType;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevFailed;
-
 /**
  * A device to test Tango events.
- * 
+ *
  * @author ABEILLE
- * 
+ *
  */
 @Device
 public class EventServer {
@@ -55,10 +54,62 @@ public class EventServer {
     public static final String INSTANCE_NAME = "1";
     public static final String NO_DB_DEVICE_NAME = "1/2/3";
     public static final String SERVER_NAME = EventServer.class.getSimpleName();
-
     @Attribute(isPolled = true, pollingPeriod = 100)
     @AttributeProperties(changeEventAbsolute = "1", periodicEvent = "100")
-    private double doubleAtt = 1;
+    private final double[] doubleArrayAtt = new double[]{1};
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    private final String[] stringArrayAtt = new String[]{"1"};
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "100")
+    private final boolean[] booleanArrayAtt = new boolean[]{false};
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    DeviceState[] stateArray = new DeviceState[]{DeviceState.OFF};
+    @DeviceManagement
+    DeviceManager deviceManager;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "1", periodicEvent = "100")
+    private volatile double doubleAtt = 1;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventRelative = "1")
+    private double changeRelative = 1;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    private String stringAtt = "1";
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "5")
+    private int qualityAtt;
+    private AttrQuality quality = AttrQuality.ATTR_VALID;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(archiveEventPeriod = "100")
+    private long archive = 1;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "100")
+    private boolean booleanAtt = false;
+    @Attribute(isPolled = true, pollingPeriod = 100)
+    @AttributeProperties(changeEventAbsolute = "1")
+    private DevEncoded devEncodedAttr;
+    private byte counterEncoded = 0;
+    @State
+    private DeviceState state = DeviceState.OFF;
+    private int counter = 1;
+    private int error = 0;
+
+    public static void startNoDb(final int portNr) throws DevFailed {
+        System.setProperty("OAPort", Integer.toString(portNr));
+        ServerManager.getInstance().addClass(EventServer.class.getCanonicalName(), EventServer.class);
+        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME},
+                SERVER_NAME);
+    }
+
+    public static void start() throws DevFailed {
+        ServerManager.getInstance().addClass(EventServer.class.getSimpleName(), EventServer.class);
+        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME}, EventServer.class.getSimpleName());
+        System.out.println("Event server started ");
+    }
+
+    public static void main(final String[] args) throws DevFailed {
+        //System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+        EventServer.start();
+    }
 
     public double getDoubleAtt() throws DevFailed {
         doubleAtt = doubleAtt + 1;
@@ -70,66 +121,35 @@ public class EventServer {
         return doubleAtt;
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventRelative = "1")
-    private double changeRelative = 1;
-
     public double getChangeRelative() throws DevFailed {
         changeRelative = changeRelative + 1;
         return changeRelative;
     }
-
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventAbsolute = "1", periodicEvent = "100")
-    private final double[] doubleArrayAtt = new double[] { 1 };
 
     public double[] getDoubleArrayAtt() throws DevFailed {
         doubleArrayAtt[0] = doubleArrayAtt[0] + 1;
         return doubleArrayAtt;
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    private String stringAtt = "1";
-
     public String getStringAtt() {
         stringAtt = Double.toString(Double.parseDouble(stringAtt) + 1);
         return stringAtt;
     }
-
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    private final String[] stringArrayAtt = new String[] { "1" };
 
     public String[] getStringArrayAtt() {
         stringArrayAtt[0] = Double.toString(Double.parseDouble(stringArrayAtt[0]) + 1);
         return stringArrayAtt;
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    DeviceState[] stateArray = new DeviceState[] { DeviceState.OFF };
-
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventAbsolute = "5")
-    private int qualityAtt;
-
-    private AttrQuality quality = AttrQuality.ATTR_VALID;
-
     public AttributeValue getQualityAtt() throws DevFailed {
         quality = quality == AttrQuality.ATTR_VALID ? AttrQuality.ATTR_CHANGING : AttrQuality.ATTR_VALID;
         return new AttributeValue(10, quality);
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(archiveEventPeriod = "100")
-    private long archive = 1;
-
     public long getArchive() {
         archive = archive + 1;
         return archive;
     }
-
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventAbsolute = "100")
-    private boolean booleanAtt = false;
 
     public AttributeValue getBooleanAtt() throws DevFailed {
         final AttributeValue val = new AttributeValue();
@@ -138,40 +158,21 @@ public class EventServer {
         return val;
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventAbsolute = "100")
-    private final boolean[] booleanArrayAtt = new boolean[] { false };
-
     public boolean[] getBooleanArrayAtt() {
         booleanArrayAtt[0] = !booleanArrayAtt[0];
         return booleanArrayAtt;
     }
 
-    @Attribute(isPolled = true, pollingPeriod = 100)
-    @AttributeProperties(changeEventAbsolute = "1")
-    private DevEncoded devEncodedAttr;
-    private byte counterEncoded = 0;
-
     public DevEncoded getDevEncodedAttr() {
-        devEncodedAttr = new DevEncoded("toto", new byte[] { counterEncoded });
+        devEncodedAttr = new DevEncoded("toto", new byte[]{counterEncoded});
         counterEncoded++;
         return devEncodedAttr;
     }
-
-    @DeviceManagement
-    DeviceManager deviceManager;
-
-    @State
-    private DeviceState state = DeviceState.OFF;
 
     @Init
     public void init() throws DevFailed {
         deviceManager.startPolling("State", 100);
 
-    }
-
-    public void setState(final DeviceState state) {
-        this.state = state;
     }
 
     @Attribute
@@ -180,8 +181,8 @@ public class EventServer {
     }
 
     public DeviceState[] getStateArray() {
-        stateArray = stateArray[0] == DeviceState.OFF ? new DeviceState[] { DeviceState.ON }
-                : new DeviceState[] { DeviceState.OFF };
+        stateArray = stateArray[0] == DeviceState.OFF ? new DeviceState[]{DeviceState.ON}
+                : new DeviceState[]{DeviceState.OFF};
         return stateArray;
     }
 
@@ -189,8 +190,6 @@ public class EventServer {
     public double getDataReady() {
         return 10.0;
     }
-
-    private int counter = 1;
 
     @Command
     public void pushDataReady() throws DevFailed {
@@ -207,8 +206,6 @@ public class EventServer {
         deviceManager.pushEvent("userEvent", EventType.USER_EVENT);
     }
 
-    private int error = 0;
-
     @Attribute(pushChangeEvent = true, checkChangeEvent = true)
     @AttributeProperties(changeEventAbsolute = "100")
     public int getError() throws DevFailed {
@@ -224,13 +221,13 @@ public class EventServer {
     }
 
     @Command
-    public void pushError() throws DevFailed {
-        deviceManager.pushEvent("error", EventType.CHANGE_EVENT);
+    public void setError(final int error) throws DevFailed {
+        this.error = error;
     }
 
     @Command
-    public void setError(final int error) throws DevFailed {
-        this.error = error;
+    public void pushError() throws DevFailed {
+        deviceManager.pushEvent("error", EventType.CHANGE_EVENT);
     }
 
     public void setDeviceManager(final DeviceManager deviceManager) {
@@ -242,20 +239,7 @@ public class EventServer {
         return state;
     }
 
-    public static void startNoDb(final int portNr) throws DevFailed {
-        System.setProperty("OAPort", Integer.toString(portNr));
-        ServerManager.getInstance().addClass(EventServer.class.getCanonicalName(), EventServer.class);
-        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME },
-                SERVER_NAME);
-    }
-
-    public static void start() throws DevFailed {
-        ServerManager.getInstance().addClass(EventServer.class.getSimpleName(), EventServer.class);
-        ServerManager.getInstance().startError(new String[] { INSTANCE_NAME }, EventServer.class.getSimpleName());
-    }
-
-    public static void main(final String[] args) throws DevFailed {
-        //System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
-        EventServer.start();
+    public void setState(final DeviceState state) {
+        this.state = state;
     }
 }

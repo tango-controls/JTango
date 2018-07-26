@@ -232,9 +232,9 @@ public final class DeviceManager {
                 try {
                     attribute.updateValue();
                     // push the event
-                    EventManager.getInstance().pushAttributeEvent(name, attributeName, eventType);
+                    EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
                 }
                 break;
             default:
@@ -261,9 +261,9 @@ public final class DeviceManager {
                 try {
                     attribute.updateValue(value);
                     // push the event
-                    EventManager.getInstance().pushAttributeEvent(name, attributeName, eventType);
+                    EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
                 }
                 break;
             default:

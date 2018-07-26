@@ -803,11 +803,11 @@ public final class AdminDevice implements TangoMXBean {
         // - Lg[5] = ZMQ release
         if (eventType.equals(EventType.INTERFACE_CHANGE_EVENT)) {
             // event for INTERFACE_CHANGE_EVENT does not have an attribute
-            result = EventManager.getInstance().subcribe(deviceName);
+            result = EventManager.getInstance().subscribe(deviceName);
         } else if (eventType.equals(EventType.PIPE_EVENT)) {
-            result = EventManager.getInstance().subcribe(deviceName, pipe);
+            result = EventManager.getInstance().subscribe(deviceName, pipe);
         } else {
-            result = EventManager.getInstance().subcribe(deviceName, attribute, eventType, idlversion);
+            result = EventManager.getInstance().subscribe(deviceName, attribute, eventType, idlversion);
         }
         return result;
     }

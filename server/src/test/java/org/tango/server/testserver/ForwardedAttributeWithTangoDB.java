@@ -26,6 +26,7 @@ package org.tango.server.testserver;
 
 import java.io.IOException;
 
+import fr.esrf.Tango.DevState;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -45,7 +46,7 @@ import fr.esrf.TangoDs.TangoConst;
  * @author ABEILLE
  * 
  */
-@Ignore
+@Ignore("Tests need a tangdb")
 public class ForwardedAttributeWithTangoDB {
     // XXX a device has to be declared in tangoddb
     private static String deviceNameRoot = "tango9/java/events.1";
@@ -54,13 +55,16 @@ public class ForwardedAttributeWithTangoDB {
 
     @BeforeClass
     public static void startDevice() throws DevFailed, IOException {
-        System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+        System.setProperty("TANGO_HOST", "dev-el4-db1.ica.synchrotron-soleil.fr:20001");
+        //System.out.println( System.getProperty("TANGO_HOST"));
         try {
             final String classpath = System.getProperty("java.class.path");
             final ProcessBuilder pb = new ProcessBuilder("java", "-cp", classpath,
                     EventServer.class.getCanonicalName(), "1");
-
+            System.out.println("starting root device");
             process = pb.start();
+
+
             ForwardedAttributeTest.inheritIO(process.getInputStream(), System.out);
             ForwardedAttributeTest.inheritIO(process.getErrorStream(), System.err);
 
@@ -68,11 +72,27 @@ public class ForwardedAttributeWithTangoDB {
                 Thread.sleep(5000);
             } catch (final InterruptedException e) {
             }
-            ForwardedServer.setNoDbFwdAttributeName("tango9/java/events.1/doubleAtt");
-            ForwardedServer.setNoDbFwdAttributeName2("tango9/java/event.1/doubleArrayAtt");
+
+            final DeviceProxy devRoot = new DeviceProxy(deviceNameRoot);
+            System.out.println(devRoot.state());
+            System.out.println(devRoot.status());
+            System.out.println(" root device started");
+            ForwardedServer.setNoDbFwdAttributeName(deviceNameRoot +"/doubleAtt");
+            ForwardedServer.setNoDbFwdAttributeName2(deviceNameRoot +"/doubleArrayAtt");
+            ForwardedServer.setNoDbFwdAttributeName3(deviceNameRoot +"/userEvent");
             ServerManager.getInstance().addClass("ForwardedServer", ForwardedServer.class);
             ServerManager.getInstance().startError(new String[] { ForwardedServer.INSTANCE_NAME }, "ForwardedServer");
-
+            try {
+                Thread.sleep(5000);
+            } catch (final InterruptedException e) {
+            }
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            System.out.println(dev.state());
+            System.out.println(dev.status());
+            if(dev.state().equals(DevState.FAULT) ){
+                throw  DevFailedUtils.newDevFailed(dev.status());
+            }
+            System.out.println("forwarded device started");
         } catch (final DevFailed e) {
             e.printStackTrace();
             DevFailedUtils.printDevFailed(e);
@@ -106,6 +126,34 @@ public class ForwardedAttributeWithTangoDB {
             throw e;
         }
 
+    }
+
+    @Test(timeout = 5000)
+    public void userEvent() throws DevFailed{
+        try {
+        final DeviceProxy devRoot = new DeviceProxy(deviceNameRoot);
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+
+        final int id = dev.subscribe_event("testfowarded3", TangoConst.USER_EVENT, 100, new String[] {},
+                TangoConst.NOT_STATELESS);
+        int eventsNb = 0;
+        while (eventsNb < 3) {
+            devRoot.command_inout("pushUserEvent");
+            final EventData[] events = dev.get_events();
+            for (final EventData eventData : events) {
+                if (eventData.name.contains("testfowarded3")) {
+                    eventsNb++;
+                    final String value = eventData.attr_value.extractString();
+                    System.out.println("######USER_EVENT value from event " + value);
+                }
+            }
+        }
+        dev.unsubscribe_event(id);
+        } catch (final DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Test(timeout = 3000)
@@ -159,7 +207,7 @@ public class ForwardedAttributeWithTangoDB {
         int eventsNb = 0;
         while (eventsNb < 3) {
             final EventData[] events = dev.get_events();
-            // System.out.println(events.length);
+           // System.out.println("has events " + events.length);
             for (final EventData eventData : events) {
                 if (eventData.name.contains("testfowarded")) {
                     eventsNb++;
