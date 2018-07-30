@@ -32,6 +32,7 @@ public final class DevFailedUtils {
         return ex;
     }
 
+    @Deprecated
     public static void throwDevFailed(final String msg) throws DevFailed {
         final DevFailed e = new DevFailed(msg, buildDevError(TANGO_ERROR, msg, 3));
         LOGGER.error(msg);
@@ -39,6 +40,7 @@ public final class DevFailedUtils {
         throw e;
     }
 
+    @Deprecated
     public static void throwDevFailed(final String reason, final String desc) throws DevFailed {
         final DevFailed e = new DevFailed(reason, buildDevError(reason, desc, 3));
         LOGGER.error("{}, {}", reason, desc);
