@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,7 +40,14 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.*;
+import org.tango.server.annotation.Attribute;
+import org.tango.server.annotation.Command;
+import org.tango.server.annotation.Device;
+import org.tango.server.annotation.DeviceProperty;
+import org.tango.server.annotation.Init;
+import org.tango.server.annotation.StateMachine;
+import org.tango.server.annotation.Status;
+import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.build.DeviceClassBuilder;
@@ -58,7 +65,12 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -596,7 +608,12 @@ public final class AdminDevice implements TangoMXBean {
                     for (final DevicePropertyImpl prop : props) {
                         names.add(prop.getName());
                         names.add(prop.getDescription());
-                        names.add(prop.getDefaultValue()[0]);// default value
+                        // default value
+                        if (prop.getDefaultValue().length == 0) {
+                            names.add("");
+                        } else {
+                            names.add(prop.getDefaultValue()[0]);
+                        }
                     }
                 }
                 break;
@@ -927,7 +944,7 @@ public final class AdminDevice implements TangoMXBean {
             nbClasses++;
         }
         if (nbClasses == classList.size()) {
-           throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
         }
         logger.debug("DevLockStatus {} {}", Arrays.toString(result.lvalue), Arrays.toString(result.svalue));
         return result;

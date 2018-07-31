@@ -249,7 +249,7 @@ public final class PropertiesUtils {
                     final String errorMsg = "could not set property " + propertyName + ", error converting "
                             + valueToInject + " to " + paramType.getCanonicalName();
                     // ignore error for default value
-                    if (property[0].isEmpty()) {
+                    if (property.length == 0 || property[0].isEmpty()) {
                         LOGGER.debug("{} is empty", propertyName);
                     } else {
                         throw DevFailedUtils.newDevFailed("PROPERTY_ERROR", errorMsg);

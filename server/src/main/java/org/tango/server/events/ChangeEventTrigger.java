@@ -1,32 +1,33 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
+import fr.esrf.Tango.DevEncoded;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -38,10 +39,8 @@ import org.tango.server.attribute.AttributeValue;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevEncoded;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.EventProperties;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * manage trigger for {@link EventType#CHANGE_EVENT}
@@ -54,6 +53,7 @@ public class ChangeEventTrigger implements IEventTrigger {
     private final Logger logger = LoggerFactory.getLogger(ChangeEventTrigger.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(ChangeEventTrigger.class);
     private final AttributeImpl attribute;
+    private final QualityEventTrigger qualityTrigger;
     private AttributeValue previousValue;
     private AttributeValue value;
     private double absolute;
@@ -63,7 +63,6 @@ public class ChangeEventTrigger implements IEventTrigger {
     private DevFailed error;
     private DevFailed previousError;
     private boolean previousInitialized = false;
-    private final QualityEventTrigger qualityTrigger;
 
     /**
      * Ctr
@@ -77,6 +76,27 @@ public class ChangeEventTrigger implements IEventTrigger {
         value = attribute.getReadValue();
         qualityTrigger = new QualityEventTrigger(attribute);
         setCriteria(absolute, relative);
+    }
+
+    /**
+     * Check if event criteria are set for specified events
+     *
+     * @param attribute the specified attribute
+     * @throws DevFailed if no event criteria is set for specified attribute.
+     */
+    static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
+        // Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString() || attribute.isBoolean()) {
+            return;
+        }
+        // Else check criteria
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                    "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                            + " are not set");
+        }
     }
 
     public void setCriteria(final String absolute, final String relative) {
@@ -279,27 +299,6 @@ public class ChangeEventTrigger implements IEventTrigger {
             }
         }
         return hasChanged;
-    }
-
-    /**
-     * Check if event criteria are set for specified events
-     *
-     * @param attribute the specified attribute
-     * @throws DevFailed if no event criteria is set for specified attribute.
-     */
-    static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
-        // Check if value is not numerical (always true for State and String)
-        if (attribute.isState() || attribute.isString() || attribute.isBoolean()) {
-            return;
-        }
-        // Else check criteria
-        final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
-                && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                            "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
-                                    + " are not set");
-        }
     }
 
     @Override
