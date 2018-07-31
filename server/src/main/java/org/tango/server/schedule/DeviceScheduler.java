@@ -82,8 +82,8 @@ public final class DeviceScheduler {
             final String[] activationProps = PropertiesUtils.getDeviceProperty(deviceName, className,
                     config.activationProperty());
             boolean active = false;
-            if (activationProps.length > 0 && activationProps[0].equalsIgnoreCase("true")
-                    || activationProps[0].equalsIgnoreCase("1")) {
+            if (activationProps.length > 0 && (activationProps[0].equalsIgnoreCase("true")
+                    || activationProps[0].equalsIgnoreCase("1"))) {
                 active = true;
             }
             // the job is started only if device property activationProperty is true
