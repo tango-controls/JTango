@@ -49,7 +49,7 @@ public final class ClassPropertyImpl {
 	this.businessObject = businessObject;
 	this.className = className;
 	name = propertyName;
-	this.defaultValue = defaultValue.length == 0 ? new String[] { "" } : defaultValue;
+	this.defaultValue = defaultValue.length == 0 ? new String[0] : defaultValue;
     }
 
     public void update() throws DevFailed {

@@ -28,7 +28,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -174,6 +176,15 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
         devdaClass = dev.command_inout("getMyClassProperty");
         valueClass = devdaClass.extractStringArray();
         Assert.assertArrayEquals(new String[] { "classDefault" }, valueClass);
+    }
+
+    @Test
+    public void testEmptyArrayProperty() throws DevFailed{
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        DeviceData devdaClass = dev.command_inout("getEmptyArrayProperty");
+        String[] valueClass = devdaClass.extractStringArray();
+        System.out.println("test array "+ Arrays.toString(valueClass));
+        Assert.assertArrayEquals(new String[0], valueClass);
     }
 
     @Test

@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -159,7 +159,7 @@ public final class PropertiesUtils {
 
     public static String[] getDeviceProperty(final String deviceName, final String className, final String propertyName)
             throws DevFailed {
-        String[] property = new String[] { "" };
+        String[] property = new String[0];
         final Map<String, String[]> prop = getDeviceProperties(deviceName);
         final String[] temp = getProp(prop, propertyName);
         if (temp != null) {
@@ -182,7 +182,7 @@ public final class PropertiesUtils {
     }
 
     public static String[] getDevicePipeProperty(final String deviceName, final String className,
-            final String pipeName, final String propertyName) throws DevFailed {
+                                                 final String pipeName, final String propertyName) throws DevFailed {
         String[] property = new String[0];
         final Map<String, String[]> prop = getDevicePipeProperties(deviceName, pipeName);
         final String[] temp = getProp(prop, propertyName);
@@ -205,7 +205,7 @@ public final class PropertiesUtils {
     }
 
     static void injectProperty(final String propertyName, final Method propMethod, final String[] property,
-            final Object businessObject, final String[] defaultValue) throws DevFailed {
+                               final Object businessObject, final String[] defaultValue) throws DevFailed {
         // if (property.length > 0) {
         final Transmorph transmorph = new Transmorph(new DefaultConverters());
         final Class<?> paramType = propMethod.getParameterTypes()[0];
@@ -218,13 +218,19 @@ public final class PropertiesUtils {
     }
 
     private static void injectValue(final String propertyName, final Method propMethod, final String[] property,
-            final Object businessObject, final Transmorph transmorph, final Class<?> paramType,
-            final String[] defaultValue) throws DevFailed {
+                                    final Object businessObject, final Transmorph transmorph, final Class<?> paramType,
+                                    final String[] defaultValue) throws DevFailed {
 
         Object propConverted = null;
         final String valueToInject;
+        String trimmedDefaultValue = null;
+        if (defaultValue.length == 0) {
+            trimmedDefaultValue = "";
+        } else {
+            trimmedDefaultValue = defaultValue[0].trim();
+        }
         if (property.length == 0 || property[0].isEmpty()) {
-            valueToInject = defaultValue[0].trim();
+            valueToInject = trimmedDefaultValue;
         } else {
             valueToInject = property[0].trim();
         }
@@ -274,14 +280,14 @@ public final class PropertiesUtils {
      * @throws DevFailed
      */
     public static void setDevicePipePropertiesInDB(final String deviceName, final String pipeName,
-            final Map<String, String[]> properties) throws DevFailed {
+                                                   final Map<String, String[]> properties) throws DevFailed {
         LOGGER.debug("update pipe {} device properties {} in DB ", pipeName, properties.keySet());
         DatabaseFactory.getDatabase().setDevicePipeProperties(deviceName, pipeName, properties);
     }
 
     private static void injectArray(final String propertyName, final Method propMethod, final String[] property,
-            final Object businessObject, final Transmorph transmorph, final Class<?> paramType,
-            final String[] defaultValue) throws DevFailed {
+                                    final Object businessObject, final Transmorph transmorph, final Class<?> paramType,
+                                    final String[] defaultValue) throws DevFailed {
         Object propConverted = null;
         final String[] trimProp;
         if (property.length == 0 || property.length == 1 && property[0].isEmpty()) {

@@ -1,36 +1,56 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.testserver;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevEncoded;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.DevVarDoubleStringArray;
+import fr.esrf.Tango.DevVarLongStringArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.*;
+import org.tango.server.annotation.AroundInvoke;
+import org.tango.server.annotation.Attribute;
+import org.tango.server.annotation.AttributeProperties;
+import org.tango.server.annotation.ClassProperty;
+import org.tango.server.annotation.Command;
+import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.Device;
+import org.tango.server.annotation.DeviceManagement;
+import org.tango.server.annotation.DeviceProperties;
+import org.tango.server.annotation.DeviceProperty;
+import org.tango.server.annotation.DynamicManagement;
+import org.tango.server.annotation.Init;
+import org.tango.server.annotation.Schedule;
+import org.tango.server.annotation.State;
+import org.tango.server.annotation.StateMachine;
+import org.tango.server.annotation.Status;
+import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceManager;
 import org.tango.server.dynamic.DynamicManager;
@@ -88,8 +108,10 @@ public final class JTangoTest {
     @DeviceProperty
     private boolean booleanProp = false;
     @ClassProperty(defaultValue = "classDefault")
-    private String[] myClassProp = { "test0" };
+    private String[] myClassProp = {"test0"};
     private short shortScalar = 0;
+    @DeviceProperty
+    private String[] emptyArrayProperty;
     @Attribute
     private short[] shortSpectrum = {};
     @Attribute
@@ -105,7 +127,7 @@ public final class JTangoTest {
     private long longScalar = 0L;
     @Attribute
     @AttributeProperties(minAlarm = "0", maxAlarm = "10", minValue = "-100", maxValue = "1015054014654325L", minWarning = "3", maxWarning = "4", description = "test", deltaTime = "10", deltaValue = "20")
-    private long[] longSpectrum = { 1, 2 };
+    private long[] longSpectrum = {1, 2};
     @Attribute
     private long[][] longImage = {};
     @Attribute
@@ -113,7 +135,7 @@ public final class JTangoTest {
     @Attribute
     private float[] floatSpectrum = {};
     @Attribute
-    private float[][] floatImage = { { 10.2F, 10.2140F }, { 20.01210F, 20.0F } };
+    private float[][] floatImage = {{10.2F, 10.2140F}, {20.01210F, 20.0F}};
     @Attribute
     @AttributeProperties(minAlarm = "0", maxAlarm = "10", minValue = "-100", maxValue = "1002501.125D", deltaTime = "10", deltaValue = "20", minWarning = "3", maxWarning = "4", description = "test")
     private double doubleScalar = 0.0;
@@ -139,13 +161,12 @@ public final class JTangoTest {
     @Attribute
     private String[][] stringImage = {};
     @Attribute
-    @StateMachine(deniedStates = { DeviceState.OFF })
+    @StateMachine(deniedStates = {DeviceState.OFF})
     private DeviceState stateScalar = DeviceState.ON;
     @Attribute
-    private DeviceState[] stateSpectrum = new DeviceState[] { DeviceState.ON, DeviceState.OFF };
+    private DeviceState[] stateSpectrum = new DeviceState[]{DeviceState.ON, DeviceState.OFF};
     @Attribute
-    private DevEncoded devEncodedScalar = new DevEncoded("yfui", new byte[] { 1, 2, 3 });
-
+    private DevEncoded devEncodedScalar = new DevEncoded("yfui", new byte[]{1, 2, 3});
     // @Attribute
     // private DevEncoded[] devEncodedSpectrum = new DevEncoded[] { new
     // DevEncoded("yfui", new byte[] { 1, 2, 3 }) };
@@ -203,6 +224,15 @@ public final class JTangoTest {
             ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
             ServerManager.getInstance().start(new String[]{"1"}, SERVER_NAME);
         }
+    }
+
+    @Command
+    public String[] getEmptyArrayProperty() {
+        return emptyArrayProperty;
+    }
+
+    public void setEmptyArrayProperty(String[] emptyArrayProperty) {
+        this.emptyArrayProperty = emptyArrayProperty;
     }
 
     @Schedule(activationProperty = "isRunRefresh", cronExpression = "0/1 * * * * ?")
@@ -454,7 +484,7 @@ public final class JTangoTest {
             throw DevFailedUtils.newDevFailed("error pollSpectrum");
         }
 
-        return new long[] { 1, 2 };
+        return new long[]{1, 2};
     }
 
     public void setPollSpectrum(final long[] value) {
@@ -745,7 +775,7 @@ public final class JTangoTest {
 
     @Command
     public int[] testPollingArray() {
-        return new int[] { 1, 2 };
+        return new int[]{1, 2};
     }
 
     @Command
