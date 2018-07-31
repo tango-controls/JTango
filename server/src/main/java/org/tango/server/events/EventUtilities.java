@@ -115,7 +115,6 @@ class EventUtilities {
     private static String buildEventNameBeginning(final String deviceName, final String attributeName) throws DevFailed {
         if (tangoHost == null) {
             tangoHost = DatabaseFactory.getDatabase().getPossibleTangoHosts()[0];
-            System.out.println("buildEventNameBeginning  " + tangoHost);
         }
 
         // String deviceName2 = deviceName;
