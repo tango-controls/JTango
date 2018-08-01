@@ -1,31 +1,34 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
-import java.lang.reflect.Array;
-
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttrWriteType;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DispLevel;
+import fr.esrf.TangoDs.TangoConst;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
@@ -33,11 +36,7 @@ import org.tango.server.Constants;
 import org.tango.server.IConfigurable;
 import org.tango.server.PolledObjectConfig;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrWriteType;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DispLevel;
-import fr.esrf.TangoDs.TangoConst;
+import java.lang.reflect.Array;
 
 public final class AttributeConfiguration implements PolledObjectConfig, IConfigurable {
     private String name = "";
@@ -97,36 +96,34 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
         return name;
     }
 
+    public void setName(final String name) {
+        this.name = name;
+    }
+
     public AttrDataFormat getFormat() {
         return format;
+    }
+
+    public void setFormat(final AttrDataFormat format) {
+        this.format = format;
+        if (format.equals(AttrDataFormat.SCALAR)) {
+            maxX = 1;
+            maxY = 0;
+        } else if (format.equals(AttrDataFormat.SPECTRUM)) {
+            maxY = 0;
+        }
     }
 
     public AttrWriteType getWritable() {
         return writable;
     }
 
-    public Class<?> getType() {
-        return type;
-    }
-
-    public Class<?> getScalarType() {
-        return enumType.getType();
-    }
-
-    public int getMaxX() {
-        return maxX;
-    }
-
-    public int getMaxY() {
-        return maxY;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public void setWritable(final AttrWriteType writable) {
         this.writable = writable;
+    }
+
+    public Class<?> getType() {
+        return type;
     }
 
     /**
@@ -136,7 +133,7 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
      * @throws DevFailed
      */
     public void setType(final Class<?> type) throws DevFailed {
-        this.type = type;
+        this.type = AttributeTangoType.getTypeFromClass(type).getType();
         enumType = AttributeTangoType.getTypeFromClass(type);
         tangoType = enumType.getTangoIDLType();
         if (type.isArray()) {
@@ -153,8 +150,20 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
         }
     }
 
+    public Class<?> getScalarType() {
+        return enumType.getType();
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
     public void setMaxX(final int maxX) {
         this.maxX = maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
     }
 
     public void setMaxY(final int maxY) {
@@ -237,16 +246,6 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
             type = Array.newInstance(enumType.getType(), 0).getClass();
         } else {
             type = Array.newInstance(enumType.getType(), 0, 0).getClass();
-        }
-    }
-
-    public void setFormat(final AttrDataFormat format) {
-        this.format = format;
-        if (format.equals(AttrDataFormat.SCALAR)) {
-            maxX = 1;
-            maxY = 0;
-        } else if (format.equals(AttrDataFormat.SPECTRUM)) {
-            maxY = 0;
         }
     }
 
