@@ -133,7 +133,11 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
      * @throws DevFailed
      */
     public void setType(final Class<?> type) throws DevFailed {
-        this.type = AttributeTangoType.getTypeFromClass(type).getType();
+        if (Enum.class.isAssignableFrom(type)) {
+            this.type = AttributeTangoType.getTypeFromClass(type).getType();
+        } else {
+            this.type = type;
+        }
         enumType = AttributeTangoType.getTypeFromClass(type);
         tangoType = enumType.getTangoIDLType();
         if (type.isArray()) {
@@ -232,9 +236,9 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
     /**
      * Set the attribute type with Tango type.
      *
-     * @see TangoConst for possible values
      * @param tangoType
      * @throws DevFailed
+     * @see TangoConst for possible values
      */
     public void setTangoType(final int tangoType, final AttrDataFormat format) throws DevFailed {
         setFormat(format);
