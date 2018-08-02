@@ -281,7 +281,7 @@ public final class EventManager {
             try {
                 heartBeatExecutor.awaitTermination(1, TimeUnit.SECONDS);
             } catch (final InterruptedException e) {
-                logger.error("could not stop event hearbeat");
+                Thread.currentThread().interrupt();
             }
         }
 
