@@ -1,30 +1,37 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.AttrWriteType;
+import fr.esrf.Tango.DevEncoded;
+import fr.esrf.Tango.DevError;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.DispLevel;
 import net.entropysoft.transmorph.ConverterException;
 import net.entropysoft.transmorph.DefaultConverters;
 import net.entropysoft.transmorph.Transmorph;
@@ -35,7 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.attribute.AttributeTangoType;
-import org.tango.server.*;
+import org.tango.server.Constants;
+import org.tango.server.DeviceBehaviorObject;
+import org.tango.server.ExceptionMessages;
+import org.tango.server.IPollable;
+import org.tango.server.IReadableWritable;
 import org.tango.server.cache.PollingUtils;
 import org.tango.server.events.EventManager;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -310,7 +321,7 @@ public class AttributeImpl extends DeviceBehaviorObject
     }
 
     private void checkSpectrumQuality(final AttributeValue returnedValue, final double maxAlarm, final double minAlarm,
-            final double maxWarning, final double minWarning, final long deltaTime) {
+                                      final double maxWarning, final double minWarning, final long deltaTime) {
         final long currentDeltaTime = returnedValue.getTime() - writtenTimestamp;
         final String[] readArray = ArrayUtils.toStringArray(returnedValue.getValue());
         String[] writeArray = null;
@@ -366,7 +377,7 @@ public class AttributeImpl extends DeviceBehaviorObject
     }
 
     private void checkScalarQuality(final AttributeValue returnedValue, final double maxAlarm, final double minAlarm,
-            final double maxWarning, final double minWarning, final long deltaTime) {
+                                    final double maxWarning, final double minWarning, final long deltaTime) {
         final double valRead = Double.parseDouble(returnedValue.getValue().toString());
         checkScalarDeltaAlarm(returnedValue, deltaTime, valRead);
         if (!returnedValue.getQuality().equals(AttrQuality.ATTR_ALARM)) {
@@ -542,10 +553,13 @@ public class AttributeImpl extends DeviceBehaviorObject
      * @throws DevFailed
      */
     public void setProperties(final AttributePropertiesImpl properties) throws DevFailed {
-        if (isMemorized() && getMemorizedValue() != null) {
-            final double memoValue = Double.parseDouble(getMemorizedValue().toString());
-            if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
-                throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
+        if (isMemorized()) {
+            Object memorizedValue = getMemorizedValue();
+            if (memorizedValue != null) {
+                final double memoValue = Double.parseDouble(memorizedValue.toString());
+                if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
+                    throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
+                }
             }
         }
         config.setAttributeProperties(properties);
@@ -575,7 +589,7 @@ public class AttributeImpl extends DeviceBehaviorObject
     public String toString() {
         final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
                 ToStringStyle.MULTI_LINE_STYLE);
-        reflectionToStringBuilder.setExcludeFieldNames(new String[] { "readValue", "writeValue", "history", "type" });
+        reflectionToStringBuilder.setExcludeFieldNames(new String[]{"readValue", "writeValue", "history", "type"});
         return reflectionToStringBuilder.toString();
     }
 

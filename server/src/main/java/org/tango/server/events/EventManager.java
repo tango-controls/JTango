@@ -176,26 +176,15 @@ public final class EventManager {
      * @throws DevFailed if no free port found
      */
     private int getNextAvailablePort() throws DevFailed {
-
         // find an available port
-        ServerSocket ss1 = null;
         int port = 0;
-        try {
-            ss1 = new ServerSocket(0);
+        try (ServerSocket ss1 = new ServerSocket(0)) {
             ss1.setReuseAddress(true);
             port = ss1.getLocalPort();
         } catch (final SocketException e) {
             throw DevFailedUtils.newDevFailed(e);
         } catch (final IOException e) {
             throw DevFailedUtils.newDevFailed(e);
-        } finally {
-            if (ss1 != null) {
-                try {
-                    ss1.close();
-                } catch (final IOException e) {
-                    throw DevFailedUtils.newDevFailed(e);
-                }
-            }
         }
         return port;
     }
@@ -216,25 +205,25 @@ public final class EventManager {
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
-        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
-        socket.setLinger(0);
-        socket.setReconnectIVL(-1);
-        logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
-        socket.bind(endpoint);
+        try (final ZMQ.Socket socket = context.createSocket(ZMQ.PUB)) {
+            socket.setLinger(0);
+            socket.setReconnectIVL(-1);
+            logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
+            socket.bind(endpoint);
 
-        switch (socketType) {
-            case HEARTBEAT:
-                heartbeatSocket = socket;
-                heartbeatEndpoint = endpoint;
-                break;
-            case EVENTS:
-                socket.setSndHWM(serverHWM);
-                eventSocket = socket;
-                eventEndpoint = endpoint;
-                logger.debug("HWM has been set to {}", socket.getSndHWM());
-                break;
+            switch (socketType) {
+                case HEARTBEAT:
+                    heartbeatSocket = socket;
+                    heartbeatEndpoint = endpoint;
+                    break;
+                case EVENTS:
+                    socket.setSndHWM(serverHWM);
+                    eventSocket = socket;
+                    eventEndpoint = endpoint;
+                    logger.debug("HWM has been set to {}", socket.getSndHWM());
+                    break;
+            }
         }
-
         xlogger.exit();
     }
 

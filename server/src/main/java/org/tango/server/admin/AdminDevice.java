@@ -79,7 +79,6 @@ import java.util.regex.Pattern;
  * server.
  *
  * @author ABEILLE
- *
  */
 @Device(transactionType = TransactionType.DEVICE)
 public final class AdminDevice implements TangoMXBean {
@@ -143,8 +142,7 @@ public final class AdminDevice implements TangoMXBean {
     /**
      * get the polling status
      *
-     * @param deviceName
-     *            Device name
+     * @param deviceName Device name
      * @return Device polling status
      * @throws DevFailed
      */
@@ -158,7 +156,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @return Device class list
      * @throws DevFailed
      */
@@ -177,7 +174,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @return Device list
      * @throws DevFailed
      */
@@ -211,9 +207,7 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
-     * @param deviceName
-     *            Device name
+     * @param deviceName Device name
      * @throws DevFailed
      */
     @Command(name = "DevRestart", inTypeDesc = DEVICE_NAME)
@@ -386,8 +380,7 @@ public final class AdminDevice implements TangoMXBean {
     /**
      * Set logging level
      *
-     * @param dvlsa
-     *            Lg[i]=Logging Level. Str[i]=Device name.
+     * @param dvlsa Lg[i]=Logging Level. Str[i]=Device name.
      * @throws DevFailed
      */
     @Command(name = "SetLoggingLevel", inTypeDesc = "Lg[i]=Logging Level. Str[i]=Device name.")
@@ -422,7 +415,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @return Polled device name list
      */
     @Command(name = "PolledDevice", outTypeDesc = "Polled device name list")
@@ -450,10 +442,8 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
-     * @param dvlsa
-     *            Lg[0]=Upd period. Str[0]=Device name. Str[1]=Object
-     *            type(COMMAND or ATTRIBUTE). Str[2]=Object name
+     * @param dvlsa Lg[0]=Upd period. Str[0]=Device name. Str[1]=Object
+     *              type(COMMAND or ATTRIBUTE). Str[2]=Object name
      * @throws DevFailed
      */
     @Command(name = "AddObjPolling", inTypeDesc = "Lg[0]=Upd period. Str[0]=Device name. Str[1]=Object type. Str[2]=Object name")
@@ -499,8 +489,7 @@ public final class AdminDevice implements TangoMXBean {
     /**
      * Command RemObjPolling
      *
-     * @param devices
-     *            deviceName,type= {attribute or command},name1, namei
+     * @param devices deviceName,type= {attribute or command},name1, namei
      * @throws DevFailed
      */
     @Command(name = "RemObjPolling", inTypeDesc = "Str[0]=Device name. Str[1]=Object type. Str[2]=Object name")
@@ -624,7 +613,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @param argin
      * @throws DevFailed
      */
@@ -830,7 +818,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @param argin
      * @throws DevFailed
      */
@@ -902,7 +889,6 @@ public final class AdminDevice implements TangoMXBean {
     }
 
     /**
-     *
      * @param deviceNames
      * @throws DevFailed
      */
@@ -925,8 +911,7 @@ public final class AdminDevice implements TangoMXBean {
     /**
      * Command DevLockStatus
      *
-     * @param deviceName
-     *            device name
+     * @param deviceName device name
      * @return lock status
      * @throws DevFailed
      */
@@ -938,6 +923,7 @@ public final class AdminDevice implements TangoMXBean {
         for (final DeviceClassBuilder deviceClass : classList) {
             if (deviceClass.containsDevice(fullDeviceName)) {
                 result = deviceClass.getDeviceImpl(fullDeviceName).getLockStatus();
+                logger.debug("DevLockStatus {} {}", Arrays.toString(result.lvalue), Arrays.toString(result.svalue));
                 xlogger.exit();
                 break;
             }
@@ -946,7 +932,6 @@ public final class AdminDevice implements TangoMXBean {
         if (nbClasses == classList.size()) {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.DEVICE_NOT_FOUND, deviceName + DOES_NOT_EXISTS);
         }
-        logger.debug("DevLockStatus {} {}", Arrays.toString(result.lvalue), Arrays.toString(result.svalue));
         return result;
     }
 

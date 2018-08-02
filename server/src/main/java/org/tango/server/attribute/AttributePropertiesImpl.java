@@ -1,30 +1,35 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.ArchiveEventProp;
+import fr.esrf.Tango.ChangeEventProp;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.EventProperties;
+import fr.esrf.Tango.PeriodicEventProp;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.DeviceState;
@@ -34,8 +39,13 @@ import org.tango.server.properties.AttributePropertiesManager;
 import org.tango.utils.CaseInsensitiveMap;
 import org.tango.utils.DevFailedUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * User class to create attribute properties.
@@ -72,7 +82,7 @@ public final class AttributePropertiesImpl {
     private String[] extensions = new String[0];
     private String[] sysExtensions = new String[0];
     private double deltaValDouble = 0;
-    private String[] enumLabels = new String[] { Constants.NOT_SPECIFIED };
+    private String[] enumLabels = new String[]{Constants.NOT_SPECIFIED};
     private String rootAttribute = Constants.NOT_SPECIFIED;
 
     private boolean isEnumMutable = true;
@@ -493,9 +503,9 @@ public final class AttributePropertiesImpl {
 
         final ReflectionToStringBuilder reflectionToStringBuilder = new ReflectionToStringBuilder(this,
                 ToStringStyle.SHORT_PREFIX_STYLE);
-        reflectionToStringBuilder.setExcludeFieldNames(new String[] { "eventProp", "alarmExtensions", "extensions",
+        reflectionToStringBuilder.setExcludeFieldNames(new String[]{"eventProp", "alarmExtensions", "extensions",
                 "sysExtensions", "minValueDouble", "maxValueDouble", "minAlarmDouble", "maxAlarmDouble",
-                "minWarningDouble", "maxWarningDouble", "writableAttrName", "deltaTLong", "deltaValDouble" });
+                "minWarningDouble", "maxWarningDouble", "writableAttrName", "deltaTLong", "deltaValDouble"});
         return reflectionToStringBuilder.toString();
     }
 
@@ -589,13 +599,16 @@ public final class AttributePropertiesImpl {
 
     @Override
     public boolean equals(final Object obj) {
-        final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .toString();
-        final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
-        boolean isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
-        if (isEqual) {
-            isEqual = compareEventProps(this.getEventProp(), ((AttributePropertiesImpl) obj).getEventProp());
+        boolean isEqual = false;
+        if (obj != null && obj instanceof AttributePropertiesImpl) {
+            final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                    .toString();
+            final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+            isEqual = reflectionToStringBuilder.equalsIgnoreCase(toCompare);
+            if (isEqual) {
+                isEqual = compareEventProps(this.getEventProp(), ((AttributePropertiesImpl) obj).getEventProp());
 
+            }
         }
         return isEqual;
     }
@@ -617,30 +630,30 @@ public final class AttributePropertiesImpl {
 
     void persist(final String deviceName, final String attributeName) throws DevFailed {
         final Map<String, String[]> properties = new HashMap<String, String[]>();
-        properties.put(Constants.LABEL, new String[] { getLabel() });
+        properties.put(Constants.LABEL, new String[]{getLabel()});
         if (!isFwdAttribute) {
-            properties.put(Constants.FORMAT, new String[] { getFormat() });
-            properties.put(Constants.UNIT, new String[] { getUnit() });
-            properties.put(Constants.DISPLAY_UNIT, new String[] { getDisplayUnit() });
-            properties.put(Constants.STANDARD_UNIT, new String[] { getStandardUnit() });
-            properties.put(Constants.MIN_VAL, new String[] { getMinValue() });
-            properties.put(Constants.MAX_VAL, new String[] { getMaxValue() });
-            properties.put(Constants.MIN_ALARM, new String[] { getMinAlarm() });
-            properties.put(Constants.MAX_ALARM, new String[] { getMaxAlarm() });
-            properties.put(Constants.MIN_WARNING, new String[] { getMinWarning() });
-            properties.put(Constants.MAX_WARNING, new String[] { getMaxWarning() });
-            properties.put(Constants.DELTA_T, new String[] { getDeltaT() });
-            properties.put(Constants.DELTA_VAL, new String[] { getDeltaVal() });
-            properties.put(Constants.DESC, new String[] { getDescription() });
+            properties.put(Constants.FORMAT, new String[]{getFormat()});
+            properties.put(Constants.UNIT, new String[]{getUnit()});
+            properties.put(Constants.DISPLAY_UNIT, new String[]{getDisplayUnit()});
+            properties.put(Constants.STANDARD_UNIT, new String[]{getStandardUnit()});
+            properties.put(Constants.MIN_VAL, new String[]{getMinValue()});
+            properties.put(Constants.MAX_VAL, new String[]{getMaxValue()});
+            properties.put(Constants.MIN_ALARM, new String[]{getMinAlarm()});
+            properties.put(Constants.MAX_ALARM, new String[]{getMaxAlarm()});
+            properties.put(Constants.MIN_WARNING, new String[]{getMinWarning()});
+            properties.put(Constants.MAX_WARNING, new String[]{getMaxWarning()});
+            properties.put(Constants.DELTA_T, new String[]{getDeltaT()});
+            properties.put(Constants.DELTA_VAL, new String[]{getDeltaVal()});
+            properties.put(Constants.DESC, new String[]{getDescription()});
             properties.put(Constants.ENUM_LABELS, getEnumLabels());
 
             final EventProperties eventProp = getEventProp();
-            properties.put(Constants.EVENT_ARCHIVE_ABS, new String[] { eventProp.arch_event.abs_change });
-            properties.put(Constants.EVENT_ARCHIVE_PERIOD, new String[] { eventProp.arch_event.period });
-            properties.put(Constants.EVENT_ARCHIVE_REL, new String[] { eventProp.arch_event.rel_change });
-            properties.put(Constants.EVENT_CHANGE_ABS, new String[] { eventProp.ch_event.abs_change });
-            properties.put(Constants.EVENT_PERIOD, new String[] { eventProp.per_event.period });
-            properties.put(Constants.EVENT_CHANGE_REL, new String[] { eventProp.ch_event.rel_change });
+            properties.put(Constants.EVENT_ARCHIVE_ABS, new String[]{eventProp.arch_event.abs_change});
+            properties.put(Constants.EVENT_ARCHIVE_PERIOD, new String[]{eventProp.arch_event.period});
+            properties.put(Constants.EVENT_ARCHIVE_REL, new String[]{eventProp.arch_event.rel_change});
+            properties.put(Constants.EVENT_CHANGE_ABS, new String[]{eventProp.ch_event.abs_change});
+            properties.put(Constants.EVENT_PERIOD, new String[]{eventProp.per_event.period});
+            properties.put(Constants.EVENT_CHANGE_REL, new String[]{eventProp.ch_event.rel_change});
         }
         final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
         attributePropertiesManager.setAttributePropertiesInDB(attributeName, properties);
