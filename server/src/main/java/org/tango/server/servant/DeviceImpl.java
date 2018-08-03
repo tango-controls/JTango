@@ -1,30 +1,57 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.servant;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttributeConfig;
+import fr.esrf.Tango.AttributeConfig_2;
+import fr.esrf.Tango.AttributeConfig_3;
+import fr.esrf.Tango.AttributeConfig_5;
+import fr.esrf.Tango.AttributeValue;
+import fr.esrf.Tango.AttributeValue_3;
+import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_5;
+import fr.esrf.Tango.ClntIdent;
+import fr.esrf.Tango.DevAttrHistory;
+import fr.esrf.Tango.DevAttrHistory_3;
+import fr.esrf.Tango.DevAttrHistory_4;
+import fr.esrf.Tango.DevAttrHistory_5;
+import fr.esrf.Tango.DevCmdHistory;
+import fr.esrf.Tango.DevCmdHistory_4;
+import fr.esrf.Tango.DevCmdInfo;
+import fr.esrf.Tango.DevCmdInfo_2;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevInfo;
+import fr.esrf.Tango.DevInfo_3;
+import fr.esrf.Tango.DevIntrChange;
+import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.DevSource;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.DevVarLongStringArray;
+import fr.esrf.Tango.Device_5POA;
+import fr.esrf.Tango.MultiDevFailed;
+import fr.esrf.Tango.PipeConfig;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.omg.CORBA.Any;
@@ -42,15 +69,29 @@ import org.tango.server.InvocationContext;
 import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.*;
+import org.tango.server.annotation.AroundInvoke;
+import org.tango.server.annotation.Attribute;
+import org.tango.server.annotation.ClassProperty;
+import org.tango.server.annotation.Command;
+import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.Device;
+import org.tango.server.annotation.DeviceProperties;
+import org.tango.server.annotation.DeviceProperty;
+import org.tango.server.annotation.Init;
+import org.tango.server.annotation.State;
+import org.tango.server.annotation.Status;
+import org.tango.server.annotation.TransactionType;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.PollingManager;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
-import org.tango.server.device.*;
+import org.tango.server.device.AroundInvokeImpl;
+import org.tango.server.device.DeviceLocker;
+import org.tango.server.device.InitImpl;
+import org.tango.server.device.StateImpl;
+import org.tango.server.device.StatusImpl;
 import org.tango.server.events.DeviceInterfaceChangedSender;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -67,7 +108,14 @@ import org.tango.utils.DevFailedUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -165,6 +213,7 @@ public class DeviceImpl extends Device_5POA {
     private final Map<String, Integer> cmdPollRingDepth = new HashMap<String, Integer>();
     private final Map<String, Integer> attrPollRingDepth = new HashMap<String, Integer>();
     private final String deviceType;
+    private final Map<String, String> contextMap;
     /**
      * to init the device
      */
@@ -213,16 +262,12 @@ public class DeviceImpl extends Device_5POA {
     private boolean stateCheckAttrAlarm = false;
     private int minPolling = 0;
     private DeviceScheduler deviceScheduler;
-
     private PollingManager pollingManager;
-
     private DeviceInterfaceChangedSender interfaceChangeSender;
     /**
      * device property, default polling ring depth for attributes and commands
      */
     private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
-
-    private final Map<String, String> contextMap;
 
     /**
      * Ctr
@@ -238,7 +283,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public DeviceImpl(final String deviceName, final String className, final TransactionType txType,
-            final Object businessObject, final String deviceType) throws DevFailed {
+                      final Object businessObject, final String deviceType) throws DevFailed {
         MDC.put(MDC_KEY, deviceName);
         contextMap = MDC.getCopyOfContextMap();
 
@@ -277,7 +322,7 @@ public class DeviceImpl extends Device_5POA {
             // attr_min_poll_period
             final DevicePropertyImpl property4 = new DevicePropertyImpl(Constants.ATTR__MIN_POLL_PERIOD,
                     "min poll value for attributes", this.getClass()
-                            .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
+                    .getMethod("setMinAttributePolling", String[].class), this, name, className, false);
             addDeviceProperty(property4);
             // poll_ring_depth
             final DevicePropertyImpl property10 = new DevicePropertyImpl(Constants.POLL_RING_DEPTH,
@@ -315,7 +360,7 @@ public class DeviceImpl extends Device_5POA {
             throw DevFailedUtils.newDevFailed(e);
         }
         logger.debug("Device {} of of {} created with tx type: {}",
-                new Object[] { deviceName, businessObject.getClass(), txType });
+                new Object[]{deviceName, businessObject.getClass(), txType});
 
     }
 
@@ -425,7 +470,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Command(name = STATE_NAME, outTypeDesc = "Device state")
     public DevState executeStateCmd() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         xlogger.exit();
         return getState();
@@ -440,7 +485,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Command(name = STATUS_NAME, outTypeDesc = "Device status")
     public String executeStatusCmd() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         xlogger.exit();
         return getStatus();
@@ -597,12 +642,22 @@ public class DeviceImpl extends Device_5POA {
         deviceProperties = properties;
     }
 
-    public void configurePolling(final CommandImpl command) throws DevFailed {
-        pollingManager.configurePolling(command);
+    /**
+     * Start polling of a command
+     * @param command
+     * @throws DevFailed
+     */
+    public void startPolling(final CommandImpl command) throws DevFailed {
+        pollingManager.startPolling(command);
     }
 
-    public void configurePolling(final AttributeImpl attribute) throws DevFailed {
-        pollingManager.configurePolling(attribute);
+    /**
+     * Start polling of an attribute
+     * @param attribute
+     * @throws DevFailed
+     */
+    public void startPolling(final AttributeImpl attribute) throws DevFailed {
+        pollingManager.startPolling(attribute);
     }
 
     private synchronized void doInit() {
@@ -656,7 +711,7 @@ public class DeviceImpl extends Device_5POA {
      * </ul>
      */
     public synchronized void initDevice() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (stateImpl == null) {
             stateImpl = new StateImpl(businessObject, null, null);
@@ -680,7 +735,7 @@ public class DeviceImpl extends Device_5POA {
 
     public synchronized void pushInterfaceChangeEvent(final boolean isStarted) throws DevFailed {
         final DevIntrChange devInterface = new DevIntrChange(isStarted, command_list_query_2(),
-                get_attribute_config_5(new String[] { ALL_ATTR }));
+                get_attribute_config_5(new String[]{ALL_ATTR}));
         if (interfaceChangeSender == null) {
             interfaceChangeSender = new DeviceInterfaceChangedSender(name);
         }
@@ -694,7 +749,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public void deleteDevice() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         PropertiesUtils.clearCache();
         PropertiesUtils.clearDeviceCache(name);
@@ -749,7 +804,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevInfo info() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation info");
         final DevInfo info = new DevInfo();
@@ -770,7 +825,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevInfo_3 info_3() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation info_3");
         final DevInfo_3 info3 = new DevInfo_3();
@@ -792,7 +847,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void ping() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Operation ping");
         xlogger.exit();
@@ -803,7 +858,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String adm_name() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Attribute adm_name");
         xlogger.exit();
@@ -823,7 +878,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String[] black_box(final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // deviceMonitoring.addRequest("black_box");
         if (maxSize <= 0) {
@@ -840,7 +895,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String description() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         deviceMonitoring.startRequest("Attribute description requested ");
         String desc = "A TANGO device";
@@ -857,7 +912,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String name() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         deviceMonitoring.startRequest("Device name");
         xlogger.entry();
         return name;
@@ -875,7 +930,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory[] read_attribute_history_2(final String attributeName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_2");
@@ -895,7 +950,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_3[] read_attribute_history_3(final String attributeName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // TODO read_attribute_history_3
         checkInitialization();
@@ -915,7 +970,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_4 read_attribute_history_4(final String attributeName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_4");
@@ -949,7 +1004,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes(final String[] attributeNames) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (attributeNames.length != 1 || !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -989,7 +1044,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes_2(final String[] names, final DevSource source) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1032,7 +1087,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_3[] read_attributes_3(final String[] names, final DevSource source) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1079,7 +1134,7 @@ public class DeviceImpl extends Device_5POA {
             throws DevFailed {
         // final Profiler profilerPeriod = new Profiler("period");
         // profilerPeriod.start(Arrays.toString(names));
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
         if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1129,7 +1184,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
             throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
         // final Profiler profiler = new Profiler("read time");
         // profiler.start(Arrays.toString(names));
@@ -1183,7 +1238,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes(final AttributeValue[] values) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("write_attributes");
@@ -1220,7 +1275,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes_3(final AttributeValue[] values) throws MultiDevFailed, DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("write_attributes_3");
@@ -1260,7 +1315,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
             DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         final String[] names = new String[values.length];
@@ -1303,7 +1358,7 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_4[] write_read_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent)
             throws MultiDevFailed, DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
 
@@ -1349,7 +1404,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_5[] write_read_attributes_5(final AttributeValue_4[] writeValues, final String[] readNames,
-            final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
+                                                      final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
         deviceMonitoring.startRequest("write_read_attributes_5 ", clIdent);
         clientIdentity.set(clIdent);
         final String[] names = new String[writeValues.length];
@@ -1425,7 +1480,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo[] command_list_query() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_list_query");
@@ -1456,7 +1511,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo_2[] command_list_query_2() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_list_query_2");
@@ -1490,7 +1545,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo command_query(final String commandName) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_query " + commandName);
@@ -1515,7 +1570,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdInfo_2 command_query_2(final String commandName) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("command_query_2 " + commandName);
@@ -1543,7 +1598,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout(final String command, final Any argin) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
@@ -1583,7 +1638,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout_2(final String command, final Any argin, final DevSource source) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
@@ -1623,8 +1678,8 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout_4(final String commandName, final Any argin, final DevSource source,
-            final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+                               final ClntIdent clIdent) throws DevFailed {
+        MDC.setContextMap(contextMap);
         xlogger.entry(commandName);
         if (!commandName.equalsIgnoreCase(DeviceImpl.STATE_NAME)
                 && !commandName.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
@@ -1667,13 +1722,13 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdHistory[] command_inout_history_2(final String commandName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("command_inout_history_2 " + commandName);
         // TODO command_inout_history_2
         // returncommandHistory.get(command).toArray(n)
-        return new DevCmdHistory[] {};
+        return new DevCmdHistory[]{};
     }
 
     /**
@@ -1688,7 +1743,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevCmdHistory_4 command_inout_history_4(final String commandName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         final long request = deviceMonitoring.startRequest("command_inout_history_4 " + commandName);
@@ -1731,7 +1786,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     private Any commandHandler(final String commandName, final Any inAny, final DevSource source,
-            final ClntIdent clntIdent) throws DevFailed {
+                               final ClntIdent clntIdent) throws DevFailed {
         xlogger.entry();
         boolean fromCache = false;
         if (source.equals(DevSource.CACHE) || source.equals(DevSource.CACHE_DEV)) {
@@ -1787,7 +1842,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_5[] get_attribute_config_5(final String[] attributeNames) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_5 " + Arrays.toString(attributeNames));
@@ -1840,7 +1895,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_3[] get_attribute_config_3(final String[] attributeNames) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_3 " + Arrays.toString(attributeNames));
@@ -1890,7 +1945,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig_2[] get_attribute_config_2(final String[] attributeNames) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config_2 " + Arrays.toString(attributeNames));
@@ -1942,7 +1997,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeConfig[] get_attribute_config(final String[] attributeNames) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
         deviceMonitoring.startRequest("get_attribute_config " + Arrays.toString(attributeNames));
@@ -1987,7 +2042,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void set_attribute_config_5(final AttributeConfig_5[] newConf, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2034,7 +2089,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config_4(final AttributeConfig_3[] newConf, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2056,7 +2111,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config_3(final AttributeConfig_3[] newConf) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("set_attribute_config_3");
@@ -2089,7 +2144,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config(final AttributeConfig[] newConf) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("set_attribute_config");
@@ -2256,7 +2311,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevState state() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         try {
             state = getState();
@@ -2280,7 +2335,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public String status() {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         try {
             status = getStatus();
@@ -2364,7 +2419,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public DevState getState() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         if (isCorrectlyInit.get() && initImpl.isInitDoneCorrectly()) {
             state = stateImpl.updateState();
@@ -2420,7 +2475,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     public String getStatus() throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
 
         if (initImpl.isInitInProgress()) {
@@ -2546,7 +2601,7 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public DevAttrHistory_5 read_attribute_history_5(final String attributeName, final int maxSize) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         deviceMonitoring.startRequest("read_attribute_history_5");
@@ -2612,7 +2667,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void set_pipe_config_5(final PipeConfig[] newConf, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
         clientIdentity.set(clIdent);
@@ -2628,7 +2683,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public DevPipeData read_pipe_5(final String name, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         deviceMonitoring.startRequest("read_pipe_5 " + name, clIdent);
@@ -2657,7 +2712,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void write_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(value.name);
         final PipeImpl pipe = getPipe(value.name, pipeList);
         deviceMonitoring.startRequest("write_pipe_5 " + value.name, clIdent);
@@ -2683,7 +2738,7 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public DevPipeData write_read_pipe_5(final DevPipeData value, final ClntIdent clIdent) throws DevFailed {
-       MDC.setContextMap(contextMap);
+        MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
         deviceMonitoring.startRequest("write_read_pipe_5 " + name, clIdent);

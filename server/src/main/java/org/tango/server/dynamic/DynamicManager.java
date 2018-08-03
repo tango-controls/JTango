@@ -30,7 +30,6 @@ import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
-import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.DynamicManagement;
 import org.tango.server.annotation.Init;
 import org.tango.server.attribute.AttributeConfiguration;
@@ -51,8 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Manage dynamic commands and attributes. The creation of commands and attributes should done in {@link Init}. Don't
- * forget to delete them in {@link Delete} This class is injected by {@link DynamicManagement}
+ * Manage dynamic commands and attributes. This class is injected by {@link DynamicManagement}
  *
  * @author ABEILLE
  */
@@ -138,6 +136,20 @@ public final class DynamicManager {
             deviceImpl.addAttributePolling(attributeName, configuration.getPollingPeriod());
         }
         xlogger.exit();
+    }
+
+    /**
+     * Load memorized attribute value and attribute properties from tangodb.
+     * This loading is done by default at device init, should only be called when dynamic attribute is created outside {@link Init}
+     *
+     * @param attributeName
+     * @throws DevFailed
+     */
+    public void loadAttributeConfigFromDb(final String attributeName) throws DevFailed {
+        final AttributeImpl toConfigure = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH));
+        if (toConfigure != null) {
+            toConfigure.loadTangoDbConfig();
+        }
     }
 
     /**

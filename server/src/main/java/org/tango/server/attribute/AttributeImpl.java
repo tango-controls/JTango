@@ -98,6 +98,11 @@ public class AttributeImpl extends DeviceBehaviorObject
         isAlarmToHigh = false;
     }
 
+    public void loadTangoDbConfig() throws DevFailed {
+        applyMemorizedValue();
+        configureAttributePropsFromDb();
+    }
+
     private Object getMemorizedValue() throws DevFailed {
         final String value = attributePropertiesManager.getAttributePropertyFromDB(getName(),
                 Constants.MEMORIZED_VALUE);
@@ -121,7 +126,7 @@ public class AttributeImpl extends DeviceBehaviorObject
                 final AttributeValue attrValue = new AttributeValue(value, AttrQuality.ATTR_VALID);
                 synchronized (this) {
                     if (config.isMemorizedAtInit()) {
-                        setValue(attrValue);
+                        setValue(attrValue, true);
                     } else {
                         writeValue = attrValue;
                     }
@@ -427,13 +432,13 @@ public class AttributeImpl extends DeviceBehaviorObject
     }
 
     /**
-     * write attribute
+     * Write value
      *
      * @param value
+     * @param fromMemorizedValue true is value comes from tangodb
      * @throws DevFailed
      */
-    @Override
-    public void setValue(final AttributeValue value) throws DevFailed {
+    private void setValue(final AttributeValue value, boolean fromMemorizedValue) throws DevFailed {
         if (!config.getWritable().equals(AttrWriteType.READ)) {
             // final Profiler profilerPeriod = new Profiler("write attribute " + name);
             // profilerPeriod.start("check");
@@ -457,7 +462,7 @@ public class AttributeImpl extends DeviceBehaviorObject
             value.setValue(ArrayUtils.fromArrayTo2DArray(writeValue.getValue(), writeValue.getXDim(), dimY),
                     writtenTimestamp);
             behavior.setValue(value);
-            if (isMemorized() && getFormat().equals(AttrDataFormat.SCALAR)) {
+            if (isMemorized() && getFormat().equals(AttrDataFormat.SCALAR) && !fromMemorizedValue) {
                 // TODO: refactoring to manage performance issues for spectrum and
                 // images
                 attributePropertiesManager.setAttributePropertyInDB(getName(), Constants.MEMORIZED_VALUE,
@@ -473,6 +478,19 @@ public class AttributeImpl extends DeviceBehaviorObject
         } else {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_WRITABLE, name + " is not writable");
         }
+
+
+    }
+
+    /**
+     * write attribute
+     *
+     * @param value
+     * @throws DevFailed
+     */
+    @Override
+    public void setValue(final AttributeValue value) throws DevFailed {
+        setValue(value, false);
     }
 
     private void checkMinMaxValue() throws DevFailed {
@@ -555,7 +573,7 @@ public class AttributeImpl extends DeviceBehaviorObject
     public void setProperties(final AttributePropertiesImpl properties) throws DevFailed {
         if (isMemorized()) {
             Object memorizedValue = getMemorizedValue();
-            if (memorizedValue != null) {
+            if (memorizedValue != null && memorizedValue.getClass().isAssignableFrom(Number.class)) {
                 final double memoValue = Double.parseDouble(memorizedValue.toString());
                 if (properties.getMaxValueDouble() < memoValue || properties.getMinValueDouble() > memoValue) {
                     throw DevFailedUtils.newDevFailed("min or max value not possible for current memorized value");
@@ -667,7 +685,7 @@ public class AttributeImpl extends DeviceBehaviorObject
         config.setPollingPeriod(0);
     }
 
-    public void configureAttributePropFromDb() throws DevFailed {
+    public void configureAttributePropsFromDb() throws DevFailed {
         config.load(deviceName);
         if (isFwdAttribute) {
             ((ForwardedAttribute) behavior).setLabel(config.getAttributeProperties().getLabel());

@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,7 +54,6 @@ import java.util.Map.Entry;
  * Manage all polling stuff of a device
  *
  * @author ABEILLE
- *
  */
 public final class PollingManager {
 
@@ -76,9 +75,9 @@ public final class PollingManager {
     private int pollRingDepth = Constants.DEFAULT_POLL_DEPTH;
 
     public PollingManager(final String deviceName, final TangoCacheManager cacheManager,
-            final List<AttributeImpl> attributeList, final List<CommandImpl> commandList, final int minPolling,
-            final Map<String, Integer> minCommandPolling, final Map<String, Integer> minAttributePolling,
-            final Map<String, Integer> cmdPollRingDepth, final Map<String, Integer> attrPollRingDepth) {
+                          final List<AttributeImpl> attributeList, final List<CommandImpl> commandList, final int minPolling,
+                          final Map<String, Integer> minCommandPolling, final Map<String, Integer> minAttributePolling,
+                          final Map<String, Integer> cmdPollRingDepth, final Map<String, Integer> attrPollRingDepth) {
         this.deviceName = deviceName;
         this.cacheManager = cacheManager;
         this.attributeList = attributeList;
@@ -92,55 +91,58 @@ public final class PollingManager {
 
     public void initPolling() throws DevFailed {
         for (final AttributeImpl attribute : attributeList) {
-            attribute.applyMemorizedValue();
-            attribute.configureAttributePropFromDb();
-            configurePolling(attribute);
+            attribute.loadTangoDbConfig();
+            startPolling(attribute);
         }
         for (final CommandImpl command : commandList) {
             command.updatePollingConfigFromDB();
-            configurePolling(command);
+            startPolling(command);
         }
     }
 
-    public void configurePolling(final CommandImpl command) throws DevFailed {
-        if (command.isPolled()) {
-            if (command.getName().equals(DeviceImpl.STATE_NAME) || command.getName().equals(DeviceImpl.STATUS_NAME)) {
-                // attribute is also set as polled
-                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(command.getName(), attributeList);
-                // attribute.updatePollingConfigFromDB();
-                cacheManager.startStateStatusPolling(command, attribute);
-            } else {
-                cacheManager.startCommandPolling(command);
+    public void startPolling(final CommandImpl command) throws DevFailed {
+        if (command != null) {
+            if (command.isPolled()) {
+                if (command.getName().equals(DeviceImpl.STATE_NAME) || command.getName().equals(DeviceImpl.STATUS_NAME)) {
+                    // attribute is also set as polled
+                    final AttributeImpl attribute = AttributeGetterSetter.getAttribute(command.getName(), attributeList);
+                    // attribute.updatePollingConfigFromDB();
+                    cacheManager.startStateStatusPolling(command, attribute);
+                } else {
+                    cacheManager.startCommandPolling(command);
+                }
             }
-        }
-        if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
-            command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
-        } else {
-            command.setPollRingDepth(pollRingDepth);
+            if (cmdPollRingDepth.containsKey(command.getName().toLowerCase(Locale.ENGLISH))) {
+                command.setPollRingDepth(cmdPollRingDepth.get(command.getName().toLowerCase(Locale.ENGLISH)));
+            } else {
+                command.setPollRingDepth(pollRingDepth);
+            }
         }
     }
 
-    public void configurePolling(final AttributeImpl attribute) throws DevFailed {
-        if (pollAttributes.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            // configuration comes from tango db
-            attribute.configurePolling(pollAttributes.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
-        }
-        if (attribute.isPolled()) {
-            logger.debug("configure polling of {}", attribute.getName());
-            // start polling
-            if (attribute.getName().equals(DeviceImpl.STATE_NAME) || attribute.getName().equals(DeviceImpl.STATUS_NAME)) {
-                // command is also set as polled
-                final CommandImpl cmd = CommandGetter.getCommand(attribute.getName(), commandList);
-                cmd.updatePollingConfigFromDB();
-                cacheManager.startStateStatusPolling(cmd, attribute);
-            } else {
-                cacheManager.startAttributePolling(attribute);
+    public void startPolling(final AttributeImpl attribute) throws DevFailed {
+        if (attribute != null) {
+            if (pollAttributes.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
+                // configuration comes from tango db
+                attribute.configurePolling(pollAttributes.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
             }
-        }
-        if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
-            attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
-        } else {
-            attribute.setPollRingDepth(pollRingDepth);
+            if (attribute.isPolled()) {
+                logger.debug("configure polling of {}", attribute.getName());
+                // start polling
+                if (attribute.getName().equals(DeviceImpl.STATE_NAME) || attribute.getName().equals(DeviceImpl.STATUS_NAME)) {
+                    // command is also set as polled
+                    final CommandImpl cmd = CommandGetter.getCommand(attribute.getName(), commandList);
+                    cmd.updatePollingConfigFromDB();
+                    cacheManager.startStateStatusPolling(cmd, attribute);
+                } else {
+                    cacheManager.startAttributePolling(attribute);
+                }
+            }
+            if (attrPollRingDepth.containsKey(attribute.getName().toLowerCase(Locale.ENGLISH))) {
+                attribute.setPollRingDepth(attrPollRingDepth.get(attribute.getName().toLowerCase(Locale.ENGLISH)));
+            } else {
+                attribute.setPollRingDepth(pollRingDepth);
+            }
         }
     }
 
@@ -164,8 +166,7 @@ public final class PollingManager {
     /**
      * Update polling cache
      *
-     * @param objectName
-     *            The command or attribute to update
+     * @param objectName The command or attribute to update
      * @throws DevFailed
      */
     public void triggerPolling(final String objectName) throws DevFailed {
@@ -226,10 +227,8 @@ public final class PollingManager {
      * Add command polling. Init command cannot be polled. Only command with
      * parameter void can be polled
      *
-     * @param commandName
-     *            the command to poll
-     * @param pollingPeriod
-     *            the polling period
+     * @param commandName   the command to poll
+     * @param pollingPeriod the polling period
      * @throws DevFailed
      */
     public void addCommandPolling(final String commandName, final int pollingPeriod) throws DevFailed {
@@ -253,7 +252,7 @@ public final class PollingManager {
     }
 
     private void checkPollingLimits(final String commandName, final int pollingPeriod,
-            final Map<String, Integer> minPollingValues) throws DevFailed {
+                                    final Map<String, Integer> minPollingValues) throws DevFailed {
         if (pollingPeriod != 0) {
             if (pollingPeriod < minPolling) {
                 throw DevFailedUtils.newDevFailed(Constants.MIN_POLLING_PERIOD_IS + minPolling);
@@ -282,10 +281,8 @@ public final class PollingManager {
     /**
      * Add attribute polling
      *
-     * @param attributeName
-     *            the attribute to poll
-     * @param pollingPeriod
-     *            the polling period
+     * @param attributeName the attribute to poll
+     * @param pollingPeriod the polling period
      * @throws DevFailed
      */
     public void addAttributePolling(final String attributeName, final int pollingPeriod) throws DevFailed {
@@ -312,8 +309,7 @@ public final class PollingManager {
     /**
      * Remove attribute polling
      *
-     * @param attributeName
-     *            the attribute
+     * @param attributeName the attribute
      * @throws DevFailed
      */
     public void removeAttributePolling(final String attributeName) throws DevFailed {
@@ -334,8 +330,7 @@ public final class PollingManager {
     /**
      * Remove command polling
      *
-     * @param commandName
-     *            the command
+     * @param commandName the command
      * @throws DevFailed
      */
     public void removeCommandPolling(final String commandName) throws DevFailed {
