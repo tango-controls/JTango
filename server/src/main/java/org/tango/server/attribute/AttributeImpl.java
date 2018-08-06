@@ -55,6 +55,7 @@ import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
 import java.lang.reflect.Array;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Tango attribute
@@ -84,6 +85,7 @@ public class AttributeImpl extends DeviceBehaviorObject
     private volatile double executionDuration;
     private volatile double lastUpdateTime;
     private volatile double deltaTime;
+    private ReentrantLock lock = new ReentrantLock();
 
     public AttributeImpl(final IAttributeBehavior behavior, final String deviceName) throws DevFailed {
         super();
@@ -98,9 +100,25 @@ public class AttributeImpl extends DeviceBehaviorObject
         isAlarmToHigh = false;
     }
 
+    public void lock() {
+        System.out.println("getQueueLength = " + lock.getQueueLength());
+        lock.lock();
+    }
+
+    public void unlock() {
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
+
     public void loadTangoDbConfig() throws DevFailed {
-        applyMemorizedValue();
-        configureAttributePropsFromDb();
+        try {
+            lock();
+            applyMemorizedValue();
+            configureAttributePropsFromDb();
+        } finally {
+            unlock();
+        }
     }
 
     private Object getMemorizedValue() throws DevFailed {
@@ -118,7 +136,7 @@ public class AttributeImpl extends DeviceBehaviorObject
         return obj;
     }
 
-    public void applyMemorizedValue() throws DevFailed {
+    private void applyMemorizedValue() throws DevFailed {
         if (isMemorized() && !config.getWritable().equals(AttrWriteType.READ)) {
             xlogger.entry(config.getName());
             final Object value = getMemorizedValue();
@@ -685,7 +703,7 @@ public class AttributeImpl extends DeviceBehaviorObject
         config.setPollingPeriod(0);
     }
 
-    public void configureAttributePropsFromDb() throws DevFailed {
+    private void configureAttributePropsFromDb() throws DevFailed {
         config.load(deviceName);
         if (isFwdAttribute) {
             ((ForwardedAttribute) behavior).setLabel(config.getAttributeProperties().getLabel());
@@ -770,10 +788,8 @@ public class AttributeImpl extends DeviceBehaviorObject
             return false;
         }
         final AttributeImpl other = (AttributeImpl) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
+        if (name == null && other.name != null) {
+            return false;
         } else if (!name.equals(other.name)) {
             return false;
         }

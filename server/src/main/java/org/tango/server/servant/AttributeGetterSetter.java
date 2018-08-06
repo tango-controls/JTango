@@ -1,30 +1,39 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.servant;
 
-import fr.esrf.Tango.*;
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttributeValue_3;
+import fr.esrf.Tango.AttributeValue_4;
+import fr.esrf.Tango.AttributeValue_5;
+import fr.esrf.Tango.ClntIdent;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevSource;
+import fr.esrf.Tango.DevState;
+import fr.esrf.Tango.MultiDevFailed;
+import fr.esrf.Tango.NamedDevError;
 import net.sf.ehcache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +90,7 @@ public final class AttributeGetterSetter {
     }
 
     static void setAttributeValue4(final AttributeValue_4[] values, final List<AttributeImpl> attributeList,
-            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID)
+                                   final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID)
             throws MultiDevFailed {
         XLOGGER.entry();
         final List<NamedDevError> errors = new ArrayList<NamedDevError>();
@@ -103,8 +112,11 @@ public final class AttributeGetterSetter {
                 final Object obj = CleverAttrValUnion.get(value4.value, att.getFormat());
                 final AttributeValue attrValue = new AttributeValue(obj, value4.quality, value4.w_dim.dim_x,
                         value4.w_dim.dim_y);
-                synchronized (att) {
+                att.lock();
+                try {
                     att.setValue(attrValue);
+                } finally {
+                    att.unlock();
                 }
                 // state machine
                 stateImpl.stateMachine(att.getEndState());
@@ -116,13 +128,13 @@ public final class AttributeGetterSetter {
             i++;
         }
         if (!errors.isEmpty()) {
-            throw new MultiDevFailed(errors.toArray(new NamedDevError[errors.size()]));
+            throw new MultiDevFailed(errors.toArray(new NamedDevError[0]));
         }
         XLOGGER.exit();
     }
 
     static void setAttributeValue(final fr.esrf.Tango.AttributeValue[] values, final List<AttributeImpl> attributeList,
-            final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID) throws DevFailed {
+                                  final StateImpl stateImpl, final AroundInvokeImpl aroundInvoke, final ClntIdent clientID) throws DevFailed {
         XLOGGER.entry();
 
         for (final fr.esrf.Tango.AttributeValue value3 : values) {
@@ -143,8 +155,11 @@ public final class AttributeGetterSetter {
             }
             final Object obj = CleverAnyAttribute.get(value3.value, att.getTangoType(), att.getFormat());
             final AttributeValue attrValue = new AttributeValue(obj, value3.quality);
-            synchronized (att) {
+            att.lock();
+            try {
                 att.setValue(attrValue);
+            } finally {
+                att.unlock();
             }
             // state machine
             stateImpl.stateMachine(att.getEndState());
@@ -155,9 +170,9 @@ public final class AttributeGetterSetter {
     }
 
     static AttributeValue_5[] getAttributesValues5(final String deviceName, final String[] names,
-            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
-            final ClntIdent clientID) throws DevFailed {
+                                                   final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+                                                   final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+                                                   final ClntIdent clientID) throws DevFailed {
         // final Profiler profiler = new Profiler("get value time");
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
@@ -239,18 +254,19 @@ public final class AttributeGetterSetter {
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
                             att.getName()));
                     try {
-
-                        synchronized (att) {
-                            if (att.getBehavior() instanceof ForwardedAttribute) {
-                                // special case for fwd attribute where we retrieve directly a AttributeValue_5
-                                final ForwardedAttribute fwdAttr = (ForwardedAttribute) att.getBehavior();
-                                back[i] = fwdAttr.getValue5();
-                            } else {
+                        if (att.getBehavior() instanceof ForwardedAttribute) {
+                            // special case for fwd attribute where we retrieve directly a AttributeValue_5
+                            final ForwardedAttribute fwdAttr = (ForwardedAttribute) att.getBehavior();
+                            back[i] = fwdAttr.getValue5();
+                        } else {
+                            att.lock();
+                            try {
                                 att.updateValue();
                                 back[i] = TangoIDLAttributeUtil.toAttributeValue5(att, att.getReadValue(),
                                         att.getWriteValue());
+                            } finally {
+                                att.unlock();
                             }
-
                         }
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue5Error(names[i], att.getFormat(),
@@ -276,9 +292,9 @@ public final class AttributeGetterSetter {
     }
 
     static AttributeValue_4[] getAttributesValues4(final String deviceName, final String[] names,
-            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
-            final ClntIdent clientID) throws DevFailed {
+                                                   final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+                                                   final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+                                                   final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
         final AttributeValue_4[] back = new AttributeValue_4[names.length];
@@ -347,14 +363,15 @@ public final class AttributeGetterSetter {
                     LOGGER.debug("read from DEVICE {} ", att.getName());
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
                             att.getName()));
+                    att.lock();
                     try {
-                        synchronized (att) {
-                            att.updateValue();
-                            back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, att.getReadValue(),
-                                    att.getWriteValue());
-                        }
+                        att.updateValue();
+                        back[i] = TangoIDLAttributeUtil.toAttributeValue4(att, att.getReadValue(),
+                                att.getWriteValue());
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue4Error(names[i], att.getFormat(), e);
+                    } finally {
+                        att.unlock();
                     }
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
                             clientID, att.getName()));
@@ -368,9 +385,9 @@ public final class AttributeGetterSetter {
     }
 
     static AttributeValue_3[] getAttributesValues3(final String deviceName, final String[] names,
-            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
-            final ClntIdent clientID) throws DevFailed {
+                                                   final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+                                                   final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+                                                   final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
         final AttributeValue_3[] back = new AttributeValue_3[names.length];
@@ -436,14 +453,15 @@ public final class AttributeGetterSetter {
                     LOGGER.debug("read from DEVICE {} ", att.getName());
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
                             att.getName()));
+                    att.lock();
                     try {
-                        synchronized (att) {
-                            att.updateValue();
-                            back[i] = TangoIDLAttributeUtil.toAttributeValue3(att, att.getReadValue(),
-                                    att.getWriteValue());
-                        }
+                        att.updateValue();
+                        back[i] = TangoIDLAttributeUtil.toAttributeValue3(att, att.getReadValue(),
+                                att.getWriteValue());
                     } catch (final DevFailed e) {
                         back[i] = TangoIDLAttributeUtil.toAttributeValue3Error(names[i], e);
+                    } finally {
+                        att.unlock();
                     }
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
                             clientID, att.getName()));
@@ -456,9 +474,9 @@ public final class AttributeGetterSetter {
     }
 
     static fr.esrf.Tango.AttributeValue[] getAttributesValues(final String deviceName, final String[] names,
-            final PollingManager cacheManager, final List<AttributeImpl> attributeList,
-            final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
-            final ClntIdent clientID) throws DevFailed {
+                                                              final PollingManager cacheManager, final List<AttributeImpl> attributeList,
+                                                              final AroundInvokeImpl aroundInvoke, final DevSource source, final DeviceLocker locker,
+                                                              final ClntIdent clientID) throws DevFailed {
         final boolean fromCache = isFromCache(source);
         final CallType callType = CallType.getFromDevSource(source);
 
@@ -515,9 +533,12 @@ public final class AttributeGetterSetter {
                     LOGGER.debug("read from DEVICE {} ", att.getName());
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.PRE_READ_ATTRIBUTE, callType, clientID,
                             att.getName()));
-                    synchronized (att) {
+                    att.lock();
+                    try {
                         att.updateValue();
                         back[i] = TangoIDLAttributeUtil.toAttributeValue(att, att.getReadValue());
+                    } finally {
+                        att.unlock();
                     }
                     aroundInvoke.aroundInvoke(new InvocationContext(ContextType.POST_READ_ATTRIBUTE, callType,
                             clientID, att.getName()));

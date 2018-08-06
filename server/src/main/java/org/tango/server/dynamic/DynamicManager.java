@@ -148,7 +148,12 @@ public final class DynamicManager {
     public void loadAttributeConfigFromDb(final String attributeName) throws DevFailed {
         final AttributeImpl toConfigure = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH));
         if (toConfigure != null) {
-            toConfigure.loadTangoDbConfig();
+            toConfigure.lock();
+            try {
+                toConfigure.loadTangoDbConfig();
+            }finally {
+                toConfigure.unlock();
+            }
         }
     }
 

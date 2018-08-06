@@ -272,14 +272,10 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Ctr
      *
-     * @param deviceName
-     *            The device name
-     * @param className
-     *            The class name as defined in tangodb
-     * @param txType
-     *            {@link TransactionType}
-     * @param businessObject
-     *            The real implementation of the device {@link Device}
+     * @param deviceName     The device name
+     * @param className      The class name as defined in tangodb
+     * @param txType         {@link TransactionType}
+     * @param businessObject The real implementation of the device {@link Device}
      * @throws DevFailed
      */
     public DeviceImpl(final String deviceName, final String className, final TransactionType txType,
@@ -559,7 +555,6 @@ public class DeviceImpl extends Device_5POA {
     }
 
     /**
-     *
      * @param pipe
      * @throws DevFailed
      */
@@ -644,6 +639,7 @@ public class DeviceImpl extends Device_5POA {
 
     /**
      * Start polling of a command
+     *
      * @param command
      * @throws DevFailed
      */
@@ -653,6 +649,7 @@ public class DeviceImpl extends Device_5POA {
 
     /**
      * Start polling of an attribute
+     *
      * @param attribute
      * @throws DevFailed
      */
@@ -872,8 +869,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Get the clients' requests history
      *
-     * @param maxSize
-     *            The maximum depth of history
+     * @param maxSize The maximum depth of history
      * @return the request history
      */
     @Override
@@ -922,10 +918,8 @@ public class DeviceImpl extends Device_5POA {
      * read an attribute history. IDL 2 version. The history is filled only be
      * attribute polling
      *
-     * @param attributeName
-     *            The attribute to retrieve
-     * @param maxSize
-     *            The history maximum size returned
+     * @param attributeName The attribute to retrieve
+     * @param maxSize       The history maximum size returned
      * @throws DevFailed
      */
     @Override
@@ -942,10 +936,8 @@ public class DeviceImpl extends Device_5POA {
      * read an attribute history. IDL 3 version. The history is filled only be
      * attribute polling
      *
-     * @param attributeName
-     *            The attribute to retrieve
-     * @param maxSize
-     *            The history maximum size returned
+     * @param attributeName The attribute to retrieve
+     * @param maxSize       The history maximum size returned
      * @throws DevFailed
      */
     @Override
@@ -962,10 +954,8 @@ public class DeviceImpl extends Device_5POA {
      * read an attribute history. IDL 4 version. The history is filled only be
      * attribute polling
      *
-     * @param attributeName
-     *            The attribute to retrieve
-     * @param maxSize
-     *            The history maximum size returned
+     * @param attributeName The attribute to retrieve
+     * @param maxSize       The history maximum size returned
      * @throws DevFailed
      */
     @Override
@@ -997,8 +987,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Read some attributes. IDL 1 version.
      *
-     * @param attributeNames
-     *            The attributes names
+     * @param attributeNames The attributes names
      * @return The read results.
      * @throws DevFailed
      */
@@ -1035,10 +1024,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Read some attributes. IDL 2 version.
      *
-     * @param names
-     *            The attributes names
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
+     * @param names  The attributes names
+     * @param source the device source (CACHE, DEV or CACHE_DEV)
      * @return The read results.
      * @throws DevFailed
      */
@@ -1078,10 +1065,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Read some attributes. IDL 3 version.
      *
-     * @param names
-     *            The attributes names
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
+     * @param names  The attributes names
+     * @param source the device source (CACHE, DEV or CACHE_DEV)
      * @return The read results.
      * @throws DevFailed
      */
@@ -1120,12 +1105,9 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Read some attributes. IDL 4 version.
      *
-     * @param names
-     *            The attributes names
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
-     * @param clIdent
-     *            the client ID
+     * @param names   The attributes names
+     * @param source  the device source (CACHE, DEV or CACHE_DEV)
+     * @param clIdent the client ID
      * @return The read results.
      * @throws DevFailed
      */
@@ -1172,12 +1154,9 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Read some attributes. IDL 5 version.
      *
-     * @param names
-     *            The attributes names
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
-     * @param clIdent
-     *            the client ID
+     * @param names   The attributes names
+     * @param source  the device source (CACHE, DEV or CACHE_DEV)
+     * @param clIdent the client ID
      * @return The read results.
      * @throws DevFailed
      */
@@ -1232,8 +1211,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Write some attributes. IDL 1 version
      *
-     * @param values
-     *            a container for attribute values.
+     * @param values a container for attribute values.
      * @throws DevFailed
      */
     @Override
@@ -1269,8 +1247,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Write some attributes. IDL 3 version
      *
-     * @param values
-     *            a container for attribute values.
+     * @param values a container for attribute values.
      * @throws DevFailed
      */
     @Override
@@ -1306,10 +1283,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Write some attributes. IDL 4 version
      *
-     * @param values
-     *            a container for attribute values.
-     * @param clIdent
-     *            the client ID
+     * @param values  a container for attribute values.
+     * @param clIdent the client ID
      * @throws DevFailed
      */
     @Override
@@ -1349,10 +1324,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Write and read attributes in a single request
      *
-     * @param values
-     *            the values to write
-     * @param clIdent
-     *            the client ID
+     * @param values  the values to write
+     * @param clIdent the client ID
      * @return the read results
      */
     @Override
@@ -1394,12 +1367,9 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Write and read attributes in a single request
      *
-     * @param writeValues
-     *            the values to write
-     * @param readNames
-     *            the attributes to read
-     * @param clIdent
-     *            the client ID
+     * @param writeValues the values to write
+     * @param readNames   the attributes to read
+     * @param clIdent     the client ID
      * @return the read results
      */
     @Override
@@ -1538,8 +1508,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Query a command details. IDL 1 version.
      *
-     * @param commandName
-     *            the command name
+     * @param commandName the command name
      * @return the command details of this device
      * @throws DevFailed
      */
@@ -1563,8 +1532,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Query a command details. IDL 2 version.
      *
-     * @param commandName
-     *            the command name
+     * @param commandName the command name
      * @return the command details of this device
      * @throws DevFailed
      */
@@ -1589,10 +1557,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Execute a command. IDL 1 version
      *
-     * @param command
-     *            command name
-     * @param argin
-     *            command parameters
+     * @param command command name
+     * @param argin   command parameters
      * @return command result
      * @throws DevFailed
      */
@@ -1627,12 +1593,9 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Execute a command. IDL 2 version
      *
-     * @param command
-     *            command name
-     * @param argin
-     *            command parameters
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
+     * @param command command name
+     * @param argin   command parameters
+     * @param source  the device source (CACHE, DEV or CACHE_DEV)
      * @return command result
      * @throws DevFailed
      */
@@ -1665,14 +1628,10 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Execute a command. IDL 4 version
      *
-     * @param commandName
-     *            command name
-     * @param argin
-     *            command parameters
-     * @param source
-     *            the device source (CACHE, DEV or CACHE_DEV)
-     * @param clIdent
-     *            client id
+     * @param commandName command name
+     * @param argin       command parameters
+     * @param source      the device source (CACHE, DEV or CACHE_DEV)
+     * @param clIdent     client id
      * @return command result
      * @throws DevFailed
      */
@@ -1713,10 +1672,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Command history. IDL 2 version.
      *
-     * @param commandName
-     *            the command name
-     * @param maxSize
-     *            the maximum depth of history
+     * @param commandName the command name
+     * @param maxSize     the maximum depth of history
      * @return the history
      * @throws DevFailed
      */
@@ -1734,10 +1691,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Command history. IDL 4 version.
      *
-     * @param commandName
-     *            the command name
-     * @param maxSize
-     *            the maximum depth of history
+     * @param commandName the command name
+     * @param maxSize     the maximum depth of history
      * @return the history
      * @throws DevFailed
      */
@@ -1770,8 +1725,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Update polling cache
      *
-     * @param objectName
-     *            The command or attribute to update
+     * @param objectName The command or attribute to update
      * @throws DevFailed
      */
     public void triggerPolling(final String objectName) throws DevFailed {
@@ -1835,8 +1789,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Get attributes config. IDL5 version
      *
-     * @param attributeNames
-     *            the attribute names or "All attributes"
+     * @param attributeNames the attribute names or "All attributes"
      * @return the attribute configs
      * @throws DevFailed
      */
@@ -1888,8 +1841,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Get attributes config. IDL3 version
      *
-     * @param attributeNames
-     *            the attribute names or "All attributes"
+     * @param attributeNames the attribute names or "All attributes"
      * @return the attribute configs
      * @throws DevFailed
      */
@@ -1938,8 +1890,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Get attributes config. IDL2 version
      *
-     * @param attributeNames
-     *            the attribute names or "All attributes"
+     * @param attributeNames the attribute names or "All attributes"
      * @return the attribute configs
      * @throws DevFailed
      */
@@ -1990,8 +1941,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Get attributes config. IDL1 version
      *
-     * @param attributeNames
-     *            the attribute names or "All attributes"
+     * @param attributeNames the attribute names or "All attributes"
      * @return the attribute configs
      * @throws DevFailed
      */
@@ -2033,10 +1983,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Set some attribute configs. IDL5 version
      *
-     * @param newConf
-     *            the new configurations
-     * @param clIdent
-     *            client id
+     * @param newConf the new configurations
+     * @param clIdent client id
      * @throws DevFailed
      */
 
@@ -2081,10 +2029,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Set some attribute configs. IDL4 version
      *
-     * @param newConf
-     *            the new configurations
-     * @param clIdent
-     *            client id
+     * @param newConf the new configurations
+     * @param clIdent client id
      * @throws DevFailed
      */
     @Override
@@ -2105,8 +2051,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Set some attribute configs. IDL3 version
      *
-     * @param newConf
-     *            the new configurations
+     * @param newConf the new configurations
      * @throws DevFailed
      */
     @Override
@@ -2138,8 +2083,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Set some attribute configs. IDL2 version
      *
-     * @param newConf
-     *            the new configurations
+     * @param newConf the new configurations
      * @throws DevFailed
      */
     @Override
@@ -2178,8 +2122,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * add a command
      *
-     * @param command
-     *            the new command
+     * @param command the new command
      * @throws DevFailed
      */
     public synchronized void addCommand(final CommandImpl command) throws DevFailed {
@@ -2227,10 +2170,8 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Add attribute polling
      *
-     * @param attributeName
-     *            the attribute to poll
-     * @param pollingPeriod
-     *            the polling period
+     * @param attributeName the attribute to poll
+     * @param pollingPeriod the polling period
      * @throws DevFailed
      */
     public void addAttributePolling(final String attributeName, final int pollingPeriod) throws DevFailed {
@@ -2241,10 +2182,8 @@ public class DeviceImpl extends Device_5POA {
      * Add command polling. Init command cannot be polled. Only command with
      * parameter void can be polled
      *
-     * @param commandName
-     *            the command to poll
-     * @param pollingPeriod
-     *            the polling period
+     * @param commandName   the command to poll
+     * @param pollingPeriod the polling period
      * @throws DevFailed
      */
     public void addCommandPolling(final String commandName, final int pollingPeriod) throws DevFailed {
@@ -2269,8 +2208,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Remove attribute polling
      *
-     * @param attributeName
-     *            the attribute
+     * @param attributeName the attribute
      * @throws DevFailed
      */
     public void removeAttributePolling(final String attributeName) throws DevFailed {
@@ -2280,8 +2218,7 @@ public class DeviceImpl extends Device_5POA {
     /**
      * Remove command polling
      *
-     * @param commandName
-     *            the command
+     * @param commandName the command
      * @throws DevFailed
      */
     public void removeCommandPolling(final String commandName) throws DevFailed {
@@ -2440,10 +2377,13 @@ public class DeviceImpl extends Device_5POA {
         for (final AttributeImpl attr : attrs) {
             try {
                 if (!attr.getName().equals(STATE_NAME) && !attr.getName().equals(STATUS_NAME)) {
-                    synchronized (attr) {
-                        if (!attr.isPolled() && !attr.isFwdAttribute()) {
-                            // refresh value only if not polled
+                    if (!attr.isPolled() && !attr.isFwdAttribute()) {
+                        // refresh value only if not polled
+                        attr.lock();
+                        try {
                             attr.updateValue();
+                        } finally {
+                            attr.unlock();
                         }
                     }
                 }
@@ -2593,10 +2533,8 @@ public class DeviceImpl extends Device_5POA {
      * read an attribute history. IDL 5 version. The history is filled only be
      * attribute polling
      *
-     * @param attributeName
-     *            The attribute to retrieve
-     * @param maxSize
-     *            The history maximum size returned
+     * @param attributeName The attribute to retrieve
+     * @param maxSize       The history maximum size returned
      * @throws DevFailed
      */
     @Override

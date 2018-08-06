@@ -91,8 +91,13 @@ public final class PollingManager {
 
     public void initPolling() throws DevFailed {
         for (final AttributeImpl attribute : attributeList) {
-            attribute.loadTangoDbConfig();
-            startPolling(attribute);
+            attribute.lock();
+            try {
+                attribute.loadTangoDbConfig();
+                startPolling(attribute);
+            } finally {
+                attribute.unlock();
+            }
         }
         for (final CommandImpl command : commandList) {
             command.updatePollingConfigFromDB();

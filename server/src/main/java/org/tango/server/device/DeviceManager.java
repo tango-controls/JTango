@@ -47,7 +47,6 @@ import org.tango.utils.DevFailedUtils;
  * Global info and tool for a device. Injected with {@link DeviceManagement}
  *
  * @author ABEILLE
- *
  */
 public final class DeviceManager {
 
@@ -69,7 +68,6 @@ public final class DeviceManager {
     }
 
     /**
-     *
      * @return name of the device
      */
     public String getName() {
@@ -77,7 +75,6 @@ public final class DeviceManager {
     }
 
     /**
-     *
      * @return class of the device, as defined in tango db
      */
     public String getClassName() {
@@ -85,7 +82,6 @@ public final class DeviceManager {
     }
 
     /**
-     *
      * @return admin device name
      */
     public String getAdminName() {
@@ -95,8 +91,7 @@ public final class DeviceManager {
     /**
      * Get an attribute's properties
      *
-     * @param attributeName
-     *            the attribute name
+     * @param attributeName the attribute name
      * @return its properties
      * @throws DevFailed
      */
@@ -108,10 +103,8 @@ public final class DeviceManager {
     /**
      * Configure an attribute's properties
      *
-     * @param attributeName
-     *            the attribute name
-     * @param properties
-     *            its properties
+     * @param attributeName the attribute name
+     * @param properties    its properties
      * @throws DevFailed
      */
     public void setAttributeProperties(final String attributeName, final AttributePropertiesImpl properties)
@@ -123,8 +116,7 @@ public final class DeviceManager {
     /**
      * Remove an attribute's properties
      *
-     * @param attributeName
-     *            the attribute name
+     * @param attributeName the attribute name
      * @throws DevFailed
      */
     public void removeAttributeProperties(final String attributeName) throws DevFailed {
@@ -135,8 +127,7 @@ public final class DeviceManager {
     /**
      * Check if an attribute or an command is polled
      *
-     * @param polledObject
-     *            The name of the polled object (attribute or command)
+     * @param polledObject The name of the polled object (attribute or command)
      * @return true if polled
      * @throws DevFailed
      */
@@ -151,8 +142,7 @@ public final class DeviceManager {
     /**
      * Get polling period of an attribute or a command
      *
-     * @param polledObject
-     *            The name of the polled object (attribute or command)
+     * @param polledObject The name of the polled object (attribute or command)
      * @return The polling period
      * @throws DevFailed
      */
@@ -167,7 +157,7 @@ public final class DeviceManager {
     /**
      * Configure polling of an attribute or a command and start it
      *
-     * @param polledObject The name of the polled object (attribute or command)
+     * @param polledObject  The name of the polled object (attribute or command)
      * @param pollingPeriod The polling period
      * @throws DevFailed
      */
@@ -225,8 +215,7 @@ public final class DeviceManager {
     /**
      * Update polling cache. Works only if polling period is zero.
      *
-     * @param polledObject
-     *            The name of the polled object (attribute or command)
+     * @param polledObject The name of the polled object (attribute or command)
      * @throws DevFailed
      */
     public void triggerPolling(final String polledObject) throws DevFailed {
@@ -238,7 +227,7 @@ public final class DeviceManager {
      * sending the event
      *
      * @param attributeName The attribute name
-     * @param eventType The type of event to fire
+     * @param eventType     The type of event to fire
      * @throws DevFailed
      */
     public void pushEvent(final String attributeName, final EventType eventType) throws DevFailed {
@@ -249,12 +238,15 @@ public final class DeviceManager {
                 // get attribute value
                 final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName,
                         device.getAttributeList());
+                attribute.lock();
                 try {
                     attribute.updateValue();
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
                     EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
+                } finally {
+                    attribute.unlock();
                 }
                 break;
             default:
@@ -266,7 +258,7 @@ public final class DeviceManager {
      * Push an event if some client had register it.
      *
      * @param attributeName The attribute name
-     * @param eventType The type of event to fire
+     * @param eventType     The type of event to fire
      * @throws DevFailed
      */
     public void pushEvent(final String attributeName, final AttributeValue value, final EventType eventType)
@@ -278,12 +270,15 @@ public final class DeviceManager {
                 // set attribute value
                 final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName,
                         device.getAttributeList());
+                attribute.lock();
                 try {
                     attribute.updateValue(value);
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
                     EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
+                } finally {
+                    attribute.unlock();
                 }
                 break;
             default:
@@ -306,7 +301,7 @@ public final class DeviceManager {
      * Push a PIPE EVENT event if some client had registered it
      *
      * @param pipeName The pipe name
-     * @param blob The pipe data
+     * @param blob     The pipe data
      * @throws DevFailed
      */
     public void pushPipeEvent(final String pipeName, final PipeValue blob) throws DevFailed {
