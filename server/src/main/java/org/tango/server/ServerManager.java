@@ -31,6 +31,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -329,7 +330,7 @@ public final class ServerManager {
                 try {
                     final int level = Integer.parseInt(arg.substring(arg.lastIndexOf('v') + 1));
                     LoggingManager.getInstance().setLoggingLevel(level,
-                            tangoClasses.values().toArray(new Class<?>[tangoClasses.size()]));
+                            tangoClasses.values().toArray(new Class<?>[0]));
                 } catch (final NumberFormatException e) {
                     throw DevFailedUtils.newDevFailed("Logging level error. Must be a number");
                 }
@@ -361,9 +362,7 @@ public final class ServerManager {
                     // several devices separated by commons
                     final String[] devices = argv[j].split(",");
                     if (devices.length > 1) {
-                        for (final String device : devices) {
-                            noDbDevices.add(device);
-                        }
+                        Collections.addAll(noDbDevices, devices);
                     } else {
                         noDbDevices.add(argv[j]);
                     }
@@ -373,7 +372,7 @@ public final class ServerManager {
                 }
             }
             // only one class can be loaded with no db (the last one)
-            DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
+            DatabaseFactory.setNoDbDevices(noDbDevices.toArray(new String[0]), lastClass);
         }
         return noDbDevices;
 
@@ -399,7 +398,7 @@ public final class ServerManager {
                 throw DevFailedUtils.newDevFailed(INIT_ERROR, name + " does not exists or is not a file");
             }
             logger.warn("Tango Database is not used - with file {} ", file.getPath());
-            DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[noDbDevices.size()]), lastClass);
+            DatabaseFactory.setDbFile(file, noDbDevices.toArray(new String[0]), lastClass);
         }
 
     }

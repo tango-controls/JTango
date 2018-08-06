@@ -35,7 +35,7 @@ import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 
 /**
- * manage trigger for {@link EventType#QUALITY_EVENT}
+ * manage trigger for {@link EventType#CHANGE_EVENT}
  * 
  * @author ABEILLE
  * 

@@ -189,7 +189,7 @@ public final class AdminDevice implements TangoMXBean {
             }
         }
         xlogger.exit();
-        return deviceNames.toArray(new String[deviceNames.size()]);
+        return deviceNames.toArray(new String[0]);
     }
 
     /**

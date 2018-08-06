@@ -59,5 +59,5 @@ public enum TransactionType {
     /**
      * All client requests can be done at the same time.
      */
-    NONE;
+    NONE
 }

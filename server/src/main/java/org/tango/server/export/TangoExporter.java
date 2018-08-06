@@ -268,7 +268,7 @@ public final class TangoExporter implements IExporter {
         for (final DeviceClassBuilder classBuilder : deviceClassList) {
             if (tangoClass.equalsIgnoreCase(classBuilder.getClassName())) {
                 final List<String> list = classBuilder.getDeviceNameList();
-                deviceNames = list.toArray(new String[list.size()]);
+                deviceNames = list.toArray(new String[0]);
                 break;
             }
         }

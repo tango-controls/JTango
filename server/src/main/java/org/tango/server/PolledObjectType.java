@@ -38,5 +38,5 @@ public enum PolledObjectType {
     /**
      * Poll an attribute
      */
-    ATTRIBUTE;
+    ATTRIBUTE
 }

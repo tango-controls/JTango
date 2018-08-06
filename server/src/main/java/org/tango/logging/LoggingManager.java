@@ -282,7 +282,7 @@ public final class LoggingManager {
             final FileAppender appender = fileAppenders.get(loggingDeviceNameLower);
             targets.add(LOGGING_TARGET_FILE + LOGGING_TARGET_SEPARATOR + appender.getFile());
         }
-        return targets.toArray(new String[targets.size()]);
+        return targets.toArray(new String[0]);
     }
 
     @SuppressWarnings("unchecked")

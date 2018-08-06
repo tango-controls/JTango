@@ -69,14 +69,10 @@ public class PollStatusCommand implements Callable<String[]> {
     @Override
     public String[] call() throws DevFailed {
         final List<String> result = new ArrayList<String>();
-
         final DeviceImpl device = tryFindDeviceByName(deviceName);
-
         addPolledStatus(result, device, device.getCommandList());
-
         addPolledStatus(result, device, device.getAttributeList());
-
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     private void addPolledStatus(List<String> pollStatus, final DeviceImpl device, List<? extends IPollable> pollableList) {

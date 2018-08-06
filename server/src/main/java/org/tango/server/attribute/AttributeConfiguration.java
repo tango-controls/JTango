@@ -68,6 +68,8 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
         format = config.format;
         writable = config.writable;
         type = config.type;
+        tangoType = config.tangoType;
+        enumType = config.enumType;
         dispLevel = config.dispLevel;
         maxX = config.maxX;
         maxY = config.maxY;
@@ -179,9 +181,9 @@ public final class AttributeConfiguration implements PolledObjectConfig, IConfig
         final ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE);
         sb.append("name", name);
         sb.append("format", format.value());
-        final StringBuilder s = new StringBuilder().append(type.getCanonicalName()).append(",").append(enumType)
-                .append("=").append(tangoType);
-        sb.append("type", s.toString());
+        String s = type.getCanonicalName() + "," + enumType +
+                "=" + tangoType;
+        sb.append("type", s);
         sb.append("writable", writable.value());
         sb.append("dispLevel", dispLevel.value());
         sb.append("isMemorized", isMemorized);

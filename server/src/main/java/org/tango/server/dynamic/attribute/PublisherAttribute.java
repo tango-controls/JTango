@@ -118,7 +118,7 @@ public final class PublisherAttribute implements IAttributeBehavior, ISetValueUp
                 throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute format: " + config[1]);
             }
         } else {
-            throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute config: " + config[1]);
+            throw DevFailedUtils.newDevFailed("DEVICE_PROP_ERROR", "unknown attribute config");
         }
     }
 

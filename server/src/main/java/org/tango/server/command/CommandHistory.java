@@ -155,12 +155,12 @@ public final class CommandHistory {
 	    final LinkedList<DevError[]> errors = new LinkedList<DevError[]>();
 	    final LinkedList<EltInArray> errorsArray = new LinkedList<EltInArray>();
 	    final Object array = fillHistoryArray(returnedhistoryArray, times, dim, dimSize, errors, errorsArray);
-	    history.errors_array = errorsArray.toArray(new EltInArray[errorsArray.size()]);
+	    history.errors_array = errorsArray.toArray(new EltInArray[0]);
 	    history.errors = errors.toArray(new DevError[0][0]);
 	    history.cmd_type = type;
 	    history.dates = times;
-	    history.dims = dim.toArray(new AttributeDim[dim.size()]);
-	    history.dims_array = dimSize.toArray(new EltInArray[dimSize.size()]);
+	    history.dims = dim.toArray(new AttributeDim[0]);
+	    history.dims_array = dimSize.toArray(new EltInArray[0]);
 	    if (type != TangoConst.Tango_DEV_VOID) {
 		history.value = CleverAnyCommand.set(SCALAR_TO_ARRAY.get(type), array);
 	    } else {

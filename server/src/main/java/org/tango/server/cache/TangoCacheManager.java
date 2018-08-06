@@ -175,7 +175,7 @@ public final class TangoCacheManager {
         if (!polledDevices.contains(deviceName)) {
             polledDevices.add(deviceName);
             final Map<String, String[]> properties = new HashMap<String, String[]>();
-            properties.put(POLLING_THREADS_POOL_CONF, polledDevices.toArray(new String[polledDevices.size()]));
+            properties.put(POLLING_THREADS_POOL_CONF, polledDevices.toArray(new String[0]));
             DatabaseFactory.getDatabase().setDeviceProperties(ServerManager.getInstance().getAdminDeviceName(),
                     properties);
         }

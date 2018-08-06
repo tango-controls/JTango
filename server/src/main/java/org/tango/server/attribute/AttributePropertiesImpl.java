@@ -51,7 +51,6 @@ import java.util.Set;
  * User class to create attribute properties.
  *
  * @author ABEILLE
- *
  */
 public final class AttributePropertiesImpl {
 
@@ -125,6 +124,8 @@ public final class AttributePropertiesImpl {
         enumLabels = Arrays.copyOf(props.enumLabels, props.enumLabels.length);
         isEnumMutable = props.isEnumMutable;
         isFwdAttribute = props.isFwdAttribute;
+        rootAttribute = props.rootAttribute;
+        writableAttrName = props.writableAttrName;
     }
 
     public EventProperties createEmptyEventProperties() {
@@ -485,7 +486,7 @@ public final class AttributePropertiesImpl {
             }
             this.enumLabels = Arrays.copyOf(enumLabels, enumLabels.length);
             // set min max values
-            if (enumLabels.length >= 1 && !enumLabels[0].equals(Constants.NOT_SPECIFIED)) {
+            if (!enumLabels[0].equals(Constants.NOT_SPECIFIED)) {
                 setMinValue("0");
                 setMaxValue(Integer.toString(enumLabels.length - 1));
             }
@@ -600,7 +601,7 @@ public final class AttributePropertiesImpl {
     @Override
     public boolean equals(final Object obj) {
         boolean isEqual = false;
-        if (obj != null && obj instanceof AttributePropertiesImpl) {
+        if (obj instanceof AttributePropertiesImpl) {
             final String reflectionToStringBuilder = new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                     .toString();
             final String toCompare = new ReflectionToStringBuilder(obj, ToStringStyle.SHORT_PREFIX_STYLE).toString();

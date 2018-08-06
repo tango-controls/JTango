@@ -53,7 +53,7 @@ public final class DeviceBlackBox {
         if (blackbox.size() == 0) {
             throw DevFailedUtils.newDevFailed(ExceptionMessages.BLACK_BOX_EMPTY, "blackbox is emty");
         }
-        final String[] blackboxArray = blackbox.toArray(new String[blackbox.size()]);
+        final String[] blackboxArray = blackbox.toArray(new String[0]);
         String[] result;
         if (size < Constants.QUEUE_CAPACITY && size < blackbox.size()) {
             result = new String[size];
@@ -66,8 +66,7 @@ public final class DeviceBlackBox {
     }
 
     public void insertInblackBox(final String message) {
-        final StringBuilder sb = new StringBuilder(message).append(insertHostName());
-        offerInblackBox(sb.toString());
+        offerInblackBox(message + insertHostName());
     }
 
     private synchronized void offerInblackBox(final String message) {
@@ -130,8 +129,6 @@ public final class DeviceBlackBox {
             // ignore
             logger.debug("{}", e);
         }
-        final StringBuilder sb = new StringBuilder(message);
-        sb.append(" from  \"").append(cli).append("\"");
-        offerInblackBox(sb.toString());
+        offerInblackBox(message + " from  \"" + cli + "\"");
     }
 }

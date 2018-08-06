@@ -25,6 +25,7 @@
 package org.tango.server;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -68,7 +69,7 @@ public final class StateMachineBehavior implements Cloneable {
      * @return denied states {@link DeviceState}
      */
     public DeviceState[] getDeniedStates() {
-        return deniedStates.toArray(new DeviceState[deniedStates.size()]);
+        return deniedStates.toArray(new DeviceState[0]);
     }
 
     /**
@@ -77,9 +78,7 @@ public final class StateMachineBehavior implements Cloneable {
      * @param deniedStates
      */
     public void setDeniedStates(final DeviceState... deniedStates) {
-        for (final DeviceState deviceState : deniedStates) {
-            this.deniedStates.add(deviceState);
-        }
+        Collections.addAll(this.deniedStates, deniedStates);
     }
 
     /**

@@ -152,18 +152,18 @@ public class AttributeHistoryConvertor {
                     }
                 }
             }
-            errorsArrayHist = errorsArray.toArray(new EltInArray[errorsArray.size()]);
+            errorsArrayHist = errorsArray.toArray(new EltInArray[0]);
             errorsHist = errors.toArray(new DevError[0][0]);
 
-            readDimArray = readDim.toArray(new AttributeDim[readDim.size()]);
-            readDimSizeArray = readDimSize.toArray(new EltInArray[readDimSize.size()]);
+            readDimArray = readDim.toArray(new AttributeDim[0]);
+            readDimSizeArray = readDimSize.toArray(new EltInArray[0]);
 
-            qualitiesArray = qualities.toArray(new AttrQuality[qualities.size()]);
-            qualSizeArray = qualSize.toArray(new EltInArray[qualSize.size()]);
+            qualitiesArray = qualities.toArray(new AttrQuality[0]);
+            qualSizeArray = qualSize.toArray(new EltInArray[0]);
 
             if (isReadWrite) {
-                writeDimArray = writeDim.toArray(new AttributeDim[writeDim.size()]);
-                writeDimSizeArray = writeDimSize.toArray(new EltInArray[writeDimSize.size()]);
+                writeDimArray = writeDim.toArray(new AttributeDim[0]);
+                writeDimSizeArray = writeDimSize.toArray(new EltInArray[0]);
             } else {
                 writeDimArray = new AttributeDim[readDimArray.length];
                 Arrays.fill(writeDimArray, new AttributeDim(0, 0));
@@ -274,20 +274,20 @@ public class AttributeHistoryConvertor {
                 }
             }
         }
-        qualitiesArray = qualities.toArray(new AttrQuality[qualities.size()]);
-        qualSizeArray = qualSize.toArray(new EltInArray[qualSize.size()]);
-        readDimArray = readDim.toArray(new AttributeDim[readDim.size()]);
-        readDimSizeArray = readDimSize.toArray(new EltInArray[readDimSize.size()]);
+        qualitiesArray = qualities.toArray(new AttrQuality[0]);
+        qualSizeArray = qualSize.toArray(new EltInArray[0]);
+        readDimArray = readDim.toArray(new AttributeDim[0]);
+        readDimSizeArray = readDimSize.toArray(new EltInArray[0]);
 
         if (isReadWrite) {
-            writeDimArray = writeDim.toArray(new AttributeDim[writeDim.size()]);
-            writeDimSizeArray = writeDimSize.toArray(new EltInArray[writeDimSize.size()]);
+            writeDimArray = writeDim.toArray(new AttributeDim[0]);
+            writeDimSizeArray = writeDimSize.toArray(new EltInArray[0]);
         } else {
             writeDimArray = new AttributeDim[readDimArray.length];
             Arrays.fill(writeDimArray, new AttributeDim(0, 0));
             writeDimSizeArray = Arrays.copyOf(readDimSizeArray, readDimSizeArray.length);
         }
-        errorsArrayHist = errorsArray.toArray(new EltInArray[errorsArray.size()]);
+        errorsArrayHist = errorsArray.toArray(new EltInArray[0]);
         errorsHist = errors.toArray(new DevError[0][0]);
         return array;
     }

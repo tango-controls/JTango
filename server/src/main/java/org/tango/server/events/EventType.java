@@ -1,39 +1,38 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
+
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoDs.TangoConst;
+import org.tango.utils.DevFailedUtils;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoDs.TangoConst;
 
 public enum EventType {
     /**
@@ -42,7 +41,7 @@ public enum EventType {
     CHANGE_EVENT(TangoConst.CHANGE_EVENT, TangoConst.eventNames[0]),
     /**
      * DEPRECATED: Quality event. Send an event if the attribute quality changes.
-     * 
+     *
      * QUALITY_EVENT(TangoConst.QUALITY_EVENT, TangoConst.eventNames[1]),
      */
     /**
@@ -76,20 +75,21 @@ public enum EventType {
     PIPE_EVENT(TangoConst.PIPE_EVENT, TangoConst.eventNames[8]);
 
     private static final Map<String, EventType> EVENT_TYPE_MAP = new HashMap<String, EventType>();
+    private static final Map<Integer, EventType> EVENT_TYPE_INT_MAP = new HashMap<Integer, EventType>();
+    private static final List<EventType> EVENT_ATTR_VALUE_TYPE_LIST = new ArrayList<>();
+
     static {
         for (final EventType s : EnumSet.allOf(EventType.class)) {
             EVENT_TYPE_MAP.put(s.getString(), s);
         }
     }
 
-    private static final Map<Integer, EventType> EVENT_TYPE_INT_MAP = new HashMap<Integer, EventType>();
     static {
         for (final EventType s : EnumSet.allOf(EventType.class)) {
             EVENT_TYPE_INT_MAP.put(s.getValue(), s);
         }
     }
 
-    private static final List<EventType> EVENT_ATTR_VALUE_TYPE_LIST = new ArrayList<>();
     static {
         EVENT_ATTR_VALUE_TYPE_LIST.add(CHANGE_EVENT);
         EVENT_ATTR_VALUE_TYPE_LIST.add(PERIODIC_EVENT);
@@ -100,14 +100,14 @@ public enum EventType {
     private int value;
     private String string;
 
-    private EventType(final int value, final String string) {
+    EventType(final int value, final String string) {
         this.value = value;
         this.string = string;
     }
 
     /**
      * Get an {@link EventType} from a String
-     * 
+     *
      * @param string the event type as a String
      * @return the EventType
      * @throws DevFailed if event type does not exist
@@ -123,7 +123,7 @@ public enum EventType {
 
     /**
      * Get an {@link EventType} from a String
-     * 
+     *
      * @param eventValue the event type as an int
      * @return the EventType
      * @throws DevFailed if event type does not exist
@@ -146,7 +146,7 @@ public enum EventType {
     }
 
     /**
-     * 
+     *
      * @return EventType as a String
      */
     public String getString() {
@@ -154,7 +154,7 @@ public enum EventType {
     }
 
     /**
-     * 
+     *
      * @return EventType as an int
      */
     public int getValue() {

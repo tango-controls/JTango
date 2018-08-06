@@ -392,7 +392,6 @@ class EventUtilities {
                 try {
                     zmqVersion = Double.parseDouble(strVersion);
                 } catch (final NumberFormatException e) {
-                    System.err.println(e);
                 }
             } catch (final Exception e) { /*System.err.println(e);*/
             } catch (final Error e) { /*System.err.println(e);*/
