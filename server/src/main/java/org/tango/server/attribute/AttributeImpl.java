@@ -101,7 +101,6 @@ public class AttributeImpl extends DeviceBehaviorObject
     }
 
     public void lock() {
-        System.out.println("getQueueLength = " + lock.getQueueLength());
         lock.lock();
     }
 
