@@ -24,13 +24,6 @@
  */
 package org.tango.server.attribute;
 
-import fr.esrf.Tango.AttributeConfig_5;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.TangoApi.CommandInfo;
-import fr.esrf.TangoApi.DeviceInterface;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.ExceptionMessages;
@@ -38,7 +31,6 @@ import org.tango.server.StateMachineBehavior;
 import org.tango.server.dynamic.attribute.TangoConverter;
 import org.tango.server.events.EventManager;
 import org.tango.server.events.EventType;
-import org.tango.server.idl.TangoIDLAttributeUtil;
 import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
@@ -52,8 +44,6 @@ import fr.esrf.TangoApi.CallBack;
 import fr.esrf.TangoApi.Connection;
 import fr.esrf.TangoApi.events.EventData;
 import fr.soleil.tango.clientapi.TangoAttribute;
-
-import javax.xml.transform.sax.SAXSource;
 
 /**
  * Attribute that is a proxy to another attribute. Works only for IDL5 device and client
