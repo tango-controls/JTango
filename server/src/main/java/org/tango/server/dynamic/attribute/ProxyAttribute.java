@@ -118,7 +118,7 @@ public final class ProxyAttribute implements IAttributeBehavior, ISetValueUpdate
     @Override
     public void setValue(final AttributeValue value) throws DevFailed {
         if (isReadyOnly) {
-            DevFailedUtils.newDevFailed("SECURITY_ERROR", "it not allowed to write this attribute");
+            throw DevFailedUtils.newDevFailed("SECURITY_ERROR", "it not allowed to write this attribute");
         }
         proxy.write(value.getValue());
     }
