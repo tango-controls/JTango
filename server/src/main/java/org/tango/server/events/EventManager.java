@@ -223,11 +223,11 @@ public final class EventManager {
      *
      * @param socket
      * @param ipAddresses
-     * @param heartbeatEndpoints
+     * @param endpoints
      * @param socketType
      */
-    private void bindEndpoints(ZMQ.Socket socket, Iterable<String> ipAddresses, Map<String, ZMQ.Socket> heartbeatEndpoints, SocketType socketType) {
-        xlogger.entry(ipAddresses, heartbeatEndpoints, socketType);
+    private void bindEndpoints(ZMQ.Socket socket, Iterable<String> ipAddresses, Map<String, ZMQ.Socket> endpoints, SocketType socketType) {
+        xlogger.entry(ipAddresses, endpoints, socketType);
 
 
         for (String ipAddress : ipAddresses) {
@@ -238,7 +238,7 @@ public final class EventManager {
 
             //replace * with actual port
             endpoint.deleteCharAt(endpoint.length() - 1).append(port);
-            heartbeatEndpoints.put(endpoint.toString(), socket);
+            endpoints.put(endpoint.toString(), socket);
             logger.debug("bind ZMQ socket {} for {}", endpoint.toString(), socketType);
         }
 
