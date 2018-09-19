@@ -126,8 +126,7 @@ final class EventImpl {
      * @throws DevFailed
      * @param eventSocket
      */
-
-    void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
@@ -181,7 +180,7 @@ final class EventImpl {
      * @param eventSocket
      * @throws DevFailed
      */
-    void pushAttributeDataReadyEvent(final int counter, ZMQ.Socket eventSocket)
+    protected void pushAttributeDataReadyEvent(final int counter, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -196,7 +195,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigIDL5Event(AttributeConfig_5 config, ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeConfigIDL5Event(AttributeConfig_5 config, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             synchronized (eventSocket) {
@@ -208,7 +207,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigEvent(ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeConfigEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             if (islatestIDLVersion) {
@@ -239,7 +238,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushPipeEvent(final DevPipeData pipeData, ZMQ.Socket eventSocket)
+    protected void pushPipeEvent(final DevPipeData pipeData, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -259,7 +258,7 @@ final class EventImpl {
      * @param eventSocket
      * @throws DevFailed
      */
-    void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.updateProperties();
         eventTrigger.setError(devFailed);
