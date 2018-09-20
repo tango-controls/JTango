@@ -205,7 +205,7 @@ public final class EventManager {
         }
 
         final String endpoint = "tcp://" + ipAddress + ":" + getNextAvailablePort();
-        try (final ZMQ.Socket socket = context.createSocket(ZMQ.PUB)) {
+            final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
             socket.setLinger(0);
             socket.setReconnectIVL(-1);
             logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
@@ -223,7 +223,6 @@ public final class EventManager {
                     logger.debug("HWM has been set to {}", socket.getSndHWM());
                     break;
             }
-        }
         xlogger.exit();
     }
 
