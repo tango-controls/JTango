@@ -341,21 +341,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                 deviceName, attribute, event_name, filters, event_channel_struct);
         event_callback_map.put(callback_key, new_event_callback_struct);
 
-
-        //	Thread to read the attribute by a simple synchronous call and
-        //	force callback execution after release monitor.
-        //	This is necessary for the first point in "change" mode,
-        //	but it is not necessary to be serialized in case of
-        //	read attribute or callback execution a little bit long.
-        if ((event == CHANGE_EVENT) ||
-                (event == PERIODIC_EVENT) ||
-                (event == PIPE_EVENT) ||
-                (event == ARCHIVE_EVENT) ||
-                (event == USER_EVENT) ||
-                (event == INTERFACE_CHANGE) ||
-                (event == ATT_CONF_EVENT)) {
-            new PushAttrValueLater(new_event_callback_struct).start();
-        }
         return evnt_id;
     }
     //===============================================================
@@ -638,81 +623,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         return (consumer instanceof NotifdEventConsumer) ?
             EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
     }
-    //===============================================================
-    /**
-     * Thread to read the attribute by a simple synchronous call and
-     * force callback execution after release monitor.
-     * This is necessary for the first point in "change" mode,
-     * but it is not necessary to be serialized in case of
-     * read attribute or callback execution a little bit long.
-     */
-    //===============================================================
-    class PushAttrValueLater extends Thread {
-        private EventCallBackStruct cb_struct;
-
-        //===============================================================
-        PushAttrValueLater(EventCallBackStruct cb_struct) {
-            this.cb_struct = cb_struct;
-        }
-
-        //===============================================================
-        public void run() {
-             //	Then read attribute
-            DeviceAttribute deviceAttribute = null;
-            DevicePipe      devicePipe = null;
-            AttributeInfoEx attributeInfo = null;
-            DeviceInterface deviceInterface = null;
-            DevError[] err = null;
-            String eventName = cb_struct.device.name();
-            if (cb_struct.event_type!=INTERFACE_CHANGE) {
-
-                eventName += "/" + cb_struct.attr_name.toLowerCase();
-            }
-            try {
-                if (cb_struct.event_type==INTERFACE_CHANGE) {
-                    deviceInterface = new DeviceInterface(cb_struct.device);
-                }
-                else
-                if (cb_struct.event_type==PIPE_EVENT) {
-                    devicePipe = cb_struct.device.readPipe(cb_struct.attr_name);
-                }
-                else
-                if (cb_struct.event_type==ATT_CONF_EVENT) {
-                    attributeInfo = cb_struct.device.get_attribute_info_ex(cb_struct.attr_name);
-                }
-                else {
-                    deviceAttribute = cb_struct.device.read_attribute(cb_struct.attr_name);
-                }
-            } catch (DevFailed e) {
-                err = e.errors;
-            }
-
-            //	And push value
-            int eventSource = (cb_struct.consumer instanceof NotifdEventConsumer)?
-                    EventData.NOTIFD_EVENT : EventData.ZMQ_EVENT;
-            EventData event_data =
-                    new EventData(cb_struct.device,
-                            eventName,
-                            cb_struct.event_name,
-                            cb_struct.event_type,
-                            eventSource,
-                            deviceAttribute,
-                            devicePipe,
-                            attributeInfo, null, deviceInterface, err);
-            if (cb_struct.use_ev_queue) {
-                EventQueue ev_queue = cb_struct.device.getEventQueue();
-                ev_queue.insert_event(event_data);
-            } else
-                cb_struct.callback.push_event(event_data);
-            cb_struct.setSynchronousDone(true);
-        }
-    }
-    //===============================================================
-    //===============================================================
-
-
-
-
 
     //===============================================================
     //===============================================================

@@ -214,21 +214,6 @@ public class ZmqEventConsumer extends EventConsumer implements
         new_event_callback_struct.consumer  = this;
         event_callback_map.put(callback_key, new_event_callback_struct);
 
-
-        //	Thread to read the attribute by a simple synchronous call and
-        //	force callback execution after release monitor.
-        //	This is necessary for the first point in "change" mode,
-        //	but it is not necessary to be serialized in case of
-        //	read attribute or callback execution a little bit long.
-        if ((event == CHANGE_EVENT) ||
-                (event == PERIODIC_EVENT) ||
-                (event == PIPE_EVENT) ||
-                (event == ARCHIVE_EVENT) ||
-                (event == USER_EVENT) ||
-                (event == INTERFACE_CHANGE) ||
-                (event == ATT_CONF_EVENT)) {
-            new PushAttrValueLater(new_event_callback_struct).start();
-        }
         return eventId;
     }
     //===============================================================
@@ -566,19 +551,12 @@ public class ZmqEventConsumer extends EventConsumer implements
                     if (dev_error != null)
                         pushReceivedException(channelStruct, callbackStruct, dev_error);
                     else {
-                        //  ToDo Re connect without error means heartbeat missing
-                        dev_error = new DevError("API_NoHeartbeat",
-                                ErrSeverity.ERR, "No heartbeat from " +
+                        if (!reconnectToEvent(channelStruct, callbackStruct)) {
+                            dev_error = new DevError("API_NoHeartbeat",
+                                    ErrSeverity.ERR, "No heartbeat from " +
                                     channelStruct.adm_device_proxy.get_name(),
-                                "ZmqEventConsumer.checkIfHeartbeatSkipped()");
-                        pushReceivedException(channelStruct, callbackStruct, dev_error);
-                    }
-
-                    //	If reconnection done, try to re subscribe
-                    //		and read attribute in synchronous mode
-                    if (reconnectToEvent(channelStruct, callbackStruct)) {
-                        if (!callbackStruct.event_name.equals(eventNames[DATA_READY_EVENT])) {
-                            readAttributeAndPush(channelStruct, callbackStruct);
+                                    "ZmqEventConsumer.checkIfHeartbeatSkipped()");
+                            pushReceivedException(channelStruct, callbackStruct, dev_error);
                         }
                     }
                 }
