@@ -4,7 +4,7 @@
 
     <groupId>org.tango-controls</groupId>
     <artifactId>JTangoParent</artifactId>
-    <version>9.5.10.hzg</version>
+    <version>9.5.11.hzg-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -16,7 +16,7 @@
         <connection>scm:git:git@github.com:HZG-WPI/JTango.git</connection>
         <developerConnection>scm:git:git@github.com:HZG-WPI/JTango.git</developerConnection>
         <url>https://github.com/HZG-WPI/JTango</url>
-        <tag>JTango-9.5.10.hzg</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
