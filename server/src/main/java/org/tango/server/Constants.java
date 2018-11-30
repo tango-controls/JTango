@@ -54,7 +54,7 @@ public final class Constants {
     /**
      * Retrieve the default value of STATE_CHECK_ATTR_ALARM from a system property. {@link stateCheckAttrAlarm}
      */
-    public static final String STATE_CHECK_ALARMS_DEFAULT = System.getProperty("org.tango.server.checkalarms", "true");
+    public static final String STATE_CHECK_ALARMS_DEFAULT = System.getProperty("org.tango.server.checkalarms", "false");
 
     // attribute properties names in tango db
     public static final String MEMORIZED_VALUE = "__value";
