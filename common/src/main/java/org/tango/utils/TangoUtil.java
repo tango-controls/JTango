@@ -13,7 +13,6 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoDs.TangoConst;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
@@ -312,10 +311,10 @@ public final class TangoUtil {
 
     public static void checkFullCommandName(final String fullCommandName) throws DevFailed {
         checkNullOrEmptyString(fullCommandName);
-        if (!fullCommandName.contains(DBASE_NO)
-                && StringUtils.countMatches(fullCommandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
-            throw DevFailedUtils.newDevFailed(fullCommandName + " command must contains 4 fields");
-        }
+//        if (!fullCommandName.contains(DBASE_NO)
+//                && StringUtils.countMatches(fullCommandName, TangoUtil.DEVICE_SEPARATOR) != TangoUtil.FULL_NAME_NR_SEPARATOR) {
+//            throw DevFailedUtils.newDevFailed(fullCommandName + " command must contains 4 fields");
+//        }
     }
 
     /**
