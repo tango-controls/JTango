@@ -84,12 +84,25 @@ public final class TangoCommand {
     }
 
     /**
+     * @param devProxy
+     *            The Tango device proxy
+     * @param commandName
+     *            The command name
+     * @throws DevFailed
+     */
+    public TangoCommand(final DeviceProxy devProxy, final String commandName) throws DevFailed {
+        command = new RealCommand(devProxy, commandName);
+    }
+
+    /**
      * @param deviceName
      *            The device tango (e.g. domain/family/member)
      * @param commandName
      *            The command name
      * @throws DevFailed
+     * @deprecated use {@link this#TangoCommand(DeviceProxy, String)} instead
      */
+    @Deprecated
     public TangoCommand(final String deviceName, final String commandName) throws DevFailed {
         command = new RealCommand(deviceName, commandName);
     }

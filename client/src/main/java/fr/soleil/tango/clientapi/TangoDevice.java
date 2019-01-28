@@ -1,12 +1,12 @@
 package fr.soleil.tango.clientapi;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class TangoDevice {
     private final Map<String, TangoAttribute> attributes = new HashMap<String, TangoAttribute>();
@@ -39,16 +39,16 @@ public final class TangoDevice {
 	return ta;
     }
 
-    public TangoCommand getTangoCommand(final String commandName) throws DevFailed {
-	TangoCommand tc;
-	if (commands.containsKey(commandName)) {
-	    tc = commands.get(commandName);
-	} else {
-	    tc = new TangoCommand(deviceName, commandName);
-	    commands.put(commandName, tc);
+	public TangoCommand getTangoCommand(final String commandName) throws DevFailed {
+		TangoCommand tc;
+		if (commands.containsKey(commandName)) {
+			tc = commands.get(commandName);
+		} else {
+			tc = new TangoCommand(getDeviceProxy(), commandName);
+			commands.put(commandName, tc);
+		}
+		return tc;
 	}
-	return tc;
-    }
 
     public DevState state() throws DevFailed {
 	return dev.state();

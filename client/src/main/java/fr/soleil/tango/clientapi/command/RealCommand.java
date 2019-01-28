@@ -1,10 +1,5 @@
 package fr.soleil.tango.clientapi.command;
 
-import java.util.Arrays;
-
-import org.tango.utils.DevFailedUtils;
-import org.tango.utils.TangoUtil;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevVarDoubleStringArray;
 import fr.esrf.Tango.DevVarLongStringArray;
@@ -17,6 +12,10 @@ import fr.soleil.tango.clientapi.factory.ProxyFactory;
 import fr.soleil.tango.clientapi.util.TypeConversionUtil;
 import fr.soleil.tango.errorstrategy.RetriableTask;
 import fr.soleil.tango.errorstrategy.Task;
+import org.tango.utils.DevFailedUtils;
+import org.tango.utils.TangoUtil;
+
+import java.util.Arrays;
 
 public final class RealCommand implements ITangoCommand {
 
@@ -33,12 +32,39 @@ public final class RealCommand implements ITangoCommand {
 
     /**
      *
+     * @param devProxy
+     *            The Tango device proxy
+     * @param commandName
+     *            The command name
+     * @throws DevFailed
+     */
+    public RealCommand(final DeviceProxy devProxy, final String commandName) throws DevFailed {
+        delay = Properties.getDelay();
+        retries = Properties.getRetries();
+        this.commandName = commandName;
+        this.devProxy = devProxy;
+        final Task<Void> task = new Task<Void>() {
+            @Override
+            public Void call() throws DevFailed {
+                arginType = devProxy.command_query(commandName).in_type;
+                argoutType = devProxy.command_query(commandName).out_type;
+                return null;
+            }
+        };
+        final RetriableTask<Void> retriable = new RetriableTask<Void>(retries, delay);
+        retriable.execute(task);
+    }
+
+    /**
+     *
      * @param deviceName
      *            The device tango (e.g. domain/family/member)
      * @param commandName
      *            The command name
      * @throws DevFailed
+     * @deprecated use {@link this#RealCommand(DeviceProxy, String)} instead
      */
+    @Deprecated
     public RealCommand(final String deviceName, final String commandName) throws DevFailed {
         delay = Properties.getDelay();
         retries = Properties.getRetries();
