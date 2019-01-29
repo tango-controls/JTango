@@ -24,34 +24,7 @@
  */
 package org.tango.server.servant;
 
-import fr.esrf.Tango.AttributeConfig;
-import fr.esrf.Tango.AttributeConfig_2;
-import fr.esrf.Tango.AttributeConfig_3;
-import fr.esrf.Tango.AttributeConfig_5;
-import fr.esrf.Tango.AttributeValue;
-import fr.esrf.Tango.AttributeValue_3;
-import fr.esrf.Tango.AttributeValue_4;
-import fr.esrf.Tango.AttributeValue_5;
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.DevAttrHistory;
-import fr.esrf.Tango.DevAttrHistory_3;
-import fr.esrf.Tango.DevAttrHistory_4;
-import fr.esrf.Tango.DevAttrHistory_5;
-import fr.esrf.Tango.DevCmdHistory;
-import fr.esrf.Tango.DevCmdHistory_4;
-import fr.esrf.Tango.DevCmdInfo;
-import fr.esrf.Tango.DevCmdInfo_2;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevInfo;
-import fr.esrf.Tango.DevInfo_3;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.Tango.DevPipeData;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.DevState;
-import fr.esrf.Tango.DevVarLongStringArray;
-import fr.esrf.Tango.Device_5POA;
-import fr.esrf.Tango.MultiDevFailed;
-import fr.esrf.Tango.PipeConfig;
+import fr.esrf.Tango.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.omg.CORBA.Any;
@@ -69,29 +42,15 @@ import org.tango.server.InvocationContext;
 import org.tango.server.InvocationContext.CallType;
 import org.tango.server.InvocationContext.ContextType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.AroundInvoke;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.ClassProperty;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Delete;
 import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceProperties;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.State;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.cache.PollingManager;
 import org.tango.server.cache.TangoCacheManager;
 import org.tango.server.command.CommandImpl;
-import org.tango.server.device.AroundInvokeImpl;
-import org.tango.server.device.DeviceLocker;
-import org.tango.server.device.InitImpl;
-import org.tango.server.device.StateImpl;
-import org.tango.server.device.StatusImpl;
+import org.tango.server.device.*;
 import org.tango.server.events.DeviceInterfaceChangedSender;
 import org.tango.server.idl.CleverAnyCommand;
 import org.tango.server.idl.TangoIDLAttributeUtil;
@@ -108,14 +67,7 @@ import org.tango.utils.DevFailedUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -2702,5 +2654,13 @@ public class DeviceImpl extends Device_5POA {
         }
         xlogger.exit();
         return result;
+    }
+
+    /**
+     *
+     * @return read-only MDC context map
+     */
+    public Map<String, String> getMdcContextMap() {
+        return Collections.unmodifiableMap(contextMap);
     }
 }
