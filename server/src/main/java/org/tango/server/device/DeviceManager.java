@@ -348,4 +348,8 @@ public final class DeviceManager {
         reflectionToStringBuilder.setExcludeFieldNames(new String[]{"device"});
         return reflectionToStringBuilder.toString();
     }
+
+    public DeviceImpl getDevice() {
+        return device;
+    }
 }
