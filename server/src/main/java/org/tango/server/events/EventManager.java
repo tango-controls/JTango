@@ -118,7 +118,7 @@ public final class EventManager {
             DevFailedUtils.logDevFailed(e, logger);
             return EventConstants.HWM_DEFAULT;
         } catch (final NumberFormatException e) {
-            logger.error("ControlSystem/EventBufferHwm property is not a number: {} ", value);
+            logger.error("CtrlSystem/EventBufferHwm property is not a number: {} ", value);
             return EventConstants.HWM_DEFAULT;
         }
     }
