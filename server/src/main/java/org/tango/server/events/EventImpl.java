@@ -24,12 +24,7 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.Tango.AttDataReady;
-import fr.esrf.Tango.AttributeConfig_5;
-import fr.esrf.Tango.AttributeValue_5;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -52,7 +47,6 @@ final class EventImpl {
     private final IEventTrigger eventTrigger;
     private final EventType eventType;
     private final boolean islatestIDLVersion;
-    private final ZMQ.Socket eventSocket;
     private final String fullName;
     private AttributeImpl attribute;
     private long subscribeTime;
@@ -67,12 +61,11 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
+    EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion, final String fullName) throws DevFailed {
         this.attribute = attribute;
         this.eventType = eventType;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         this.fullName = fullName;
-        this.eventSocket = eventSocket;
         eventTrigger = EventTriggerFactory.createEventTrigger(eventType, attribute);
         logger.debug("event trigger for {} type is {}", attribute.getName(), eventTrigger.getClass());
         updateSubscribeTime();
@@ -85,10 +78,9 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final PipeImpl pipe, final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
+    EventImpl(final PipeImpl pipe, final int idlVersion, final String fullName) throws DevFailed {
         this.eventType = EventType.PIPE_EVENT;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
-        this.eventSocket = eventSocket;
         this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
         logger.debug("event trigger for {} type is {}", pipe.getName(), eventTrigger.getClass());
@@ -101,10 +93,9 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final int idlVersion, final String fullName, final ZMQ.Socket eventSocket) throws DevFailed {
+    EventImpl(final int idlVersion, final String fullName) throws DevFailed {
         this.eventType = EventType.INTERFACE_CHANGE_EVENT;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
-        this.eventSocket = eventSocket;
         this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
         logger.debug("event trigger for Device, type is {}", eventTrigger.getClass());
@@ -133,20 +124,20 @@ final class EventImpl {
      * Fire an event containing a value is condition is valid.
      *
      * @throws DevFailed
+     * @param eventSocket
      */
-
-    void pushAttributeValueEvent() throws DevFailed {
+    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
         if (isSendEvent()) {
-            sendAttributeValueEvent();
+            sendAttributeValueEvent(eventSocket);
         }
         xlogger.exit();
     }
 
 
-    private void sendAttributeValueEvent() throws DevFailed {
+    private void sendAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             if (islatestIDLVersion) {
@@ -167,7 +158,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    public void pushAttributeIDL5Event(AttributeValue_5 value) throws DevFailed {
+    public void pushAttributeIDL5Event(AttributeValue_5 value, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             synchronized (eventSocket) {
@@ -186,9 +177,10 @@ final class EventImpl {
      * Send a data ready event
      *
      * @param counter  a counter value
+     * @param eventSocket
      * @throws DevFailed
      */
-    void pushAttributeDataReadyEvent(final int counter)
+    protected void pushAttributeDataReadyEvent(final int counter, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -203,7 +195,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigIDL5Event(AttributeConfig_5 config) throws DevFailed {
+    protected void pushAttributeConfigIDL5Event(AttributeConfig_5 config, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             synchronized (eventSocket) {
@@ -215,7 +207,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigEvent() throws DevFailed {
+    protected void pushAttributeConfigEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             if (islatestIDLVersion) {
@@ -234,7 +226,7 @@ final class EventImpl {
     }
 
     void pushInterfaceChangeEvent(
-            final DevIntrChange deviceInterface) throws DevFailed {
+            final DevIntrChange deviceInterface, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             synchronized (eventSocket) {
@@ -246,7 +238,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushPipeEvent(final DevPipeData pipeData)
+    protected void pushPipeEvent(final DevPipeData pipeData, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -263,9 +255,10 @@ final class EventImpl {
      * Fire an event containing a DevFailed.
      *
      * @param devFailed the failed object to be sent.
+     * @param eventSocket
      * @throws DevFailed
      */
-    void pushDevFailedEvent(final DevFailed devFailed) throws DevFailed {
+    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.updateProperties();
         eventTrigger.setError(devFailed);
