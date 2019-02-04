@@ -28,6 +28,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.*;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.server.ServerManager;
 
@@ -38,7 +39,7 @@ import org.tango.server.ServerManager;
  * 
  */
 //TODO move to integration tests (start db)
-//@Ignore
+@Ignore
 public class PropertiesTest {
     // XXX: device must be declared in tango db before running this test
     private static String deviceName = "test/tango/jtangotest.1";
