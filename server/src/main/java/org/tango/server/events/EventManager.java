@@ -245,12 +245,12 @@ public final class EventManager {
         xlogger.exit();
     }
 
-    private ZMQ.Socket createSocket() {
+    private ZMQ.Socket createSocket(){
         final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
-        socket.setLinger(0);
-        socket.setReconnectIVL(-1);
-        return socket;
-    }
+            socket.setLinger(0);
+            socket.setReconnectIVL(-1);
+            return socket ;
+            }
 
     private ZMQ.Socket createEventSocket() {
         final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
@@ -514,6 +514,7 @@ public final class EventManager {
                 }
             }
         }
+        xlogger.exit();
     }
 
     /**
