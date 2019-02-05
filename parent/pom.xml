@@ -220,9 +220,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
