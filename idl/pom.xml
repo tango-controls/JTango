@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.5.12-SNAPSHOT</version>
+        <version>9.5.12</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -20,7 +19,7 @@
         <connection>scm:git:git@github.com:tango-controls/JTango.git</connection>
         <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
         <url>https://github.com/tango-controls/JTango</url>
-        <tag>HEAD</tag>
+        <tag>JTango-9.5.12</tag>
     </scm>
 
     <issueManagement>
