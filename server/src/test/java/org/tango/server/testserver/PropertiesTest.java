@@ -28,6 +28,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.*;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.tango.server.ServerManager;
@@ -38,10 +40,8 @@ import org.tango.server.ServerManager;
  * @author ABEILLE
  * 
  */
-//TODO move to integration tests (start db)
-@Ignore
+
 public class PropertiesTest {
-    // XXX: device must be declared in tango db before running this test
     private static String deviceName = "test/tango/jtangotest.1";
 
     @Test
@@ -113,6 +113,12 @@ public class PropertiesTest {
         dev.set_attribute_info(new AttributeInfo[] { info });
         final String actualValue = dev.get_attribute_info(attrName).description;
         Assert.assertEquals(value, actualValue);
+    }
+
+    @BeforeClass
+    public static void createDeviceInTangoDB() throws DevFailed {
+        Database tangoDb = ApiUtil.get_db_obj();
+        tangoDb.add_device(deviceName, JTangoTest.class.getCanonicalName(), JTangoTest.SERVER_NAME);
     }
 
     public void connect() throws DevFailed {

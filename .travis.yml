@@ -1,5 +1,18 @@
 language: java
 sudo: false
+
+services:
+- docker
+
+before_script:
+  - docker-compose up -d
+  #TODO wait-for-it
+  - sleep 30
+  - docker ps
+
+#skip mvn install
+install: /bin/true
+
 script:
   - mvn clean install -Ptravis
 jdk:
