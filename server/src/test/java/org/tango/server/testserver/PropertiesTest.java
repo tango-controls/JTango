@@ -35,12 +35,12 @@ import org.junit.Test;
 import org.tango.server.ServerManager;
 
 /**
- * properties tests
+ *
+ *  Integration tests with tango db
  * 
  * @author ABEILLE
  * 
  */
-
 public class PropertiesTest {
     private static String deviceName = "test/tango/jtangotest.1";
 
