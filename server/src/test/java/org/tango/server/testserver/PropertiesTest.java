@@ -24,6 +24,9 @@
  */
 package org.tango.server.testserver;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.*;
 import org.junit.After;
@@ -122,7 +125,8 @@ public class PropertiesTest {
     }
 
     public void connect() throws DevFailed {
-        // assertThat(System.getProperty("TANGO_HOST"), notNullValue());
+        System.out.println("Tango host = "+ System.getProperty("TANGO_HOST"));
+        assertThat(System.getProperty("TANGO_HOST"), notNullValue());
         JTangoTest.start();
     }
 
