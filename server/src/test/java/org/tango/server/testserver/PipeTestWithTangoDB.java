@@ -42,6 +42,7 @@ import fr.esrf.TangoDs.TangoConst;
 /**
  * Integration tests with tango db
  */
+@Ignore
 public class PipeTestWithTangoDB {
 
     private static final String deviceName = "tango9/java/pipe.1";
@@ -50,7 +51,7 @@ public class PipeTestWithTangoDB {
     @BeforeClass
     public static void start() throws DevFailed {
         Database tangoDb = ApiUtil.get_db_obj();
-        tangoDb.add_device(deviceName, PipeServer.class.getCanonicalName(), PipeServer.SERVER_NAME);
+        tangoDb.add_device(deviceName, PipeServer.class.getSimpleName(), PipeServer.SERVER_NAME + "/"+PipeServer.INSTANCE_NAME);
       //  System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
         PipeServer.start();
     }
