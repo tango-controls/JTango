@@ -48,7 +48,7 @@ import org.tango.utils.DevFailedUtils;
  *
  * @author ABEILLE
  */
-public final class DeviceManager {
+public class DeviceManager {
 
     private final DeviceImpl device;
     private final String name;
