@@ -24,15 +24,10 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.ServerSocket;
-import java.util.Scanner;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfoEx;
+import fr.soleil.tango.clientapi.TangoAttribute;
+import fr.soleil.tango.clientapi.TangoCommand;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,10 +35,14 @@ import org.tango.server.Constants;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeInfoEx;
-import fr.soleil.tango.clientapi.TangoAttribute;
-import fr.soleil.tango.clientapi.TangoCommand;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.ServerSocket;
+import java.util.Scanner;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * TODO: test polling
@@ -189,7 +188,7 @@ public class ForwardedAttributeTest {
         attrRoot.getAttributeProxy().set_info(new AttributeInfoEx[] { info });
     }
 
-    @Test(expected = DevFailed.class)
+    @Test
     public void configurePolling() throws DevFailed {
         // install polling
         final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
