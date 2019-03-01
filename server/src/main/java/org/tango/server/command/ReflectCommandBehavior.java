@@ -68,11 +68,9 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
                 // execute without params
                 obj = executeMethod.invoke(businessObject);
             }
-        } catch (final IllegalArgumentException e) {
-            throw DevFailedUtils.newDevFailed(e);
         } catch (final IllegalAccessException e) {
             throw DevFailedUtils.newDevFailed(e);
-        } catch (final InvocationTargetException e) {
+        } catch (IllegalArgumentException| InvocationTargetException e) {
             DevFailed devFailed;
             if (e.getCause() instanceof DevFailed) {
                 devFailed = (DevFailed) e.getCause();
@@ -81,6 +79,7 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
             }
 
             DevFailedUtils.logDevFailed(devFailed,businessObjectLogger);
+            throw devFailed;
         }
 
         xlogger.exit();
