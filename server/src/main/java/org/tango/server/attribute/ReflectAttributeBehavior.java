@@ -24,9 +24,8 @@
  */
 package org.tango.server.attribute;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -37,8 +36,8 @@ import org.tango.server.ExceptionMessages;
 import org.tango.server.StateMachineBehavior;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Behavior a Tango attribute using java reflection
@@ -54,6 +53,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
     private final Method getter;
     private final Method setter;
     private final Object businessObject;
+    private final Logger businessObjectLogger;
 
     /**
      * Ctr
@@ -73,6 +73,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
         this.getter = getter;
         this.setter = setter;
         this.config = config;
+        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -83,12 +84,12 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
             try {
                 logger.debug("read attribute {} from method '{}'", config.getName(), getter);
                 value = getter.invoke(businessObject);
-            } catch (final IllegalArgumentException e) {
-                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
-            } catch (final InvocationTargetException e) {
-                throwDevFailed(e);
+            } catch (IllegalArgumentException | InvocationTargetException e) {
+                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
+                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
+                throw devFailed;
             }
         }
         result = buildAttributeValue(value);
@@ -151,12 +152,12 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
                     checkParamTypes(value, paramSetter, input);
                     setter.invoke(businessObject, value.getValue());
                 }
-            } catch (final IllegalArgumentException e) {
-                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
-            } catch (final InvocationTargetException e) {
-                throwDevFailed(e);
+            } catch (IllegalArgumentException | InvocationTargetException e) {
+                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
+                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
+                throw devFailed;
             }
         }
 

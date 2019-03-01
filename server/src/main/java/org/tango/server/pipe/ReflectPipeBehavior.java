@@ -24,16 +24,15 @@
  */
 package org.tango.server.pipe;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import fr.esrf.Tango.DevFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tango.server.StateMachineBehavior;
 import org.tango.server.attribute.ReflectAttributeBehavior;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public final class ReflectPipeBehavior implements IPipeBehavior {
 
@@ -43,6 +42,7 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
     private final Method getter;
     private final Method setter;
     private final Object businessObject;
+    private final Logger businessObjectLogger;
 
     /**
      * Ctr
@@ -62,6 +62,7 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
         this.getter = getter;
         this.setter = setter;
         this.config = config;
+        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -71,12 +72,12 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
             try {
                 logger.debug("read pipe {} from method '{}'", config.getName(), getter);
                 result = (PipeValue) getter.invoke(businessObject);
-            } catch (final IllegalArgumentException e) {
-                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
-            } catch (final InvocationTargetException e) {
-                throwDevFailed(e);
+            } catch (IllegalArgumentException| InvocationTargetException e) {
+                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
+                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
+                throw devFailed;
             }
         }
         return result;
@@ -87,12 +88,12 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
         if (setter != null) {
             try {
                 setter.invoke(businessObject, value);
-            } catch (final IllegalArgumentException e) {
-                throw DevFailedUtils.newDevFailed(e);
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
-            } catch (final InvocationTargetException e) {
-                throwDevFailed(e);
+            } catch (IllegalArgumentException | InvocationTargetException e) {
+                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
+                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
+                throw devFailed;
             }
         }
     }

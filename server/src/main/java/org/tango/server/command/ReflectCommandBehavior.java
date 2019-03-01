@@ -24,18 +24,19 @@
  */
 package org.tango.server.command;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.StateMachineBehavior;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public final class ReflectCommandBehavior implements ICommandBehavior {
 
@@ -43,6 +44,7 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
 
     private final Method executeMethod;
     private final Object businessObject;
+    private final Logger businessObjectLogger;
     private final CommandConfiguration config;
 
     public ReflectCommandBehavior(final Method executeMethod, final Object businessObject,
@@ -50,6 +52,7 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
         this.executeMethod = executeMethod;
         this.businessObject = businessObject;
         this.config = config;
+        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -70,11 +73,14 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
         } catch (final IllegalAccessException e) {
             throw DevFailedUtils.newDevFailed(e);
         } catch (final InvocationTargetException e) {
+            DevFailed devFailed;
             if (e.getCause() instanceof DevFailed) {
-                throw (DevFailed) e.getCause();
+                devFailed = (DevFailed) e.getCause();
             } else {
-                throw DevFailedUtils.newDevFailed(e.getCause());
+                devFailed = DevFailedUtils.newDevFailed(e.getCause());
             }
+
+            DevFailedUtils.logDevFailed(devFailed,businessObjectLogger);
         }
 
         xlogger.exit();
