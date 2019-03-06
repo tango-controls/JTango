@@ -1,14 +1,14 @@
 package org.tango.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.ErrSeverity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
 
 public final class DevFailedUtils {
     private static final String TANGO_ERROR = "TANGO_ERROR";
@@ -62,12 +62,12 @@ public final class DevFailedUtils {
         return err;
     }
 
-    public static DevFailed newDevFailed(final Throwable origin) throws DevFailed {
+    public static DevFailed newDevFailed(final Throwable origin) {
         final DevError[] err = new DevError[1];
         err[0] = new DevError();
-        err[0].desc = origin.getClass().getCanonicalName();
+        err[0].desc = Optional.ofNullable(origin.getLocalizedMessage()).orElse("NA");
         err[0].severity = ErrSeverity.PANIC;
-        err[0].reason = "NA";
+        err[0].reason = origin.getClass().getCanonicalName();
         final StringWriter sw = new StringWriter();
         origin.printStackTrace(new PrintWriter(sw));
         err[0].origin = sw.toString();
@@ -77,6 +77,7 @@ public final class DevFailedUtils {
         return e;
     }
 
+    @Deprecated
     public static void throwDevFailed(final Throwable origin) throws DevFailed {
         final DevFailed e = newDevFailed(origin);
         // LOGGER.error("exception origin {}, at {}", origin.getClass());
