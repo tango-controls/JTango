@@ -174,6 +174,7 @@ public class DeviceImpl extends Device_5POA {
      * The delete method. Called at each init
      */
     private Method deleteMethod;
+
     /**
      * Implementaion of Tango state
      */
@@ -924,14 +925,7 @@ public class DeviceImpl extends Device_5POA {
             }
             result = attr.getHistory().getAttrHistory4(maxSize);
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
         return result;
     }
@@ -945,32 +939,19 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes(final String[] attributeNames) throws DevFailed {
-        MDC.setContextMap(contextMap);
-        xlogger.entry();
-        if (attributeNames.length != 1 || !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !attributeNames[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        deviceMonitoring.startRequest("read_attributes");
-        clientIdentity.set(null);
+        pre_attributes(attributeNames, null);
+
         if (attributeNames.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-        AttributeValue[] result = null;
-        try {
-            result = AttributeGetterSetter.getAttributesValues(name, attributeNames, pollingManager, attributeList,
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attributes " + Arrays.toString(attributeNames))) {
+            AttributeValue[] result = AttributeGetterSetter.getAttributesValues(name, attributeNames, pollingManager, attributeList,
                     aroundInvokeImpl, DevSource.CACHE_DEV, deviceLock, null);
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        return result;
+
     }
 
     /**
@@ -983,35 +964,19 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue[] read_attributes_2(final String[] names, final DevSource source) throws DevFailed {
-        MDC.setContextMap(contextMap);
         xlogger.entry();
-        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        deviceMonitoring.startRequest("read_attributes_2", source);
-        clientIdentity.set(null);
+        pre_attributes(names, null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-
-        AttributeValue[] result = null;
-        try {
-            result = AttributeGetterSetter.getAttributesValues(name, names, pollingManager, attributeList,
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attributes_2", source)) {
+            AttributeValue[] result = AttributeGetterSetter.getAttributesValues(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, null);
+            xlogger.exit();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-
-        xlogger.exit();
-        return result;
     }
 
     /**
@@ -1024,34 +989,19 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_3[] read_attributes_3(final String[] names, final DevSource source) throws DevFailed {
-        MDC.setContextMap(contextMap);
         xlogger.entry();
-        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        deviceMonitoring.startRequest("read_attributes_3", source);
-        clientIdentity.set(null);
+        pre_attributes(names, null);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-        AttributeValue_3[] result = null;
-        try {
-            result = AttributeGetterSetter.getAttributesValues3(name, names, pollingManager, attributeList,
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attributes_3", source)) {
+            AttributeValue_3[] result = AttributeGetterSetter.getAttributesValues3(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, null);
+            xlogger.exit();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
-
+            throw handleException(e);
         }
-        xlogger.exit();
-        return result;
     }
 
     /**
@@ -1068,39 +1018,21 @@ public class DeviceImpl extends Device_5POA {
             throws DevFailed {
         // final Profiler profilerPeriod = new Profiler("period");
         // profilerPeriod.start(Arrays.toString(names));
-        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
-        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-
-        deviceMonitoring.startRequest("read_attributes_4 " + Arrays.toString(names), source, clIdent);
-        clientIdentity.set(clIdent);
+        pre_attributes(names, clIdent);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, names);
-        }
 
-        AttributeValue_4[] result = null;
-        try {
-            result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attributes_4 " + Arrays.toString(names), source, clIdent)) {
+            AttributeValue_4[] result = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, clIdent);
+            xlogger.exit();
+            // profilerPeriod.stop().print();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        xlogger.exit();
-        // profilerPeriod.stop().print();
-        return result;
     }
 
     /**
@@ -1115,49 +1047,25 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public AttributeValue_5[] read_attributes_5(final String[] names, final DevSource source, final ClntIdent clIdent)
             throws DevFailed {
-        MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(names));
+        pre_attributes(names, clIdent);
         // final Profiler profiler = new Profiler("read time");
         // profiler.start(Arrays.toString(names));
 
-        if (names.length != 1 || !names[0].equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !names[0].equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        // profiler.start("blackbox");
-        final long request = deviceMonitoring.startRequest("read_attributes_5 " + Arrays.toString(names), source,
-                clIdent);
-        // profiler.start("locking");
-        clientIdentity.set(clIdent);
         if (names.length == 0) {
             throw DevFailedUtils.newDevFailed(READ_ERROR, READ_ASKED_FOR_0_ATTRIBUTES);
         }
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, names);
-        }
-
-        AttributeValue_5[] result = null;
-
-        try {
-            // profiler.start("get value");
-            result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
+        // profiler.start("blackbox");
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attributes_5 " + Arrays.toString(names), source, clIdent)) {
+            // profiler.start("locking");
+            AttributeValue_5[] result = AttributeGetterSetter.getAttributesValues5(name, names, pollingManager, attributeList,
                     aroundInvokeImpl, source, deviceLock, clIdent);
+            // profiler.stop().print();
+            xlogger.exit();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        } finally {
-            deviceMonitoring.endRequest(request);
+            throw handleException(e);
         }
-
-        // profiler.stop().print();
-        xlogger.exit();
-        return result;
     }
 
     /**
@@ -1168,30 +1076,18 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void write_attributes(final AttributeValue[] values) throws DevFailed {
-        MDC.setContextMap(contextMap);
         xlogger.entry();
-        checkInitialization();
-        deviceMonitoring.startRequest("write_attributes");
-        clientIdentity.set(null);
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
-            logger.debug("writing {}", names[i]);
-        }
+
+        final String[] names = Arrays.stream(values).map(attributeValue -> attributeValue.name).toArray(String[]::new);
+        pre_attributes(names, null);
         final Object lock = deviceLock.getAttributeLock();
-        try {
+        logger.debug("writing {}", Arrays.toString(names));
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_attributes")) {
             synchronized (lock != null ? lock : new Object()) {
                 AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
         xlogger.exit();
     }
@@ -1203,31 +1099,18 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     @Override
-    public void write_attributes_3(final AttributeValue[] values) throws MultiDevFailed, DevFailed {
-        MDC.setContextMap(contextMap);
+    public void write_attributes_3(final AttributeValue[] values) throws DevFailed {
         xlogger.entry();
-        checkInitialization();
-        deviceMonitoring.startRequest("write_attributes_3");
-        clientIdentity.set(null);
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
-            logger.debug("writing {}", names[i]);
-        }
+        String[] names = Arrays.stream(values).map(attributeValue -> attributeValue.name).toArray(String[]::new);
+        pre_attributes(names, null);
+        logger.debug("writing {}", Arrays.toString(names));
         final Object lock = deviceLock.getAttributeLock();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_attributes_3")) {
             synchronized (lock != null ? lock : new Object()) {
                 AttributeGetterSetter.setAttributeValue(values, attributeList, stateImpl, aroundInvokeImpl, null);
             }
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
         xlogger.exit();
     }
@@ -1242,33 +1125,17 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public void write_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent) throws MultiDevFailed,
             DevFailed {
-        MDC.setContextMap(contextMap);
         xlogger.entry();
-        checkInitialization();
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
-        }
+        String[] names = Arrays.stream(values).map(attributeValue_4 -> attributeValue_4.name).toArray(String[]::new);
+        pre_attributes(names, clIdent);
         logger.debug("writing {}", Arrays.toString(names));
-        deviceMonitoring.startRequest("write_attributes_4 " + Arrays.toString(names), clIdent);
-        clientIdentity.set(clIdent);
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, names);
-        }
-        final Object lock = deviceLock.getAttributeLock();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_attributes_4 " + Arrays.toString(names), clIdent)) {
+            final Object lock = deviceLock.getAttributeLock();
             synchronized (lock != null ? lock : new Object()) {
                 AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, clIdent);
             }
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof MultiDevFailed) {
-                throw (MultiDevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
         xlogger.exit();
     }
@@ -1282,38 +1149,22 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_4[] write_read_attributes_4(final AttributeValue_4[] values, final ClntIdent clIdent)
-            throws MultiDevFailed, DevFailed {
-        MDC.setContextMap(contextMap);
+            throws DevFailed {
         xlogger.entry();
-        checkInitialization();
+        String[] names = Arrays.stream(values).map(attributeValue_4 -> attributeValue_4.name).toArray(String[]::new);
+        pre_attributes(names, clIdent);
 
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
-        }
-        deviceMonitoring.startRequest("write_read_attributes_4 " + Arrays.toString(names), clIdent);
-        clientIdentity.set(clIdent);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_read_attributes_4 " + Arrays.toString(names), clIdent)) {
         AttributeValue_4[] val = null;
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, names);
-        }
         final Object lock = deviceLock.getAttributeLock();
-        try {
             synchronized (lock != null ? lock : new Object()) {
-                val = writeRead(values);
+                val = writeRead(values, names);
             }
+            xlogger.exit();
+            return val;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        xlogger.exit();
-        return val;
     }
 
     /**
@@ -1326,48 +1177,45 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public AttributeValue_5[] write_read_attributes_5(final AttributeValue_4[] writeValues, final String[] readNames,
-                                                      final ClntIdent clIdent) throws MultiDevFailed, DevFailed {
-        deviceMonitoring.startRequest("write_read_attributes_5 ", clIdent);
-        clientIdentity.set(clIdent);
-        final String[] names = new String[writeValues.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = writeValues[i].name;
-        }
+                                                      final ClntIdent clIdent) throws DevFailed {
+        xlogger.entry();
+        String[] names = Arrays.stream(writeValues).map(attributeValue_4 -> attributeValue_4.name).toArray(String[]::new);
+        pre_attributes(names, clIdent);
 
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, names);
-        }
-
-        AttributeValue_5[] resultValues = null;
-        final Object lock = deviceLock.getAttributeLock();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_read_attributes_5 ", clIdent)) {
+            AttributeValue_5[] resultValues = null;
+            final Object lock = deviceLock.getAttributeLock();
             synchronized (lock != null ? lock : new Object()) {
                 aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES,
                         CallType.CACHE_DEV, clIdent, name));
                 // write attributes
-                try {
-                    AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl,
-                            clIdent);
-                } catch (final MultiDevFailed e) {
-                    throw new DevFailed(e.errors[0].err_list);
-                }
+                AttributeGetterSetter.setAttributeValue4(writeValues, attributeList, stateImpl, aroundInvokeImpl,
+                        clIdent);
                 // read attributes
                 resultValues = AttributeGetterSetter.getAttributesValues5(name, readNames, pollingManager,
                         attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock, clIdent);
                 aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES,
                         CallType.CACHE_DEV, clIdent, name));
+                xlogger.exit();
+                return resultValues;
             }
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        return resultValues;
+    }
+
+    private void pre_attributes(String[] names, ClntIdent clIdent) throws DevFailed {
+        MDC.setContextMap(contextMap);
+        checkInitialization();
+
+        checkClientLocking(clIdent, names);
+        clientIdentity.set(clIdent);
+    }
+
+    private void checkClientLocking(ClntIdent clIdent, String[] names) throws DevFailed {
+        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
+            clientLocking.checkClientLocking(clIdent, names);
+        }
     }
 
     /**
@@ -1375,18 +1223,10 @@ public class DeviceImpl extends Device_5POA {
      * @return The read values
      * @throws DevFailed
      */
-    private AttributeValue_4[] writeRead(final AttributeValue_4[] values) throws DevFailed {
+    private AttributeValue_4[] writeRead(final AttributeValue_4[] values, String[] names) throws DevFailed, MultiDevFailed {
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
                 null, name));
-        try {
-            AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, null);
-        } catch (final MultiDevFailed e) {
-            throw new DevFailed(e.errors[0].err_list);
-        }
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
-        }
+        AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, null);
         final AttributeValue_4[] resultValues = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager,
                 attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock, null);
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
@@ -1401,7 +1241,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     @Override
-    public DevCmdInfo[] command_list_query() throws DevFailed {
+    public DevCmdInfo[] command_list_query() {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
@@ -1432,7 +1272,7 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     @Override
-    public DevCmdInfo_2[] command_list_query_2() throws DevFailed {
+    public DevCmdInfo_2[] command_list_query_2() {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
@@ -1516,30 +1356,15 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout(final String command, final Any argin) throws DevFailed {
-        MDC.setContextMap(contextMap);
-        xlogger.entry();
-        if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        final long request = deviceMonitoring.startRequest("command_inout " + command);
-        clientIdentity.set(null);
-        Any argout = null;
-        try {
-            argout = commandHandler(command, argin, DevSource.CACHE_DEV, null);
+        xlogger.entry(command);
+        pre_command_inout(command, null);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_inout " + command)) {
+            Any argout = commandHandler(command, argin, DevSource.CACHE_DEV, null);
+            xlogger.exit();
+            return argout;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        } finally {
-            deviceMonitoring.endRequest(request);
+            throw handleException(e);
         }
-        xlogger.exit();
-        return argout;
     }
 
     /**
@@ -1553,34 +1378,21 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public Any command_inout_2(final String command, final Any argin, final DevSource source) throws DevFailed {
-        MDC.setContextMap(contextMap);
-        xlogger.entry();
-        if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-            checkInitialization();
-        }
-        deviceMonitoring.startRequest("command_inout_2 " + command, source);
-        clientIdentity.set(null);
-        Any argout = null;
-        try {
-            argout = commandHandler(command, argin, source, null);
+        xlogger.entry(command);
+        pre_command_inout(command, null);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_inout_2 " + command, source)) {
+            Any argout = commandHandler(command, argin, source, null);
+            xlogger.exit();
+            return argout;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        xlogger.exit();
-        return argout;
     }
 
     /**
      * Execute a command. IDL 4 version
      *
-     * @param commandName command name
+     * @param command command name
      * @param argin       command parameters
      * @param source      the device source (CACHE, DEV or CACHE_DEV)
      * @param clIdent     client id
@@ -1588,37 +1400,46 @@ public class DeviceImpl extends Device_5POA {
      * @throws DevFailed
      */
     @Override
-    public Any command_inout_4(final String commandName, final Any argin, final DevSource source,
+    public Any command_inout_4(final String command, final Any argin, final DevSource source,
                                final ClntIdent clIdent) throws DevFailed {
+        xlogger.entry(command);
+        pre_command_inout(command, clIdent);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("Operation command_inout_4 (cmd = " + command + ")",
+                source, clIdent)) {
+            Any argout = commandHandler(command, argin, source, clIdent);
+            xlogger.exit();
+            return argout;
+        } catch (final Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    private void pre_command_inout(String command, ClntIdent clIdent) throws DevFailed {
         MDC.setContextMap(contextMap);
-        xlogger.entry(commandName);
-        if (!commandName.equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                && !commandName.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+        if (!command.equalsIgnoreCase(DeviceImpl.STATE_NAME) && !command.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
             checkInitialization();
         }
-        final long request = deviceMonitoring.startRequest("Operation command_inout_4 (cmd = " + commandName + ")",
-                source, clIdent);
-        clientIdentity.set(clIdent);
-        Any argout = null;
         if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent, commandName);
+            clientLocking.checkClientLocking(clIdent, command);
         }
-        try {
-            argout = commandHandler(commandName, argin, source, clIdent);
-        } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        } finally {
-            deviceMonitoring.endRequest(request);
+        clientIdentity.set(clIdent);
+    }
+
+    private DevFailed handleException(Exception e) {
+        deviceMonitoring.addError();
+        if (e instanceof DevFailed) {
+            return (DevFailed) e;
         }
-        xlogger.exit();
-        return argout;
+        if (e instanceof MultiDevFailed) {
+            return new DevFailed("MultiDevFailed",
+                    Arrays.stream(((MultiDevFailed) e).errors)
+                            .flatMap(namedDevError -> Arrays.stream(namedDevError.err_list))
+                            .toArray(DevError[]::new));
+        } else {
+            // with CORBA, the stack trace is not visible by the client if
+            // not inserted in DevFailed.
+            return DevFailedUtils.newDevFailed(e);
+        }
     }
 
     /**
@@ -1634,10 +1455,11 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        deviceMonitoring.startRequest("command_inout_history_2 " + commandName);
-        // TODO command_inout_history_2
-        // returncommandHistory.get(command).toArray(n)
-        return new DevCmdHistory[]{};
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_inout_history_2 " + commandName)) {
+            // TODO command_inout_history_2
+            // returncommandHistory.get(command).toArray(n)
+            return new DevCmdHistory[]{};
+        }
     }
 
     /**
@@ -1653,25 +1475,14 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        final long request = deviceMonitoring.startRequest("command_inout_history_4 " + commandName);
         final CommandImpl command = getCommand(commandName);
-
-        DevCmdHistory_4 history = null;
-        try {
-            history = command.getHistory().toDevCmdHistory4(maxSize);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_inout_history_4 " + commandName)) {
+            DevCmdHistory_4 history = command.getHistory().toDevCmdHistory4(maxSize);
+            xlogger.exit();
+            return history;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        } finally {
-            deviceMonitoring.endRequest(request);
+            throw handleException(e);
         }
-        return history;
     }
 
     /**
@@ -1942,38 +1753,33 @@ public class DeviceImpl extends Device_5POA {
 
     @Override
     public void set_attribute_config_5(final AttributeConfig_5[] newConf, final ClntIdent clIdent) throws DevFailed {
-        MDC.setContextMap(contextMap);
-        xlogger.entry();
-        checkInitialization();
-        clientIdentity.set(clIdent);
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent);
-        }
+        pre_command_inout("set_attribute_config_5", clIdent);
 
-        deviceMonitoring.startRequest("set_attribute_config_5", clIdent);
-        for (final AttributeConfig_5 attributeConfig : newConf) {
-            final String attributeName = attributeConfig.name;
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("set_attribute_config_5", clIdent)) {
+            for (final AttributeConfig_5 attributeConfig : newConf) {
+                final String attributeName = attributeConfig.name;
 
-            final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
-            if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
-            }
-            if (!attribute.getFormat().equals(attributeConfig.data_format)
-                    || !attribute.getWritable().equals(attributeConfig.writable)
-                    || !attribute.getDispLevel().equals(attributeConfig.level)
-                    || attribute.getTangoType() != attributeConfig.data_type) {
-                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
-            }
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+                if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
+                    throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
+                }
+                if (!attribute.getFormat().equals(attributeConfig.data_format)
+                        || !attribute.getWritable().equals(attributeConfig.writable)
+                        || !attribute.getDispLevel().equals(attributeConfig.level)
+                        || attribute.getTangoType() != attributeConfig.data_type) {
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                }
 
-            final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
-            logger.debug("set_attribute_config_5: {}", props);
-            if (!attribute.getProperties().isEnumMutable()
-                    && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
-                throw DevFailedUtils
-                        .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
-                                "It's not supported to change enumeration labels number from outside the Tango device class code");
+                final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
+                logger.debug("set_attribute_config_5: {}", props);
+                if (!attribute.getProperties().isEnumMutable()
+                        && !Arrays.equals(attribute.getProperties().getEnumLabels(), props.getEnumLabels())) {
+                    throw DevFailedUtils
+                            .newDevFailed(ExceptionMessages.NOT_SUPPORTED_FEATURE,
+                                    "It's not supported to change enumeration labels number from outside the Tango device class code");
+                }
+                attribute.setProperties(props);
             }
-            attribute.setProperties(props);
         }
         xlogger.exit();
     }
@@ -1987,17 +1793,11 @@ public class DeviceImpl extends Device_5POA {
      */
     @Override
     public void set_attribute_config_4(final AttributeConfig_3[] newConf, final ClntIdent clIdent) throws DevFailed {
-        MDC.setContextMap(contextMap);
-        xlogger.entry();
-        checkInitialization();
-        clientIdentity.set(clIdent);
-        if (!name.equalsIgnoreCase(getAdminDeviceName())) {
-            clientLocking.checkClientLocking(clIdent);
+        pre_command_inout("set_attribute_config_4", clIdent);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("set_attribute_config_4", clIdent)) {
+            set_attribute_config_3(newConf);
         }
-        deviceMonitoring.startRequest("set_attribute_config_4", clIdent);
-        set_attribute_config_3(newConf);
         xlogger.exit();
-
     }
 
     /**
@@ -2011,23 +1811,24 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        deviceMonitoring.startRequest("set_attribute_config_3");
-        for (final AttributeConfig_3 attributeConfig : newConf) {
-            final String attributeName = attributeConfig.name;
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("set_attribute_config_3")) {
+            for (final AttributeConfig_3 attributeConfig : newConf) {
+                final String attributeName = attributeConfig.name;
 
-            final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
-            if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+                if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
+                    throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
+                }
+                if (!attribute.getFormat().equals(attributeConfig.data_format)
+                        || !attribute.getWritable().equals(attributeConfig.writable)
+                        || !attribute.getDispLevel().equals(attributeConfig.level)
+                        || attribute.getTangoType() != attributeConfig.data_type) {
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                }
+                final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
+                logger.debug("set_attribute_config_3: {}", props);
+                attribute.setProperties(props);
             }
-            if (!attribute.getFormat().equals(attributeConfig.data_format)
-                    || !attribute.getWritable().equals(attributeConfig.writable)
-                    || !attribute.getDispLevel().equals(attributeConfig.level)
-                    || attribute.getTangoType() != attributeConfig.data_type) {
-                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
-            }
-            final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
-            logger.debug("set_attribute_config_3: {}", props);
-            attribute.setProperties(props);
         }
         xlogger.exit();
     }
@@ -2043,21 +1844,22 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        deviceMonitoring.startRequest("set_attribute_config");
-        for (final AttributeConfig attributeConfig : newConf) {
-            final String attributeName = attributeConfig.name;
-            final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
-            if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
-                throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("set_attribute_config")) {
+            for (final AttributeConfig attributeConfig : newConf) {
+                final String attributeName = attributeConfig.name;
+                final AttributeImpl attribute = AttributeGetterSetter.getAttribute(attributeName, attributeList);
+                if (attribute.getName().equals(STATE_NAME) || attribute.getName().equals(STATUS_NAME)) {
+                    throw DevFailedUtils.newDevFailed("set attribute is not possible for " + attribute.getName());
+                }
+                if (!attribute.getFormat().equals(attributeConfig.data_format)
+                        || !attribute.getWritable().equals(attributeConfig.writable)
+                        || attribute.getTangoType() != attributeConfig.data_type) {
+                    throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
+                }
+                final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
+                logger.debug("set_attribute_config: {}", props);
+                attribute.setProperties(props);
             }
-            if (!attribute.getFormat().equals(attributeConfig.data_format)
-                    || !attribute.getWritable().equals(attributeConfig.writable)
-                    || attribute.getTangoType() != attributeConfig.data_type) {
-                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_ALLOWED, "not a good config");
-            }
-            final AttributePropertiesImpl props = TangoIDLAttributeUtil.toAttributeProperties(attributeConfig);
-            logger.debug("set_attribute_config: {}", props);
-            attribute.setProperties(props);
         }
         xlogger.exit();
     }
@@ -2509,14 +2311,7 @@ public class DeviceImpl extends Device_5POA {
                 result = attr.getHistory().getAttrHistory5(maxSize);
             }
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            handleException(e);
         }
         return result;
 
@@ -2562,11 +2357,12 @@ public class DeviceImpl extends Device_5POA {
         checkInitialization();
         clientIdentity.set(clIdent);
 
-        deviceMonitoring.startRequest("set_pipe_config_5", clIdent);
-        for (final PipeConfig config : newConf) {
-            final String name = config.name;
-            final PipeImpl pipe = getPipe(name, pipeList);
-            pipe.setConfiguration(config.label, config.description);
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("set_pipe_config_5", clIdent)) {
+            for (final PipeConfig config : newConf) {
+                final String name = config.name;
+                final PipeImpl pipe = getPipe(name, pipeList);
+                pipe.setConfiguration(config.label, config.description);
+            }
         }
         xlogger.exit();
     }
@@ -2576,28 +2372,20 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
-        deviceMonitoring.startRequest("read_pipe_5 " + name, clIdent);
         clientIdentity.set(clIdent);
-        DevPipeData result = null;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_pipe_5 " + name, clIdent)) {
+            DevPipeData result = null;
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_READ, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
             pipe.updateValue();
             result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_READ, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
+            xlogger.exit();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        xlogger.exit();
-        return result;
     }
 
     @Override
@@ -2605,23 +2393,15 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(value.name);
         final PipeImpl pipe = getPipe(value.name, pipeList);
-        deviceMonitoring.startRequest("write_pipe_5 " + value.name, clIdent);
         clientIdentity.set(clIdent);
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_pipe_5 " + value.name, clIdent)) {
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_WRITE, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
             pipe.setValue(TangoIDLUtil.toPipeValue(value));
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE, CallType.UNKNOWN, clIdent,
                     pipe.getName()));
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
         xlogger.exit();
     }
@@ -2631,10 +2411,9 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(name);
         final PipeImpl pipe = getPipe(name, pipeList);
-        deviceMonitoring.startRequest("write_read_pipe_5 " + name, clIdent);
         clientIdentity.set(clIdent);
-        DevPipeData result = null;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("write_read_pipe_5 " + name, clIdent)) {
+            DevPipeData result = null;
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_PIPE_WRITE_READ, CallType.UNKNOWN,
                     clIdent, pipe.getName()));
             pipe.setValue(TangoIDLUtil.toPipeValue(value));
@@ -2642,18 +2421,11 @@ public class DeviceImpl extends Device_5POA {
             result = TangoIDLUtil.toDevPipeData(pipe.getName(), pipe.getReadValue());
             aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.POST_PIPE_WRITE_READ, CallType.UNKNOWN,
                     clIdent, pipe.getName()));
+            xlogger.exit();
+            return result;
         } catch (final Exception e) {
-            deviceMonitoring.addError();
-            if (e instanceof DevFailed) {
-                throw (DevFailed) e;
-            } else {
-                // with CORBA, the stack trace is not visible by the client if
-                // not inserted in DevFailed.
-                throw DevFailedUtils.newDevFailed(e);
-            }
+            throw handleException(e);
         }
-        xlogger.exit();
-        return result;
     }
 
     /**
@@ -2662,5 +2434,13 @@ public class DeviceImpl extends Device_5POA {
      */
     public Map<String, String> getMdcContextMap() {
         return Collections.unmodifiableMap(contextMap);
+    }
+
+    public StateImpl getStateImpl() {
+        return stateImpl;
+    }
+
+    public StatusImpl getStatusImpl() {
+        return statusImpl;
     }
 }
