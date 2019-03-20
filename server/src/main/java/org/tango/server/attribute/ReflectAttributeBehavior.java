@@ -53,7 +53,6 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
     private final Method getter;
     private final Method setter;
     private final Object businessObject;
-    private final Logger businessObjectLogger;
 
     /**
      * Ctr
@@ -73,7 +72,6 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
         this.getter = getter;
         this.setter = setter;
         this.config = config;
-        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -87,9 +85,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
             } catch (IllegalArgumentException | InvocationTargetException e) {
-                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
-                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
-                throw devFailed;
+                throw DevFailedUtils.newDevFailed(e.getCause());
             }
         }
         result = buildAttributeValue(value);
@@ -155,9 +151,7 @@ public final class ReflectAttributeBehavior implements IAttributeBehavior {
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
             } catch (IllegalArgumentException | InvocationTargetException e) {
-                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
-                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
-                throw devFailed;
+                throw DevFailedUtils.newDevFailed(e.getCause());
             }
         }
 

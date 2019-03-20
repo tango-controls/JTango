@@ -42,7 +42,6 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
     private final Method getter;
     private final Method setter;
     private final Object businessObject;
-    private final Logger businessObjectLogger;
 
     /**
      * Ctr
@@ -62,7 +61,6 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
         this.getter = getter;
         this.setter = setter;
         this.config = config;
-        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -75,9 +73,7 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
             } catch (IllegalArgumentException| InvocationTargetException e) {
-                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
-                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
-                throw devFailed;
+                throw DevFailedUtils.newDevFailed(e.getCause());
             }
         }
         return result;
@@ -91,9 +87,7 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
             } catch (IllegalArgumentException | InvocationTargetException e) {
-                DevFailed devFailed = DevFailedUtils.newDevFailed(e.getCause());
-                DevFailedUtils.logDevFailed(devFailed, businessObjectLogger);
-                throw devFailed;
+                throw DevFailedUtils.newDevFailed(e.getCause());
             }
         }
     }
@@ -102,14 +96,6 @@ public final class ReflectPipeBehavior implements IPipeBehavior {
     public StateMachineBehavior getStateMachine() throws DevFailed {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    private void throwDevFailed(final InvocationTargetException e) throws DevFailed {
-        if (e.getCause() instanceof DevFailed) {
-            throw (DevFailed) e.getCause();
-        } else {
-            throw DevFailedUtils.newDevFailed(e.getCause());
-        }
     }
 
     @Override

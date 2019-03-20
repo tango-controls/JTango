@@ -24,18 +24,7 @@
  */
 package org.tango.server.device;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -48,7 +37,13 @@ import org.tango.server.annotation.Init;
 import org.tango.server.cache.PollingManager;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Managed the initialization of a device.
@@ -165,7 +160,7 @@ public final class InitImpl extends DeviceBehaviorObject {
         try {
             if (initMethod != null) {
                 stateImpl.stateMachine(DeviceState.INIT);
-                statusImpl.statusMachine(Constants.INIT_IN_PROGRESS, DeviceState.INIT);
+                statusImpl.statusMachine(Constants.INIT_IN_PROGRESS);
                 initMethod.invoke(businessObject);
                 if (getEndState() != null) {
                     // state changed by @StateMachine
@@ -186,7 +181,7 @@ public final class InitImpl extends DeviceBehaviorObject {
             logger.error(Constants.INIT_FAILED, e);
             try {
                 stateImpl.stateMachine(DeviceState.FAULT);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
             } catch (final DevFailed e1) {
                 logger.debug(DevFailedUtils.toString(e1));
             }
@@ -200,13 +195,13 @@ public final class InitImpl extends DeviceBehaviorObject {
             stateImpl.stateMachine(DeviceState.FAULT);
             if (e.getCause() instanceof DevFailed) {
                 logger.error("Tango error at Init: {}", DevFailedUtils.toString((DevFailed) e.getCause()));
-                statusImpl.statusMachine("Init failed: " + DevFailedUtils.toString((DevFailed) e.getCause()),
-                        DeviceState.FAULT);
+                statusImpl.statusMachine("Init failed: " + DevFailedUtils.toString((DevFailed) e.getCause())
+                );
             } else {
                 final StringWriter sw = new StringWriter();
                 e.getCause().printStackTrace(new PrintWriter(sw));
                 final String stacktrace = sw.toString();
-                statusImpl.statusMachine("Init failed: " + stacktrace, DeviceState.FAULT);
+                statusImpl.statusMachine("Init failed: " + stacktrace);
             }
         } catch (final DevFailed e1) {
             logger.error(DevFailedUtils.toString(e1));
@@ -223,7 +218,7 @@ public final class InitImpl extends DeviceBehaviorObject {
                 e.printStackTrace(new PrintWriter(sw));
             }
             final String stacktrace = sw.toString();
-            statusImpl.statusMachine(stacktrace, DeviceState.FAULT);
+            statusImpl.statusMachine(stacktrace);
         } catch (final DevFailed e1) {
             logger.debug(DevFailedUtils.toString(e1));
         }

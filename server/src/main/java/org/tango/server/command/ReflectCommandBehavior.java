@@ -28,8 +28,6 @@ import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.server.StateMachineBehavior;
@@ -44,7 +42,6 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
 
     private final Method executeMethod;
     private final Object businessObject;
-    private final Logger businessObjectLogger;
     private final CommandConfiguration config;
 
     public ReflectCommandBehavior(final Method executeMethod, final Object businessObject,
@@ -52,7 +49,6 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
         this.executeMethod = executeMethod;
         this.businessObject = businessObject;
         this.config = config;
-        this.businessObjectLogger = LoggerFactory.getLogger(businessObject.getClass());
     }
 
     @Override
@@ -77,8 +73,6 @@ public final class ReflectCommandBehavior implements ICommandBehavior {
             } else {
                 devFailed = DevFailedUtils.newDevFailed(e.getCause());
             }
-
-            DevFailedUtils.logDevFailed(devFailed,businessObjectLogger);
             throw devFailed;
         }
 

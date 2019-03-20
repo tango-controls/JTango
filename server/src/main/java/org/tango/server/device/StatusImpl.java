@@ -24,11 +24,7 @@
  */
 package org.tango.server.device;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -40,7 +36,10 @@ import org.tango.DeviceState;
 import org.tango.server.annotation.Status;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manage the status of the device
@@ -114,7 +113,7 @@ public final class StatusImpl {
      * @param status
      * @throws DevFailed
      */
-    public synchronized void statusMachine(final String status, final DeviceState state) throws DevFailed {
+    public synchronized void statusMachine(final String status) throws DevFailed {
         if (status != null) {
             logger.debug("Changing status to: {}", status);
             this.status = status;

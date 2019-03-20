@@ -25,6 +25,7 @@
 package org.tango.server.servant;
 
 import fr.esrf.Tango.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.omg.CORBA.Any;
@@ -638,7 +639,7 @@ public class DeviceImpl extends Device_5POA {
             // ignore error so that server always starts
             try {
                 stateImpl.stateMachine(DeviceState.FAULT);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
             } catch (final DevFailed e1) {
                 // ignore
                 logger.debug("not important", e1);
@@ -1427,18 +1428,28 @@ public class DeviceImpl extends Device_5POA {
 
     private DevFailed handleException(Exception e) {
         deviceMonitoring.addError();
+
+        DevFailed original = null;
         if (e instanceof DevFailed) {
-            return (DevFailed) e;
-        }
-        if (e instanceof MultiDevFailed) {
-            return new DevFailed("MultiDevFailed",
+            original = (DevFailed) e;
+        } else if (e instanceof MultiDevFailed) {
+            original = new DevFailed("MultiDevFailed",
                     Arrays.stream(((MultiDevFailed) e).errors)
                             .flatMap(namedDevError -> Arrays.stream(namedDevError.err_list))
                             .toArray(DevError[]::new));
         } else {
             // with CORBA, the stack trace is not visible by the client if
             // not inserted in DevFailed.
-            return DevFailedUtils.newDevFailed(e);
+            original = DevFailedUtils.newDevFailed(e);
+        }
+        DevFailedUtils.logDevFailed(original, logger);
+        try {
+            stateImpl.stateMachine(DeviceState.FAULT);
+            statusImpl.statusMachine(DevFailedUtils.toString(original));
+            return original;
+        } catch (DevFailed devFailed) {
+            ArrayUtils.addAll(devFailed.errors, original.errors);
+            return devFailed;
         }
     }
 
@@ -2009,7 +2020,7 @@ public class DeviceImpl extends Device_5POA {
         } catch (final DevFailed e) {
             try {
                 stateImpl.stateMachine(DeviceState.UNKNOWN);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.UNKNOWN);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
                 state = DevState.UNKNOWN;
             } catch (final DevFailed e1) {
                 logger.debug(NOT_IMPORTANT_ERROR, e1);
@@ -2033,7 +2044,7 @@ public class DeviceImpl extends Device_5POA {
         } catch (final DevFailed e) {
             try {
                 stateImpl.stateMachine(DeviceState.UNKNOWN);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.UNKNOWN);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
                 status = DevFailedUtils.toString(e);
             } catch (final DevFailed e1) {
                 logger.debug(NOT_IMPORTANT_ERROR, e1);

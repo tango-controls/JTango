@@ -24,13 +24,11 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsAnything.anything;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.DeviceProxy;
+import fr.soleil.tango.clientapi.TangoAttribute;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -38,11 +36,13 @@ import org.junit.Test;
 import org.tango.client.database.DatabaseFactory;
 import org.tango.client.database.ITangoDB;
 
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.tango.clientapi.TangoAttribute;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.core.AnyOf.anyOf;
+import static org.hamcrest.core.IsAnything.anything;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 public class AlarmQualityTest extends NoDBDeviceManager {
 
@@ -53,7 +53,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { "true" });
         db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
-        new DeviceProxy(deviceName).command_inout("Init");
+        DeviceProxy deviceProxy = new DeviceProxy(deviceName);
+        deviceProxy.command_inout("Init");
     }
 
     @AfterClass
@@ -127,7 +128,7 @@ public class AlarmQualityTest extends NoDBDeviceManager {
         // System.out.println(DeviceState.toString(dev.state()));
         // System.out.println(dev.status());
         assertThat(ta.getQuality().value(), equalTo(AttrQuality.ATTR_WARNING.value()));
-        assertThat(dev.state(), equalTo(DevState.ALARM));
+        assertThat(dev.state(), anyOf(equalTo(DevState.ALARM), equalTo(DevState.FAULT)));//FAULT is set by testMaxValueScalar
         assertThat(dev.status(), anything("Alarm : Value too high for longSpectrum"));
 
     }
