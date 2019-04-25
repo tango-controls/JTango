@@ -24,12 +24,12 @@
  */
 package org.tango.server.annotation;
 
+import org.tango.DeviceState;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.tango.DeviceState;
 
 /**
  * <p>
@@ -67,4 +67,11 @@ public @interface State {
      * @return polling period
      */
     int pollingPeriod() default 0;
+
+    /**
+     * The framework will check event conditions before firing it
+     *
+     * @return
+     */
+    boolean checkChangeEvent() default false;
 }

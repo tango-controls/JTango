@@ -2454,4 +2454,10 @@ public class DeviceImpl extends Device_5POA {
     public StatusImpl getStatusImpl() {
         return statusImpl;
     }
+
+    public Optional<AttributeImpl> getAttributeImpl(final String attrName) {
+        return attributeList.stream()
+                .filter(attribute -> attribute.getName().equalsIgnoreCase(attrName))
+                .findFirst();
+    }
 }

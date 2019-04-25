@@ -67,4 +67,10 @@ public @interface Status {
      */
     int pollingPeriod() default 0;
 
+    /**
+     * The framework will check event conditions before firing it
+     *
+     * @return
+     */
+    boolean checkChangeEvent() default false;
 }
