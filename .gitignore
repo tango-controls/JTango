@@ -60,5 +60,6 @@ assembly/target/
 client/target/
 common/target/
 dao/target/
+dao/src/test/
 idl/target/
 server/target/
