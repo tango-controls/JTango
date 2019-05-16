@@ -113,13 +113,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>idlj-maven-plugin</artifactId>
-                <version>1.2.2</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <user.language>us</user.language>
-                        <user.region>US</user.region>
-                    </systemPropertyVariables>
-                </configuration>
                 <executions>
                     <execution>
                         <id>compile-tango-idl</id>
@@ -128,15 +121,12 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                                <systemPropertyVariables>
-                                    <user.language>us</user.language>
-                                    <user.region>US</user.region>
-                                </systemPropertyVariables>
                             <debug>true</debug>
                             <compiler>jacorb</compiler>
                             <sources>
                                 <source>
                                     <additionalArguments>
+                                        <additionalArgument>-notimestamps</additionalArgument>
                                         <additionalArgument>-nofinal</additionalArgument>
                                     </additionalArguments>
                                     <packagePrefix>fr.esrf</packagePrefix>
