@@ -42,7 +42,6 @@ import fr.esrf.Tango.ErrSeverity;
 import fr.esrf.TangoApi.*;
 import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
-import org.omg.CosEventComm.Disconnected;
 import org.omg.CosNotification.StructuredEvent;
 
 import java.net.InetSocketAddress;
@@ -266,7 +265,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     @Override
-    protected void checkIfAlreadyConnected(DeviceProxy device, String attribute, String event_name, CallBack callback, int max_size, boolean stateless) throws DevFailed {
+    protected void checkIfAlreadyConnected(DeviceProxy device, String attribute, String event_name, CallBack callback, int max_size, boolean stateless) {
         //  Nothing to do (only override)
     }
 
@@ -274,7 +273,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     @Override
     protected void setAdditionalInfoToEventCallBackStruct(EventCallBackStruct callback_struct,
-                          String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) throws DevFailed {
+                          String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) {
         // Nothing
         ApiUtil.printTrace("-------------> Set as ZmqEventConsumer for "+device_name);
         callback_struct.consumer  = this;
@@ -366,7 +365,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      * @param deviceData    data from ZmqEventSubscriptionChange command
      * @param deviceProxy   the admin device
      * @return the endpoints after checked
-     * @throws DevFailed
+     * @throws DevFailed in case of connection problem
      */
     //===============================================================
     private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
@@ -503,11 +502,11 @@ public class ZmqEventConsumer extends EventConsumer implements
         try {
             ApiUtil.printTrace("====================================================\n" +
                                 "   Try to resubscribe " + eventCallBackStruct.channel_name);
-            DevVarLongStringArray   lsa =
-                ZMQutils.getEventSubscriptionInfoFromAdmDevice(
+            DeviceData argOut = ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                         channelStruct.adm_device_proxy,
                         eventCallBackStruct.device.name(),
                         eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
+            DevVarLongStringArray lsa = checkZmqAddress(argOut, eventCallBackStruct.device).extractLongStringArray();
 
             //  Update the heartbeat time
             String  admDeviceName = channelStruct.adm_device_proxy.name();  //.toLowerCase();
@@ -530,7 +529,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     @Override
-    protected void removeFilters(EventCallBackStruct cb_struct) throws DevFailed {
+    protected void removeFilters(EventCallBackStruct cb_struct) {
         //  Nothing to do for ZMQ
     }
     //===============================================================
@@ -597,7 +596,7 @@ public class ZmqEventConsumer extends EventConsumer implements
 
     //===============================================================
     //===============================================================
-    public void push_structured_event(StructuredEvent structuredEvent) throws Disconnected {
+    public void push_structured_event(StructuredEvent structuredEvent) {
         //  Nothing to do for ZMQ system
     }
 
@@ -612,12 +611,12 @@ public class ZmqEventConsumer extends EventConsumer implements
     private boolean reconnectToEvent(EventChannelStruct channelStruct, EventCallBackStruct callBackStruct) {
         boolean reConnected;
         try {
-            DevVarLongStringArray   lsa =
-                ZMQutils.getEventSubscriptionInfoFromAdmDevice(
+            DeviceData argOut = ZMQutils.getEventSubscriptionInfoFromAdmDevice(
                         channelStruct.adm_device_proxy,
                         callBackStruct.device.name(),
                         callBackStruct.attr_name,
                         callBackStruct.event_name);
+            DevVarLongStringArray   lsa = checkZmqAddress(argOut, callBackStruct.device).extractLongStringArray();
 
             //  Build the buffer to connect event and send it
             ZMQutils.connectEvent(callBackStruct.device.get_tango_host(),
@@ -648,10 +647,11 @@ public class ZmqEventConsumer extends EventConsumer implements
             if (eventCallBackStruct.channel_name.equals(name) && (eventCallBackStruct.callback != null)) {
                 try {
                     EventChannelStruct channelStruct = channel_map.get(name);
-                    DevVarLongStringArray   lsa =
-                            ZMQutils.getEventSubscriptionInfoFromAdmDevice(
-                                    channelStruct.adm_device_proxy,
-                                    eventCallBackStruct.device.name(), eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
+                    DeviceData argOut = ZMQutils.getEventSubscriptionInfoFromAdmDevice(
+                            channelStruct.adm_device_proxy, eventCallBackStruct.device.name(),
+                            eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
+                    DevVarLongStringArray lsa = checkZmqAddress(
+                            argOut, eventCallBackStruct.device).extractLongStringArray();
 
                     //  Re Connect heartbeat
                     ZMQutils.connectHeartbeat(channelStruct.adm_device_proxy.get_tango_host(),

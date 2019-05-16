@@ -35,11 +35,6 @@
 package fr.esrf.TangoApi.events;
 
 
-/** 
- *	This class is a set of ZMQ low level utilities
- *
- * @author  verdier
- */
 
 import fr.esrf.Tango.*;
 import fr.esrf.TangoApi.*;
@@ -50,8 +45,14 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
+/**
+ *	This class is a set of ZMQ low level utilities
+ *
+ * @author  verdier
+ */
 
 public class  ZMQutils {
 
@@ -103,7 +104,7 @@ public class  ZMQutils {
             try {
                 String  strVersion = org.zeromq.ZMQ.getVersionString();
                 StringTokenizer stk = new StringTokenizer(strVersion, ".");
-                ArrayList<String>   list = new ArrayList<String>();
+                List<String>   list = new ArrayList<>();
                 while (stk.hasMoreTokens())
                     list.add(stk.nextToken());
 
@@ -117,8 +118,7 @@ public class  ZMQutils {
                     System.err.println("ZMQutils.getZmqVersion(): " + e);
                 }
             }
-            catch (Exception e) { /*System.err.println(e);*/  }
-            catch (Error e)     { /*System.err.println(e);*/  }
+            catch (Error | Exception e) { /*System.err.println(e);*/  }
         }
         return zmqVersion;
     }
@@ -146,7 +146,7 @@ public class  ZMQutils {
      * @return the buffer built
      */
 	//===============================================================
-    private static byte[] buildTheBuffer(int command, boolean forceConnect, ArrayList<String> stringList) {
+    private static byte[] buildTheBuffer(int command, boolean forceConnect, List<String> stringList) {
         return buildTheBuffer(command, forceConnect, stringList, null);
     }
 	//===============================================================
@@ -161,7 +161,7 @@ public class  ZMQutils {
      */
 	//===============================================================
     private static byte[] buildTheBuffer(int command, boolean forceConnect,
-                                         ArrayList<String> stringList, ArrayList<Integer> intList) {
+                                         List<String> stringList, List<Integer> intList) {
 
         //  Check size to allocate
         int size = 2; //    for Command + forceConnect
@@ -230,7 +230,7 @@ public class  ZMQutils {
 	//===============================================================
     /**
      * build a byte buffer from an integer
-     * @param value the specifid integer value
+     * @param value the specified integer value
      * @return the byte buffer built.
      */
 	//===============================================================
@@ -312,11 +312,10 @@ public class  ZMQutils {
      * @param attributeName specified attribute name
      * @param eventName     specified event name
      * @return the full attribute name with tango host and event name
-     * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
     static String getFullAttributeName(String tangoHost, String deviceName, String attributeName,
-                                       int idl, String eventName) throws DevFailed {
+                                       int idl, String eventName) {
         //  If full name, replace Tango Host
         if (deviceName.startsWith("tango://" )) {
             int start = deviceName.indexOf('/', "tango://".length()+1);
@@ -345,10 +344,9 @@ public class  ZMQutils {
      * @param tangoHost    specified tango host
      * @param deviceName    specified device name
      * @return the full heartbeat name with tango host
-     * @throws DevFailed in case of TANGO_HOST not defined
      */
 	//===============================================================
-    static String getFullHeartBeatName(String tangoHost, String deviceName) throws DevFailed {
+    static String getFullHeartBeatName(String tangoHost, String deviceName) {
         return ("tango://" + tangoHost + "/" + deviceName + ".heartbeat").toLowerCase();
     }
 	//===============================================================
@@ -389,7 +387,7 @@ public class  ZMQutils {
                          String attributeName, int idl, String eventName) throws DevFailed{
         byte[]  buffer = new byte[0];
         try {
-            ArrayList<String>   stringList = new ArrayList<String>();
+            List<String>   stringList = new ArrayList<>();
             stringList.add(getFullAttributeName(tangoHost,
                                 deviceName, attributeName, idl, eventName));
             buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_EVENT, false, stringList);
@@ -445,20 +443,17 @@ public class  ZMQutils {
                                 String eventName, boolean forceConnect) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
-            ArrayList<String>   stringList = new ArrayList<String>();
+            List<String>   stringList = new ArrayList<>();
             stringList.add(lsa.svalue[1]);                          //  EndPoint
             stringList.add(getFullAttributeName(tangoHost, deviceName,
                     attributeName, lsa.lvalue[1], eventName));    //  Event name
-            ArrayList<Integer>  intList = new ArrayList<Integer>();
+            List<Integer>  intList = new ArrayList<>();
             intList.add(lsa.lvalue[0]);     //  Tango release
             intList.add(lsa.lvalue[1]);     //  IDL version
             intList.add(lsa.lvalue[2]);     //  Sub HWM
             intList.add(lsa.lvalue[3]);     //  Rate
             intList.add(lsa.lvalue[4]);     //  IVL
             buffer = buildTheBuffer((byte)ZMQ_CONNECT_EVENT, forceConnect, stringList, intList);
-        }
-        catch (DevFailed e) {
-            throw e;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -504,13 +499,10 @@ public class  ZMQutils {
                           String adminDeviceName, DevVarLongStringArray lsa, boolean forceConnect) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
-            ArrayList<String>   stringList = new ArrayList<String>();
+            List<String>   stringList = new ArrayList<>();
             stringList.add(lsa.svalue[0]);                          //  EndPoint
             stringList.add(getFullHeartBeatName(tangoHost, adminDeviceName));  //  Heartbeat name
             buffer = buildTheBuffer((byte)ZMQ_CONNECT_HEARTBEAT, forceConnect, stringList);
-        }
-        catch (DevFailed e) {
-            throw e;
         }
         catch (Exception e) {
             Except.throw_exception("API_ConversionFailed", e.toString());
@@ -519,7 +511,7 @@ public class  ZMQutils {
     }
 	//===============================================================
     /**
-     * RBuild buffer to request to control to disconnect heartbeat
+     * Build buffer to request to control to disconnect heartbeat
      * @param tangoHost    specified tango host
      * @param deviceName    specified admin device
      * @return the buffer built to disconnect heartbeat
@@ -531,12 +523,9 @@ public class  ZMQutils {
                                                          String deviceName) throws DevFailed {
         byte[]  buffer = new byte[0];
         try {
-            ArrayList<String>   stringList = new ArrayList<String>();
+            List<String>   stringList = new ArrayList<>();
             stringList.add(getFullHeartBeatName(tangoHost, deviceName));   //  Heartbeat name
             buffer = buildTheBuffer((byte)ZMQ_DISCONNECT_HEARTBEAT, false, stringList);
-        }
-        catch (DevFailed e) {
-            throw e;
         }
         catch (Exception e) {
             Except.throw_exception("API_ConversionFailed", e.toString());
@@ -561,7 +550,7 @@ public class  ZMQutils {
      * @throws DevFailed in case of admin device connection failed
      */
 	//===============================================================
-    static DevVarLongStringArray getEventSubscriptionInfoFromAdmDevice(DeviceProxy adminDevice,
+    static DeviceData getEventSubscriptionInfoFromAdmDevice(DeviceProxy adminDevice,
             String deviceName, String attributeName, String eventName) throws DevFailed {
 
         //System.out.println(SUBSCRIBE_COMMAND + " for\n -" +
@@ -577,8 +566,7 @@ public class  ZMQutils {
                 Integer.toString(adminDevice.get_idl_version()),
         };
         argIn.insert(strArray);
-        DeviceData argOut = adminDevice.command_inout(SUBSCRIBE_COMMAND, argIn);
-        return argOut.extractLongStringArray();
+        return adminDevice.command_inout(SUBSCRIBE_COMMAND, argIn);
     }
 	//===============================================================
     /**
@@ -864,7 +852,7 @@ public class  ZMQutils {
                 int hwm = getInteger(bytes, idx);                   idx +=sizeOfInt;
                 controlStructure.hwm   = manageHwmValue(hwm);
                 controlStructure.rate  = getInteger(bytes, idx);    idx +=sizeOfInt;
-                controlStructure.ivl   = getInteger(bytes, idx);    idx +=sizeOfInt;
+                controlStructure.ivl   = getInteger(bytes, idx);//    idx +=sizeOfInt;
                 zmqEventTrace(controlStructure.toString());
                 break;
 
