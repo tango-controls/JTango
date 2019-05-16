@@ -356,6 +356,68 @@ public class EventTest {
         }
     }
 
+    @Test(timeout = 1000)
+    public void pushDevStateEvent() throws DevFailed {
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        System.out.println("state "+ dev.state());
+        final int id = dev.subscribe_event("state", TangoConst.USER_EVENT, 100, new String[] {},
+                TangoConst.NOT_STATELESS);
+        dev.command_inout("pushDevStateEvents");
+        int eventsNb = 0;
+        DevState value = DevState.UNKNOWN;
+        try {
+            while (eventsNb < 2) {
+                final EventData[] events = dev.get_events(TangoConst.USER_EVENT);
+                System.out.println("events data " + events.length);
+                for (final EventData eventData : events) {
+                    System.out.println("received event name =" + eventData.name);
+                    System.out.println("received event type =" + eventData.event_type);
+                    if (eventData.name.contains("state")) {
+                        eventsNb ++;
+                        value = eventData.attr_value.extractDevState();
+                        System.out.println("received state event "+ value);
+                        break;
+                    }
+                }
+            }
+            assertThat(value, equalTo( DevState.ALARM));
+        } finally {
+            dev.unsubscribe_event(id);
+        }
+    }
+
+    @Test(timeout = 1000)
+    public void pushStateEvent() throws DevFailed {
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        System.out.println("state "+ dev.state());
+        final int id = dev.subscribe_event("state", TangoConst.USER_EVENT, 100, new String[] {},
+                TangoConst.NOT_STATELESS);
+        dev.command_inout("pushDeviceStateEvents");
+        int eventsNb = 0;
+        DevState value = DevState.UNKNOWN;
+        try {
+            while (eventsNb < 2) {
+                final EventData[] events = dev.get_events(TangoConst.USER_EVENT);
+                System.out.println("events data " + events.length);
+                for (final EventData eventData : events) {
+                    System.out.println("received event name =" + eventData.name);
+                    System.out.println("received event type =" + eventData.event_type);
+                    if (eventData.name.contains("state")) {
+                        eventsNb ++;
+                        value = eventData.attr_value.extractDevState();
+                        System.out.println("received state event "+ value);
+                        break;
+                    }
+                }
+            }
+            assertThat(value, equalTo( DevState.FAULT));
+        } finally {
+            dev.unsubscribe_event(id);
+        }
+    }
+
+
+
     @Test(timeout = 3000)
     public void changeStateScalar() throws DevFailed {
         System.out.println("\t####changeStateScalar");
@@ -367,7 +429,6 @@ public class EventTest {
         DevState previousValue = DevState.UNKNOWN;
         try {
             while (eventsNb < 3) {
-
                 final EventData[] events = dev.get_events();
                 // System.out.println("events " + events.length);
                 for (final EventData eventData : events) {

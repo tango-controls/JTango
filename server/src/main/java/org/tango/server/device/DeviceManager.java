@@ -28,6 +28,7 @@ import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.tango.DeviceState;
 import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.annotation.DeviceManagement;
 import org.tango.server.attribute.AttributeImpl;
@@ -272,6 +273,11 @@ public final class DeviceManager {
                         device.getAttributeList());
                 attribute.lock();
                 try {
+                    // convert to the State type use on API side
+                    if (value.getValue() instanceof  DeviceState) {
+                        DeviceState state = (DeviceState) value.getValue();
+                        value.setValue(state.getDevState());
+                    }
                     attribute.updateValue(value);
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
