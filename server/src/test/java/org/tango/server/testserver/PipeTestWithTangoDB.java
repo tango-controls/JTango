@@ -24,6 +24,13 @@
  */
 package org.tango.server.testserver;
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.ApiUtil;
+import fr.esrf.TangoApi.CallBack;
+import fr.esrf.TangoApi.Database;
+import fr.esrf.TangoApi.DeviceProxy;
+import fr.esrf.TangoApi.events.EventData;
+import fr.esrf.TangoDs.TangoConst;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -31,20 +38,20 @@ import org.junit.Test;
 import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.CallBack;
-import fr.esrf.TangoApi.DeviceProxy;
-import fr.esrf.TangoApi.events.EventData;
-import fr.esrf.TangoDs.TangoConst;
-
-@Ignore(value = "attribute_history and events do not work without tango db")
+/**
+ * Integration tests with tango db
+ */
+@Ignore
 public class PipeTestWithTangoDB {
 
-    private final String deviceName = "tango9/java/pipe.1";
+    private static final String deviceName = "tango9/java/pipe.1";
+
 
     @BeforeClass
     public static void start() throws DevFailed {
-        System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
+        Database tangoDb = ApiUtil.get_db_obj();
+        tangoDb.add_device(deviceName, PipeServer.class.getSimpleName(), PipeServer.SERVER_NAME + "/" + PipeServer.INSTANCE_NAME);
+        //  System.setProperty("TANGO_HOST", "tango9-db1.ica.synchrotron-soleil.fr:20001");
         PipeServer.start();
     }
 

@@ -24,12 +24,7 @@
  */
 package org.tango.server.events;
 
-import fr.esrf.Tango.AttDataReady;
-import fr.esrf.Tango.AttributeConfig_5;
-import fr.esrf.Tango.AttributeValue_5;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevIntrChange;
-import fr.esrf.Tango.DevPipeData;
+import fr.esrf.Tango.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -123,8 +118,7 @@ final class EventImpl {
      * @throws DevFailed
      * @param eventSocket
      */
-
-    void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
@@ -178,7 +172,7 @@ final class EventImpl {
      * @param eventSocket
      * @throws DevFailed
      */
-    void pushAttributeDataReadyEvent(final int counter, ZMQ.Socket eventSocket)
+    protected void pushAttributeDataReadyEvent(final int counter, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -193,7 +187,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigIDL5Event(AttributeConfig_5 config, ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeConfigIDL5Event(AttributeConfig_5 config, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             synchronized (eventSocket) {
@@ -205,7 +199,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushAttributeConfigEvent(ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeConfigEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         try {
             if (isLatestIDLVersion) {
@@ -236,7 +230,7 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    void pushPipeEvent(final DevPipeData pipeData, ZMQ.Socket eventSocket)
+    protected void pushPipeEvent(final DevPipeData pipeData, ZMQ.Socket eventSocket)
             throws DevFailed {
         xlogger.entry();
         try {
@@ -256,7 +250,7 @@ final class EventImpl {
      * @param eventSocket
      * @throws DevFailed
      */
-    void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.updateProperties();
         eventTrigger.setError(devFailed);

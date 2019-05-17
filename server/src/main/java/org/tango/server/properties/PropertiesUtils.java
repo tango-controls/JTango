@@ -266,7 +266,11 @@ public final class PropertiesUtils {
             } catch (final IllegalAccessException e) {
                 throw DevFailedUtils.newDevFailed(e);
             } catch (final InvocationTargetException e) {
-                throw DevFailedUtils.newDevFailed(e);
+                if (e.getCause() instanceof DevFailed) {
+                    throw (DevFailed) e.getCause();
+                } else {
+                    throw DevFailedUtils.newDevFailed(e.getCause());
+                }
             }
         }
     }

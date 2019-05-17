@@ -1,5 +1,10 @@
 # Changelog
 
+#### JTango-9.5.14  (13/05/2019):
+    Fix a bug in event reconnection when multiple network interfaces.
+
+- - - - - - - -- -
+
 #### JTango-9.5.7  (11/03/2018):
     Fix a compatibility problem with MySql 5.6 and higher
 

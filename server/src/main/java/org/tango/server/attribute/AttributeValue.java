@@ -1,32 +1,31 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.attribute;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-
+import fr.esrf.Tango.AttrQuality;
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.tango.attribute.AttributeTangoType;
@@ -34,8 +33,8 @@ import org.tango.server.IValue;
 import org.tango.utils.ArrayUtils;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.AttrQuality;
-import fr.esrf.Tango.DevFailed;
+import java.io.Serializable;
+import java.lang.reflect.Array;
 
 public final class AttributeValue implements Cloneable, Serializable, IValue<Object> {
 
@@ -103,14 +102,12 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
      * </ul>
      * Time is set to System.currentTimeMillis().
      *
-     * @param value
-     *            attribute value.
+     * @param value attribute value.
      * @throws DevFailed
      */
     @Override
     public void setValue(final Object value) throws DevFailed {
-        if (time==0) // Initialize if not already done
-            time = System.currentTimeMillis();
+        time = System.currentTimeMillis();
         if (value != null) {
             if (!value.getClass().isArray()) { // SCALAR
                 // check if this value can be an attribute value
@@ -187,8 +184,7 @@ public final class AttributeValue implements Cloneable, Serializable, IValue<Obj
     /**
      * Set timestamp. By default, time is set to System.currentTimeMillis() in {@link #setValue(Object)}.
      *
-     * @param time
-     *            timestamp in milliseconds
+     * @param time timestamp in milliseconds
      */
     @Override
     public void setTime(final long time) {

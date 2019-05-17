@@ -24,26 +24,24 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.ServerSocket;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfoEx;
+import fr.esrf.TangoApi.DeviceData;
+import fr.esrf.TangoApi.DeviceProxy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tango.client.database.DatabaseFactory;
 import org.tango.client.database.ITangoDB;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeInfoEx;
-import fr.esrf.TangoApi.DeviceData;
-import fr.esrf.TangoApi.DeviceProxy;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test properties without tango db

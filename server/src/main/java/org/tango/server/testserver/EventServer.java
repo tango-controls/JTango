@@ -27,15 +27,10 @@ package org.tango.server.testserver;
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevEncoded;
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.AttributeProperties;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceManagement;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.State;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceManager;
@@ -46,7 +41,6 @@ import org.tango.utils.DevFailedUtils;
  * A device to test Tango events.
  *
  * @author ABEILLE
- *
  */
 @Device
 public class EventServer {
@@ -230,16 +224,28 @@ public class EventServer {
         deviceManager.pushEvent("error", EventType.CHANGE_EVENT);
     }
 
-    public void setDeviceManager(final DeviceManager deviceManager) {
-        this.deviceManager = deviceManager;
-    }
-
     public DeviceState getState() throws DevFailed {
         state = state == DeviceState.OFF ? DeviceState.ON : DeviceState.OFF;
         return state;
     }
 
+    @Command
+    public void pushDeviceStateEvents() throws DevFailed {
+        DeviceState value = DeviceState.FAULT;
+        deviceManager.pushEvent("State", new AttributeValue(value), EventType.USER_EVENT);
+    }
+
+    @Command
+    public void pushDevStateEvents() throws DevFailed {
+        DevState value = DevState.ALARM;
+        deviceManager.pushEvent("State", new AttributeValue(value), EventType.USER_EVENT);
+    }
+
     public void setState(final DeviceState state) {
         this.state = state;
+    }
+
+    public void setDeviceManager(final DeviceManager deviceManager) {
+        this.deviceManager = deviceManager;
     }
 }

@@ -61,12 +61,9 @@ import static fr.esrf.TangoDs.TangoConst.*;
  * singleton design pattern. Therefore a device server process can have only one
  * instance of this class and its constructor is not public.
  *
- * @deprecated use {@link org.tango.server.ServerManager}
- *
  * @author $Author: pascal_verdier $
  * @version $Revision: 25482 $
  */
-@Deprecated
 @SuppressWarnings( { "NestedTryStatement" })
 public class Util {
     /**

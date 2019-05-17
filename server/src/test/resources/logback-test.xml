@@ -29,7 +29,7 @@
 
     <logger name="org.jacorb" level="OFF"/>
     <logger name="org.tango" level="INFO"/>
-    <logger name="org.tango.server.events" level="INFO"/>
+    <logger name="org.tango.server.events" level="DEBUG"/>
     <logger name="org.quartz" level="OFF"/>
     <logger name="net.sf.ehcache" level="OFF"/>
     <logger name="ch.qos.logback" level="OFF"/>
