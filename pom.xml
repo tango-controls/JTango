@@ -88,16 +88,6 @@
                     <tagNameFormat>JTango-@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-                <configuration>
-                    <skip>true</skip>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                    <additionalJOption>-Xdoclint:none</additionalJOption>
-               </configuration>
-            </plugin>
         </plugins>
     </build>
 
