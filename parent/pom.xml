@@ -221,18 +221,18 @@
 
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!--executions>
+                <executions>
                     <execution>
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                        </configuration>
                     </execution>
-                </executions-->
-                <configuration>
-                    <doclint>none</doclint>
-                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                </configuration>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
