@@ -31,10 +31,7 @@ import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
 
@@ -46,6 +43,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author ABEILLE
  */
+@Ignore
 public class PropertiesTest {
     private static String deviceName = "test/tango/jtangotest.1";
 
