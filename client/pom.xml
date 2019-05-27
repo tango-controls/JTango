@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.5.14-SNAPSHOT</version>
+        <version>9.5.14</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>JTangoClientLang</artifactId>
@@ -16,7 +16,7 @@
         <connection>scm:git:git@github.com:tango-controls/JTango.git</connection>
         <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
         <url>https://github.com/tango-controls/JTango</url>
-        <tag>HEAD</tag>
+        <tag>JTango-9.5.14</tag>
     </scm>
 
     <issueManagement>
