@@ -43,6 +43,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author ABEILLE
  */
+@Ignore
 public class PropertiesTest {
     private static String deviceName = "test/tango/jtangotest.1";
 
