@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.5.15-SNAPSHOT</version>
+        <version>issue-73</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -19,7 +19,7 @@
         <connection>scm:git:git@github.com:tango-controls/JTango.git</connection>
         <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
         <url>https://github.com/tango-controls/JTango</url>
-        <tag>HEAD</tag>
+        <tag>JTango-issue-73</tag>
     </scm>
 
     <issueManagement>
