@@ -138,7 +138,7 @@ public final class InitImpl extends DeviceBehaviorObject {
      *
      * @return true if init is in progress
      */
-    public synchronized boolean isInitInProgress() {
+    public boolean isInitInProgress() {
         boolean isInitInProgress = false;
         if (future != null) {
             isInitInProgress = !future.isDone();
