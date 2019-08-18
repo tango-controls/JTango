@@ -11,7 +11,7 @@ commit_website_files() {
 }
 
 upload_files() {
-  git push --quiet
+  git push --quiet origin HEAD:$TRAVIS_BRANCH
 }
 
 setup_git
