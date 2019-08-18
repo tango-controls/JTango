@@ -3,6 +3,8 @@
 setup_git() {
   git config --global user.email "info@tango-controls.org"
   git config --global user.name "Tango CI"
+  git remote rm origin
+  git remote add origin https://tango-ci:$GITHUB_TOKEN@github.com/tango-controls/JTango.git
 }
 
 commit_website_files() {
