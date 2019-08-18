@@ -4,12 +4,15 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.3.12-SNAPSHOT</version>
+        <version>9.5.16-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
-    <artifactId>JTangoClientLang</artifactId>
-    <name>JTango Client Lang</name>
-    <description>Tango client utilities</description>
+    <artifactId>JTangoServer</artifactId>
+
+    <name>JTango Server</name>
+    <description>Library for Tango Server (ie. Tango Device) in Java</description>
+    <inceptionYear>2012</inceptionYear>
+
     <url>https://github.com/tango-controls/JTango</url>
 
     <scm>
@@ -68,19 +71,50 @@
         </contributor>
     </contributors>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/Test*.java</include>
+                        <include>**/*Test.java</include>
+                        <include>**/*TestCase.java</include>
+                        <include>**/*Test*.java</include>
+                    </includes>
+                    <systemProperties>
+                        <property>
+                            <name>TANGO_HOST</name>
+                            <value>${env.TANGO_HOST}</value>
+                        </property>
+                        <property>
+                            <name>org.tango.server.checkalarms</name>
+                            <value>false</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.tango-controls</groupId>
             <artifactId>TangORB</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
-            <version>1.7.7.1</version>
+            <groupId>org.tango-controls</groupId>
+            <artifactId>JTangoClientLang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-ext</artifactId>
+            <version>1.7.6</version>
         </dependency>
         <dependency>
             <groupId>net.sf.transmorph</groupId>
@@ -88,23 +122,36 @@
             <version>3.1.3</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-ext</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.databene</groupId>
+            <artifactId>contiperf</artifactId>
+            <version>2.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
-    <properties>
-        <slf4j.version>1.6.4</slf4j.version>
-    </properties>
 </project>
