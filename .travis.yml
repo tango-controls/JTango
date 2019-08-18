@@ -7,36 +7,50 @@ services:
 env:
   - TANGO_HOST=localhost:10000
 
-before_script:
-  - docker-compose up -d
-  #TODO wait-for-it
-  - sleep 30
-  - docker ps
-
 #skip mvn install
 install: /bin/true
 
 script:
+  - docker-compose up -d
+  #TODO wait-for-it
+  - sleep 30
+  - docker ps
   - mvn clean install -Ptravis
 jdk:
   - openjdk8
   - openjdk7
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - mvn sonar:sonar -Ptravis
-  - mvn com.gavinmogan:codacy-maven-plugin:coverage -Ptravis
-addons:
-  sonarcloud:
-    organization: "tango-controls"
-    token:
-      secure: $SONAR_TOKEN
 cache:
   directories:
     - '$HOME/.m2/repository'
 
+
 jobs:
   include:
     - stage: deploy
+      name: "Deploy to SonarCloud"
+      jdk: openjdk8
+      install: mvn clean install -Ptravis
+      script:
+        - mvn sonar:sonar -Ptravis
+      addons:
+        sonarcloud:
+          organization: "tango-controls"
+          token:
+            secure: $SONAR_TOKEN
+    -
+      name: "Deploy to Codacy"
+      jdk: openjdk8
+      install: mvn clean install -Ptravis
+      script:
+        - mvn com.gavinmogan:codacy-maven-plugin:coverage -Ptravis
+    -
+      name: "Deploy to Codcov.io"
+      jdk: openjdk8
+      install: mvn clean install -Ptravis
+      script:
+        - bash <(curl -s https://codecov.io/bash)
+    -
+      name: "Deploy artifacts"
       jdk: openjdk8
       script:
        - cd parent
