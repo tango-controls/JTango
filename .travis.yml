@@ -57,9 +57,9 @@ jobs:
       script:
         - cd parent
         - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule
+        - cd ..
         - mvn install -Dmaven.test.skip=true
       before_deploy:
-        - cd ..
         - cp .travis/settings.xml $HOME/.m2/settings.xml
       after_deploy:
         - cd parent
