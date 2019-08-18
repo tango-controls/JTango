@@ -33,3 +33,29 @@ addons:
 cache:
   directories:
     - '$HOME/.m2/repository'
+
+jobs:
+  include:
+    - stage: deploy
+      jdk: openjdk8
+      script:
+       - cd parent
+       - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule
+       - mvn install -Dmaven.test.skip=true
+      before_deploy: cp .travis/settings.xml $HOME/.m2/settings.xml
+      after_deploy:
+        - cd parent
+        - mvn versions:set versions:update-child-modules -DprocessAllModules -DnextSnapshot
+        - .travis/push.sh
+      deploy:
+        - provider: script
+          script: mvn deploy -Dmaven.test.skip=true
+          skip_cleanup: true
+          on:
+            tags: true
+        - provider: releases
+          file: assembly/target/JTango-${TRAVIS_TAG}.jar
+          api_key: $GITHUB_TOKEN
+          skip_cleanup: true
+          on:
+            tags: true
