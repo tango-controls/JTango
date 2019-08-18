@@ -10,11 +10,12 @@ env:
 #skip mvn install
 install: /bin/true
 
-script:
+before_script:
   - docker-compose up -d
   #TODO wait-for-it
   - sleep 30
   - docker ps
+script:
   - mvn clean install -Ptravis
 jdk:
   - openjdk8
@@ -52,6 +53,7 @@ jobs:
     -
       name: "Deploy artifacts"
       jdk: openjdk8
+      before_script: true #override before_script
       script:
        - cd parent
        - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule
