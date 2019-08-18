@@ -13,7 +13,7 @@ commit_website_files() {
 }
 
 upload_files() {
-  git push --quiet
+  git push --quiet origin HEAD:issue-68
 }
 
 setup_git
