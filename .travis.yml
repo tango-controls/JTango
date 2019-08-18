@@ -56,7 +56,7 @@ jobs:
       before_script: true #override before_script
       script:
         - cd parent
-        - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule
+        - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule -DgenerateBackupPoms=false
         - cd ..
         - mvn install -Dmaven.test.skip=true
       deploy:
