@@ -123,7 +123,7 @@
             </dependency>
             <dependency>
                 <groupId>org.tango-controls</groupId>
-                <artifactId>tango-idl</artifactId>
+                <artifactId>tango-idl-java</artifactId>
                 <version>5</version>
             </dependency>
             <dependency>
