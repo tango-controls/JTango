@@ -13,7 +13,7 @@ commit_website_files() {
 }
 
 upload_files() {
-  git push --quiet origin HEAD:issue-68
+  git push --quiet origin HEAD:jtango-9-lts
 }
 
 setup_git
