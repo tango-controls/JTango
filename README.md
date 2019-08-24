@@ -10,19 +10,20 @@
 
 ## SonarCloud
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
-[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
-[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
-[![Security](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=security_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=security_rating)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=bugs)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
-[![Code smells](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
-[![Tech debt](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=sqale_index)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=bugs)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=code_smells)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=sqale_index)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
 
-[![Lines of code](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root%3Ajtango-9-lts&metric=ncloc)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root%3Ajtango-9-lts)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=ncloc)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=org.tango-controls%3AJTango-root&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=org.tango-controls%3AJTango-root)
 
 # JavaDoc
 
