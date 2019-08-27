@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=jtango-9-lts)](https://travis-ci.org/tango-controls/JTango)
 [![Documentation Status](https://readthedocs.org/projects/jtango/badge/?version=jtango-9-lts)](http://jtango.readthedocs.io/en/jtango-9-lts/?badge=jtango-9-lts)
 
-[![Download](https://api.bintray.com/packages/tango-controls/generic/JTango-9-LTS/images/download.svg) ](https://bintray.com/tango-controls/generic/JTango-9-LTS/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/tango-controls/jtango/JTango/images/download.svg) ](https://bintray.com/tango-controls/jtango/JTango/_latestVersion)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/tango-controls/JTango/blob/jtango-9-lts/LICENSE)
 
 ## SonarCloud
