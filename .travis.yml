@@ -61,7 +61,7 @@ jobs:
         - cd parent
         - mvn versions:set versions:update-child-modules -DnewVersion=${TRAVIS_BRANCH} -DprocessAllModule -DgenerateBackupPoms=false
         - cd ..
-        - mvn install -Dmaven.test.skip=true -Prelease
+        - mvn install -Dmaven.test.skip=true
       deploy:
         - provider: script
           script: bash .travis/maven_deploy.sh
