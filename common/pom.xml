@@ -79,7 +79,7 @@
         </dependency>
         <dependency>
             <groupId>org.tango-controls</groupId>
-            <artifactId>JavaTangoIDL</artifactId>
+            <artifactId>tango-idl-java</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

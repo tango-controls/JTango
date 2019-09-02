@@ -76,7 +76,7 @@ public class DeviceMonitoring {
     }
 
     public class Request implements Closeable {
-        final long id;
+        public final long id;
 
         Request(String request) {
             this.id = monitoring.addRequest(request);

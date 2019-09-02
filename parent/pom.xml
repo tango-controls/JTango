@@ -124,8 +124,8 @@
             </dependency>
             <dependency>
                 <groupId>org.tango-controls</groupId>
-                <artifactId>JavaTangoIDL</artifactId>
-                <version>${project.version}</version>
+                <artifactId>tango-idl-java</artifactId>
+                <version>5</version>
             </dependency>
             <dependency>
                 <groupId>org.tango-controls</groupId>

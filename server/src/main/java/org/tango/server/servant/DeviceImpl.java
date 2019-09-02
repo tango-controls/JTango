@@ -638,7 +638,7 @@ public class DeviceImpl extends Device_5POA {
             // ignore error so that server always starts
             try {
                 stateImpl.stateMachine(DeviceState.FAULT);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.FAULT);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
             } catch (final DevFailed e1) {
                 // ignore
                 logger.debug("not important", e1);
@@ -756,16 +756,13 @@ public class DeviceImpl extends Device_5POA {
     public DevInfo info() throws DevFailed {
         MDC.setContextMap(contextMap);
         xlogger.entry();
-        long id = deviceMonitoring.startRequest("Operation info");
         final DevInfo info = new DevInfo();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("Operation info")) {
             info.dev_class = className;
             info.doc_url = "Doc URL = http://www.tango-controls.org";
             info.server_host = ServerManager.getInstance().getHostName();
             info.server_id = ServerManager.getInstance().getServerName();
             info.server_version = SERVER_VERSION;
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return info;
@@ -803,7 +800,7 @@ public class DeviceImpl extends Device_5POA {
     public void ping() throws DevFailed {
         MDC.setContextMap(contextMap);
         xlogger.entry();
-        deviceMonitoring.endRequest(deviceMonitoring.startRequest("Operation ping"));
+        deviceMonitoring.endRequest(deviceMonitoring.startRequest("Operation ping").id);
         xlogger.exit();
     }
 
@@ -814,7 +811,7 @@ public class DeviceImpl extends Device_5POA {
     public String adm_name() {
         MDC.setContextMap(contextMap);
         xlogger.entry();
-        deviceMonitoring.endRequest(deviceMonitoring.startRequest("Attribute adm_name"));
+        deviceMonitoring.endRequest(deviceMonitoring.startRequest("Attribute adm_name").id);
         xlogger.exit();
         return getAdminDeviceName();
     }
@@ -850,12 +847,12 @@ public class DeviceImpl extends Device_5POA {
     public String description() {
         MDC.setContextMap(contextMap);
         xlogger.entry();
-        long id = deviceMonitoring.startRequest("Attribute description requested");
         String desc = "A TANGO device";
-        if (name.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
-            desc = "A device server device !!";
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("Attribute description requested")) {
+            if (name.equalsIgnoreCase(ServerManager.getInstance().getAdminDeviceName())) {
+                desc = "A device server device !!";
+            }
         }
-        deviceMonitoring.endRequest(id);
         return desc;
     }
 
@@ -867,12 +864,9 @@ public class DeviceImpl extends Device_5POA {
     @Override
     public String name() {
         MDC.setContextMap(contextMap);
-        long id = deviceMonitoring.startRequest("Device name");
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("Device name")) {
             xlogger.entry();
             return name;
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
     }
 
@@ -889,12 +883,9 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        long id = deviceMonitoring.startRequest("read_attribute_history_2");
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attribute_history_2")) {
             // TODO read_attribute_history_2
             return new DevAttrHistory[0];
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
     }
 
@@ -912,11 +903,8 @@ public class DeviceImpl extends Device_5POA {
         xlogger.entry();
         // TODO read_attribute_history_3
         checkInitialization();
-        long id = deviceMonitoring.startRequest("read_attribute_history_3");
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attribute_history_3")) {
             return new DevAttrHistory_3[0];
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
     }
 
@@ -933,9 +921,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        long id = deviceMonitoring.startRequest("read_attribute_history_4");
         DevAttrHistory_4 result = null;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attribute_history_4")) {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
             if (!attr.isPolled()) {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED, attr.getName() + " is not polled");
@@ -943,8 +930,6 @@ public class DeviceImpl extends Device_5POA {
             result = attr.getHistory().getAttrHistory4(maxSize);
         } catch (final Exception e) {
             throw handleException(e);
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         return result;
     }
@@ -1242,17 +1227,13 @@ public class DeviceImpl extends Device_5POA {
      * @return The read values
      * @throws DevFailed
      */
-    private AttributeValue_4[] writeRead(final AttributeValue_4[] values) throws DevFailed {
+    private AttributeValue_4[] writeRead(final AttributeValue_4[] values, String[] names) throws DevFailed {
         aroundInvokeImpl.aroundInvoke(new InvocationContext(ContextType.PRE_WRITE_READ_ATTRIBUTES, CallType.CACHE_DEV,
                 null, name));
         try {
             AttributeGetterSetter.setAttributeValue4(values, attributeList, stateImpl, aroundInvokeImpl, null);
         } catch (final MultiDevFailed e) {
             throw new DevFailed(e.errors[0].err_list);
-        }
-        final String[] names = new String[values.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = values[i].name;
         }
         final AttributeValue_4[] resultValues = AttributeGetterSetter.getAttributesValues4(name, names, pollingManager,
                 attributeList, aroundInvokeImpl, DevSource.DEV, deviceLock, null);
@@ -1272,9 +1253,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("command_list_query");
         final DevCmdInfo[] back = new DevCmdInfo[commandList.size()];
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_list_query")) {
             // Retrieve number of command and allocate memory to send back info
             final List<CommandImpl> cmdList = getCommandList();
             Collections.sort(cmdList);
@@ -1289,8 +1269,6 @@ public class DeviceImpl extends Device_5POA {
                 tmp.out_type_desc = cmd.getOutTypeDesc();
                 back[i++] = tmp;
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return back;
@@ -1307,9 +1285,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("command_list_query_2");
         final DevCmdInfo_2[] back = new DevCmdInfo_2[commandList.size()];
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_list_query_2")) {
             int i = 0;
             final List<CommandImpl> cmdList = getCommandList();
             Collections.sort(cmdList);
@@ -1326,8 +1303,6 @@ public class DeviceImpl extends Device_5POA {
             }
             logger.debug("found {} commands ", commandList.size());
 
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return back;
@@ -1345,9 +1320,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("command_query " + commandName);
         final DevCmdInfo cmdInfo = new DevCmdInfo();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_query " + commandName)) {
             final CommandImpl foundCmd = getCommand(commandName);
             cmdInfo.cmd_name = foundCmd.getName();
             cmdInfo.cmd_tag = foundCmd.getTag();
@@ -1355,8 +1329,6 @@ public class DeviceImpl extends Device_5POA {
             cmdInfo.out_type = foundCmd.getOutType().getTangoIDLType();
             cmdInfo.in_type_desc = foundCmd.getInTypeDesc();
             cmdInfo.out_type_desc = foundCmd.getOutTypeDesc();
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         return cmdInfo;
     }
@@ -1373,9 +1345,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("command_query_2 " + commandName);
         final DevCmdInfo_2 cmdInfo = new DevCmdInfo_2();
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("command_query_2 " + commandName)) {
             final CommandImpl foundCmd = getCommand(commandName);
             cmdInfo.cmd_name = foundCmd.getName();
             cmdInfo.cmd_tag = foundCmd.getTag();
@@ -1384,8 +1355,6 @@ public class DeviceImpl extends Device_5POA {
             cmdInfo.in_type_desc = foundCmd.getInTypeDesc();
             cmdInfo.out_type_desc = foundCmd.getOutTypeDesc();
             cmdInfo.level = foundCmd.getDisplayLevel();
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         return cmdInfo;
     }
@@ -1615,9 +1584,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("get_attribute_config_5 " + Arrays.toString(attributeNames));
         AttributeConfig_5[] result;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("get_attribute_config_5 " + Arrays.toString(attributeNames))) {
             // check if we must retrieve all attributes config
             final int length = attributeNames.length;
             boolean getAllConfig = false;
@@ -1652,8 +1620,6 @@ public class DeviceImpl extends Device_5POA {
                     result[i++] = TangoIDLAttributeUtil.toAttributeConfig5(attribute);
                 }
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return result;
@@ -1671,9 +1637,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("get_attribute_config_3 " + Arrays.toString(attributeNames));
         AttributeConfig_3[] result;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("get_attribute_config_3 " + Arrays.toString(attributeNames))) {
             // check if we must retrieve all attributes config
             final int length = attributeNames.length;
             boolean getAllConfig = false;
@@ -1706,8 +1671,6 @@ public class DeviceImpl extends Device_5POA {
                     result[i++] = TangoIDLAttributeUtil.toAttributeConfig3(attribute);
                 }
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return result;
@@ -1725,10 +1688,9 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry(Arrays.toString(attributeNames));
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("get_attribute_config_2 " + Arrays.toString(attributeNames));
 
         AttributeConfig_2[] result;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("get_attribute_config_2 " + Arrays.toString(attributeNames))) {
             // check if we must retrieve all attributes config
             final int length = attributeNames.length;
             boolean getAllConfig = false;
@@ -1762,8 +1724,6 @@ public class DeviceImpl extends Device_5POA {
 
                 }
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return result;
@@ -1781,9 +1741,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("get_attribute_config " + Arrays.toString(attributeNames));
         AttributeConfig[] result;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("get_attribute_config " + Arrays.toString(attributeNames))) {
             // check if we must retrieve all attributes config
             final int length = attributeNames.length;
             boolean getAllConfig = false;
@@ -1807,8 +1766,6 @@ public class DeviceImpl extends Device_5POA {
                     result[i++] = TangoIDLAttributeUtil.toAttributeConfig(attribute);
                 }
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return result;
@@ -2080,7 +2037,7 @@ public class DeviceImpl extends Device_5POA {
         } catch (final DevFailed e) {
             try {
                 stateImpl.stateMachine(DeviceState.UNKNOWN);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.UNKNOWN);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
                 state = DevState.UNKNOWN;
             } catch (final DevFailed e1) {
                 logger.debug(NOT_IMPORTANT_ERROR, e1);
@@ -2104,7 +2061,7 @@ public class DeviceImpl extends Device_5POA {
         } catch (final DevFailed e) {
             try {
                 stateImpl.stateMachine(DeviceState.UNKNOWN);
-                statusImpl.statusMachine(DevFailedUtils.toString(e), DeviceState.UNKNOWN);
+                statusImpl.statusMachine(DevFailedUtils.toString(e));
                 status = DevFailedUtils.toString(e);
             } catch (final DevFailed e1) {
                 logger.debug(NOT_IMPORTANT_ERROR, e1);
@@ -2367,9 +2324,8 @@ public class DeviceImpl extends Device_5POA {
         MDC.setContextMap(contextMap);
         xlogger.entry();
         checkInitialization();
-        long id = deviceMonitoring.startRequest("read_attribute_history_5");
         DevAttrHistory_5 result = null;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("read_attribute_history_5")) {
             final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, attributeList);
             if (attr.getBehavior() instanceof ForwardedAttribute) {
                 final ForwardedAttribute fwdAttr = (ForwardedAttribute) attr.getBehavior();
@@ -2382,9 +2338,7 @@ public class DeviceImpl extends Device_5POA {
                 result = attr.getHistory().getAttrHistory5(maxSize);
             }
         } catch (final Exception e) {
-            handleException(e);
-        } finally {
-            deviceMonitoring.endRequest(id);
+            throw handleException(e);
         }
         return result;
 
@@ -2394,9 +2348,8 @@ public class DeviceImpl extends Device_5POA {
     public PipeConfig[] get_pipe_config_5(final String[] names) throws DevFailed {
         xlogger.entry(Arrays.toString(names));
         // checkInitialization();
-        long id = deviceMonitoring.startRequest("get_pipe_config_5 " + Arrays.toString(names));
         PipeConfig[] result;
-        try {
+        try (DeviceMonitoring.Request ignored = deviceMonitoring.startRequest("get_pipe_config_5 " + Arrays.toString(names))) {
             // check if we must retrieve all attributes config
             final int length = names.length;
             boolean getAllConfig = false;
@@ -2419,8 +2372,6 @@ public class DeviceImpl extends Device_5POA {
                     result[i++] = TangoIDLUtil.toPipeConfig(pipe);
                 }
             }
-        } finally {
-            deviceMonitoring.endRequest(id);
         }
         xlogger.exit();
         return result;
