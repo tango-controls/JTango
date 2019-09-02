@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,8 +35,10 @@ import org.tango.server.Chronometer;
  * @author abeille
  *
  */
-public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
+public class TangoStats implements TangoMXBean /*, NotificationEmitter*/ {
 
+    private static final int MAX_CHRONO = 1000;
+    private static final int DURATION = 1000;
     private final Chronometer periodChrono = new Chronometer();
     private final Map<Long, Chronometer> chronoMap = new ConcurrentHashMap<Long, Chronometer>();
     // private final NotificationBroadcasterSupport broadcaster = new NotificationBroadcasterSupport();
@@ -114,9 +116,9 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
         final Chronometer chrono = new Chronometer();
         chrono.start();
         final long id = getNextSeqNumber();
-        if (chronoMap.size() > 10000) {
+        if (chronoMap.size() > MAX_CHRONO) {
             // manage memory
-            chronoMap.clear();
+            resetStats();
         }
         chronoMap.put(id, chrono);
         if (periodChrono.isOver()) {
@@ -128,7 +130,7 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
             // broadcaster.sendNotification(notification);
             requestsPerSecond = requestsPerSecondTemp;
             requestsPerSecondTemp = 0;
-            periodChrono.start(1000);
+            periodChrono.start(DURATION);
         } else {
             this.requestsPerSecondTemp++;
         }
@@ -184,7 +186,6 @@ public class TangoStats implements TangoMXBean /*, NotificationEmitter*/{
             }
             totalRequestsPerSecond = totalRequestsPerSecond + requestsPerSecond;
             averageRequestsPerSecond = totalRequestsPerSecond / getSeqNumber();
-
         }
     }
 
