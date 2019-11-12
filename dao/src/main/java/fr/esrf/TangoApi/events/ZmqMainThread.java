@@ -70,12 +70,12 @@ public class ZmqMainThread extends Thread {
 
     private static final long SendHwmSocket = 10000;
     //===============================================================
-    private class ZmqPollers extends ZMQ.Poller {
+    //===============================================================
+    private static class ZmqPollers extends ZMQ.Poller {
         private ZmqPollers(ZMQ.Context context, int size) {
             super(context, size);
         }
     }
-    //===============================================================
     //===============================================================
     /**
      * Default constructor
@@ -667,19 +667,20 @@ public class ZmqMainThread extends Thread {
             //  Check if it ia a reconnection -> disconnect before connection
             if (controlStructure.forceReconnection && alreadyConnected(controlStructure.endPoint)) {
                 try {
-                    //  needs an un subscribe before disconnection
-                    //socket.unsubscribe(controlStructure.eventName.getBytes());
                     socket.disconnect(controlStructure.endPoint);
                 }
                 catch (org.zeromq.ZMQException e) {
                     System.err.println(e.getMessage());
                 }
             }
-
-            //  Do the connection
             //System.out.println("Connect on " + controlStructure.endPoint);
             //System.out.println("        for " + controlStructure.eventName);
-            socket.setHWM(controlStructure.hwm);
+
+            //  Do the connection (HWM for send is set without limit
+            //  to avoid problem due to the buffer size when connect
+            //  to server for large number of attributes)
+            socket.setSndHWM(0);
+            socket.setRcvHWM(controlStructure.hwm);
             socket.connect(controlStructure.endPoint);
             if (!alreadyConnected(controlStructure.endPoint)) {
                 EventList eventList = new EventList();
@@ -763,11 +764,9 @@ public class ZmqMainThread extends Thread {
 
         return time + "." + ms;
     }
-
-
     //===============================================================
     //===============================================================
-    private class EventList extends ArrayList<String> {
+    private static class EventList extends ArrayList<String> {
         private String getEvent(String eventName) {
             for (String event : this) {
                 if (event.equals(eventName)) {
