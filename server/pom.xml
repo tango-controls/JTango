@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>9.5.18-SNAPSHOT</version>
+        <version>9.5.19-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>JTangoServer</artifactId>
