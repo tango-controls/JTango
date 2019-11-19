@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
-        <version>JTango-9.5.17-SNAPSHOT</version>
+        <version>9.5.18-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -124,43 +124,5 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.5.0</version>
-                        <executions>
-                            <execution>
-                                <id>deploy-jar</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>curl</executable>
-                                    <arguments>
-                                        <argument>-T</argument>
-                                        <argument>
-                                            ${shaded.outputFile}
-                                        </argument>
-                                        <argument>-u${bintray.user.name}:${bintray.user.apikey}</argument>
-                                        <argument>
-                                            https://api.bintray.com/content/tango-controls/generic/${project.artifactId}-9-LTS/${project.version}/${project.artifactId}-${project.version}.jar;publish=1
-                                        </argument>
-                                        <argument>--verbose</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    </build>    
 </project>
