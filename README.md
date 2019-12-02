@@ -29,11 +29,10 @@
 
 You can choose the specific version of the library via drop down box after following the links below:
 
-[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoServer.svg?color=yellowgreen&label=JTangoServer)](http://javadoc.io/doc/org.tango-controls/JTangoServer)
-[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoClientLang.svg?label=JTangoClientLang&color=blue)](http://javadoc.io/doc/org.tango-controls/JTangoClientLang)
-[![Javadocs](http://javadoc.io/badge/org.tango-controls/JTangoCommons.svg?color=yellow&label=JTangoCommons)](http://javadoc.io/doc/org.tango-controls/JTangoCommons)
-[![Javadocs](http://javadoc.io/badge/org.tango-controls/TangORB.svg?color=orange&label=TangORB)](http://javadoc.io/doc/org.tango-controls/TangORB)
-[![Javadocs](http://javadoc.io/badge/org.tango-controls/JavaTangoIDL.svg?color=lightgrey&label=JavaTangoIDL)](http://javadoc.io/doc/org.tango-controls/JavaTangoIDL)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoServer/9.5.18.svg?color=yellowgreen&label=JTangoServer)](https://www.javadoc.io/doc/org.tango-controls/JTangoServer/9.5.18)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoClientLang/9.5.18.svg?label=JTangoClientLang&color=blue)](https://www.javadoc.io/doc/org.tango-controls/JTangoClientLang/9.5.18)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoCommons/9.5.18.svg?color=yellow&label=JTangoCommons)](https://www.javadoc.io/doc/org.tango-controls/JTangoCommons/9.5.18)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/TangORB/9.5.18.svg?color=orange&label=TangORB)](https://www.javadoc.io/doc/org.tango-controls/TangORB/9.5.18)
 
 
 # JTango
