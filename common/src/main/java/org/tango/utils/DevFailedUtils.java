@@ -1,14 +1,13 @@
 package org.tango.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.esrf.Tango.DevError;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.ErrSeverity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public final class DevFailedUtils {
     private static final String TANGO_ERROR = "TANGO_ERROR";
@@ -62,7 +61,7 @@ public final class DevFailedUtils {
         return err;
     }
 
-    public static DevFailed newDevFailed(final Throwable origin) throws DevFailed {
+    public static DevFailed newDevFailed(final Throwable origin) {
         final DevError[] err = new DevError[1];
         err[0] = new DevError();
         err[0].desc = origin.getClass().getCanonicalName();

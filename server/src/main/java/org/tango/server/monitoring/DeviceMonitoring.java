@@ -24,11 +24,12 @@
  */
 package org.tango.server.monitoring;
 
-import org.tango.server.history.DeviceBlackBox;
-
 import fr.esrf.Tango.ClntIdent;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevSource;
+import org.tango.server.history.DeviceBlackBox;
+
+import java.io.Closeable;
 
 public class DeviceMonitoring {
     private static final String SEPARATOR = " - ";
@@ -42,24 +43,24 @@ public class DeviceMonitoring {
         monitoring = TangoStats.getInstance();
     }
 
-    public long startRequest(final String request) {
+    public Request startRequest(final String request) {
         blackbox.insertInblackBox(request);
-        return monitoring.addRequest(deviceName + SEPARATOR + request);
+        return new Request(deviceName + SEPARATOR + request);
     }
 
-    public long startRequest(final String request, final ClntIdent clt) {
+    public Request startRequest(final String request, final ClntIdent clt) {
         blackbox.insertInblackBox(request, clt);
-        return monitoring.addRequest(deviceName + SEPARATOR + request);
+        return new Request(deviceName + SEPARATOR + request);
     }
 
-    public long startRequest(final String request, final DevSource devSource) {
+    public Request startRequest(final String request, final DevSource devSource) {
         blackbox.insertInblackBox(request, devSource);
-        return monitoring.addRequest(deviceName + SEPARATOR + request);
+        return new Request(deviceName + SEPARATOR + request);
     }
 
-    public long startRequest(final String request, final DevSource devSource, final ClntIdent clt) {
+    public Request startRequest(final String request, final DevSource devSource, final ClntIdent clt) {
         blackbox.insertInblackBox(request, devSource, clt);
-        return monitoring.addRequest(deviceName + SEPARATOR + request);
+        return new Request(deviceName + SEPARATOR + request);
     }
 
     public void addError() {
@@ -72,6 +73,19 @@ public class DeviceMonitoring {
 
     public String[] getBlackBox(final int size) throws DevFailed {
         return blackbox.toArray(size);
+    }
+
+    public class Request implements Closeable {
+        public final long id;
+
+        Request(String request) {
+            this.id = monitoring.addRequest(request);
+        }
+
+        @Override
+        public void close() {
+            monitoring.endRequest(id);
+        }
     }
 
 }
