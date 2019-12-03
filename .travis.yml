@@ -19,9 +19,10 @@ before_script:
   - sleep 30
   - docker ps
 script:
-  - mvn clean install -Ptravis
+  - mvn clean install
 jdk:
   - openjdk8
+  - openjdk11
 cache:
   directories:
     - '$HOME/.m2/repository'
