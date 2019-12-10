@@ -32,7 +32,6 @@ import org.omg.PortableInterceptor.ServerRequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
 import java.net.Socket;
 
 /**
@@ -51,9 +50,8 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
      *
      */
     private static final long serialVersionUID = 1L;
-    private final ThreadLocal<String> clientHostName = new ThreadLocal<String>();
-    private volatile ThreadLocal<String> giopHostAddress = new ThreadLocal<String>();
-    private volatile ThreadLocal<String> clientIPAddress = new ThreadLocal<String>();
+    private final ThreadLocal<String> giopHostAddress = new ThreadLocal<String>();
+    private final ThreadLocal<String> clientIPAddress = new ThreadLocal<String>();
     private static final ServerRequestInterceptor INSTANCE = new ServerRequestInterceptor();
 
     private ServerRequestInterceptor() {
@@ -82,15 +80,13 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
                         // remote informations
                         clientIPAddress.set(sock.getInetAddress().getHostAddress());
                         final int remotePort = sock.getPort();
-                        clientHostName.set(InetAddress.getByName(clientIPAddress.get()).getCanonicalHostName());
+
                         giopHostAddress.set(GIOP_TCP + clientIPAddress.get() + ":" + remotePort);
                     }
                 } else {
                     // when client is in the same process as the server, connection instance of
                     // org.jacorb.orb.iiop.IIOPListener$LoopbackAcceptor
-                    final InetAddress addr = InetAddress.getLocalHost();
-                    clientIPAddress.set(addr.getHostAddress());
-                    clientHostName.set(addr.getCanonicalHostName());
+                    clientIPAddress.set("127.0.0.1");
                     giopHostAddress.set(GIOP_TCP + clientIPAddress.get());
                 }
             }
@@ -122,7 +118,7 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
     }
 
     public String getClientHostName() {
-        return clientHostName.get();
+        return clientIPAddress.get();
     }
 
     public String getClientIPAddress() {
