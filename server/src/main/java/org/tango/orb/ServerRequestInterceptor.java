@@ -117,6 +117,7 @@ public final class ServerRequestInterceptor extends org.omg.CORBA.LocalObject im
     public void destroy() {
     }
 
+    @Deprecated
     public String getClientHostName() {
         return clientIPAddress.get();
     }

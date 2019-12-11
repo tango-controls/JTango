@@ -336,7 +336,9 @@ public final class DeviceManager {
     /**
      * Get the client host name of the current request
      *
-     * @return
+     * @return IPv4
+     *
+     * @deprecated since 9.6.0 this method returns ip address. Client code must resolve ip to get the actual host name
      */
     @Deprecated
     public String getClientHostName() {
