@@ -18,17 +18,18 @@ before_script:
   #TODO wait-for-it
   - sleep 30
   - docker ps
-script:
-  - mvn clean install -Ptravis
+
 jdk:
   - openjdk8
 cache:
   directories:
     - '$HOME/.m2/repository'
 
-
 jobs:
   include:
+    - stage: build
+      script:
+        - mvn clean install -Ptravis
     - stage: deploy
       name: "Deploy to SonarCloud"
       jdk: openjdk8
