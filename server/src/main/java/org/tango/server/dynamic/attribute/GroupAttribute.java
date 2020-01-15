@@ -24,10 +24,14 @@
  */
 package org.tango.server.dynamic.attribute;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
+import fr.esrf.Tango.AttrDataFormat;
+import fr.esrf.Tango.AttrWriteType;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.TangoApi.AttributeInfo;
+import fr.esrf.TangoApi.DeviceAttribute;
+import fr.esrf.TangoDs.TangoConst;
+import fr.soleil.tango.clientapi.InsertExtractUtils;
+import fr.soleil.tango.clientapi.TangoGroupAttribute;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.tango.server.StateMachineBehavior;
@@ -38,14 +42,9 @@ import org.tango.server.attribute.IAttributeBehavior;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
-import fr.esrf.Tango.AttrDataFormat;
-import fr.esrf.Tango.AttrWriteType;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeInfo;
-import fr.esrf.TangoApi.DeviceAttribute;
-import fr.esrf.TangoDs.TangoConst;
-import fr.soleil.tango.clientapi.InsertExtractUtils;
-import fr.soleil.tango.clientapi.TangoGroupAttribute;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Attribute to group several attributes. 2 options: <br>
@@ -65,10 +64,10 @@ public class GroupAttribute implements IAttributeBehavior {
 
     private final String name;
     private final TangoGroupAttribute attributeGroup;
-    private AttrDataFormat attributeFormat = AttrDataFormat.SCALAR;
-    private AttrWriteType attributeWritable = AttrWriteType.READ;
     private final String[] attributeNames;
     private final boolean isExternalRead;
+    private AttrDataFormat attributeFormat = AttrDataFormat.SCALAR;
+    private AttrWriteType attributeWritable = AttrWriteType.READ;
     private DeviceAttribute[] readValues;
     private boolean isMean = true;
 
@@ -108,8 +107,12 @@ public class GroupAttribute implements IAttributeBehavior {
     private void init() throws DevFailed {
         AttrDataFormat firstAttributeFormat = AttrDataFormat.SCALAR;
         for (int i = 0; i < attributeNames.length; i++) {
+            String attributeName = TangoUtil.getAttributeName(attributeNames[i]);
+            if (attributeName == null) {
+                throw DevFailedUtils.newDevFailed("cannot retrieve " + attributeNames[i]);
+            }
             final AttributeInfo info = attributeGroup.getGroup().getDevice(attributeNames[i])
-                    .get_attribute_info(TangoUtil.getAttributeName(attributeNames[i]));
+                    .get_attribute_info(attributeName);
             if (info.data_type == TangoConst.Tango_DEV_STRING) {
                 throw DevFailedUtils.newDevFailed(attributeNames[i] + " is a String, not supported");
             }
