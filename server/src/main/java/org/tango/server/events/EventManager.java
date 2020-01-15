@@ -87,11 +87,36 @@ public final class EventManager {
     private final Map<String, ZMQ.Socket> eventEndpoints = new LinkedHashMap<>();
     //TODO get rid of this
     private volatile boolean isInitialized;
+    private String heartbeatName;
 
     private EventManager() {
         logger.debug("client IP address is {}", ServerRequestInterceptor.getInstance().getClientIPAddress());
         logger.info("ZMQ ({}) SERVER event system started", ZMQ.getVersionString());
         isInitialized = false;
+    }
+
+    public static EventManager getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Check if event criteria are set for change and archive events
+     *
+     * @param attribute the specified attribute
+     * @param eventType the specified event type
+     * @throws DevFailed if event type is change or archive and no event criteria is set.
+     */
+    public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
+        switch (eventType) {
+            case CHANGE_EVENT:
+                ChangeEventTrigger.checkEventCriteria(attribute);
+                break;
+            case ARCHIVE_EVENT:
+                ArchiveEventTrigger.checkEventCriteria(attribute);
+                break;
+            default:
+                break;
+        }
     }
 
     private int initializeServerHwm() {
@@ -123,30 +148,6 @@ public final class EventManager {
         }
     }
 
-    public static EventManager getInstance() {
-        return INSTANCE;
-    }
-
-    /**
-     * Check if event criteria are set for change and archive events
-     *
-     * @param attribute the specified attribute
-     * @param eventType the specified event type
-     * @throws DevFailed if event type is change or archive and no event criteria is set.
-     */
-    public static void checkEventCriteria(final AttributeImpl attribute, final EventType eventType) throws DevFailed {
-        switch (eventType) {
-            case CHANGE_EVENT:
-                ChangeEventTrigger.checkEventCriteria(attribute);
-                break;
-            case ARCHIVE_EVENT:
-                ArchiveEventTrigger.checkEventCriteria(attribute);
-                break;
-            default:
-                break;
-        }
-    }
-
     private void initialize() throws DevFailed {
         xlogger.entry();
         Iterable<String> ipAddress = getIpAddresses();
@@ -163,7 +164,7 @@ public final class EventManager {
         // Start the heartbeat thread
         // // TODO : without database?
         final String adminDeviceName = ServerManager.getInstance().getAdminDeviceName();
-        final String heartbeatName = EventUtilities.buildHeartBeatEventName(adminDeviceName);
+        heartbeatName = EventUtilities.buildHeartBeatEventName(adminDeviceName);
         heartBeatExecutor.scheduleAtFixedRate(new HeartbeatThread(heartbeatName), 0,
                 EventConstants.EVENT_HEARTBEAT_PERIOD, TimeUnit.MILLISECONDS);
         isInitialized = true;
@@ -228,29 +229,23 @@ public final class EventManager {
      */
     private void bindEndpoints(ZMQ.Socket socket, Iterable<String> ipAddresses, Map<String, ZMQ.Socket> endpoints, SocketType socketType) {
         xlogger.entry(ipAddresses, endpoints, socketType);
-
-
         for (String ipAddress : ipAddresses) {
             final StringBuilder endpoint = new StringBuilder("tcp://").append(ipAddress).append(":*");
-
-
             int port = socket.bind(endpoint.toString());
-
             //replace * with actual port
             endpoint.deleteCharAt(endpoint.length() - 1).append(port);
             endpoints.put(endpoint.toString(), socket);
             logger.debug("bind ZMQ socket {} for {}", endpoint.toString(), socketType);
         }
-
         xlogger.exit();
     }
 
-    private ZMQ.Socket createSocket(){
+    private ZMQ.Socket createSocket() {
         final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
-            socket.setLinger(0);
-            socket.setReconnectIVL(-1);
-            return socket ;
-            }
+        socket.setLinger(0);
+        socket.setReconnectIVL(-1);
+        return socket;
+    }
 
     private ZMQ.Socket createEventSocket() {
         final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
@@ -344,20 +339,20 @@ public final class EventManager {
         if (heartbeatEndpoints.isEmpty() || eventEndpoints.isEmpty()) {
             longStringArray.svalue = new String[]{"No ZMQ event yet !"};
         } else {
-            longStringArray.svalue = endpointsAsStringArray();
+            longStringArray.svalue = endpointsAndEventsAsStringArray("");
         }
         return longStringArray;
 
     }
 
-    private String[] endpointsAsStringArray() {
+    private String[] endpointsAndEventsAsStringArray(String eventName) {
         List<String> svalue = new ArrayList<>(heartbeatEndpoints.size() + eventEndpoints.size());
-
         for (int i = 0, size = heartbeatEndpoints.size(); i < size; ++i) {
             svalue.add(Iterables.get(heartbeatEndpoints.keySet(), i));
             svalue.add(Iterables.get(eventEndpoints.keySet(), i));
         }
-
+        svalue.add(eventName);
+        svalue.add(heartbeatName);
         return svalue.toArray(new String[svalue.size()]);
     }
 
@@ -462,7 +457,7 @@ public final class EventManager {
         final DevVarLongStringArray longStringArray = new DevVarLongStringArray();
         longStringArray.lvalue = new int[]{EventConstants.TANGO_RELEASE, DeviceImpl.SERVER_VERSION, clientHWN, 0, 0,
                 EventConstants.ZMQ_RELEASE};
-        longStringArray.svalue = endpointsAsStringArray();
+        longStringArray.svalue = endpointsAndEventsAsStringArray(fullName);
         logger.debug("event registered for {}", fullName);
         return longStringArray;
     }

@@ -37,7 +37,7 @@ interface EventConstants {
     int USER_PORT_END = 64000;
 
     // Miscellaneous releases
-    int TANGO_RELEASE = 900;
+    int TANGO_RELEASE = 930;
     int ZMQ_RELEASE = (int) (100.0 * EventUtilities.getZmqVersion());
 
     // Time to manage events
