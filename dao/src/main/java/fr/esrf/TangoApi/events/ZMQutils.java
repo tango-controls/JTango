@@ -524,9 +524,9 @@ public class ZMQutils {
             int tangoVersion = lsa.lvalue[0];
             //  Heartbeat name
             if (tangoVersion >= 930) {
-                stringList.add(getFullHeartBeatName(tangoHost, adminDeviceName));
-            } else {
                 stringList.add(lsa.svalue[lsa.svalue.length-1]);
+            } else {
+                stringList.add(getFullHeartBeatName(tangoHost, adminDeviceName));
             }
             buffer = buildTheBuffer((byte) ZMQ_CONNECT_HEARTBEAT, forceConnect, stringList);
         } catch (Exception e) {
