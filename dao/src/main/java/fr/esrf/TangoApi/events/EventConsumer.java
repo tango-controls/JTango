@@ -200,7 +200,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //  Return the full device name
         //  Since Tango 9.3 the full device name is returned by the subscription command
         int tangoVersion = argOut.extractLongStringArray().lvalue[0];
-        System.out.println(deviceName + ": TANGO release is " + tangoVersion);
+        ApiUtil.printTrace(deviceName + ": TANGO release is " + tangoVersion);
         if (tangoVersion>930) {
             String[] strings = argOut.extractLongStringArray().svalue;
             String fullDeviceName = strings[strings.length - 2];
