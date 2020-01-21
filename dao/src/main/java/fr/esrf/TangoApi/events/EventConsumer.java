@@ -172,15 +172,15 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
     //===============================================================
     //===============================================================
-    private void callEventSubscriptionAndConnect(DeviceProxy device,
+    private String callEventSubscriptionAndConnect(DeviceProxy device,
                                                  String attribute,
                                                  String eventType) throws DevFailed {
 
-        String device_name = device.name();
+        String deviceName = device.name();
         if (attribute==null) // Interface change event on device.
             attribute = "";
         String[] info = new String[] {
-                device_name,
+                deviceName,
                 attribute,
                 "subscribe",
                 eventType,
@@ -190,12 +190,25 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         argIn.insert(info);
         String cmdName = getEventSubscriptionCommandName();
         ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
-                    cmdName + "\") for " + device_name + "/" + attribute + "." + eventType);
+                    cmdName + "\") for " + deviceName + "/" + attribute + "." + eventType);
         DeviceData argOut = device.get_adm_dev().command_inout(cmdName, argIn);
         ApiUtil.printTrace("    command_inout done.");
 
         //	And then connect to device
         checkDeviceConnection(device, attribute, argOut, eventType);
+
+        //  Return the full device name
+        //  Since Tango 9.3 the full device name is returned by the subscription command
+        int tangoVersion = argOut.extractLongStringArray().lvalue[0];
+        System.out.println(deviceName + ": TANGO release is " + tangoVersion);
+        if (tangoVersion>930) {
+            String[] strings = argOut.extractLongStringArray().svalue;
+            String fullDeviceName = strings[strings.length - 2];
+            // remove attribute and event name
+            return fullDeviceName.substring(0, fullDeviceName.lastIndexOf("/"));
+        }
+        else
+            return device.fullName();
     }
     //===============================================================
     //===============================================================
@@ -249,7 +262,11 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
                     device.setEventQueue(new EventQueue());
         }
 
-        String deviceName = device.fullName();
+        //	Inform server that we want to subscribe and try to connect
+        ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
+        String  att = (attribute==null)? null : attribute.toLowerCase();
+        String deviceName = callEventSubscriptionAndConnect(device, att, event_name);
+        ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         String callback_key = deviceName.toLowerCase();
         try {
             //  Check idl version
@@ -271,11 +288,6 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             else
                 callback_key += "/" + attribute + "." + event_name;
 
-            //	Inform server that we want to subscribe and try to connect
-            ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
-            String  att = (attribute==null)? null : attribute.toLowerCase();
-            callEventSubscriptionAndConnect(device, att, event_name);
-            ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
             if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
@@ -310,6 +322,8 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             deviceName = deviceName.substring(start+1);
             channelName = device_channel_map.get(deviceName);
         }
+
+        System.out.println("-------> " + deviceName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
@@ -739,7 +753,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             this.deviceName     = deviceName;
             this.attributeName  = attributeName;
             this.eventName      = eventName;
-            this.database          = database;
+            this.database       = database;
             this.deviceData     = deviceData;
             this.reconnect      = reconnect;
         }

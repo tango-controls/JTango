@@ -358,16 +358,17 @@ public class ZmqMainThread extends Thread {
 
         //  Not found
         /*  Display table content
-		if (eventName.contains("maxtempchange")) {
-			System.err.println("===============================================================");
-			System.err.println(eventName + " NOT FOUND");
-			System.err.println("keys are:");
-        	Enumeration<String> keys = callbackMap.keys();
-        	while (keys.hasMoreElements()) {
-            	System.err.println(keys.nextElement());
-        	}
-		}
-        */
+        System.err.println("===============================================================");
+        System.err.println(eventName + " NOT FOUND");
+        System.err.println("Map keys are:");
+        Enumeration<String> keys = callbackMap.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            System.err.println(key);
+            //System.out.println(callbackMap.get(key));
+        }
+        System.err.println("===============================================================");
+        /* */
         return null;
     }
     //===============================================================

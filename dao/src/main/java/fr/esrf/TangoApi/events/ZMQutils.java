@@ -458,6 +458,7 @@ public class ZMQutils {
             List<String> stringList = new ArrayList<>();
             stringList.add(lsa.svalue[1]);                          //  EndPoint
             int tangoVersion = lsa.lvalue[0];
+            //  Since Tango 9.3 the full device name is returned by the subscription command
             if(tangoVersion >= 930){
                 stringList.add(lsa.svalue[lsa.svalue.length-2]);    //  Event name
             }else {
@@ -523,6 +524,7 @@ public class ZMQutils {
             stringList.add(lsa.svalue[0]);                          //  EndPoint
             int tangoVersion = lsa.lvalue[0];
             //  Heartbeat name
+            //  Since Tango 9.3 the full device name is returned by the subscription command
             if (tangoVersion >= 930) {
                 stringList.add(lsa.svalue[lsa.svalue.length-1]);
             } else {
