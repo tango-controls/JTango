@@ -323,7 +323,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             channelName = device_channel_map.get(deviceName);
         }
 
-        System.out.println("-------> " + deviceName);
+        //System.out.println("-------> " + deviceName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
