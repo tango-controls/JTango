@@ -24,22 +24,6 @@
  */
 package org.tango.server.testserver;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
-import org.tango.server.ServerManager;
-import org.tango.server.events.EventType;
-import org.tango.utils.DevFailedUtils;
-
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
@@ -47,6 +31,17 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
+import org.junit.*;
+import org.junit.runners.MethodSorters;
+import org.tango.server.ServerManager;
+import org.tango.server.events.EventType;
+import org.tango.utils.DevFailedUtils;
+
+import java.io.IOException;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertThat;
 
 @Ignore("Tests need a tangdb")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -119,24 +114,29 @@ public class EventTest {
     @Test(timeout = 3000)
     public void changeNumberScalar() throws DevFailed {
         System.out.println("\t####changeNumberScalar");
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final int id = dev.subscribe_event("doubleAtt", TangoConst.CHANGE_EVENT, 100, new String[] {},
-                TangoConst.NOT_STATELESS);
-        int eventsNb = 0;
-        double value = 0;
-        double previousValue = 0;
-        while (eventsNb < 3) {
-            final EventData[] events = dev.get_events();
-            for (final EventData eventData : events) {
-                if (eventData.name.contains("doubleatt")) {
-                    eventsNb++;
-                    previousValue = value;
-                    value = eventData.attr_value.extractDouble();
+        try {
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final int id = dev.subscribe_event("doubleAtt", TangoConst.CHANGE_EVENT, 100, new String[]{},
+                    TangoConst.NOT_STATELESS);
+            int eventsNb = 0;
+            double value = 0;
+            double previousValue = 0;
+            while (eventsNb < 3) {
+                final EventData[] events = dev.get_events();
+                for (final EventData eventData : events) {
+                    if (eventData.name.contains("doubleatt")) {
+                        eventsNb++;
+                        previousValue = value;
+                        value = eventData.attr_value.extractDouble();
+                    }
                 }
             }
+            assertThat(value, equalTo(previousValue + 1));
+            dev.unsubscribe_event(id);
+        }catch (DevFailed e){
+            DevFailedUtils.printDevFailed(e);
+            throw e;
         }
-        assertThat(value, equalTo(previousValue + 1));
-        dev.unsubscribe_event(id);
     }
 
     @Test(timeout = 3000)
