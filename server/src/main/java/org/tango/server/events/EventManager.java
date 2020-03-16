@@ -29,6 +29,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import fr.esrf.Tango.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -352,7 +353,8 @@ public final class EventManager {
             svalue.add(Iterables.get(eventEndpoints.keySet(), i));
         }
         svalue.add(eventName);
-        svalue.add(heartbeatName);
+        // XXX: The Tango client API is inconsistent and asks for a truncated hearbeat name ( remove ".heartbeat")
+        svalue.add(StringUtils.removeEnd( heartbeatName, EventUtilities.HEARTBEAT));
         return svalue.toArray(new String[svalue.size()]);
     }
 

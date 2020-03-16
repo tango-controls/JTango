@@ -40,14 +40,7 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.StateMachine;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.build.DeviceClassBuilder;
@@ -65,12 +58,7 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -645,8 +633,9 @@ public final class AdminDevice implements TangoMXBean {
         if (m.matches()) {
             returned = subcribeIDLInEventString(eventTypeAndIDL, deviceName, attributeName);
         } else {
-            int idlversion = EventManager.MINIMUM_IDL_VERSION;
+            int idlversion = DeviceImpl.SERVER_VERSION;
             if (argin.length == 5) {
+                // IDL version passed in argin
                 idlversion = Integer.parseInt(argin[4]);
             }
             final EventType eventType = EventType.getEvent(eventTypeAndIDL);
@@ -798,7 +787,7 @@ public final class AdminDevice implements TangoMXBean {
                                                  final int idlversion, final AttributeImpl attribute, final PipeImpl pipe) throws DevFailed {
         DevVarLongStringArray result;
         // Subscribe and returns connection parameters for client
-        // Str[0] = Heartbeat pub endpoint -
+        // Str[0] = Heartbeat pub endpoint (XXX: asks by client API without ".hearbeat" at the end)
         // Str[1] = Event pub endpoint
         // - Lg[0] = Tango lib release
         // - Lg[1] = Device IDL release
