@@ -166,7 +166,7 @@ public final class DynamicManager {
     public void removeAttribute(final String attributeName) throws DevFailed {
         final AttributeImpl toRemove = dynamicAttributes.get(attributeName.toLowerCase(Locale.ENGLISH));
         if (toRemove == null)
-            throw DevFailedUtils.newDevFailed("API_AttributeNotFound", "Attribute \'" + attributeName + "\' not found");
+            throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_FOUND, "Attribute \'" + attributeName + "\' not found");
         if (toRemove.getBehavior() instanceof ForwardedAttribute) {
             final ForwardedAttribute att = (ForwardedAttribute) toRemove.getBehavior();
             final String lower = att.getRootName().toLowerCase(Locale.ENGLISH);
