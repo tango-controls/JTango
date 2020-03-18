@@ -201,7 +201,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //  Since Tango 9.3 the full device name is returned by the subscription command
         int tangoVersion = argOut.extractLongStringArray().lvalue[0];
         ApiUtil.printTrace(deviceName + ": TANGO release is " + tangoVersion);
-        if (tangoVersion>930) {
+        if (tangoVersion>=930) {
             String[] strings = argOut.extractLongStringArray().svalue;
             String fullDeviceName = strings[strings.length - 2];
             // remove attribute and event name
@@ -323,7 +323,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             channelName = device_channel_map.get(deviceName);
         }
 
-        //System.out.println("-------> " + deviceName);
+        System.out.println("-------> " + deviceName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
