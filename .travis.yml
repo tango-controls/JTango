@@ -38,8 +38,7 @@ jobs:
       addons:
         sonarcloud:
           organization: "tango-controls"
-          token:
-            secure: $SONAR_TOKEN
+          token: ${SONAR_TOKEN}
     -
       name: "Deploy to Codacy"
       jdk: openjdk8
