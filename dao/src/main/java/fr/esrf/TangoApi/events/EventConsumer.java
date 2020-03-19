@@ -106,11 +106,13 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     }
     //===============================================================
     //===============================================================
+    @Override
     public void disconnect_structured_push_consumer() {
         System.out.println("calling EventConsumer.disconnect_structured_push_consumer()");
     }
     //===============================================================
     //===============================================================
+    @Override
     public void offer_change(org.omg.CosNotification.EventType[] added, org.omg.CosNotification.EventType[] removed)
             throws org.omg.CosNotifyComm.InvalidEventType {
         System.out.println("calling EventConsumer.offer_change()");
@@ -172,7 +174,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
 
     //===============================================================
     //===============================================================
-    private String callEventSubscriptionAndConnect(DeviceProxy device,
+    protected String callEventSubscriptionAndConnect(DeviceProxy device,
                                                  String attribute,
                                                  String eventType) throws DevFailed {
 

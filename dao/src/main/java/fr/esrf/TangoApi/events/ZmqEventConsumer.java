@@ -140,20 +140,13 @@ public class ZmqEventConsumer extends EventConsumer implements
                     device.setEventQueue(new EventQueue());
         }
 
-        String deviceName = device.fullName();
-        String callback_key = deviceName.toLowerCase();
+        //String deviceName = device.fullName();
 
-        //  Not added for Interface change event (Special case)
-        /*
-        if (device.get_idl_version()>=5)
-            callback_key += ".idl" + device.get_idl_version()+ "_" + event_name;
-        else
-        */
-            callback_key += "." + event_name;
+        String deviceName;
         try {
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
-            callEventSubscriptionAndConnect(device, event_name);
+            deviceName = callEventSubscriptionAndConnect(device, null, event_name);
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
@@ -161,6 +154,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                 throw e;
             }
             else {
+                String callback_key = device.fullName().toLowerCase() + "." + event_name;
                 //	Build Event CallBack Structure and add it to map
                 subscribe_event_id++;
                 EventCallBackStruct new_event_callback_struct =
@@ -176,15 +170,19 @@ public class ZmqEventConsumer extends EventConsumer implements
                 return subscribe_event_id;
             }
         }
+        String callback_key = deviceName.toLowerCase();
+        callback_key += "." + event_name;
 
         //	Prepare filters for heartbeat events on channelName
         String channelName = device_channel_map.get(deviceName);
+        System.out.println("deviceName:  "+deviceName);
         if (channelName==null) {
             //  If from notifd, tango host not used.
             int start = deviceName.indexOf('/', "tango:// ".length());
             deviceName = deviceName.substring(start+1);
             channelName = device_channel_map.get(deviceName);
         }
+        System.out.println("channelName: "+channelName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 
@@ -230,31 +228,6 @@ public class ZmqEventConsumer extends EventConsumer implements
     }
     //===============================================================
     //===============================================================
-    private void callEventSubscriptionAndConnect(DeviceProxy device, String eventType)
-            throws DevFailed {
-        //  Done for IDL>=5 and not for notifd event system (no attribute name)
-        String device_name = device.name();
-        String[] info = new String[] {
-                device_name,
-                "",
-                "subscribe",
-                eventType,
-                Integer.toString(device.get_idl_version())
-        };
-        DeviceData argIn = new DeviceData();
-        argIn.insert(info);
-        String cmdName = getEventSubscriptionCommandName();
-        ApiUtil.printTrace(device.get_adm_dev().name() + ".command_inout(\"" +
-                cmdName + "\") for " + device_name + eventType);
-        DeviceData argOut =
-                device.get_adm_dev().command_inout(cmdName, argIn);
-        ApiUtil.printTrace("    command_inout done.");
-
-        //	And then connect to device
-        checkDeviceConnection(device, null, argOut, eventType);
-    }
-   //===============================================================
-   //===============================================================
     @Override
     protected String getEventSubscriptionCommandName() {
         return ZMQutils.SUBSCRIBE_COMMAND;
