@@ -70,7 +70,7 @@ class EventUtilities {
         return fullName.toLowerCase(Locale.ENGLISH);
     }
 
-    static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
+   static String buildEventName(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, attributeName);
         fullName += DOT + EventManager.IDL_LATEST + eventType.getString();
@@ -91,7 +91,7 @@ class EventUtilities {
 
     static String buildDeviceEventName(final String deviceName, final EventType eventType) throws DevFailed {
         String fullName = buildEventNameBeginning(deviceName, null);
-        fullName += DOT + eventType.getString();
+        fullName += DOT + EventManager.IDL_LATEST + eventType.getString();
         return fullName.toLowerCase(Locale.ENGLISH);
     }
 
