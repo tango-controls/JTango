@@ -143,10 +143,12 @@ public class ZmqEventConsumer extends EventConsumer implements
         //String deviceName = device.fullName();
 
         String deviceName;
+        String[] info;
         try {
             //	Inform server that we want to subscribe and try to connect
             ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
-            deviceName = callEventSubscriptionAndConnect(device, null, event_name);
+            info = callEventSubscriptionAndConnect(device, null, event_name);
+            deviceName = info[0];
             ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
         } catch (DevFailed e) {
             //  re throw if not stateless
@@ -170,8 +172,11 @@ public class ZmqEventConsumer extends EventConsumer implements
                 return subscribe_event_id;
             }
         }
-        String callback_key = deviceName.toLowerCase();
-        callback_key += "." + event_name;
+        String callback_key;
+        if (info.length>1)
+            callback_key = info[1];
+        else
+             callback_key = deviceName.toLowerCase() + "." + event_name;
 
         //	Prepare filters for heartbeat events on channelName
         String channelName = device_channel_map.get(deviceName);
@@ -182,7 +187,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             deviceName = deviceName.substring(start+1);
             channelName = device_channel_map.get(deviceName);
         }
-        System.out.println("channelName: "+channelName);
+        //System.out.println("channelName: "+channelName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 

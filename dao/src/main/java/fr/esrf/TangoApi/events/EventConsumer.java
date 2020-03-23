@@ -173,8 +173,16 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
     }
 
     //===============================================================
+    /**
+     *
+     * @param device    The device
+     * @param attribute The attribute name
+     * @param eventType The event type
+     * @return array[0]: The full device name  -- (if release>=9.3) array[1]: the full event name
+     * @throws DevFailed in case of connection failed
+     */
     //===============================================================
-    protected String callEventSubscriptionAndConnect(DeviceProxy device,
+    protected String[] callEventSubscriptionAndConnect(DeviceProxy device,
                                                  String attribute,
                                                  String eventType) throws DevFailed {
 
@@ -205,12 +213,15 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         ApiUtil.printTrace(deviceName + ": TANGO release is " + tangoVersion);
         if (tangoVersion>=930) {
             String[] strings = argOut.extractLongStringArray().svalue;
-            String fullDeviceName = strings[strings.length - 2];
+            String fullEventName = strings[strings.length - 2];
             // remove attribute and event name
-            return fullDeviceName.substring(0, fullDeviceName.lastIndexOf("/"));
+            return new String[] {
+                    fullEventName.substring(0, fullEventName.lastIndexOf("/")),
+                    fullEventName,
+            };
         }
         else
-            return device.fullName();
+            return new String[] { device.fullName().toLowerCase() };
     }
     //===============================================================
     //===============================================================
@@ -267,52 +278,56 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
         //	Inform server that we want to subscribe and try to connect
         ApiUtil.printTrace("calling callEventSubscriptionAndConnect() method");
         String  att = (attribute==null)? null : attribute.toLowerCase();
-        String deviceName = callEventSubscriptionAndConnect(device, att, event_name);
+        String[] info = callEventSubscriptionAndConnect(device, att, event_name);
+        String deviceName = info[0];
         ApiUtil.printTrace("call callEventSubscriptionAndConnect() method done");
-        String callback_key = deviceName.toLowerCase();
-        try {
-            //  Check idl version
-            if (device.get_idl_version()>=5) {
-                switch (event_name) {
-                    case "intr_change":
-                        //  No IDL for interface change
-                        callback_key += "." + event_name;
-                        break;
-                    case "pipe":
-                        //    No IDL for pipe
-                        callback_key += "/" + attribute + "." + event_name;
-                        break;
-                    default:
-                        callback_key += "/" + attribute + ".idl" + device.get_idl_version() + "_" + event_name;
-                        break;
-                }
-            }
-            else
-                callback_key += "/" + attribute + "." + event_name;
+        String callback_key;
+        if (info.length>1)
+            callback_key = info[1];
+        else {
+            callback_key = deviceName;
+            try {
+                //  Check idl version
+                if (device.get_idl_version() >= 5) {
+                    switch (event_name) {
+                        case "intr_change":
+                            //  No IDL for interface change
+                            callback_key += "." + event_name;
+                            break;
+                        case "pipe":
+                            //    No IDL for pipe
+                            callback_key += "/" + attribute + "." + event_name;
+                            break;
+                        default:
+                            callback_key += "/" + attribute + ".idl" + device.get_idl_version() + "_" + event_name;
+                            break;
+                    }
+                } else
+                    callback_key += "/" + attribute + "." + event_name;
 
-        } catch (DevFailed e) {
-            //  re throw if not stateless
-            if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
-                throw e;
-            }
-            else {
-                //	Build Event CallBack Structure and add it to map
-                subscribe_event_id++;
-                EventCallBackStruct new_event_callback_struct =
-                        new EventCallBackStruct(device,
-                                attribute,
-                                event_name,
-                                "",
-                                callback,
-                                max_size,
-                                subscribe_event_id,
-                                event,
+            } catch (DevFailed e) {
+                //  re throw if not stateless
+                if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
+                    throw e;
+                } else {
+                    //	Build Event CallBack Structure and add it to map
+                    subscribe_event_id++;
+                    EventCallBackStruct new_event_callback_struct =
+                            new EventCallBackStruct(device,
+                                    attribute,
+                                    event_name,
+                                    "",
+                                    callback,
+                                    max_size,
+                                    subscribe_event_id,
+                                    event,
 //                                "",
 //                                -1,
-                                filters,
-                                false);
-                failed_event_callback_map.put(callback_key, new_event_callback_struct);
-                return subscribe_event_id;
+                                    filters,
+                                    false);
+                    failed_event_callback_map.put(callback_key, new_event_callback_struct);
+                    return subscribe_event_id;
+                }
             }
         }
 
@@ -325,7 +340,7 @@ abstract public class EventConsumer extends StructuredPushConsumerPOA
             channelName = device_channel_map.get(deviceName);
         }
 
-        System.out.println("-------> " + deviceName);
+        //System.out.println("-------> " + deviceName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
 

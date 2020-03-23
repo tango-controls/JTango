@@ -378,7 +378,7 @@ public class ZmqMainThread extends Thread {
                                   byte[] recData,
                                   boolean littleEndian,
                                   boolean isExcept) throws  DevFailed {
-        //System.out.println("Event name  = " + eventName);
+        //System.out.println("=============> Event name  = " + eventName);
         EventCallBackStruct callBackStruct = getEventCallBackStruct(eventName);
         if (callBackStruct!=null) {
             DeviceAttribute attributeValue  = null;
