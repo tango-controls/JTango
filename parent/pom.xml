@@ -36,7 +36,7 @@
     </organization>
 
     <properties>
-        <jacorb.version>3.8</jacorb.version>
+        <jacorb.version>3.9</jacorb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
