@@ -885,10 +885,13 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		}
 		// Else tango call
 		boolean done = false;
+		int timeoutReconnection = get_timeout_millis(connection);
 		// try 2 times for reconnection if requested
 		final int retries = connection.transparent_reconnection ? 2 : 1;
 		for (int i=0 ; i<retries && !done ; i++) {
 	    	try {
+				if (i>0)
+					connection.set_timeout_millis(timeoutReconnection);
 				if (connection.device_5 != null) {
 		    		received = connection.device_5.command_inout_4(command, argin.extractAny(),
 			    		connection.dev_src, DevLockManager.getInstance().getClntIdent());
@@ -928,7 +931,6 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 		}
 		return new DeviceData(received);
     }
-
     // ===========================================================
     /**
      * Send a command to a device server.
@@ -1089,9 +1091,12 @@ public class ConnectionDAODefaultImpl implements ApiDefs, IConnectionDAO {
 
 		build_connection(connection);
 
+		int timeoutReconnection = get_timeout_millis(connection);
         final int retries = connection.transparent_reconnection ? 2 : 1;
         for (int oneTry=1 ; oneTry<=retries ; oneTry++) {
             try {
+				if (oneTry>0)
+					connection.set_timeout_millis(timeoutReconnection);
                 CommandInfo[] result;
                 if (connection.url.protocol == TACO) {
                     result = connection.taco_device.commandListQuery();

@@ -163,20 +163,14 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void startPolling(final String polledObject, final int pollingPeriod) throws DevFailed {
-        try {
-            final AttributeImpl attr = AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList());
-            attr.configurePolling(pollingPeriod);
-            device.startPolling(attr);
-        } catch (final DevFailed e) {
-            if (polledObject.equalsIgnoreCase(DeviceImpl.STATE_NAME)
-                    || polledObject.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
-                final CommandImpl cmd = device.getCommand(polledObject);
-                cmd.configurePolling(pollingPeriod);
-                device.startPolling(cmd);
-            } else {
-                throw e;
-            }
+        final AttributeImpl attr = AttributeGetterSetter.getAttribute(polledObject, device.getAttributeList());
+        attr.configurePolling(pollingPeriod);
+        if (polledObject.equalsIgnoreCase(DeviceImpl.STATE_NAME)
+                || polledObject.equalsIgnoreCase(DeviceImpl.STATUS_NAME)) {
+            final CommandImpl cmd = device.getCommand(polledObject);
+            cmd.configurePolling(pollingPeriod);
         }
+        device.startPolling(attr);
     }
 
     /**
@@ -274,7 +268,7 @@ public final class DeviceManager {
                 attribute.lock();
                 try {
                     // convert to the State type use on API side
-                    if (value.getValue() instanceof  DeviceState) {
+                    if (value.getValue() instanceof DeviceState) {
                         DeviceState state = (DeviceState) value.getValue();
                         value.setValue(state.getDevState());
                     }

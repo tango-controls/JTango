@@ -32,11 +32,7 @@ import org.tango.server.Constants;
 import org.tango.server.ServerManager;
 import org.tango.utils.DevFailedUtils;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 
 public class DeviceInterfaceChangedSender {
     private final Logger logger = LoggerFactory.getLogger(DeviceInterfaceChangedSender.class);
@@ -44,6 +40,7 @@ public class DeviceInterfaceChangedSender {
     private final EventSenderTask task;
     private ExecutorService executor;
     private Future<?> future;
+
     public DeviceInterfaceChangedSender(final String deviceName) {
         this.deviceName = deviceName;
         task = new EventSenderTask(deviceName);
@@ -59,6 +56,7 @@ public class DeviceInterfaceChangedSender {
         if (isStarted) { // device startup, send event and empty queue
             if (!deviceName.equalsIgnoreCase(Constants.ADMIN_DEVICE_DOMAIN + "/"
                     + ServerManager.getInstance().getServerName())) {
+                task.clear();
                 logger.debug("send event for interface changed of {}", deviceName);
                 try {
                     EventManager.getInstance().pushInterfaceChangedEvent(deviceName, deviceInterface);
@@ -66,7 +64,6 @@ public class DeviceInterfaceChangedSender {
                     logger.error(DevFailedUtils.toString(e));
                     logger.error("impossible to send event", e);
                 }
-                task.clear();
             }
         } else {
             // queue event
@@ -76,6 +73,7 @@ public class DeviceInterfaceChangedSender {
                 future = executor.submit(task);
             }
         }
+
     }
 
     public synchronized void stop() {

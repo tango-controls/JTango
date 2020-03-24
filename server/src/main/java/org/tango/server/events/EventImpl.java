@@ -45,7 +45,6 @@ final class EventImpl {
     private final Logger logger = LoggerFactory.getLogger(EventImpl.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventImpl.class);
     private final IEventTrigger eventTrigger;
-    private final EventType eventType;
     private final boolean islatestIDLVersion;
     private final String fullName;
     private AttributeImpl attribute;
@@ -63,7 +62,6 @@ final class EventImpl {
 
     EventImpl(final AttributeImpl attribute, final EventType eventType, final int idlVersion, final String fullName) throws DevFailed {
         this.attribute = attribute;
-        this.eventType = eventType;
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         this.fullName = fullName;
         eventTrigger = EventTriggerFactory.createEventTrigger(eventType, attribute);
@@ -78,8 +76,7 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final PipeImpl pipe, final int idlVersion, final String fullName) throws DevFailed {
-        this.eventType = EventType.PIPE_EVENT;
+    EventImpl(final PipeImpl pipe, final int idlVersion, final String fullName) {
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
@@ -93,8 +90,7 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final int idlVersion, final String fullName) throws DevFailed {
-        this.eventType = EventType.INTERFACE_CHANGE_EVENT;
+    EventImpl(final int idlVersion, final String fullName){
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
@@ -123,6 +119,7 @@ final class EventImpl {
     /**
      * Fire an event containing a value is condition is valid.
      *
+     * @param eventSocket
      * @throws DevFailed
      * @param eventSocket
      */

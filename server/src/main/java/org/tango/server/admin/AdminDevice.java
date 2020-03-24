@@ -40,14 +40,7 @@ import org.tango.orb.ServerRequestInterceptor;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.PolledObjectType;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceProperty;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.StateMachine;
-import org.tango.server.annotation.Status;
-import org.tango.server.annotation.TransactionType;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
 import org.tango.server.build.DeviceClassBuilder;
@@ -65,12 +58,7 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.DevFailedUtils;
 import org.tango.utils.TangoUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -616,7 +604,7 @@ public final class AdminDevice implements TangoMXBean {
      * @param argin
      * @throws DevFailed
      */
-    @Command(name = "ZmqEventSubscriptionChange", inTypeDesc = "Events consumer wants to subscribe to", outTypeDesc = "Str[0] = Heartbeat pub endpoint - Str[1] = Event pub endpoint - Lg[0] = Tango lib release - Lg[1] = Device IDL release")
+    @Command(name = "ZmqEventSubscriptionChange", inTypeDesc = "Event consumer wants to subscribe to.\ndevice name, attribute/pipe name, action (\"subscribe\"), event name, <Tango client IDL version>\"\nevent name can take the following values:\n\t\"change\",\n\t\"quality\",\n\t\"periodic\",\n\t\"archive\",\n\t\"user_event\",\n\t\"attr_conf\",\n\t\"data_ready\",\n\t\"intr_change\",\t\"pipe\"\n\t\"info\" can also be used as single parameter to retrieve information about the heartbeat and event pub endpoints.", outTypeDesc = "Str[0] = Heartbeat pub endpoint - Str[1] = Event pub endpoint\n...\ntr[n] = Alternate Heartbeat pub endpoint - Str[n+1] = Alternate Event pub endpoint\nStr[n+1] = event name used by this server as zmq topic to send events Str[n+2] = channel name used by this server to send heartbeat events\n Lg[0] = Tango lib release - Lg[1] = Device IDL release\nLg[2] = Subscriber HWM - Lg[3] = Multicast rate\nLg[4] = Multicast IVL - Lg[5] = ZMQ release")
     public DevVarLongStringArray zmqEventSubscriptionChange(final String[] argin) throws DevFailed {
         xlogger.entry();
         // A simple way to be used in debug
@@ -645,8 +633,9 @@ public final class AdminDevice implements TangoMXBean {
         if (m.matches()) {
             returned = subcribeIDLInEventString(eventTypeAndIDL, deviceName, attributeName);
         } else {
-            int idlversion = EventManager.MINIMUM_IDL_VERSION;
+            int idlversion = DeviceImpl.SERVER_VERSION;
             if (argin.length == 5) {
+                // IDL version passed in argin
                 idlversion = Integer.parseInt(argin[4]);
             }
             final EventType eventType = EventType.getEvent(eventTypeAndIDL);
@@ -798,7 +787,7 @@ public final class AdminDevice implements TangoMXBean {
                                                  final int idlversion, final AttributeImpl attribute, final PipeImpl pipe) throws DevFailed {
         DevVarLongStringArray result;
         // Subscribe and returns connection parameters for client
-        // Str[0] = Heartbeat pub endpoint -
+        // Str[0] = Heartbeat pub endpoint (XXX: asks by client API without ".hearbeat" at the end)
         // Str[1] = Event pub endpoint
         // - Lg[0] = Tango lib release
         // - Lg[1] = Device IDL release
