@@ -225,10 +225,9 @@ public final class EventManager {
     private void bindEndpoints(ZMQ.Socket socket, Iterable<String> ipAddresses, List<String> endpoints, SocketType socketType) {
         xlogger.entry(ipAddresses, endpoints, socketType);
         for (String ipAddress : ipAddresses) {
-            final StringBuilder endpoint = new StringBuilder("tcp://").append(ipAddress).append(":*");
-            int port = socket.bind(endpoint.toString());
-            //replace * with actual port
-            endpoint.deleteCharAt(endpoint.length() - 1).append(port);
+            final StringBuilder endpoint = new StringBuilder("tcp://").append(ipAddress);
+            int port = socket.bindToRandomPort(endpoint.toString());
+            endpoint.append(":").append(port);
             endpoints.add(endpoint.toString());
             logger.debug("bind ZMQ socket {} for {}", endpoint, socketType);
         }
