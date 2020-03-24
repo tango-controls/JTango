@@ -38,6 +38,7 @@
     <properties>
         <jacorb.version>3.9</jacorb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j-api.version>1.7.6</slf4j-api.version>
     </properties>
 
     <developers>
@@ -117,6 +118,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.jboss.spec.javax.rmi</groupId>
+                <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+                <version>1.0.6.Final</version>
+            </dependency>
+            <dependency>
                 <groupId>org.tango-controls</groupId>
                 <artifactId>JTangoCommons</artifactId>
                 <version>${project.version}</version>
@@ -154,12 +160,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.6</version>
+                <version>${slf4j-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-ext</artifactId>
-                <version>1.7.6</version>
+                <version>${slf4j-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -192,12 +198,14 @@
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -256,6 +264,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -269,6 +278,7 @@
 
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.1.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
