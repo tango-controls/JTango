@@ -97,13 +97,6 @@ public class ChangeEventTrigger implements IEventTrigger {
                         "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
                                 + " are not set");
             }
-        } else if (attribute.isCheckArchivingEvent()) {
-            if (props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
-                    && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-                throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                        "Archive event properties (abs_change or rel_change) for attribute " + attribute.getName()
-                                + " are not set");
-            }
         }
     }
 

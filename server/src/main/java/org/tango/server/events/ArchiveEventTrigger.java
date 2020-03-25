@@ -1,29 +1,31 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.events;
 
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.EventProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -32,9 +34,6 @@ import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.EventProperties;
 
 /**
  * manage trigger for {@link EventType#ARCHIVE_EVENT}
@@ -47,8 +46,8 @@ public class ArchiveEventTrigger implements IEventTrigger {
     private final XLogger xlogger = XLoggerFactory.getXLogger(ArchiveEventTrigger.class);
 
     private final ChangeEventTrigger change;
-    private PeriodicEventTrigger periodic = null;
     private final AttributeImpl attribute;
+    private PeriodicEventTrigger periodic = null;
 
     /**
      * Ctr
@@ -59,10 +58,33 @@ public class ArchiveEventTrigger implements IEventTrigger {
      * @param attribute The attribute that send events
      */
     public ArchiveEventTrigger(final long period, final String absolute, final String relative,
-            final AttributeImpl attribute) {
+                               final AttributeImpl attribute) {
         this.attribute = attribute;
         periodic = new PeriodicEventTrigger(period, attribute);
         change = new ChangeEventTrigger(attribute, absolute, relative);
+    }
+
+    /**
+     * Check if event criteria are set for specified attribute
+     *
+     * @param attribute the specified attribute
+     * @throws DevFailed if no event criteria is set for specified attribute.
+     */
+    public static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
+        // Check if value is not numerical (always true for State and String)
+        if (attribute.isState() || attribute.isString()) {
+            return;
+        }
+        // Else check criteria
+        final EventProperties props = attribute.getProperties().getEventProp();
+        if (attribute.isCheckArchivingEvent()) {
+            if (props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                    && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                        "Archive event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                                + " are not set");
+            }
+        }
     }
 
     @Override
@@ -81,29 +103,6 @@ public class ArchiveEventTrigger implements IEventTrigger {
     @Override
     public void setError(final DevFailed error) {
         change.setError(error);
-    }
-
-    /**
-     * Check if event criteria are set for specified attribute
-     *
-     * @param attribute the specified attribute
-     * @throws DevFailed if no event criteria is set for specified attribute.
-     */
-    public static void checkEventCriteria(final AttributeImpl attribute) throws DevFailed {
-        // Check if value is not numerical (always true for State and String)
-        if (attribute.isState() || attribute.isString()) {
-            return;
-        }
-        // Else check criteria
-        final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.arch_event.period.equals(Constants.NOT_SPECIFIED)
-                && props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
-                && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                    "Archive event properties (archive_abs_change or "
-                            + "archive_rel_change or archive_period) for attribute " + attribute.getName()
-                            + " are not set");
-        }
     }
 
     @Override
