@@ -46,7 +46,6 @@ import java.util.Arrays;
  * manage trigger for {@link EventType#CHANGE_EVENT}
  *
  * @author ABEILLE
- *
  */
 public class ChangeEventTrigger implements IEventTrigger {
 
@@ -68,8 +67,8 @@ public class ChangeEventTrigger implements IEventTrigger {
      * Ctr
      *
      * @param attribute The attribute that send event
-     * @param absolute The absolute change delta
-     * @param relative The relative change delta
+     * @param absolute  The absolute change delta
+     * @param relative  The relative change delta
      */
     public ChangeEventTrigger(final AttributeImpl attribute, final String absolute, final String relative) {
         this.attribute = attribute;
@@ -91,11 +90,20 @@ public class ChangeEventTrigger implements IEventTrigger {
         }
         // Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
-        if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
-                && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
-            throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                    "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
-                            + " are not set");
+        if (attribute.isCheckChangeEvent()) {
+            if (props.ch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                    && props.ch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                        "Event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                                + " are not set");
+            }
+        } else if (attribute.isCheckArchivingEvent()) {
+            if (props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+                    && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
+                        "Archive event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                                + " are not set");
+            }
         }
     }
 
