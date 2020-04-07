@@ -74,13 +74,13 @@ public final class EventManager {
     private final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(EventManager.class);
     private final Map<String, EventImpl> eventImplMap = new HashMap<String, EventImpl>();
-    private final ZContext context = new ZContext();
     private final int serverHWM = initializeServerHwm();
     private final int clientHWN = initializeClientHwm();
     private final List<String> heartbeatEndpoints = new LinkedList<>();
     private final List<String> eventEndpoints = new LinkedList<>();
-    ZMQ.Socket heartbeatSocket;
-    ZMQ.Socket eventSocket;
+    private ZMQ.Socket heartbeatSocket;
+    private ZMQ.Socket eventSocket;
+    private ZContext context;
     private ScheduledExecutorService heartBeatExecutor;
     private AtomicBoolean isInitialized = new AtomicBoolean(false);
     private String heartbeatName;
@@ -181,7 +181,7 @@ public final class EventManager {
         xlogger.entry();
         Iterable<String> ipAddress = getIpAddresses();
         Iterable<String> ip4Address = Iterables.filter(ipAddress, s -> s.split("\\.").length == 4);
-
+        context = new ZContext();
         // Get the free ports and build endpoints
         heartbeatSocket = createSocket();
         bindEndpoints(heartbeatSocket, ip4Address, heartbeatEndpoints, SocketType.HEARTBEAT);
@@ -270,14 +270,14 @@ public final class EventManager {
     }
 
     private ZMQ.Socket createSocket() {
-        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
+        final ZMQ.Socket socket = context.createSocket(org.zeromq.SocketType.PUB);
         socket.setLinger(0);
         socket.setReconnectIVL(-1);
         return socket;
     }
 
     private ZMQ.Socket createEventSocket() {
-        final ZMQ.Socket socket = context.createSocket(ZMQ.PUB);
+        final ZMQ.Socket socket = context.createSocket(org.zeromq.SocketType.PUB);
         socket.setLinger(0);
         socket.setReconnectIVL(-1);
         socket.setSndHWM(serverHWM);
