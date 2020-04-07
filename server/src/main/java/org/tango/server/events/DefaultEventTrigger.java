@@ -55,6 +55,6 @@ public class DefaultEventTrigger implements IEventTrigger {
 
     @Override
     public boolean isPushedFromDeviceCode() {
-        return false;
+        return true;
     }
 }
