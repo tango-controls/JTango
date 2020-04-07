@@ -44,6 +44,9 @@ import org.tango.server.servant.DeviceImpl;
 import org.tango.utils.ClientIDUtil;
 import org.tango.utils.DevFailedUtils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * Global info and tool for a device. Injected with {@link DeviceManagement}
  *
@@ -239,7 +242,7 @@ public final class DeviceManager {
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e, false);
                 } finally {
                     attribute.unlock();
                 }
@@ -276,7 +279,7 @@ public final class DeviceManager {
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e, false);
                 } finally {
                     attribute.unlock();
                 }
@@ -334,7 +337,14 @@ public final class DeviceManager {
      */
     @Deprecated
     public String getClientHostName() {
-        return ServerRequestInterceptor.getInstance().getClientHostName();
+        String ipAddress = ServerRequestInterceptor.getInstance().getClientIPAddress();
+        String hostName;
+        try {
+            hostName = InetAddress.getByName(ipAddress).getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            hostName = ipAddress;
+        }
+        return hostName;
     }
 
     public boolean hasEventSubsriber() {

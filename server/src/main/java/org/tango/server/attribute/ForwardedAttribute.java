@@ -185,7 +185,7 @@ public class ForwardedAttribute implements IAttributeBehavior {
                 try {
                     if (evt.errors != null && evt.errors.length > 0) {
                         EventManager.getInstance().pushAttributeErrorEvent(deviceName, attributeName,
-                                new DevFailed(evt.errors));
+                                new DevFailed(evt.errors), false);
                     } else {
                         final EventType evtT = EventType.getEvent(evt.event_type);
                         switch (evtT) {

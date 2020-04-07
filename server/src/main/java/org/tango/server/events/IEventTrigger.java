@@ -60,4 +60,10 @@ public interface IEventTrigger {
      */
     boolean doCheck();
 
+    /**
+     *
+     * @return true if is pushed from code
+     */
+    boolean isPushedFromDeviceCode();
+
 }

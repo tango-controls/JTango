@@ -715,54 +715,12 @@ public final class AdminDevice implements TangoMXBean {
                     } else {
                         for (final AttributeImpl attributeImpl : deviceImpl.getAttributeList()) {
                             if (attributeImpl.getName().toLowerCase(Locale.ENGLISH).equals(objName)) {
-                                if (attributeImpl.getBehavior() instanceof ForwardedAttribute) {
-                                    // Found. Store objects
-                                    device = deviceImpl;
-                                    attribute = attributeImpl;
-                                } else if (attributeImpl.isPolled()) {
-                                    // Check if event criteria are set. Otherwise a DevFailed is thrown
+                                if (!(attributeImpl.getBehavior() instanceof ForwardedAttribute)) {
                                     EventManager.checkEventCriteria(attributeImpl, eventType);
-                                    // Found. Store objects
-                                    device = deviceImpl;
-                                    attribute = attributeImpl;
-                                } else {
-                                    // check if event is pushed from device
-                                    boolean throwError = false;
-                                    switch (eventType) {
-                                        case ARCHIVE_EVENT:
-                                            if (!attributeImpl.isPushArchiveEvent()) {
-                                                throwError = true;
-                                            }
-                                            break;
-                                        case CHANGE_EVENT:
-                                            if (!attributeImpl.isPushChangeEvent()) {
-                                                throwError = true;
-                                            }
-                                            break;
-                                        case DATA_READY_EVENT:
-                                            if (!attributeImpl.isPushDataReady()) {
-                                                throwError = true;
-                                            }
-                                            break;
-                                        case USER_EVENT:
-                                        case ATT_CONF_EVENT:
-                                        case INTERFACE_CHANGE_EVENT:
-                                            break;
-                                        case PERIODIC_EVENT:
-                                        default:
-                                            throwError = true;
-                                            break;
-
-                                    }
-                                    if (throwError) {
-                                        throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
-                                                "The polling (necessary to send events) for the attribute " + objName
-                                                        + " is not started");
-                                    } else {
-                                        device = deviceImpl;
-                                        attribute = attributeImpl;
-                                    }
                                 }
+                                // Found. Store objects
+                                device = deviceImpl;
+                                attribute = attributeImpl;
                             }
                         } // end for
                     }// end if

@@ -76,11 +76,11 @@ public final class StateStatusCacheEntryFactory implements CacheEntryFactory {
                 attribute.addToHistory();
                 result = attribute.getReadValue();
                 command.addToHistory(((AttributeValue) result).getValue());
-                EventManager.getInstance().pushAttributeValueEvent(deviceName, attribute.getName());
+                EventManager.getInstance().pushAttributeValueEvent(deviceName, attribute.getName(), true);
             } catch (final DevFailed e) {
                 command.addErrorToHistory(e);
                 attribute.addErrorToHistory(e);
-                EventManager.getInstance().pushAttributeErrorEvent(deviceName, attribute.getName(), e);
+                EventManager.getInstance().pushAttributeErrorEvent(deviceName, attribute.getName(), e, true);
                 throw e;
             } finally {
                 attribute.unlock();

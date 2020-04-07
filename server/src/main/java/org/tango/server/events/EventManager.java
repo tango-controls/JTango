@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.tango.client.database.DatabaseFactory;
-import org.tango.orb.ServerRequestInterceptor;
+import org.tango.server.ExceptionMessages;
 import org.tango.server.ServerManager;
 import org.tango.server.attribute.AttributeImpl;
 import org.tango.server.attribute.ForwardedAttribute;
@@ -86,8 +86,7 @@ public final class EventManager {
     private String heartbeatName;
 
     private EventManager() {
-        logger.debug("client IP address is {}", ServerRequestInterceptor.getInstance().getClientIPAddress());
-        logger.info("ZMQ ({}) SERVER event system started", ZMQ.getVersionString());
+        //logger.debug("client IP address is {}", ServerRequestInterceptor.getInstance().getClientIPAddress());
     }
 
     public static EventManager getInstance() {
@@ -111,6 +110,41 @@ public final class EventManager {
                 break;
             default:
                 break;
+        }
+        if (!attribute.isPolled()) {
+            // no polled, so check if event is pushed from device
+            boolean throwError = false;
+            switch (eventType) {
+                case ARCHIVE_EVENT:
+                    if (!attribute.isPushArchiveEvent()) {
+                        throwError = true;
+                    }
+                    break;
+                case CHANGE_EVENT:
+                    if (!attribute.isPushChangeEvent()) {
+                        throwError = true;
+                    }
+                    break;
+                case DATA_READY_EVENT:
+                    if (!attribute.isPushDataReady()) {
+                        throwError = true;
+                    }
+                    break;
+                case USER_EVENT:
+                case ATT_CONF_EVENT:
+                case INTERFACE_CHANGE_EVENT:
+                    break;
+                case PERIODIC_EVENT:
+                default:
+                    throwError = true;
+                    break;
+
+            }
+            if (throwError) {
+                throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_NOT_POLLED,
+                        "The polling (necessary to send events) for the attribute " + attribute.getName()
+                                + " is not started");
+            }
         }
     }
 
@@ -163,6 +197,7 @@ public final class EventManager {
         heartBeatExecutor.scheduleAtFixedRate(new HeartbeatThread(heartbeatName), 0,
                 EventConstants.EVENT_HEARTBEAT_PERIOD, TimeUnit.MILLISECONDS);
         isInitialized.set(true);
+        logger.info("ZMQ ({}) SERVER event system started", ZMQ.getVersionString());
         xlogger.exit();
     }
 
@@ -473,14 +508,14 @@ public final class EventManager {
      * @throws fr.esrf.Tango.DevFailed
      * @throws DevFailed
      */
-    public void pushAttributeErrorEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
+    public void pushAttributeErrorEvent(final String deviceName, final String attributeName, final DevFailed devFailed, boolean isPushedFromPolling)
             throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushDevFailedEvent(devFailed, eventSocket);
+                eventImpl.pushDevFailedEvent(devFailed, eventSocket, isPushedFromPolling);
             }
         }
         xlogger.exit();
@@ -492,20 +527,20 @@ public final class EventManager {
      * @param attributeName specified event attribute
      * @throws DevFailed
      */
-    public void pushAttributeValueEvent(final String deviceName, final String attributeName) throws DevFailed {
+    public void pushAttributeValueEvent(final String deviceName, final String attributeName, boolean isPushedFromPolling) throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.getEventAttrValueTypeList()) {
-            pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType);
+            pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType, isPushedFromPolling);
         }
         xlogger.exit();
     }
 
-    private void pushAttributeValueEventIdlLoop(String deviceName, String attributeName, EventType eventType) throws DevFailed {
+    private void pushAttributeValueEventIdlLoop(String deviceName, String attributeName, EventType eventType, boolean isPushedFromPolling) throws DevFailed {
         for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeValueEvent(eventSocket);
+                eventImpl.pushAttributeValueEvent(eventSocket, isPushedFromPolling);
             }
         }
         xlogger.exit();
@@ -522,7 +557,7 @@ public final class EventManager {
     public void pushAttributeValueEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         xlogger.entry();
-        pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType);
+        pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType, false);
         xlogger.exit();
     }
 
@@ -588,7 +623,7 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushDevFailedEvent(devFailed, eventSocket);
+            eventImpl.pushDevFailedEvent(devFailed, eventSocket, false);
         }
         xlogger.exit();
     }

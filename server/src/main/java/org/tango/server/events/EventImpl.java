@@ -90,7 +90,7 @@ final class EventImpl {
      * @throws DevFailed
      */
 
-    EventImpl(final int idlVersion, final String fullName){
+    EventImpl(final int idlVersion, final String fullName) {
         islatestIDLVersion = idlVersion == DeviceImpl.SERVER_VERSION;
         this.fullName = fullName;
         eventTrigger = new DefaultEventTrigger();
@@ -120,17 +120,56 @@ final class EventImpl {
      * Fire an event containing a value is condition is valid.
      *
      * @param eventSocket
+     * @param isPushedFromPolling
      * @throws DevFailed
-     * @param eventSocket
      */
-    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
+    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket, boolean isPushedFromPolling) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
-        if (isSendEvent()) {
+        if (isSendEvent(isPushedFromPolling)) {
             sendAttributeValueEvent(eventSocket);
         }
         xlogger.exit();
+    }
+
+    /**
+     * Fire an event containing a DevFailed.
+     *
+     * @param devFailed   the failed object to be sent.
+     * @param eventSocket
+     * @throws DevFailed
+     */
+    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket, boolean isPushedFromPolling) throws DevFailed {
+        xlogger.entry();
+        eventTrigger.updateProperties();
+        eventTrigger.setError(devFailed);
+        if (isSendEvent(isPushedFromPolling)) {
+            try {
+                synchronized (eventSocket) {
+                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, true, EventUtilities.marshall(devFailed));
+                }
+            } catch (final org.zeromq.ZMQException e) {
+                throw DevFailedUtils.newDevFailed(e);
+            }
+        }
+        xlogger.exit();
+    }
+
+    /**
+     * check if send event
+     *
+     * @return
+     */
+    private boolean isSendEvent(boolean isPushedFromPolling) throws DevFailed {
+        boolean isSend = false;
+        if (isPushedFromPolling && eventTrigger.isPushedFromDeviceCode()) {
+            // events can only be sent from pushed code, even if polling is running
+            isSend = false;
+        } else if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
+            isSend = true;
+        }
+        return isSend;
     }
 
 
@@ -173,7 +212,7 @@ final class EventImpl {
     /**
      * Send a data ready event
      *
-     * @param counter  a counter value
+     * @param counter     a counter value
      * @param eventSocket
      * @throws DevFailed
      */
@@ -248,39 +287,5 @@ final class EventImpl {
         xlogger.exit();
     }
 
-    /**
-     * Fire an event containing a DevFailed.
-     *
-     * @param devFailed the failed object to be sent.
-     * @param eventSocket
-     * @throws DevFailed
-     */
-    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
-        xlogger.entry();
-        eventTrigger.updateProperties();
-        eventTrigger.setError(devFailed);
-        if (isSendEvent()) {
-            try {
-                synchronized (eventSocket) {
-                    EventUtilities.sendToSocket(eventSocket, fullName, counter++, true, EventUtilities.marshall(devFailed));
-                }
-            } catch (final org.zeromq.ZMQException e) {
-                throw DevFailedUtils.newDevFailed(e);
-            }
-        }
-        xlogger.exit();
-    }
 
-    /**
-     * check if send event
-     *
-     * @return
-     */
-    private boolean isSendEvent() throws DevFailed {
-        boolean send = false;
-        if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
-            send = true;
-        }
-        return send;
-    }
 }
