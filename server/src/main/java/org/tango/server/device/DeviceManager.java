@@ -242,7 +242,7 @@ public final class DeviceManager {
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e, false);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
                 } finally {
                     attribute.unlock();
                 }
@@ -279,7 +279,7 @@ public final class DeviceManager {
                     // push the event
                     EventManager.getInstance().pushAttributeValueEvent(name, attributeName, eventType);
                 } catch (final DevFailed e) {
-                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e, false);
+                    EventManager.getInstance().pushAttributeErrorEvent(name, attributeName, e);
                 } finally {
                     attribute.unlock();
                 }

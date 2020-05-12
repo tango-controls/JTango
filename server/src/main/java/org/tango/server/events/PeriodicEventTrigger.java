@@ -107,9 +107,4 @@ public class PeriodicEventTrigger implements IEventTrigger {
         return true;
     }
 
-    @Override
-    public boolean isPushedFromDeviceCode() {
-        return false;
-    }
-
 }

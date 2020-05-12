@@ -120,14 +120,13 @@ final class EventImpl {
      * Fire an event containing a value is condition is valid.
      *
      * @param eventSocket
-     * @param isPushedFromPolling
      * @throws DevFailed
      */
-    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket, boolean isPushedFromPolling) throws DevFailed {
+    protected void pushAttributeValueEvent(ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.setError(null);
         eventTrigger.updateProperties();
-        if (isSendEvent(isPushedFromPolling)) {
+        if (isSendEvent()) {
             sendAttributeValueEvent(eventSocket);
         }
         xlogger.exit();
@@ -140,11 +139,11 @@ final class EventImpl {
      * @param eventSocket
      * @throws DevFailed
      */
-    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket, boolean isPushedFromPolling) throws DevFailed {
+    protected void pushDevFailedEvent(final DevFailed devFailed, ZMQ.Socket eventSocket) throws DevFailed {
         xlogger.entry();
         eventTrigger.updateProperties();
         eventTrigger.setError(devFailed);
-        if (isSendEvent(isPushedFromPolling)) {
+        if (isSendEvent()) {
             try {
                 synchronized (eventSocket) {
                     EventUtilities.sendToSocket(eventSocket, fullName, counter++, true, EventUtilities.marshall(devFailed));
@@ -161,12 +160,9 @@ final class EventImpl {
      *
      * @return
      */
-    private boolean isSendEvent(boolean isPushedFromPolling) throws DevFailed {
+    private boolean isSendEvent() throws DevFailed {
         boolean isSend = false;
-        if (isPushedFromPolling && eventTrigger.isPushedFromDeviceCode()) {
-            // events can only be sent from pushed code, even if polling is running
-            isSend = false;
-        } else if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
+        if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
             isSend = true;
         }
         return isSend;

@@ -508,14 +508,14 @@ public final class EventManager {
      * @throws fr.esrf.Tango.DevFailed
      * @throws DevFailed
      */
-    public void pushAttributeErrorEvent(final String deviceName, final String attributeName, final DevFailed devFailed, boolean isPushedFromPolling)
+    public void pushAttributeErrorEvent(final String deviceName, final String attributeName, final DevFailed devFailed)
             throws DevFailed {
         xlogger.entry();
         for (final EventType eventType : EventType.values()) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushDevFailedEvent(devFailed, eventSocket, isPushedFromPolling);
+                eventImpl.pushDevFailedEvent(devFailed, eventSocket);
             }
         }
         xlogger.exit();
@@ -527,20 +527,20 @@ public final class EventManager {
      * @param attributeName specified event attribute
      * @throws DevFailed
      */
-    public void pushAttributeValueEvent(final String deviceName, final String attributeName, boolean isPushedFromPolling) throws DevFailed {
+    public void pushAttributeValueEventFromPolling(final String deviceName, final String attributeName) throws DevFailed {
         xlogger.entry();
-        for (final EventType eventType : EventType.getEventAttrValueTypeList()) {
-            pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType, isPushedFromPolling);
+        for (final EventType eventType : EventType.getEventTypeListForAttrPolling()) {
+            pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType);
         }
         xlogger.exit();
     }
 
-    private void pushAttributeValueEventIdlLoop(String deviceName, String attributeName, EventType eventType, boolean isPushedFromPolling) throws DevFailed {
+    private void pushAttributeValueEventIdlLoop(String deviceName, String attributeName, EventType eventType) throws DevFailed {
         for (int idl = MINIMUM_IDL_VERSION; idl <= DeviceImpl.SERVER_VERSION; idl++) {
             final String fullName = EventUtilities.buildEventName(deviceName, attributeName, eventType, idl);
             final EventImpl eventImpl = getEventImpl(fullName);
             if (eventImpl != null) {
-                eventImpl.pushAttributeValueEvent(eventSocket, isPushedFromPolling);
+                eventImpl.pushAttributeValueEvent(eventSocket);
             }
         }
         xlogger.exit();
@@ -557,7 +557,7 @@ public final class EventManager {
     public void pushAttributeValueEvent(final String deviceName, final String attributeName, final EventType eventType)
             throws DevFailed {
         xlogger.entry();
-        pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType, false);
+        pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType);
         xlogger.exit();
     }
 
@@ -623,7 +623,7 @@ public final class EventManager {
         final String fullName = EventUtilities.buildPipeEventName(deviceName, pipeName);
         final EventImpl eventImpl = getEventImpl(fullName);
         if (eventImpl != null) {
-            eventImpl.pushDevFailedEvent(devFailed, eventSocket, false);
+            eventImpl.pushDevFailedEvent(devFailed, eventSocket);
         }
         xlogger.exit();
     }

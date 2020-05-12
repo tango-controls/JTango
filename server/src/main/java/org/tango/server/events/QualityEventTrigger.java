@@ -94,9 +94,4 @@ public class QualityEventTrigger implements IEventTrigger {
         return true;
     }
 
-    @Override
-    public boolean isPushedFromDeviceCode() {
-        return false;
-    }
-
 }

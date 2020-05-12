@@ -100,7 +100,7 @@ public class EventTest {
                 System.out.println("\nCLIENT send INIT");
                 dev.command_inout("Init");
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -183,26 +183,31 @@ public class EventTest {
     @Test(timeout = 3000)
     public void archiveScalar() throws DevFailed {
         System.out.println("\t####archiveScalar");
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final int id = dev.subscribe_event("archive", TangoConst.ARCHIVE_EVENT, 100, new String[]{},
-                TangoConst.NOT_STATELESS);
-        int eventsNb = 0;
-        long value = 0;
-        long previousValue = 0;
         try {
-            while (eventsNb < 3) {
-                final EventData[] events = dev.get_events();
-                for (final EventData eventData : events) {
-                    if (eventData.name.contains("archive")) {
-                        eventsNb++;
-                        previousValue = value;
-                        value = eventData.attr_value.extractLong64();
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final int id = dev.subscribe_event("archive", TangoConst.ARCHIVE_EVENT, 100, new String[]{},
+                    TangoConst.NOT_STATELESS);
+            int eventsNb = 0;
+            long value = 0;
+            long previousValue = 0;
+            try {
+                while (eventsNb < 3) {
+                    final EventData[] events = dev.get_events();
+                    for (final EventData eventData : events) {
+                        if (eventData.name.contains("archive")) {
+                            eventsNb++;
+                            previousValue = value;
+                            value = eventData.attr_value.extractLong64();
+                        }
                     }
                 }
+                assertThat(value, equalTo(previousValue + 1));
+            } finally {
+                dev.unsubscribe_event(id);
             }
-            assertThat(value, equalTo(previousValue + 1));
-        } finally {
-            dev.unsubscribe_event(id);
+        } catch (DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
         }
     }
 
@@ -212,6 +217,7 @@ public class EventTest {
         final DeviceProxy dev = new DeviceProxy(deviceName);
         final int id = dev.subscribe_event("booleanAtt", TangoConst.CHANGE_EVENT, 100, new String[]{},
                 TangoConst.NOT_STATELESS);
+        System.out.println("subscribe_event OK");
         int eventsNb = 0;
         boolean value = false;
         boolean previousValue = false;
@@ -223,8 +229,7 @@ public class EventTest {
                         eventsNb++;
                         previousValue = value;
                         value = eventData.attr_value.extractBoolean();
-                        System.out.println("read value " + value);
-                        System.out.println("read value time " + eventData.attr_value.getTime());
+                        System.out.println("event received read value " + value);
                         assertThat(eventData.attr_value.getTime(), equalTo(34567L));
                     }
                 }
@@ -381,7 +386,6 @@ public class EventTest {
     @Test(timeout = 1000)
     public void pushDevStateEvent() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
-        System.out.println("state " + dev.state());
         final int id = dev.subscribe_event("state", TangoConst.USER_EVENT, 100, new String[]{},
                 TangoConst.NOT_STATELESS);
         dev.command_inout("pushDevStateEvents");
@@ -393,12 +397,12 @@ public class EventTest {
                 System.out.println("events data " + events.length);
                 for (final EventData eventData : events) {
                     System.out.println("received event name =" + eventData.name);
-                    System.out.println("received event type =" + eventData.event_type);
+                    //System.out.println("received event type =" + eventData.event_type);
                     if (eventData.name.contains("state")) {
                         eventsNb++;
                         value = eventData.attr_value.extractDevState();
-                        System.out.println("received state event " + value);
-                        break;
+                        System.out.println(eventsNb + " - received state event " + value);
+                        // break;
                     }
                 }
             }
@@ -411,10 +415,16 @@ public class EventTest {
     @Test(timeout = 1000)
     public void pushStateEvent() throws DevFailed {
         final DeviceProxy dev = new DeviceProxy(deviceName);
-        System.out.println("state " + dev.state());
+        // System.out.println("state " + dev.state());
         final int id = dev.subscribe_event("state", TangoConst.USER_EVENT, 100, new String[]{},
                 TangoConst.NOT_STATELESS);
+      /*  try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
         dev.command_inout("pushDeviceStateEvents");
+
         int eventsNb = 0;
         DevState value = DevState.UNKNOWN;
         try {
@@ -428,7 +438,7 @@ public class EventTest {
                         eventsNb++;
                         value = eventData.attr_value.extractDevState();
                         System.out.println("received state event " + value);
-                        break;
+                        // break;
                     }
                 }
             }
@@ -442,29 +452,33 @@ public class EventTest {
     @Test(timeout = 3000)
     public void changeStateScalar() throws DevFailed {
         System.out.println("\t####changeStateScalar");
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final int id = dev.subscribe_event("State", TangoConst.CHANGE_EVENT, 100, new String[]{},
-                TangoConst.NOT_STATELESS);
-        int eventsNb = 0;
-        DevState value = DevState.UNKNOWN;
-        DevState previousValue = DevState.UNKNOWN;
         try {
-            while (eventsNb < 3) {
-                final EventData[] events = dev.get_events();
-                // System.out.println("events " + events.length);
-                for (final EventData eventData : events) {
-                    System.out.println("event " + eventData.name);
-                    if (eventData.name.contains("state")) {
-                        eventsNb++;
-                        previousValue = value;
-                        value = eventData.attr_value.extractDevState();
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final int id = dev.subscribe_event("State", TangoConst.CHANGE_EVENT, 100, new String[]{},
+                    TangoConst.NOT_STATELESS);
+            int eventsNb = 0;
+            DevState value = DevState.UNKNOWN;
+            DevState previousValue = DevState.UNKNOWN;
+            try {
+                while (eventsNb < 3) {
+                    final EventData[] events = dev.get_events();
+                    // System.out.println("events " + events.length);
+                    for (final EventData eventData : events) {
+                        System.out.println("event " + eventData.name);
+                        if (eventData.name.contains("state")) {
+                            eventsNb++;
+                            previousValue = value;
+                            value = eventData.attr_value.extractDevState();
+                        }
                     }
                 }
+                assertThat(value, not(previousValue));
+            } finally {
+                dev.unsubscribe_event(id);
             }
-            System.out.println("assert");
-            assertThat(value, not(previousValue));
-        } finally {
-            dev.unsubscribe_event(id);
+        } catch (DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
         }
     }
 

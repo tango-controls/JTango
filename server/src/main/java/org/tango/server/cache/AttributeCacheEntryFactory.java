@@ -93,10 +93,10 @@ public final class AttributeCacheEntryFactory implements CacheEntryFactory {
                             / NANO_TO_MILLI);
                     attribute.addToHistory();
                     result = attribute.getReadValue();
-                    EventManager.getInstance().pushAttributeValueEvent(deviceName, attribute.getName(), true);
+                    EventManager.getInstance().pushAttributeValueEventFromPolling(deviceName, attribute.getName());
                 } catch (final DevFailed e) {
                     attribute.addErrorToHistory(e);
-                    EventManager.getInstance().pushAttributeErrorEvent(deviceName, attribute.getName(), e, true);
+                    EventManager.getInstance().pushAttributeErrorEvent(deviceName, attribute.getName(), e);
                     throw e;
                 } finally {
                     attribute.unlock();

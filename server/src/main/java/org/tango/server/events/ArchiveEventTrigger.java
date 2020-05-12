@@ -123,8 +123,4 @@ public class ArchiveEventTrigger implements IEventTrigger {
         return attribute.isPushArchiveEvent() ? attribute.isCheckArchivingEvent() : true;
     }
 
-    @Override
-    public boolean isPushedFromDeviceCode() {
-        return attribute.isPushArchiveEvent();
-    }
 }

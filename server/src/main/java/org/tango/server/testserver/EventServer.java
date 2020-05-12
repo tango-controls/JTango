@@ -171,8 +171,7 @@ public class EventServer {
 
     @Init
     public void init() throws DevFailed {
-        deviceManager.startPolling("State", 100);
-
+      deviceManager.startPolling("State", 100);
     }
 
     @Attribute

@@ -313,8 +313,4 @@ public class ChangeEventTrigger implements IEventTrigger {
         return attribute.isPushChangeEvent() ? attribute.isCheckChangeEvent() : true;
     }
 
-    @Override
-    public boolean isPushedFromDeviceCode() {
-        return attribute.isPushChangeEvent();
-    }
 }
