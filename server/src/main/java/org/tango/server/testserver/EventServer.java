@@ -63,6 +63,9 @@ public class EventServer {
     @Attribute(isPolled = true, pollingPeriod = 100)
     @AttributeProperties(changeEventAbsolute = "1", periodicEvent = "100")
     private volatile double doubleAtt = 1;
+    @Attribute(isPolled = true, pollingPeriod = 100, checkChangeEvent = true, pushChangeEvent = true)
+    @AttributeProperties(changeEventAbsolute = "0.9", periodicEvent = "100")
+    private double doubleAttSendTwice = 0;
     @Attribute(isPolled = true, pollingPeriod = 100)
     @AttributeProperties(changeEventRelative = "1")
     private double changeRelative = 1;
@@ -112,7 +115,14 @@ public class EventServer {
         properties.setLabel(value);
         properties.setArchivingEventAbsChange(value);
         deviceManager.setAttributeProperties("doubleAtt", properties);
+        deviceManager.pushEvent("doubleAtt", new AttributeValue(doubleAtt - 1), EventType.CHANGE_EVENT);
         return doubleAtt;
+    }
+
+    public double getDoubleAttSendTwice() throws DevFailed {
+        deviceManager.pushEvent("doubleAttSendTwice", new AttributeValue(doubleAttSendTwice - 1), EventType.CHANGE_EVENT);
+        doubleAttSendTwice = doubleAttSendTwice + 1;
+        return doubleAttSendTwice;
     }
 
     public double getChangeRelative() throws DevFailed {

@@ -38,6 +38,8 @@ import org.tango.server.events.EventType;
 import org.tango.utils.DevFailedUtils;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -144,6 +146,38 @@ public class EventTest {
                 }
             }
             assertThat(value, equalTo(previousValue + 1));
+            dev.unsubscribe_event(id);
+        } catch (DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
+    }
+
+    @Test(timeout = 3000)
+    public void changeNumberScalarSendTwice() throws DevFailed {
+        System.out.println("\t####changeNumberScalarSendTwice");
+        try {
+            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final int id = dev.subscribe_event("doubleAttSendTwice", TangoConst.CHANGE_EVENT, 100, new String[]{},
+                    TangoConst.NOT_STATELESS);
+            int eventsNb = 0;
+            double value = 0;
+            double previousValue = 0;
+            List<Double> values = new LinkedList<>();
+            while (eventsNb < 4) {
+                final EventData[] events = dev.get_events();
+                for (final EventData eventData : events) {
+                    System.out.println("CLIENT attr value is "+ eventData.name);
+                    if (eventData.name.contains("doubleattsendtwice")) {
+                        eventsNb++;
+                        previousValue = value;
+                        value = eventData.attr_value.extractDouble();
+                        values.add(value);
+                        System.out.println("CLIENT received values is " + values);
+                    }
+                }
+            }
+            assertThat(value, equalTo(previousValue-1));
             dev.unsubscribe_event(id);
         } catch (DevFailed e) {
             DevFailedUtils.printDevFailed(e);
