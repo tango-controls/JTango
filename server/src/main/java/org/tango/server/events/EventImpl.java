@@ -162,13 +162,19 @@ final class EventImpl {
      * @return
      */
     private boolean isSendEvent(boolean isPushedFromPolling) throws DevFailed {
-        boolean isSend = false;
-        if (isPushedFromPolling && eventTrigger.isPushedFromDeviceCode()) {
-            // events can only be sent from pushed code, even if polling is running
+        boolean isSend = true;
+        if (!isPushedFromPolling && !eventTrigger.isPushedFromDeviceCode()) {
+            // if push from code is not activated, cannot send it
             isSend = false;
-        } else if ((eventTrigger.doCheck() && eventTrigger.isSendEvent()) || !eventTrigger.doCheck()) {
-            isSend = true;
+        } else {
+            if (eventTrigger.doCheck()) {
+                isSend = eventTrigger.isSendEvent();
+            } else if (isPushedFromPolling && eventTrigger.isPushedFromDeviceCode()) {
+                // events can only be sent from pushed code if doCheck==false, even if polling is running
+                isSend = false;
+            }
         }
+        logger.debug("Event must be sent  = {} (isPushFromPolling = {})", isSend, isPushedFromPolling);
         return isSend;
     }
 

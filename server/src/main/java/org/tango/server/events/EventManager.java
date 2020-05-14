@@ -529,7 +529,7 @@ public final class EventManager {
      */
     public void pushAttributeValueEvent(final String deviceName, final String attributeName, boolean isPushedFromPolling) throws DevFailed {
         xlogger.entry();
-        for (final EventType eventType : EventType.getEventAttrValueTypeList()) {
+        for (final EventType eventType : EventType.getEventTypeListForAttrPolling()) {
             pushAttributeValueEventIdlLoop(deviceName, attributeName, eventType, isPushedFromPolling);
         }
         xlogger.exit();

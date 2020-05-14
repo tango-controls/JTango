@@ -39,7 +39,6 @@ import org.tango.utils.DevFailedUtils;
  * manage trigger for {@link EventType#ARCHIVE_EVENT}
  *
  * @author ABEILLE
- *
  */
 public class ArchiveEventTrigger implements IEventTrigger {
     private final Logger logger = LoggerFactory.getLogger(ArchiveEventTrigger.class);
@@ -52,9 +51,9 @@ public class ArchiveEventTrigger implements IEventTrigger {
     /**
      * Ctr
      *
-     * @param period The archive period
-     * @param absolute The archive absolute change delta
-     * @param relative The archive relative change delta
+     * @param period    The archive period
+     * @param absolute  The archive absolute change delta
+     * @param relative  The archive relative change delta
      * @param attribute The attribute that send events
      */
     public ArchiveEventTrigger(final long period, final String absolute, final String relative,
@@ -120,7 +119,7 @@ public class ArchiveEventTrigger implements IEventTrigger {
 
     @Override
     public boolean doCheck() {
-        return attribute.isPushArchiveEvent() ? attribute.isCheckArchivingEvent() : true;
+        return attribute.isCheckArchivingEvent();
     }
 
     @Override

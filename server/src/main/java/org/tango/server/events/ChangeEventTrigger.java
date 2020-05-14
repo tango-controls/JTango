@@ -310,7 +310,7 @@ public class ChangeEventTrigger implements IEventTrigger {
 
     @Override
     public boolean doCheck() {
-        return attribute.isPushChangeEvent() ? attribute.isCheckChangeEvent() : true;
+        return attribute.isCheckChangeEvent();
     }
 
     @Override

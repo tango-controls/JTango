@@ -67,7 +67,7 @@ public class EventTest {
 //        } finally {
 //            if (ss1 != null)
 //                ss1.close();
-            //System.setProperty("TANGO_HOST", "192.168.56.101:10000");
+//            System.setProperty("TANGO_HOST", "192.168.56.101:10000");
             EventServer.start();
             System.out.println("event server started");
         } catch (DevFailed e) {
@@ -96,11 +96,11 @@ public class EventTest {
             final int id = dev.subscribe_event(TangoConst.INTERFACE_CHANGE, 100, TangoConst.NOT_STATELESS);
             int eventsNb = 0;
 
-            while (eventsNb < 5) {
+            while (eventsNb < 4) {
                 System.out.println("\nCLIENT send INIT");
                 dev.command_inout("Init");
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

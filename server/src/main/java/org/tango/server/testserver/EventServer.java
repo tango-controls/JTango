@@ -30,13 +30,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import org.tango.DeviceState;
 import org.tango.server.ServerManager;
-import org.tango.server.annotation.Attribute;
-import org.tango.server.annotation.AttributeProperties;
-import org.tango.server.annotation.Command;
-import org.tango.server.annotation.Device;
-import org.tango.server.annotation.DeviceManagement;
-import org.tango.server.annotation.Init;
-import org.tango.server.annotation.State;
+import org.tango.server.annotation.*;
 import org.tango.server.attribute.AttributePropertiesImpl;
 import org.tango.server.attribute.AttributeValue;
 import org.tango.server.device.DeviceManager;
@@ -78,7 +72,7 @@ public class EventServer {
     @AttributeProperties(changeEventAbsolute = "5")
     private int qualityAtt;
     private AttrQuality quality = AttrQuality.ATTR_VALID;
-    @Attribute(isPolled = true, pollingPeriod = 100)
+    @Attribute(isPolled = true, pollingPeriod = 100, checkArchivingEvent = false)
     @AttributeProperties(archiveEventPeriod = "100")
     private long archive = 1;
     @Attribute(isPolled = true, pollingPeriod = 100)
@@ -235,6 +229,10 @@ public class EventServer {
         return state;
     }
 
+    public void setState(final DeviceState state) {
+        this.state = state;
+    }
+
     @Command
     public void pushDeviceStateEvents() throws DevFailed {
         DeviceState value = DeviceState.FAULT;
@@ -245,10 +243,6 @@ public class EventServer {
     public void pushDevStateEvents() throws DevFailed {
         DevState value = DevState.ALARM;
         deviceManager.pushEvent("State", new AttributeValue(value), EventType.USER_EVENT);
-    }
-
-    public void setState(final DeviceState state) {
-        this.state = state;
     }
 
     public void setDeviceManager(final DeviceManager deviceManager) {

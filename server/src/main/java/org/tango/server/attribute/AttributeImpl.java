@@ -672,10 +672,20 @@ public class AttributeImpl extends DeviceBehaviorObject
         return config.isCheckChangeEvent();
     }
 
+    /**
+     * Archive event pushed from device code
+     *
+     * @return
+     */
     public boolean isPushArchiveEvent() {
         return config.isPushArchiveEvent();
     }
 
+    /**
+     * Change event pushed from device code
+     *
+     * @return
+     */
     public boolean isPushChangeEvent() {
         return config.isPushChangeEvent();
     }
