@@ -115,7 +115,6 @@ public class EventServer {
         properties.setLabel(value);
         properties.setArchivingEventAbsChange(value);
         deviceManager.setAttributeProperties("doubleAtt", properties);
-        deviceManager.pushEvent("doubleAtt", new AttributeValue(doubleAtt - 1), EventType.CHANGE_EVENT);
         return doubleAtt;
     }
 
