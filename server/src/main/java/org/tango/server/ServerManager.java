@@ -1,42 +1,30 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import fr.esrf.Tango.DevFailed;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,28 +42,33 @@ import org.tango.server.export.TangoExporter;
 import org.tango.server.monitoring.MonitoringService;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.DevFailed;
+import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Manage a tango server.
  *
  * @author ABEILLE
- *
  */
 public final class ServerManager {
     public static final String SERVER_NAME_LOGGING = "serverName";
-    private static final String NODB = "-nodb";
     /**
      * maximun length for device server name (255 characters)
      */
     public static final int SERVER_NAME_MAX_LENGTH = 255;
+    private static final String NODB = "-nodb";
     private static final String INIT_ERROR = "INIT_ERROR";
+    private static final ServerManager INSTANCE = new ServerManager();
     private final Logger logger = LoggerFactory.getLogger(ServerManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(ServerManager.class);
-    private boolean useDb;
     private final AtomicBoolean isStarted = new AtomicBoolean();
-
-    private static final ServerManager INSTANCE = new ServerManager();
+    private final Map<String, Class<?>> tangoClasses = new LinkedHashMap<String, Class<?>>();
+    private boolean useDb;
     /**
      * The name of the executable
      */
@@ -90,13 +83,11 @@ public final class ServerManager {
     private String serverName;
     private String hostName;
     private String pid = "0";
-
-    private final Map<String, Class<?>> tangoClasses = new LinkedHashMap<String, Class<?>>();
-
     private TangoExporter tangoExporter;
     private String lastClass;
     private TransactionType transactionType;
     private MonitoringService monitoring;
+    private String hostIPAddress = "";
 
     private ServerManager() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -127,10 +118,8 @@ public final class ServerManager {
     /**
      * Add a class to the server.
      *
-     * @param tangoClass
-     *            The class name as defined in the tango database
-     * @param deviceClass
-     *            The class that define a device with {@link Device}
+     * @param tangoClass  The class name as defined in the tango database
+     * @param deviceClass The class that define a device with {@link Device}
      */
     public void addClass(final String tangoClass, final Class<?> deviceClass) {
         lastClass = tangoClass;
@@ -168,11 +157,9 @@ public final class ServerManager {
      * ServerManager.getInstance().start(new String[] { &quot;1&quot; }, &quot;JTangoTest&quot;);
      * </pre>
      *
-     * @param args
-     *            The arguments to pass. instanceName [-v[trace level]] [-nodb
-     *            [-dlist <device name list>]]
-     * @param execName
-     *            The name of the server as defined by Tango.
+     * @param args     The arguments to pass. instanceName [-v[trace level]] [-nodb
+     *                 [-dlist <device name list>]]
+     * @param execName The name of the server as defined by Tango.
      * @see ServerManager#addClass(String, Class)
      */
     public synchronized void start(final String[] args, final String execName) {
@@ -209,13 +196,11 @@ public final class ServerManager {
      * ServerManager.getInstance().start(new String[] { &quot;1&quot; }, JTangoTest.class);
      * </pre>
      *
-     * @param args
-     *            The arguments to pass. instanceName [-v[trace level]] [-nodb
-     *            [-dlist <device name list>]]
-     * @param deviceClass
-     *            The class of the device. The server name and class name must
-     *            be defined in tango db with deviceClass.getSimpleName to be
-     *            started with this method.
+     * @param args        The arguments to pass. instanceName [-v[trace level]] [-nodb
+     *                    [-dlist <device name list>]]
+     * @param deviceClass The class of the device. The server name and class name must
+     *                    be defined in tango db with deviceClass.getSimpleName to be
+     *                    started with this method.
      * @see ServerManager#addClass(String, Class)
      */
     public synchronized void start(final String[] args, final Class<?> deviceClass) {
@@ -403,6 +388,10 @@ public final class ServerManager {
 
     }
 
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
     /**
      * Set the transaction type for all server. Overrides {@link Device#transactionType()}
      *
@@ -410,10 +399,6 @@ public final class ServerManager {
      */
     public void setTransactionType(final TransactionType transactionType) {
         this.transactionType = transactionType;
-    }
-
-    public TransactionType getTransactionType() {
-        return transactionType;
     }
 
     /**
@@ -437,14 +422,21 @@ public final class ServerManager {
             } else {
                 addr = InetAddress.getLocalHost();
             }
+            hostIPAddress = addr.getHostAddress();
             hostName = addr.getCanonicalHostName();
         } catch (final UnknownHostException e) {
             throw DevFailedUtils.newDevFailed(e);
         }
 
-        logger.debug("pid: " + pid);
-        logger.debug("hostName: " + hostName);
+        logger.debug("pid: {}" , pid);
+        logger.debug("ipaddress: {},  hostName: {}",hostIPAddress, hostName);
+    }
 
+    /**
+     * @return
+     */
+    public String getHostIPAddress() {
+        return hostIPAddress;
     }
 
     /**
@@ -509,7 +501,6 @@ public final class ServerManager {
     }
 
     /**
-     *
      * @return true is the server is running
      */
     public boolean isStarted() {
