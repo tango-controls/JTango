@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  *
  */
 public final class DatabaseCache implements ICachableDatabase {
-    private static final String RELEASE_1_X = "release 1\\.[7-9]";
+    private static final String RELEASE_1_X = "release 1\\.[0-9]+";
     private final Logger logger = LoggerFactory.getLogger(ServerCache.class);
     private ServerCache serverCache;
 
