@@ -39,7 +39,7 @@ You can choose the specific version of the library via drop down box after follo
 
 # JTango
 
-TANGO kernel Java implementation
+TANGO kernel Java implementation. Compatible with Java 8 and onwards.
 
 # Using JTango
 
