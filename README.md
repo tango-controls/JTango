@@ -6,7 +6,7 @@
 [![Documentation Status](https://readthedocs.org/projects/jtango/badge/?version=jtango-9-lts)](http://jtango.readthedocs.io/en/jtango-9-lts/?badge=jtango-9-lts)
 
 [ ![Download](https://api.bintray.com/packages/tango-controls/jtango/JTango/images/download.svg) ](https://bintray.com/tango-controls/jtango/JTango/_latestVersion)
-[![Maven Central](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.5.17.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.tango-controls/JTango/9.5.17/pom)
+[![Maven Central](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.6.0.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.tango-controls/JTango/9.6.0/pom)
 
 [![License](https://img.shields.io/badge/license-LGPL--3.0-orange.svg)](https://github.com/tango-controls/JTango/blob/jtango-9-lts/LICENSE)
 
@@ -31,10 +31,10 @@
 
 You can choose the specific version of the library via drop down box after following the links below:
 
-[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoServer/9.5.19.svg?color=yellowgreen&label=JTangoServer)](https://www.javadoc.io/doc/org.tango-controls/JTangoServer/9.5.19)
-[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoClientLang/9.5.19.svg?label=JTangoClientLang&color=blue)](https://www.javadoc.io/doc/org.tango-controls/JTangoClientLang/9.5.19)
-[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoCommons/9.5.19.svg?color=yellow&label=JTangoCommons)](https://www.javadoc.io/doc/org.tango-controls/JTangoCommons/9.5.19)
-[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/TangORB/9.5.19.svg?color=orange&label=TangORB)](https://www.javadoc.io/doc/org.tango-controls/TangORB/9.5.19)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoServer/9.6.0.svg?color=yellowgreen&label=JTangoServer)](https://www.javadoc.io/doc/org.tango-controls/JTangoServer/9.6.0)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoClientLang/9.6.0.svg?label=JTangoClientLang&color=blue)](https://www.javadoc.io/doc/org.tango-controls/JTangoClientLang/9.6.0)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/JTangoCommons/9.6.0.svg?color=yellow&label=JTangoCommons)](https://www.javadoc.io/doc/org.tango-controls/JTangoCommons/9.6.0)
+[![Javadocs](https://www.javadoc.io/badge/org.tango-controls/TangORB/9.6.0.svg?color=orange&label=TangORB)](https://www.javadoc.io/doc/org.tango-controls/TangORB/9.6.0)
 
 
 # JTango
