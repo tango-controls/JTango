@@ -5,8 +5,9 @@
 [![Build Status](https://travis-ci.org/tango-controls/JTango.svg?branch=jtango-9-lts)](https://travis-ci.org/tango-controls/JTango)
 [![Documentation Status](https://readthedocs.org/projects/jtango/badge/?version=jtango-9-lts)](http://jtango.readthedocs.io/en/jtango-9-lts/?badge=jtango-9-lts)
 
-[ ![Download](https://api.bintray.com/packages/tango-controls/jtango/JTango/images/download.svg) ](https://bintray.com/tango-controls/jtango/JTango/_latestVersion)
-[![Maven Central](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.6.0.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.tango-controls/JTango/9.6.0/pom)
+[![Download](https://api.bintray.com/packages/tango-controls/jtango/JTango/images/download.svg) ](https://github.com/tango-controls/JTango/releases/tag/9.6.0)
+[![Maven Central](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.6.0.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.tango-controls/JTangoServer/9.6.0/jar)
+[![Bintray](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.6.0.svg?label=Bintray)](https://bintray.com/tango-controls/jtango/JTangoServer/_latestVersion)
 
 [![License](https://img.shields.io/badge/license-LGPL--3.0-orange.svg)](https://github.com/tango-controls/JTango/blob/jtango-9-lts/LICENSE)
 
@@ -45,15 +46,26 @@ TANGO kernel Java implementation. Compatible with Java 8 and onwards.
 
 ## Setup using maven
 
-Add the following code snippet in your pom.xml
-
+To develop a Tango device server, add the following code snippet in your pom.xml:
 
 ```xml
 
 <dependency>
     <groupId>org.tango-controls</groupId>
-    <artifactId>JTango</artifactId>
-    <version>LATEST</version>
+    <artifactId>JTangoServer</artifactId>
+    <version>9.6.0</version>
+</dependency>
+
+```
+
+To develop a Tango client, add the following code snippet in your pom.xml:
+
+```xml
+
+<dependency>
+    <groupId>org.tango-controls</groupId>
+    <artifactId>JTangoClientLang</artifactId>
+    <version>9.6.0</version>
 </dependency>
 
 ```
