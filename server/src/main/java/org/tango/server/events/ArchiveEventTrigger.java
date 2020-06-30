@@ -77,10 +77,10 @@ public class ArchiveEventTrigger implements IEventTrigger {
         // Else check criteria
         final EventProperties props = attribute.getProperties().getEventProp();
         if (attribute.isCheckArchivingEvent()) {
-            if (props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
+            if (props.arch_event.period.equals(Constants.NOT_SPECIFIED) && props.arch_event.abs_change.equals(Constants.NOT_SPECIFIED)
                     && props.arch_event.rel_change.equals(Constants.NOT_SPECIFIED)) {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.EVENT_CRITERIA_NOT_SET,
-                        "Archive event properties (abs_change or rel_change) for attribute " + attribute.getName()
+                        "Archive event properties (period or abs_change or rel_change) for attribute " + attribute.getName()
                                 + " are not set");
             }
         }
