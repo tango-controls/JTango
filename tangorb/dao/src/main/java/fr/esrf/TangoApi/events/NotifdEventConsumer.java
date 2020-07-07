@@ -362,9 +362,9 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
                         String attribute, DeviceData deviceData, String event_name) throws DevFailed {
 
         String deviceName = device.name();
-        if (!device_channel_map.containsKey(deviceName)) {
+        if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
             connect(device, attribute, event_name, deviceData);
-            if (!device_channel_map.containsKey(deviceName)) {
+            if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
                         "Failed to connect to event channel for device",
                         "EventConsumer.subscribe_event()");
@@ -498,7 +498,7 @@ public class NotifdEventConsumer extends EventConsumer implements TangoConst, Ru
         eventChannelStruct.use_db = device_proxy.use_db();
         eventChannelStruct.dbase = dbase;
 
-        device_channel_map.put(deviceName, channelName);
+        device_channel_map.put(deviceName.toLowerCase(), channelName);
     }
     //===============================================================
     /**

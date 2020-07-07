@@ -182,12 +182,12 @@ public class ZmqEventConsumer extends EventConsumer implements
         }
 
         //	Prepare filters for heartbeat events on channelName
-        String channelName = device_channel_map.get(deviceName);
+        String channelName = device_channel_map.get(deviceName.toLowerCase());
         if (channelName==null) {
             //  If from notifd, tango host not used.
             int start = deviceName.indexOf('/', "tango:// ".length());
             deviceName = deviceName.substring(start+1);
-            channelName = device_channel_map.get(deviceName);
+            channelName = device_channel_map.get(deviceName.toLowerCase());
         }
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
         event_channel_struct.last_subscribed = System.currentTimeMillis();
@@ -315,7 +315,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             eventChannelStruct.dbase = database;
             eventChannelStruct.setTangoRelease(tangoVersion);
 
-            device_channel_map.put(deviceName, adminName);
+            device_channel_map.put(deviceName.toLowerCase(), adminName);
         }
         catch (DevFailed e) {
             Except.throw_event_system_failed("API_BadConfigurationProperty",
@@ -416,10 +416,10 @@ public class ZmqEventConsumer extends EventConsumer implements
 
         String deviceName = deviceProxy.fullName();
         ApiUtil.printTrace("checkDeviceConnection for " + deviceName);
-        if (!device_channel_map.containsKey(deviceName)) {
+        if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
             ApiUtil.printTrace("    Does NOT Exist");
             connect(deviceProxy, attribute, event_name, deviceData);
-            if (!device_channel_map.containsKey(deviceName)) {
+            if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
                         "Failed to connect to event channel for device",
                         "EventConsumer.subscribe_event()");
