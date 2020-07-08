@@ -82,8 +82,8 @@ public class ZmqEventConsumer extends EventConsumer implements
         zmqMainThread.start();
         addShutdownHook();
     }
-   //===============================================================
-   //===============================================================
+    //===============================================================
+    //===============================================================
     private Thread runner;
     private void addShutdownHook(){
         runner = new Thread(this);
@@ -102,8 +102,8 @@ public class ZmqEventConsumer extends EventConsumer implements
         );
         runner.start();
     }
-   //===============================================================
-   //===============================================================
+    //===============================================================
+    //===============================================================
     public void run() {
 
     }
@@ -176,16 +176,16 @@ public class ZmqEventConsumer extends EventConsumer implements
         if (info.length>1)
             callback_key = info[1];
         else
-             callback_key = deviceName.toLowerCase() + "." + event_name;
+            callback_key = deviceName.toLowerCase() + "." + event_name;
 
         //	Prepare filters for heartbeat events on channelName
-        String channelName = device_channel_map.get(deviceName);
+        String channelName = device_channel_map.get(deviceName.toLowerCase());
         System.out.println("deviceName:  "+deviceName);
         if (channelName==null) {
             //  If from notifd, tango host not used.
             int start = deviceName.indexOf('/', "tango:// ".length());
             deviceName = deviceName.substring(start+1);
-            channelName = device_channel_map.get(deviceName);
+            channelName = device_channel_map.get(deviceName.toLowerCase());
         }
         //System.out.println("channelName: "+channelName);
         EventChannelStruct event_channel_struct = channel_map.get(channelName);
@@ -249,7 +249,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     @Override
     protected void setAdditionalInfoToEventCallBackStruct(EventCallBackStruct callback_struct,
-                          String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) {
+                                                          String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) {
         // Nothing
         ApiUtil.printTrace("-------------> Set as ZmqEventConsumer for "+device_name);
         callback_struct.consumer  = this;
@@ -289,7 +289,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                 ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
                         attributeName, deviceData.extractLongStringArray(), eventName,false);
             }
-            device_channel_map.put(deviceName, adminName);
+            device_channel_map.put(deviceName.toLowerCase(), adminName);
         }
         catch (DevFailed e) {
             Except.throw_event_system_failed("API_BadConfigurationProperty",
@@ -306,7 +306,7 @@ public class ZmqEventConsumer extends EventConsumer implements
      *  In this case the address from getHostAddress()
      *  replace the address in device data.
      */
-   //===============================================================
+    //===============================================================
     private DeviceData checkWithHostAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed {
 // ToDo
         DevVarLongStringArray lsa = deviceData.extractLongStringArray();
@@ -317,16 +317,16 @@ public class ZmqEventConsumer extends EventConsumer implements
             System.err.println("Host address is " + hostAddress);
             System.err.println("Server returns  " + lsa.svalue[0]);
             if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
-                 String  wrongAdd = lsa.svalue[0];
-                 int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
-                 if (idx>0) {
-                     lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
-                     lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
-                     System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
-                     deviceData = new DeviceData();
-                     deviceData.insert(lsa);
-                     isEndpointAvailable(lsa.svalue[0]);
-                 }
+                String  wrongAdd = lsa.svalue[0];
+                int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
+                if (idx>0) {
+                    lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
+                    lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
+                    System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
+                    deviceData = new DeviceData();
+                    deviceData.insert(lsa);
+                    isEndpointAvailable(lsa.svalue[0]);
+                }
             }
         } catch (UnknownHostException e) {
             Except.throw_exception("UnknownHostException",
@@ -390,7 +390,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     @Override
     protected  void checkDeviceConnection(DeviceProxy deviceProxy,
-                        String attribute, DeviceData deviceData, String event_name) throws DevFailed {
+                                          String attribute, DeviceData deviceData, String event_name) throws DevFailed {
 
         //  Check if address is coherent (??)
         deviceData = checkZmqAddress(deviceData, deviceProxy);
@@ -407,10 +407,10 @@ public class ZmqEventConsumer extends EventConsumer implements
         else
             deviceName = deviceProxy.fullName();
         ApiUtil.printTrace("checkDeviceConnection for " + deviceName);
-        if (!device_channel_map.containsKey(deviceName)) {
+        if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
             ApiUtil.printTrace("    Does NOT Exist");
             connect(deviceProxy, attribute, event_name, deviceData);
-            if (!device_channel_map.containsKey(deviceName)) {
+            if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
                 Except.throw_event_system_failed("API_NotificationServiceFailed",
                         "Failed to connect to event channel for device",
                         "EventConsumer.subscribe_event()");
@@ -419,7 +419,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         else {
             ApiUtil.printTrace(deviceName + " already connected.");
             ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
-                        attribute, deviceData.extractLongStringArray(), event_name,false);
+                    attribute, deviceData.extractLongStringArray(), event_name,false);
         }
     }
     //===============================================================
@@ -442,7 +442,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                 lsa, cs.eventName, false);
         if (cs.reconnect) {
             EventChannelStruct eventChannelStruct = channel_map.get(cs.channelName);
-           // eventChannelStruct.eventChannel = eventChannel;
+            // eventChannelStruct.eventChannel = eventChannel;
             eventChannelStruct.last_heartbeat = System.currentTimeMillis();
             eventChannelStruct.heartbeat_skipped = false;
             eventChannelStruct.has_notifd_closed_the_connection = 0;
@@ -489,11 +489,11 @@ public class ZmqEventConsumer extends EventConsumer implements
         boolean done = false;
         try {
             ApiUtil.printTrace("====================================================\n" +
-                                "   Try to resubscribe " + eventCallBackStruct.channel_name);
+                    "   Try to resubscribe " + eventCallBackStruct.channel_name);
             DeviceData argOut = ZMQutils.getEventSubscriptionInfoFromAdmDevice(
-                        channelStruct.adm_device_proxy,
-                        eventCallBackStruct.device.name(),
-                        eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
+                    channelStruct.adm_device_proxy,
+                    eventCallBackStruct.device.name(),
+                    eventCallBackStruct.attr_name, eventCallBackStruct.event_name);
             DevVarLongStringArray lsa = checkZmqAddress(argOut, eventCallBackStruct.device).extractLongStringArray();
 
             //  Update the heartbeat time
@@ -524,10 +524,10 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     @Override
     protected void checkIfHeartbeatSkipped(String name, EventChannelStruct channelStruct) {
-            // Check if heartbeat have been skipped, can happen if
-            // 1- the server is dead
-            // 2- The network was down;
-            // 3- The server has been restarted on another host.
+        // Check if heartbeat have been skipped, can happen if
+        // 1- the server is dead
+        // 2- The network was down;
+        // 3- The server has been restarted on another host.
 
         if (KeepAliveThread.heartbeatHasBeenSkipped(channelStruct)) {
             DevError    dev_error = null;
@@ -556,7 +556,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                         //  ToDo Re connect without error means heartbeat missing
                         dev_error = new DevError("API_NoHeartbeat",
                                 ErrSeverity.ERR, "No heartbeat from " +
-                                    channelStruct.adm_device_proxy.get_name(),
+                                channelStruct.adm_device_proxy.get_name(),
                                 "ZmqEventConsumer.checkIfHeartbeatSkipped()");
                         pushReceivedException(channelStruct, callbackStruct, dev_error);
                     }
@@ -600,10 +600,10 @@ public class ZmqEventConsumer extends EventConsumer implements
         boolean reConnected;
         try {
             DeviceData argOut = ZMQutils.getEventSubscriptionInfoFromAdmDevice(
-                        channelStruct.adm_device_proxy,
-                        callBackStruct.device.name(),
-                        callBackStruct.attr_name,
-                        callBackStruct.event_name);
+                    channelStruct.adm_device_proxy,
+                    callBackStruct.device.name(),
+                    callBackStruct.attr_name,
+                    callBackStruct.event_name);
             DevVarLongStringArray   lsa = checkZmqAddress(argOut, callBackStruct.device).extractLongStringArray();
 
             //  Build the buffer to connect event and send it
@@ -643,7 +643,7 @@ public class ZmqEventConsumer extends EventConsumer implements
 
                     //  Re Connect heartbeat
                     ZMQutils.connectHeartbeat(channelStruct.adm_device_proxy.get_tango_host(),
-                                channelStruct.adm_device_proxy.name(), lsa, true);
+                            channelStruct.adm_device_proxy.name(), lsa, true);
                     reConnected = true;
                 } catch (DevFailed e1) {
                     //Except.print_exception(e1);
