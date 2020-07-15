@@ -31,7 +31,10 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
 import fr.esrf.TangoDs.TangoConst;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.tango.server.ServerManager;
 import org.tango.server.events.EventType;
@@ -40,12 +43,13 @@ import org.tango.utils.DevFailedUtils;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
-@Ignore("Tests need a tangdb")
+//@Ignore("Tests need a tangdb")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EventTest {
     // XXX dependency to tangodb
@@ -69,7 +73,8 @@ public class EventTest {
 //        } finally {
 //            if (ss1 != null)
 //                ss1.close();
-//            System.setProperty("TANGO_HOST", "192.168.56.101:10000");
+            System.setProperty("org.tango.server.checkalarms", "false");
+          //  System.setProperty("TANGO_HOST", "192.168.56.101:10000");
             EventServer.start();
             System.out.println("event server started");
         } catch (DevFailed e) {
@@ -167,7 +172,7 @@ public class EventTest {
             while (eventsNb < 4) {
                 final EventData[] events = dev.get_events();
                 for (final EventData eventData : events) {
-                    System.out.println("CLIENT attr value is "+ eventData.name);
+                    System.out.println("CLIENT attr value is " + eventData.name);
                     if (eventData.name.contains("doubleattsendtwice")) {
                         eventsNb++;
                         previousValue = value;
@@ -177,7 +182,7 @@ public class EventTest {
                     }
                 }
             }
-            assertThat(value, equalTo(previousValue-1));
+            assertThat(value, equalTo(previousValue - 1));
             dev.unsubscribe_event(id);
         } catch (DevFailed e) {
             DevFailedUtils.printDevFailed(e);
@@ -235,6 +240,46 @@ public class EventTest {
                 }
             }
             assertThat(value, equalTo(previousValue + 1));
+        } finally {
+            dev.unsubscribe_event(id);
+        }
+    }
+
+    @Test(timeout = 3000)
+    public void archiveScalarCheck() throws DevFailed, InterruptedException {
+        System.out.println("\t####archiveScalarCheck");
+        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final int id = dev.subscribe_event("archiveCheck", TangoConst.ARCHIVE_EVENT, 100, new String[]{},
+                TangoConst.NOT_STATELESS);
+        int eventsNb = 0;
+        short value = 0;
+        short previousValue = 0;
+        for (int i = 0; i < 4; i++) {
+            dev.command_inout("sendCheckArchiveEvent");
+        }
+        TimeUnit.MILLISECONDS.sleep(100);
+        //  List<Short> values = new LinkedList<>();
+        try {
+            while (eventsNb < 4) {
+                final EventData[] events = dev.get_events();
+                System.out.println("get data " + events.length);
+                for (final EventData eventData : events) {
+                    if (eventData.name.contains("archivecheck")) {
+                        eventsNb++;
+                        previousValue = value;
+                        value = eventData.attr_value.extractShort();
+                        System.out.println(eventsNb + " - value = " + value);
+                        if (eventsNb > 3) {
+                            // FIXME client API invert order of 1rt 2 events
+                            assertThat(value, equalTo((short) (previousValue + 1)));
+                        }
+                        //values.add(value);
+
+                    }
+                }
+
+            }
+
         } finally {
             dev.unsubscribe_event(id);
         }
