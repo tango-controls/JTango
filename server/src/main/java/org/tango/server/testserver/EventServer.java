@@ -125,9 +125,9 @@ public class EventServer {
     }
 
     public static void start() throws DevFailed {
-        ServerManager.getInstance().addClass(EventServer.class.getSimpleName(), EventServer.class);
+        ServerManager.getInstance().addClass(EventServer.class.getCanonicalName(), EventServer.class);
         ServerManager.getInstance().startError(new String[]{INSTANCE_NAME}, EventServer.class.getSimpleName());
-        System.out.println("Event server started ");
+        System.out.println("Event server started");
     }
 
     public static void main(final String[] args) throws DevFailed {
