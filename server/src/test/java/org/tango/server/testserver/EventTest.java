@@ -27,6 +27,8 @@ package org.tango.server.testserver;
 import fr.esrf.Tango.AttrQuality;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.ApiUtil;
+import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoApi.events.EventData;
@@ -74,7 +76,9 @@ public class EventTest {
 //            if (ss1 != null)
 //                ss1.close();
             System.setProperty("org.tango.server.checkalarms", "false");
-          //  System.setProperty("TANGO_HOST", "192.168.56.101:10000");
+            //  System.setProperty("TANGO_HOST", "192.168.56.101:10000");
+            Database tangoDb = ApiUtil.get_db_obj();
+            tangoDb.add_device(deviceName, EventServer.class.getCanonicalName(), EventServer.SERVER_NAME + "/" + EventServer.INSTANCE_NAME);
             EventServer.start();
             System.out.println("event server started");
         } catch (DevFailed e) {
