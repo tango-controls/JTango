@@ -129,6 +129,17 @@ public final class DeviceManager {
     }
 
     /**
+     * Remove all attributes' properties
+     *
+     * @throws DevFailed
+     */
+    public void clearAttributeProperties() throws DevFailed {
+        for(AttributeImpl attr: device.getAttributeList()) {
+            attr.removeProperties();
+        }
+    }
+
+    /**
      * Check if an attribute or an command is polled
      *
      * @param polledObject The name of the polled object (attribute or command)
