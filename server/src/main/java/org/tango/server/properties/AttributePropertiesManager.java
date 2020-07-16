@@ -1,34 +1,30 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.properties;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import fr.esrf.Tango.DevFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
@@ -37,13 +33,15 @@ import org.tango.client.database.DatabaseFactory;
 import org.tango.server.Constants;
 import org.tango.utils.CaseInsensitiveMap;
 
-import fr.esrf.Tango.DevFailed;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Manage attribute properties persistancy in tango db.
  *
  * @author ABEILLE
- *
  */
 public final class AttributePropertiesManager {
 
@@ -83,10 +81,8 @@ public final class AttributePropertiesManager {
         for (final Entry<String, String[]> entry : prop.entrySet()) {
             final String name = entry.getKey();
             final String[] value = entry.getValue();
-            if (value.length > 0) {
+            if (value.length > 0 && !value[0].equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
                 result.put(name, value[0]);
-            } else {
-                result.put(name, "");
             }
         }
         xlogger.exit();
@@ -107,7 +103,7 @@ public final class AttributePropertiesManager {
      */
     public String getAttributePropertyFromDB(final String attributeName, final String propertyName) throws DevFailed {
         xlogger.entry(propertyName);
-        String[] result = new String[] {};
+        String[] result = new String[]{};
         final Map<String, String[]> prop = DatabaseFactory.getDatabase().getAttributeProperties(deviceName,
                 attributeName);
         if (prop.get(propertyName) != null) {
@@ -151,9 +147,9 @@ public final class AttributePropertiesManager {
         // DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
         // }
         // } else {
-        logger.debug("update in DB {}, property {}= {}", new Object[] { attributeName, propertyName, value });
+        logger.debug("update in DB {}, property {}= {}", new Object[]{attributeName, propertyName, value});
         final Map<String, String[]> propInsert = new HashMap<String, String[]>();
-        propInsert.put(propertyName, new String[] { value });
+        propInsert.put(propertyName, new String[]{value});
         DatabaseFactory.getDatabase().setAttributeProperties(deviceName, attributeName, propInsert);
         // }
         xlogger.exit();
@@ -184,9 +180,9 @@ public final class AttributePropertiesManager {
                 if (presentValue != null) {
                     isADefaultValue = presentValue.isEmpty()
                             && (value.equalsIgnoreCase(Constants.NOT_SPECIFIED)
-                                    || value.equalsIgnoreCase(Constants.NO_DIPLAY_UNIT)
-                                    || value.equalsIgnoreCase(Constants.NO_UNIT) || value
-                                        .equalsIgnoreCase(Constants.NO_STD_UNIT));
+                            || value.equalsIgnoreCase(Constants.NO_DIPLAY_UNIT)
+                            || value.equalsIgnoreCase(Constants.NO_UNIT) || value
+                            .equalsIgnoreCase(Constants.NO_STD_UNIT));
                 }
                 if (!isADefaultValue) {
                     if (presentValue == null) {

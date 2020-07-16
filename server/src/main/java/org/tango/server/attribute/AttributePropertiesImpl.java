@@ -480,7 +480,7 @@ public final class AttributePropertiesImpl {
             }
             // find duplicate values
             final List<String> inputList = Arrays.asList(enumLabels);
-            final Set<String> inputSet = new HashSet<String>(inputList);
+            final Set<String> inputSet = new HashSet<>(inputList);
             if (inputSet.size() < inputList.size()) {
                 throw DevFailedUtils.newDevFailed(ExceptionMessages.ATTR_OPT_PROP, "duplicate enum values not allowed");
             }
@@ -630,7 +630,7 @@ public final class AttributePropertiesImpl {
     }
 
     void persist(final String deviceName, final String attributeName) throws DevFailed {
-        final Map<String, String[]> properties = new HashMap<String, String[]>();
+        final Map<String, String[]> properties = new HashMap<>();
         properties.put(Constants.LABEL, new String[]{getLabel()});
         if (!isFwdAttribute) {
             properties.put(Constants.FORMAT, new String[]{getFormat()});
@@ -664,13 +664,11 @@ public final class AttributePropertiesImpl {
         final AttributePropertiesManager attributePropertiesManager = new AttributePropertiesManager(deviceName);
         final Map<String, String[]> propValues = attributePropertiesManager.getAttributePropertiesFromDB(attributeName);
         // use a second map for attribute props that have one value
-        final Map<String, String> propValuesSingle = new CaseInsensitiveMap<String>(propValues.size());
+        final Map<String, String> propValuesSingle = new CaseInsensitiveMap<>(propValues.size());
         for (final Entry<String, String[]> entry : propValues.entrySet()) {
             final String[] value = entry.getValue();
-            if (value.length == 1) {
+            if (value.length == 1 && !value[0].equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
                 propValuesSingle.put(entry.getKey(), value[0]);
-            } else if (value.length == 0) {
-                propValuesSingle.put(entry.getKey(), "");
             }
         }
         // if (propValues.containsKey(ROOT_ATTRIBUTE)) {
