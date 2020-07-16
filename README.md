@@ -7,7 +7,7 @@
 
 [![Download](https://api.bintray.com/packages/tango-controls/jtango/JTango/images/download.svg) ](https://github.com/tango-controls/JTango/releases/tag/9.6.1)
 [![Maven Central](https://img.shields.io/maven-central/v/org.tango-controls/JTango/9.6.0.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.tango-controls/JTangoServer/9.6.0/jar)
-[![Bintray](https://api.bintray.com/packages/tango-controls/jtango/JTangoServer/images/download.svg?label=Bintray)](https://bintray.com/tango-controls/jtango/JTangoServer/_latestVersion)
+[![Bintray](https://img.shields.io/badge/bintray-9.6.1-blue)](https://bintray.com/tango-controls/jtango/JTangoServer/_latestVersion)
 
 [![License](https://img.shields.io/badge/license-LGPL--3.0-orange.svg)](https://github.com/tango-controls/JTango/blob/jtango-9-lts/LICENSE)
 
