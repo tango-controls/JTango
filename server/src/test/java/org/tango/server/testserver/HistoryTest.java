@@ -1,24 +1,24 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,13 +62,30 @@ public class HistoryTest {
     }
 
     @Test
+    public void fillHistory() throws DevFailed {
+        try {
+            DeviceProxy dev = new DeviceProxy(deviceName);
+            TangoCommand cmd = new TangoCommand(deviceName, "fillHistory");
+            cmd.execute();
+            DeviceDataHistory[] history = dev.attribute_history("shortScalar");
+            for (int i = 0; i < history.length; i++) {
+                // System.out.println(history[i].getErrStack());
+                assertThat(history[i].extractShort(), equalTo((short) i));
+            }
+        } catch (DevFailed e) {
+            DevFailedUtils.printDevFailed(e);
+            throw e;
+        }
+    }
+
+    @Test
     public void attributeHistory() throws DevFailed {
         // install polling
         final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 10 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar" };
+            final int[] param1 = new int[]{10};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.ATTRIBUTE.toString(), "shortScalar"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
 
@@ -96,8 +113,8 @@ public class HistoryTest {
         final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 10 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
+            final int[] param1 = new int[]{10};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.ATTRIBUTE.toString(), "State"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
 
@@ -125,8 +142,8 @@ public class HistoryTest {
         final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 10 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "State" };
+            final int[] param1 = new int[]{10};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.ATTRIBUTE.toString(), "State"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
 
@@ -154,8 +171,8 @@ public class HistoryTest {
         final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 10 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum" };
+            final int[] param1 = new int[]{10};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.ATTRIBUTE.toString(), "stateSpectrum"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
             try {
@@ -174,8 +191,8 @@ public class HistoryTest {
                     System.out.println(DeviceState.toString(element2));
                 }
                 System.out.println(Arrays.toString(element.extractDevStateArray()));
-                assertThat(element.extractDevStateArray(), equalTo(new DevState[] { DevState.ON, DevState.OFF,
-                        DevState.UNKNOWN }));
+                assertThat(element.extractDevStateArray(), equalTo(new DevState[]{DevState.ON, DevState.OFF,
+                        DevState.UNKNOWN}));
 
             }
 
@@ -196,8 +213,8 @@ public class HistoryTest {
         final String adminName = Constants.ADMIN_DEVICE_DOMAIN + "/" + ServerManager.getInstance().getServerName();
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 10 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum" };
+            final int[] param1 = new int[]{10};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.ATTRIBUTE.toString(), "pollSpectrum"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
             try {
@@ -213,7 +230,7 @@ public class HistoryTest {
             for (final DeviceDataHistory element : hist) {
                 if (!element.failed) {
                     System.out.println(Arrays.toString(element.extractLong64Array()));
-                    assertThat(element.extractLong64Array(), equalTo(new long[] { 1, 2, 0 }));
+                    assertThat(element.extractLong64Array(), equalTo(new long[]{1, 2, 0}));
                 } else {
                     assertThat(element.getErrStack()[0].desc, equalTo("error pollSpectrum"));
                     System.out.println(element.getErrStack()[0].desc);
@@ -238,8 +255,8 @@ public class HistoryTest {
         try {
 
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 100 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPolling" };
+            final int[] param1 = new int[]{100};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.COMMAND.toString(), "testPolling"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
             // sleep to allow history to be filled
@@ -275,14 +292,14 @@ public class HistoryTest {
         try {
 
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
-            final int[] param1 = new int[] { 100 };
-            final String[] param2 = new String[] { deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray" };
+            final int[] param1 = new int[]{100};
+            final String[] param2 = new String[]{deviceName, PolledObjectType.COMMAND.toString(), "testPollingArray"};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
             final DeviceProxy dev = new DeviceProxy(deviceName);
             final DeviceDataHistory[] hist = dev.command_history("testPollingArray");
             for (final DeviceDataHistory element : hist) {
-                assertThat(element.extractLongArray(), equalTo(new int[] { 1, 2 }));
+                assertThat(element.extractLongArray(), equalTo(new int[]{1, 2}));
             }
 
         } catch (final DevFailed e) {

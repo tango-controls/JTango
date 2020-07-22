@@ -389,7 +389,7 @@ public final class JTangoTest {
      *
      * @return shortScalar attribute
      */
-    @Attribute
+    @Attribute(isPolled = true, pollingPeriod = 0)
     public short getShortScalar() {
         return shortScalar;
     }
@@ -781,6 +781,19 @@ public final class JTangoTest {
     @Command
     @StateMachine(endState = DeviceState.FAULT)
     public void testState() {
+    }
+
+    @Command
+    public void fillHistory() throws DevFailed {
+        AttributeValue[] values = new AttributeValue[3];
+        // FIXME client API does not support null values in history even with errors
+        //DevFailed[] errors = new DevFailed[3];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = new AttributeValue();
+            values[i].setValue((short)i);
+          //  errors[i] = DevFailedUtils.newDevFailed("test");
+        }
+        deviceManager.fillAttributeHistory("shortScalar", values, values, null);
     }
 
     /**

@@ -134,7 +134,7 @@ public final class DeviceManager {
      * @throws DevFailed
      */
     public void clearAttributeProperties() throws DevFailed {
-        for(AttributeImpl attr: device.getAttributeList()) {
+        for (AttributeImpl attr : device.getAttributeList()) {
             attr.removeProperties();
         }
     }
@@ -229,6 +229,19 @@ public final class DeviceManager {
      */
     public void triggerPolling(final String polledObject) throws DevFailed {
         device.triggerPolling(polledObject);
+    }
+
+    /**
+     * Set all value of an attribute's history
+     *
+     * @param attributeName attribute name
+     * @param readValues    read value, can be null for Write only attribute
+     * @param writeValues   write value, can be null for Read only attribute
+     * @throws DevFailed
+     */
+    public void fillAttributeHistory(String attributeName, AttributeValue[] readValues, AttributeValue[] writeValues, DevFailed[] errors) throws DevFailed {
+        final AttributeImpl attr = AttributeGetterSetter.getAttribute(attributeName, device.getAttributeList());
+        attr.fillHistory(readValues, writeValues, errors);
     }
 
     /**

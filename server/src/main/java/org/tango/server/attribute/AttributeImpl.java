@@ -642,8 +642,62 @@ public class AttributeImpl extends DeviceBehaviorObject
         return behavior;
     }
 
+    /**
+     * Add current attribute data to attribute history
+     */
     public void addToHistory() {
         history.addToHistory(readValue, writeValue, new DevError[0]);
+    }
+
+    /**
+     * Set all data of attribute history
+     *
+     * @param readValues  read value
+     * @param writeValues write value
+     * @throws DevFailed
+     */
+    public void fillHistory(final AttributeValue[] readValues, final AttributeValue[] writeValues, final DevFailed[] errors) throws DevFailed {
+        history.clear();
+        if (readValues == null) {
+            if (errors != null && errors.length != writeValues.length) {
+                throw DevFailedUtils.newDevFailed("write and errors values must have the same size");
+            }
+            logger.debug("filling attribute {} history with {} write values", name, writeValues.length);
+            for (int i = 0; i < writeValues.length; i++) {
+                DevError[] error = new DevError[0];
+                if (errors != null && errors[i] != null) {
+                    error = errors[i].errors;
+                }
+                history.addToHistory(writeValues[i], null, error);
+            }
+        } else if (writeValues == null) {
+            if (errors != null && errors.length != readValues.length) {
+                throw DevFailedUtils.newDevFailed("read and errors values must have the same size");
+            }
+            logger.debug("filling attribute {} history with {} read values", name, readValues.length);
+            for (int i = 0; i < readValues.length; i++) {
+                DevError[] error = new DevError[0];
+                if (errors != null && errors[i] != null) {
+                    error = errors[i].errors;
+                }
+                history.addToHistory(readValues[i], null, error);
+            }
+        } else {
+            if (readValues.length != writeValues.length) {
+                throw DevFailedUtils.newDevFailed("read and write values must have the same size");
+            }
+            if (errors != null && errors.length != readValues.length) {
+                throw DevFailedUtils.newDevFailed("read and errors values must have the same size");
+            }
+            logger.debug("filling attribute {} history with {} read and write values", name, readValues.length);
+            for (int i = 0; i < readValues.length; i++) {
+                DevError[] error = new DevError[0];
+                if (errors != null && errors[i] != null) {
+                    error = errors[i].errors;
+                }
+                history.addToHistory(readValues[i], writeValues[i], error);
+            }
+        }
     }
 
     public void addErrorToHistory(final DevFailed e) throws DevFailed {
@@ -821,7 +875,8 @@ public class AttributeImpl extends DeviceBehaviorObject
     }
 
     @Override
-    public void setPollingStats(final double executionDuration, final double lastUpdateTime, final double deltaTime) {
+    public void setPollingStats(final double executionDuration, final double lastUpdateTime,
+                                final double deltaTime) {
         this.executionDuration = executionDuration;
         this.lastUpdateTime = lastUpdateTime;
         this.deltaTime = deltaTime;
