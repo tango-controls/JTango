@@ -67,7 +67,7 @@ public class HistoryTest {
             DeviceProxy dev = new DeviceProxy(deviceName);
             TangoCommand cmd = new TangoCommand(deviceName, "fillHistory");
             cmd.execute();
-            DeviceDataHistory[] history = dev.attribute_history("shortScalar");
+            DeviceDataHistory[] history = dev.attribute_history("fillHistory");
             for (int i = 0; i < history.length; i++) {
                 // System.out.println(history[i].getErrStack());
                 assertThat(history[i].extractShort(), equalTo((short) i));

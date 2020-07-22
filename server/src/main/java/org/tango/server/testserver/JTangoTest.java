@@ -389,7 +389,7 @@ public final class JTangoTest {
      *
      * @return shortScalar attribute
      */
-    @Attribute(isPolled = true, pollingPeriod = 0)
+    @Attribute
     public short getShortScalar() {
         return shortScalar;
     }
@@ -783,6 +783,11 @@ public final class JTangoTest {
     public void testState() {
     }
 
+    @Attribute(isPolled = true, pollingPeriod = 0)
+    public short getFillHistory() {
+        return 0;
+    }
+
     @Command
     public void fillHistory() throws DevFailed {
         AttributeValue[] values = new AttributeValue[3];
@@ -790,10 +795,10 @@ public final class JTangoTest {
         //DevFailed[] errors = new DevFailed[3];
         for (int i = 0; i < values.length; i++) {
             values[i] = new AttributeValue();
-            values[i].setValue((short)i);
-          //  errors[i] = DevFailedUtils.newDevFailed("test");
+            values[i].setValue((short) i);
+            //  errors[i] = DevFailedUtils.newDevFailed("test");
         }
-        deviceManager.fillAttributeHistory("shortScalar", values, values, null);
+        deviceManager.fillAttributeHistory("fillHistory", values, values, null);
     }
 
     /**
