@@ -666,7 +666,9 @@ public final class AttributePropertiesImpl {
         // use a second map for attribute props that have one value
         final Map<String, String> propValuesSingle = new CaseInsensitiveMap<>(propValues.size());
         for (final Entry<String, String[]> entry : propValues.entrySet()) {
+            System.out.println(attributeName + "- "+ entry.getKey() + " = "+ Arrays.toString(entry.getValue()));
             final String[] value = entry.getValue();
+            System.out.println(value.length);
             if (value.length == 1 && !value[0].equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
                 propValuesSingle.put(entry.getKey(), value[0]);
             }
@@ -677,25 +679,27 @@ public final class AttributePropertiesImpl {
         if (propValues.containsKey(Constants.LABEL)) {
             setLabel(propValuesSingle.get(Constants.LABEL));
         }
+        System.out.println(attributeName + "load " + propValues);
+        System.out.println(attributeName + "load propValuesSingle " + propValuesSingle);
         if (!isFwdAttribute) {
-            if (propValues.containsKey(Constants.FORMAT)) {
+            if (propValuesSingle.containsKey(Constants.FORMAT)) {
                 setFormat(propValuesSingle.get(Constants.FORMAT));
             }
-            if (propValues.containsKey(Constants.UNIT)) {
+            if (propValuesSingle.containsKey(Constants.UNIT)) {
                 setUnit(propValuesSingle.get(Constants.UNIT));
             }
-            if (propValues.containsKey(Constants.DISPLAY_UNIT)) {
+            if (propValuesSingle.containsKey(Constants.DISPLAY_UNIT)) {
                 setDisplayUnit(propValuesSingle.get(Constants.DISPLAY_UNIT));
             }
-            if (propValues.containsKey(Constants.STANDARD_UNIT)) {
+            if (propValuesSingle.containsKey(Constants.STANDARD_UNIT)) {
                 setStandardUnit(propValuesSingle.get(Constants.STANDARD_UNIT));
             }
             setMinMax(propValuesSingle);
-            if (propValues.containsKey(Constants.DESC)) {
+            if (propValuesSingle.containsKey(Constants.DESC)) {
                 setDescription(propValuesSingle.get(Constants.DESC));
             }
             setEventProperties(propValuesSingle);
-            if (propValues.containsKey(Constants.ENUM_LABELS)) {
+            if (propValuesSingle.containsKey(Constants.ENUM_LABELS)) {
                 setEnumLabels(propValues.get(Constants.ENUM_LABELS));
             }
         }
