@@ -666,9 +666,7 @@ public final class AttributePropertiesImpl {
         // use a second map for attribute props that have one value
         final Map<String, String> propValuesSingle = new CaseInsensitiveMap<>(propValues.size());
         for (final Entry<String, String[]> entry : propValues.entrySet()) {
-            System.out.println(attributeName + "- "+ entry.getKey() + " = "+ Arrays.toString(entry.getValue()));
-            final String[] value = entry.getValue();
-            System.out.println(value.length);
+          final String[] value = entry.getValue();
             if (value.length == 1 && !value[0].equalsIgnoreCase(Constants.NOT_SPECIFIED)) {
                 propValuesSingle.put(entry.getKey(), value[0]);
             }
@@ -676,7 +674,7 @@ public final class AttributePropertiesImpl {
         // if (propValues.containsKey(ROOT_ATTRIBUTE)) {
         // setRootAttribute(propValuesSingle.get(ROOT_ATTRIBUTE));
         // }
-        if (propValues.containsKey(Constants.LABEL)) {
+        if (propValuesSingle.containsKey(Constants.LABEL)) {
             setLabel(propValuesSingle.get(Constants.LABEL));
         }
         System.out.println(attributeName + "load " + propValues);
