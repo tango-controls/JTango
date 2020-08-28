@@ -338,7 +338,7 @@
                     <plugin>
                         <groupId>com.gavinmogan</groupId>
                         <artifactId>codacy-maven-plugin</artifactId>
-                        <version>1.0.3</version>
+                        <version>1.2.0</version>
                         <!--<executions>
                             <execution>
                                 <id>upload-coverage</id>
