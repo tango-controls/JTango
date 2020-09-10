@@ -677,8 +677,6 @@ public final class AttributePropertiesImpl {
         if (propValuesSingle.containsKey(Constants.LABEL)) {
             setLabel(propValuesSingle.get(Constants.LABEL));
         }
-        System.out.println(attributeName + "load " + propValues);
-        System.out.println(attributeName + "load propValuesSingle " + propValuesSingle);
         if (!isFwdAttribute) {
             if (propValuesSingle.containsKey(Constants.FORMAT)) {
                 setFormat(propValuesSingle.get(Constants.FORMAT));
