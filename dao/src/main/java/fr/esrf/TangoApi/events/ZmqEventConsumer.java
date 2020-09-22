@@ -56,6 +56,7 @@ import java.util.Enumeration;
 public class ZmqEventConsumer extends EventConsumer implements
         TangoConst, Runnable, IEventConsumer {
 
+    private static final String TANGO = "tango://";
     private static ZmqEventConsumer instance = null;
 
     //===============================================================
@@ -85,7 +86,7 @@ public class ZmqEventConsumer extends EventConsumer implements
     //===============================================================
     //===============================================================
     private Thread runner;
-    private void addShutdownHook(){
+    private void addShutdownHook() {
         runner = new Thread(this);
         runner.setName("ZmqEventConsumer");
         //	Create a thread and start it
@@ -102,6 +103,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         );
         runner.start();
     }
+
     //===============================================================
     //===============================================================
     public void run() {
@@ -109,11 +111,12 @@ public class ZmqEventConsumer extends EventConsumer implements
     }
 
     //===============================================================
+
     /**
      * Subscribe event on device (Interface Change Event)
-     * @param device device to subscribe
-     * @param event event to subscribe
-     * @param callback method to be called when receive an event
+     * @param device    device to subscribe
+     * @param event     event to subscribe
+     * @param callback  method to be called when receive an event
      * @param max_size  queue maximum size if use queue
      * @param stateless subscription stateless if true
      * @return the event ID
@@ -154,8 +157,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             //  re throw if not stateless
             if (!stateless || e.errors[0].desc.equals(ZMQutils.SUBSCRIBE_COMMAND_NOT_FOUND)) {
                 throw e;
-            }
-            else {
+            } else {
                 String callback_key = device.fullName().toLowerCase() + "." + event_name;
                 //	Build Event CallBack Structure and add it to map
                 subscribe_event_id++;
@@ -173,18 +175,18 @@ public class ZmqEventConsumer extends EventConsumer implements
             }
         }
         String callback_key;
-        if (info.length>1)
+        if (info.length > 1)
             callback_key = info[1];
         else
             callback_key = deviceName.toLowerCase() + "." + event_name;
 
         //	Prepare filters for heartbeat events on channelName
         String channelName = device_channel_map.get(deviceName.toLowerCase());
-        System.out.println("deviceName:  "+deviceName);
-        if (channelName==null) {
+        System.out.println("deviceName:  " + deviceName);
+        if (channelName == null) {
             //  If from notifd, tango host not used.
             int start = deviceName.indexOf('/', "tango:// ".length());
-            deviceName = deviceName.substring(start+1);
+            deviceName = deviceName.substring(start + 1);
             channelName = device_channel_map.get(deviceName.toLowerCase());
         }
         //System.out.println("channelName: "+channelName);
@@ -211,7 +213,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                         eventId,
                         event,
                         true);
-        new_event_callback_struct.consumer  = this;
+        new_event_callback_struct.consumer = this;
         event_callback_map.put(callback_key, new_event_callback_struct);
 
 
@@ -231,6 +233,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         }
         return eventId;
     }
+
     //===============================================================
     //===============================================================
     @Override
@@ -251,8 +254,8 @@ public class ZmqEventConsumer extends EventConsumer implements
     protected void setAdditionalInfoToEventCallBackStruct(EventCallBackStruct callback_struct,
                                                           String device_name, String attribute, String event_name, String[] filters, EventChannelStruct channel_struct) {
         // Nothing
-        ApiUtil.printTrace("-------------> Set as ZmqEventConsumer for "+device_name);
-        callback_struct.consumer  = this;
+        ApiUtil.printTrace("-------------> Set as ZmqEventConsumer for " + device_name);
+        callback_struct.consumer = this;
     }
 
     //===============================================================
@@ -264,16 +267,16 @@ public class ZmqEventConsumer extends EventConsumer implements
         try {
             String adminName = deviceProxy.adm_name();
             //  Since Tango 9.3 the full device name is returned by the subscription command
-            if (tangoVersion>=930) {
+            if (tangoVersion >= 930) {
                 String[] strings = deviceData.extractLongStringArray().svalue;
-                deviceName = strings[strings.length-2];
+                deviceName = strings[strings.length - 2];
                 // remove attribute and event name
                 deviceName = deviceName.substring(0, deviceName.lastIndexOf("/"));
-                adminName = strings[strings.length-1];
+                adminName = strings[strings.length - 1];
             }
             //  Since Tango 8.1, heartbeat is sent in lower case.
             //tangoVersion = new DeviceProxy(adm_name).getTangoVersion();
-            if (tangoVersion>=810)
+            if (tangoVersion >= 810)
                 adminName = adminName.toLowerCase();
 
             // If no connection exists to this channel, create it
@@ -287,11 +290,10 @@ public class ZmqEventConsumer extends EventConsumer implements
                 connect_event_channel(connectionStructure);
             } else if (deviceProxy.use_db()) {
                 ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
-                        attributeName, deviceData.extractLongStringArray(), eventName,false);
+                        attributeName, deviceData.extractLongStringArray(), eventName, false);
             }
             device_channel_map.put(deviceName.toLowerCase(), adminName);
-        }
-        catch (DevFailed e) {
+        } catch (DevFailed e) {
             Except.throw_event_system_failed("API_BadConfigurationProperty",
                     "Can't subscribe to event for device " + deviceName
                             + "\n Check that device server is running...",
@@ -299,12 +301,13 @@ public class ZmqEventConsumer extends EventConsumer implements
         }
     }
     //===============================================================
+
     /**
-     *  Due to a problem when there is more than one network card,
-     *  The address returned by the command ZmqEventSubscriptionChange
-     *  is different than the getHostAddress() call !!!
-     *  In this case the address from getHostAddress()
-     *  replace the address in device data.
+     * Due to a problem when there is more than one network card,
+     * The address returned by the command ZmqEventSubscriptionChange
+     * is different than the getHostAddress() call !!!
+     * In this case the address from getHostAddress()
+     * replace the address in device data.
      */
     //===============================================================
     private DeviceData checkWithHostAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed {
@@ -316,13 +319,13 @@ public class ZmqEventConsumer extends EventConsumer implements
             String hostAddress = iadd.getHostAddress();
             System.err.println("Host address is " + hostAddress);
             System.err.println("Server returns  " + lsa.svalue[0]);
-            if (! lsa.svalue[0].startsWith("tcp://"+hostAddress)) { //  Addresses are different
-                String  wrongAdd = lsa.svalue[0];
+            if (!lsa.svalue[0].startsWith("tcp://" + hostAddress)) { //  Addresses are different
+                String wrongAdd = lsa.svalue[0];
                 int idx = lsa.svalue[0].lastIndexOf(':');   //  get port
-                if (idx>0) {
+                if (idx > 0) {
                     lsa.svalue[0] = "tcp://" + hostAddress + lsa.svalue[0].substring(idx);
                     lsa.svalue[1] = "tcp://" + hostAddress + lsa.svalue[1].substring(idx);
-                    System.out.println(wrongAdd + " ---> "+lsa.svalue[0]);
+                    System.out.println(wrongAdd + " ---> " + lsa.svalue[0]);
                     deviceData = new DeviceData();
                     deviceData.insert(lsa);
                     isEndpointAvailable(lsa.svalue[0]);
@@ -336,23 +339,24 @@ public class ZmqEventConsumer extends EventConsumer implements
         return deviceData;
     }
     //===============================================================
+
     /**
      * In case of several endpoints, check which one is connected.
-     * @param deviceData    data from ZmqEventSubscriptionChange command
-     * @param deviceProxy   the admin device
+     * @param deviceData  data from ZmqEventSubscriptionChange command
+     * @param deviceProxy the admin device
      * @return the endpoints after checked
      * @throws DevFailed in case of connection problem
      */
     //===============================================================
-    private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed{
+    private DeviceData checkZmqAddress(DeviceData deviceData, DeviceProxy deviceProxy) throws DevFailed {
         ZMQutils.zmqEventTrace("Inside checkZmqAddress()");
         DevVarLongStringArray lsa = deviceData.extractLongStringArray();
-        for (int i=0 ; i<lsa.svalue.length ; i+=2) {
+        for (int i = 0; i < lsa.svalue.length; i += 2) {
             String endpoint = lsa.svalue[i];
             if (isEndpointAvailable(endpoint)) {
                 lsa.svalue[0] = lsa.svalue[i];
-                lsa.svalue[1] = lsa.svalue[i+1];
-                ZMQutils.zmqEventTrace("return "  + lsa.svalue[i] + " - " + lsa.svalue[i+1]);
+                lsa.svalue[1] = lsa.svalue[i + 1];
+                ZMQutils.zmqEventTrace("return " + lsa.svalue[i] + " - " + lsa.svalue[i + 1]);
                 deviceData = new DeviceData();
                 deviceData.insert(lsa);
                 return deviceData;
@@ -361,6 +365,7 @@ public class ZmqEventConsumer extends EventConsumer implements
         //  Not found check with host address
         return checkWithHostAddress(deviceData, deviceProxy);
     }
+
     //===============================================================
     //===============================================================
     private boolean isEndpointAvailable(String endpoint) {
@@ -368,11 +373,11 @@ public class ZmqEventConsumer extends EventConsumer implements
         try {
             //  Split address and port
             int start = endpoint.indexOf("//");
-            if (start<0)  throw new Exception(endpoint + ": Bad syntax");
+            if (start < 0) throw new Exception(endpoint + ": Bad syntax");
             int end = endpoint.indexOf(":", start);
-            if (end<0)  throw new Exception(endpoint + ": Bad syntax");
-            String address = endpoint.substring(start+2, end);
-            int    port    = Integer.parseInt(endpoint.substring(end+1));
+            if (end < 0) throw new Exception(endpoint + ": Bad syntax");
+            String address = endpoint.substring(start + 2, end);
+            int port = Integer.parseInt(endpoint.substring(end + 1));
 
             //  Try to connect
             InetSocketAddress ip = new InetSocketAddress(address, port);
@@ -380,17 +385,17 @@ public class ZmqEventConsumer extends EventConsumer implements
             socket.connect(ip, 10);
             socket.close();
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println(endpoint + " Failed:   " + e.getMessage());
             return false;
         }
     }
+
     //===============================================================
     //===============================================================
     @Override
-    protected  void checkDeviceConnection(DeviceProxy deviceProxy,
-                                          String attribute, DeviceData deviceData, String event_name) throws DevFailed {
+    protected void checkDeviceConnection(DeviceProxy deviceProxy,
+                                         String attribute, DeviceData deviceData, String event_name) throws DevFailed {
 
         //  Check if address is coherent (??)
         deviceData = checkZmqAddress(deviceData, deviceProxy);
@@ -398,13 +403,12 @@ public class ZmqEventConsumer extends EventConsumer implements
         int tangoVersion = deviceData.extractLongStringArray().lvalue[0];
         String deviceName;
         //  Since Tango 9.3 the full device name is returned by the subscription command
-        if (tangoVersion>=930) {
+        if (tangoVersion >= 930) {
             String[] strings = deviceData.extractLongStringArray().svalue;
-            deviceName = strings[strings.length-2];
+            deviceName = strings[strings.length - 2];
             // remove attribute and event name
             deviceName = deviceName.substring(0, deviceName.lastIndexOf("/"));
-        }
-        else
+        } else
             deviceName = deviceProxy.fullName();
         ApiUtil.printTrace("checkDeviceConnection for " + deviceName);
         if (!device_channel_map.containsKey(deviceName.toLowerCase())) {
@@ -415,13 +419,13 @@ public class ZmqEventConsumer extends EventConsumer implements
                         "Failed to connect to event channel for device",
                         "EventConsumer.subscribe_event()");
             }
-        }
-        else {
+        } else {
             ApiUtil.printTrace(deviceName + " already connected.");
             ZMQutils.connectEvent(deviceProxy.get_tango_host(), deviceName,
-                    attribute, deviceData.extractLongStringArray(), event_name,false);
+                    attribute, deviceData.extractLongStringArray(), event_name, false);
         }
     }
+
     //===============================================================
     //===============================================================
     @Override
@@ -429,11 +433,11 @@ public class ZmqEventConsumer extends EventConsumer implements
         //	Get a reference to an EventChannel for
         //  this device server from the tango database
         DeviceProxy adminDevice = new DeviceProxy(cs.channelName);
-        if (!cs.channelName.startsWith("ẗango://")) {
+        if (!cs.channelName.startsWith(TANGO)) {
             cs.channelName = adminDevice.fullName().toLowerCase(); // Update name with tango host
         }
 
-        DevVarLongStringArray   lsa = cs.deviceData.extractLongStringArray();
+        DevVarLongStringArray lsa = cs.deviceData.extractLongStringArray();
         ApiUtil.printTrace("connect_event_channel for " + cs.channelName);
 
         //  Build the buffer to connect heartbeat and send it
@@ -466,7 +470,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             ApiUtil.printTrace("Adding " + cs.channelName + " to channel_map");
 
             //  Get possible TangoHosts and add it to list if not already in.
-            String[]    tangoHosts = adminDevice.get_db_obj().getPossibleTangoHosts();
+            String[] tangoHosts = adminDevice.get_db_obj().getPossibleTangoHosts();
             for (String tangoHost : tangoHosts) {
                 tangoHost = "tango://" + tangoHost;
                 boolean found = false;
@@ -499,9 +503,9 @@ public class ZmqEventConsumer extends EventConsumer implements
             DevVarLongStringArray lsa = checkZmqAddress(argOut, eventCallBackStruct.device).extractLongStringArray();
 
             //  Update the heartbeat time
-            String  admDeviceName = channelStruct.adm_device_proxy.name();  //.toLowerCase();
+            String admDeviceName = channelStruct.adm_device_proxy.name();  //.toLowerCase();
             //  Since Tango 8.1, heartbeat is sent in lower case.
-            if (channelStruct.getTangoRelease()>=810)
+            if (channelStruct.getTangoRelease() >= 810)
                 admDeviceName = admDeviceName.toLowerCase();
             push_structured_event_heartbeat(admDeviceName);
             channelStruct.heartbeat_skipped = false;
@@ -510,18 +514,19 @@ public class ZmqEventConsumer extends EventConsumer implements
             channelStruct.setIdlVersion(lsa.lvalue[1]);
             eventCallBackStruct.last_subscribed = channelStruct.last_subscribed;
             done = true;
-        }
-        catch(DevFailed e) {
+        } catch (DevFailed e) {
             /* */
         }
         return done;
     }
+
     //===============================================================
     //===============================================================
     @Override
     protected void removeFilters(EventCallBackStruct cb_struct) {
         //  Nothing to do for ZMQ
     }
+
     //===============================================================
     //===============================================================
     @Override
@@ -532,18 +537,17 @@ public class ZmqEventConsumer extends EventConsumer implements
         // 3- The server has been restarted on another host.
 
         if (KeepAliveThread.heartbeatHasBeenSkipped(channelStruct)) {
-            DevError    dev_error = null;
-            try{
-                String  admDeviceName = channelStruct.adm_device_proxy.fullName();  //.toLowerCase();
+            DevError dev_error = null;
+            try {
+                String admDeviceName = channelStruct.adm_device_proxy.fullName();  //.toLowerCase();
                 //  Since Tango 8.1, heartbeat is sent in lower case.
-                if (channelStruct.getTangoRelease()>=810)
+                if (channelStruct.getTangoRelease() >= 810)
                     admDeviceName = admDeviceName.toLowerCase();
                 channelStruct.adm_device_proxy = new DeviceProxy(admDeviceName);
                 channelStruct.adm_device_proxy.set_timeout_millis(300);
                 channelStruct.adm_device_proxy.ping();
                 reconnectToChannel(name);
-            }
-            catch (DevFailed e) {
+            } catch (DevFailed e) {
                 dev_error = e.errors[0];
             }
 
@@ -574,6 +578,7 @@ public class ZmqEventConsumer extends EventConsumer implements
             }
         }
     }
+
     //===============================================================
     //===============================================================
     protected void unsubscribeTheEvent(EventCallBackStruct callbackStruct) throws DevFailed {
@@ -592,6 +597,7 @@ public class ZmqEventConsumer extends EventConsumer implements
 
 
     //===============================================================
+
     /**
      * Reconnect to event
      *
@@ -606,7 +612,7 @@ public class ZmqEventConsumer extends EventConsumer implements
                     callBackStruct.device.name(),
                     callBackStruct.attr_name,
                     callBackStruct.event_name);
-            DevVarLongStringArray   lsa = checkZmqAddress(argOut, callBackStruct.device).extractLongStringArray();
+            DevVarLongStringArray lsa = checkZmqAddress(argOut, callBackStruct.device).extractLongStringArray();
 
             //  Build the buffer to connect event and send it
             ZMQutils.connectEvent(callBackStruct.device.get_tango_host(),
@@ -614,14 +620,14 @@ public class ZmqEventConsumer extends EventConsumer implements
                     callBackStruct.attr_name, lsa,
                     callBackStruct.event_name, true);
             reConnected = true;
-        }
-        catch (DevFailed e) {
+        } catch (DevFailed e) {
             //System.err.println(e.errors[0].desc);
             reConnected = false;
         }
         return reConnected;
     }
     //===============================================================
+
     /**
      * Reconnect to channel
      *
