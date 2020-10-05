@@ -80,4 +80,4 @@ JTango provides fat jar file one can download from the releases page (aka JTango
 
 ## Developing Tango Java server application
 
-[Read-the-Docs](http://tango-controls.readthedocs.io/en/latest/java-server-guide/index.html)
+[Read-the-Docs](https://jtango.readthedocs.io/en/latest/)
