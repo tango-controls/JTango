@@ -663,6 +663,7 @@ public class AttributeImpl extends DeviceBehaviorObject
                 throw DevFailedUtils.newDevFailed("write and errors values must have the same size");
             }
             logger.debug("filling attribute {} history with {} write values", name, writeValues.length);
+            history.setMaxSize(writeValues.length);
             for (int i = 0; i < writeValues.length; i++) {
                 DevError[] error = new DevError[0];
                 if (errors != null && errors[i] != null) {
@@ -675,6 +676,7 @@ public class AttributeImpl extends DeviceBehaviorObject
                 throw DevFailedUtils.newDevFailed("read and errors values must have the same size");
             }
             logger.debug("filling attribute {} history with {} read values", name, readValues.length);
+            history.setMaxSize(readValues.length);
             for (int i = 0; i < readValues.length; i++) {
                 DevError[] error = new DevError[0];
                 if (errors != null && errors[i] != null) {
@@ -690,6 +692,7 @@ public class AttributeImpl extends DeviceBehaviorObject
                 throw DevFailedUtils.newDevFailed("read and errors values must have the same size");
             }
             logger.debug("filling attribute {} history with {} read and write values", name, readValues.length);
+            history.setMaxSize(readValues.length);
             for (int i = 0; i < readValues.length; i++) {
                 DevError[] error = new DevError[0];
                 if (errors != null && errors[i] != null) {

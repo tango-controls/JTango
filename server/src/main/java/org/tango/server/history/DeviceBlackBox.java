@@ -1,35 +1,33 @@
 /**
  * Copyright (C) :     2012
- *
- * 	Synchrotron Soleil
- * 	L'Orme des merisiers
- * 	Saint Aubin
- * 	BP48
- * 	91192 GIF-SUR-YVETTE CEDEX
- *
+ * <p>
+ * Synchrotron Soleil
+ * L'Orme des merisiers
+ * Saint Aubin
+ * BP48
+ * 91192 GIF-SUR-YVETTE CEDEX
+ * <p>
  * This file is part of Tango.
- *
+ * <p>
  * Tango is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Tango is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with Tango.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.tango.server.history;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.Queue;
-
+import fr.esrf.Tango.ClntIdent;
+import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevSource;
+import fr.esrf.Tango.LockerLanguage;
 import org.apache.commons.lang3.ArrayUtils;
 import org.omg.CORBA.BAD_OPERATION;
 import org.slf4j.Logger;
@@ -39,10 +37,11 @@ import org.tango.server.Constants;
 import org.tango.server.ExceptionMessages;
 import org.tango.utils.DevFailedUtils;
 
-import fr.esrf.Tango.ClntIdent;
-import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevSource;
-import fr.esrf.Tango.LockerLanguage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
+import java.util.Date;
+import java.util.Queue;
 
 public final class DeviceBlackBox {
     private final Logger logger = LoggerFactory.getLogger(DeviceBlackBox.class);
@@ -70,7 +69,7 @@ public final class DeviceBlackBox {
     }
 
     private synchronized void offerInblackBox(final String message) {
-        while (blackbox.size() >= Constants.QUEUE_CAPACITY - 1) {
+        while (blackbox.size() >= Constants.QUEUE_CAPACITY) {
             blackbox.poll();
         }
         final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
