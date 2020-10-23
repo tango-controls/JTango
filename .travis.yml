@@ -32,7 +32,7 @@ jobs:
   include:
     - stage: deploy
       name: "Deploy to SonarCloud"
-      jdk: openjdk8
+      jdk: openjdk11
       script:
         - mvn clean install -Ptravis
         - mvn sonar:sonar -Ptravis
