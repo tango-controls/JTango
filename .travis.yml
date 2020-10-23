@@ -34,8 +34,7 @@ jobs:
       name: "Deploy to SonarCloud"
       jdk: openjdk11
       script:
-        - mvn clean install -Ptravis
-        - mvn sonar:sonar -Ptravis
+        - mvn clean verify sonar:sonar -Ptravis
       addons:
         sonarcloud:
           organization: "tango-controls"
