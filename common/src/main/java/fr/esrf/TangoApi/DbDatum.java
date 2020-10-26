@@ -630,8 +630,8 @@ public class DbDatum implements java.io.Serializable {
      */
     // ===========================================
     public String[] toStringArray() {
-	String[] result;
-	result = new String[size() + 2];
+        String[] result;
+        result = new String[size() + 2];
 
 	result[0] = name;
 	result[1] = String.valueOf(size());

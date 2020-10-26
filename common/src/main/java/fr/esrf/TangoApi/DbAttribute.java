@@ -34,11 +34,11 @@
 
 package fr.esrf.TangoApi;
 
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Class Description:
- * This class manage a vector of DbDatum for attribute properties read/write
+ * This class manage a ArrayList of DbDatum for attribute properties read/write
  * and the attribute name associated.
  *
  * @author verdier
@@ -46,7 +46,7 @@ import java.util.Vector;
  */
 
 
-public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable {
+public class DbAttribute extends CopyOnWriteArrayList<DbDatum> implements java.io.Serializable {
     public String name;
 
     //===========================================================
@@ -70,7 +70,7 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
      */
     //===========================================================
     public DbDatum datum(int idx) {
-        return elementAt(idx);
+        return get(idx);
     }
 
     //===========================================================
@@ -82,8 +82,8 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
     //===========================================================
     public DbDatum datum(String name) {
         DbDatum datum;
-        for (int i = 0; i < size(); i++) {
-            datum = elementAt(i);
+        for (DbDatum dbDatum : this) {
+            datum = dbDatum;
             if (name.equalsIgnoreCase(datum.name))
                 return datum;
         }
@@ -92,103 +92,103 @@ public class DbAttribute extends Vector<DbDatum> implements java.io.Serializable
 
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name property name
      */
     //===========================================================
     public void add(String name) {
-        addElement(new DbDatum(name, ""));
+        add(new DbDatum(name, ""));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name  property name
      * @param value property value
      */
     //===========================================================
     public void add(String name, String value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name  property name
      * @param value property value
      */
     //===========================================================
     public void add(String name, short value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name  property name
      * @param value property value
      */
     //===========================================================
     public void add(String name, int value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name  property name
      * @param value property value
      */
     //===========================================================
     public void add(String name, double value) {
-        addElement(new DbDatum(name, value));
+        add(new DbDatum(name, value));
     }
 
 
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name   property name
      * @param values property value
      */
     //===========================================================
     public void add(String name, String[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name   property name
      * @param values property value
      */
     //===========================================================
     public void add(String name, short[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name   property name
      * @param values property value
      */
     //===========================================================
     public void add(String name, int[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum in ArrayList
      *
      * @param name   property name
      * @param values property value
      */
     //===========================================================
     public void add(String name, double[] values) {
-        addElement(new DbDatum(name, values));
+        add(new DbDatum(name, values));
     }
     //===========================================================
     /**
