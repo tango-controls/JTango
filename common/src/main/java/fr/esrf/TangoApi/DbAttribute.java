@@ -223,13 +223,13 @@ public class DbAttribute extends CopyOnWriteArrayList<DbDatum> implements java.i
     //===========================================================
     public String get_string_value(int idx) {
         String[] array = datum(idx).extractStringArray();
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
-            str += array[i];
+            str.append(array[i]);
             if (i < array.length - 1)
-                str += "\n";
+                str.append("\n");
         }
-        return str;
+        return str.toString();
     }
     //===========================================================
     /**
@@ -258,13 +258,13 @@ public class DbAttribute extends CopyOnWriteArrayList<DbDatum> implements java.i
 
         //  Else get string value
         String[] array = datum.extractStringArray();
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
-            str += array[i];
+            str.append(array[i]);
             if (i < array.length - 1)
-                str += "\n";
+                str.append("\n");
         }
-        return str;
+        return str.toString();
     }
     //===========================================================
     /**
