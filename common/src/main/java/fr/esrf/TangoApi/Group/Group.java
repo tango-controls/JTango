@@ -43,9 +43,8 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
 
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * TANGO group abstraction main class
@@ -56,7 +55,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     /**
      * Group's elements repository
      */
-    private final Vector elements;
+    private final List<GroupElement> elements;
 
     // -- PUBLIC INTERFACE -----------------------------------------------------
     // -------------------------------------------------------------------------
@@ -67,7 +66,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     /**
      * Asynch request repository
      */
-    private final TreeMap arp;
+    private final TreeMap<Integer, Boolean> arp;
     /**
      * Pseudo asynch. request id generator
      */
@@ -79,9 +78,9 @@ public class Group extends GroupElement implements java.io.Serializable {
     public Group(final String name) {
         super(name);
         asynch_req_id = 0;
-        elements = new Vector();
+        elements = new ArrayList<>();
         factory = new GroupElementFactory();
-        arp = new TreeMap();
+        arp = new TreeMap<>();
     }
 
     /**
@@ -168,10 +167,9 @@ public class Group extends GroupElement implements java.io.Serializable {
     public void add(final String p) throws DevFailed {
         synchronized (this) {
 
-            final Vector v = factory.instanciate(p);
-            final Iterator it = v.iterator();
-            while (it.hasNext()) {
-                add_i((GroupElement) it.next());
+            final List<GroupDeviceElement> v = factory.instantiate(p);
+            for (Object o : v) {
+                add_i((GroupElement) o);
             }
 
         }
@@ -186,10 +184,9 @@ public class Group extends GroupElement implements java.io.Serializable {
         synchronized (this) {
             for (final String element : pl) {
                 if (element != null) {
-                    final Vector v = factory.instanciate(element);
-                    final Iterator it = v.iterator();
-                    while (it.hasNext()) {
-                        add_i((GroupElement) it.next());
+                    final List<GroupDeviceElement> v = factory.instantiate(element);
+                    for (GroupDeviceElement o : v) {
+                        add_i(o);
                     }
                 }
             }
@@ -242,9 +239,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     public void set_timeout_millis(final int timeout, final boolean fwd) throws DevFailed {
         synchronized (this) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     e.set_timeout_millis(timeout, fwd);
                 }
@@ -394,17 +389,13 @@ public class Group extends GroupElement implements java.io.Serializable {
             int i = 0;
             final int av_size = get_size_i(fwd);
             final DeviceAttribute[] av = new DeviceAttribute[av_size];
-            Iterator it;
             if (fwd) {
-                final Vector h = get_hierarchy();
-                it = h.iterator();
-                while (it.hasNext()) {
-                    av[i++] = new DeviceAttribute(((GroupDeviceElement) it.next()).get_name());
+                final List<GroupDeviceElement> h = get_hierarchy();
+                for (GroupDeviceElement groupDeviceElement : h) {
+                    av[i++] = new DeviceAttribute(groupDeviceElement.get_name());
                 }
             } else {
-                it = elements.iterator();
-                while (it.hasNext()) {
-                    final GroupElement e = (GroupElement) it.next();
+                for (GroupElement e : elements) {
                     if (e instanceof GroupDeviceElement) {
                         av[i++] = new DeviceAttribute(e.get_name());
                     }
@@ -467,9 +458,7 @@ public class Group extends GroupElement implements java.io.Serializable {
         synchronized (this) {
             int i = 0;
             final String[] dl = new String[get_size_i(fwd)];
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     final String[] sub_dl = e.get_device_name_list(fwd);
                     for (int j = 0; j < sub_dl.length; j++, i++) {
@@ -484,16 +473,14 @@ public class Group extends GroupElement implements java.io.Serializable {
     /**
      * Returns the group's hierarchy
      */
-    private Vector get_hierarchy() {
+    private List<GroupDeviceElement> get_hierarchy() {
         synchronized (this) {
-            final Vector h = new Vector();
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            final List<GroupDeviceElement> h = new ArrayList<>();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement) {
-                    h.add(e);
+                    h.add((GroupDeviceElement) e);
                 } else {
-                    h.add(((Group) e).get_hierarchy());
+                    h.addAll(((Group) e).get_hierarchy());
                 }
             }
             return h;
@@ -505,9 +492,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     private int get_size_i(final boolean fwd) {
         int size = 0;
-        final Iterator it = elements.iterator();
-        while (it.hasNext()) {
-            final GroupElement e = (GroupElement) it.next();
+        for (GroupElement e : elements) {
             if (e instanceof GroupDeviceElement || fwd) {
                 size += e.get_size(true);
             }
@@ -540,18 +525,16 @@ public class Group extends GroupElement implements java.io.Serializable {
         if (name_equals(n)) {
             return this;
         }
-        GroupElement e = null;
-        Iterator it = elements.iterator();
-        while (it.hasNext()) {
-            e = (GroupElement) it.next();
+        GroupElement e;
+        for (GroupElement element : elements) {
+            e = element;
             if (e.name_equals(n)) {
                 return e;
             }
         }
         if (fwd) {
-            it = elements.iterator();
-            while (it.hasNext()) {
-                e = ((GroupElement) it.next()).find(n, fwd);
+            for (GroupElement element : elements) {
+                e = element.find(n, fwd);
                 if (e != null) {
                     return e;
                 }
@@ -591,19 +574,18 @@ public class Group extends GroupElement implements java.io.Serializable {
             return;
         }
         if (p.indexOf('*') == -1) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e.name_equals(p)) {
                     elements.remove(e);
                     break;
                 }
             }
         } else {
-            final Vector remove_list = new Vector();
-            Iterator it = elements.iterator();
+            final List<GroupElement> remove_list = new ArrayList<>();
+            Iterator<GroupElement> it = elements.iterator();
+            remove_fwd("*", fwd);
             while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+                final GroupElement e = it.next();
                 if (e.name_matches(p)) {
                     remove_list.add(e);
                 }
@@ -613,10 +595,13 @@ public class Group extends GroupElement implements java.io.Serializable {
                 elements.remove(it.next());
             }
         }
-        if (fwd == true) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+
+        remove_fwd(p, fwd);
+    }
+
+    private void remove_fwd(final String p, final boolean fwd) {
+        if (fwd) {
+            for (GroupElement e : elements) {
                 if (e instanceof Group) {
                     ((Group) e).remove(p, fwd);
                 }
@@ -632,9 +617,9 @@ public class Group extends GroupElement implements java.io.Serializable {
     DeviceProxy get_device_i(int i) {
         synchronized (this) {
             DeviceProxy dp = null;
-            final Iterator it = elements.iterator();
+            final Iterator<GroupElement> it = elements.iterator();
             while (dp == null && it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+                final GroupElement e = it.next();
                 dp = e.get_device_i(i--);
             }
             return dp;
@@ -647,9 +632,9 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     DeviceProxy get_device_i(final String n) {
         DeviceProxy dp = null;
-        final Iterator it = elements.iterator();
+        final Iterator<GroupElement> it = elements.iterator();
         while (dp == null && it.hasNext()) {
-            final GroupElement e = (GroupElement) it.next();
+            final GroupElement e = it.next();
             dp = e.get_device_i(n);
         }
         return dp;
@@ -664,9 +649,8 @@ public class Group extends GroupElement implements java.io.Serializable {
             System.out.print("  ");
         }
         System.out.println("|- Group: " + get_name() + " [" + get_size_i(true) + ":" + get_size_i(false) + "]");
-        final Iterator it = elements.iterator();
-        while (it.hasNext()) {
-            ((GroupElement) it.next()).dump_i(indent_level + 1);
+        for (GroupElement element : elements) {
+            element.dump_i(indent_level + 1);
         }
     }
 
@@ -676,11 +660,11 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     boolean ping_i(final boolean fwd) {
         boolean all_alive = true;
-        final Iterator it = elements.iterator();
+        final Iterator<GroupElement> it = elements.iterator();
         while (it.hasNext() && all_alive) {
-            final GroupElement e = (GroupElement) it.next();
+            final GroupElement e = it.next();
             if (e instanceof GroupDeviceElement || fwd) {
-                all_alive = e.ping_i(fwd) ? all_alive : false;
+                all_alive = e.ping_i(fwd);
             }
         }
         return all_alive;
@@ -692,9 +676,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     int command_inout_asynch_i(final String c, final boolean fgt, final boolean fwd, final int rid) throws DevFailed {
         synchronized (this) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     e.command_inout_asynch_i(c, fgt, fwd, rid);
                 }
@@ -710,9 +692,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     int command_inout_asynch_i(final String c, final DeviceData dd, final boolean fgt, final boolean fwd, final int rid)
             throws DevFailed {
         synchronized (this) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     e.command_inout_asynch_i(c, dd, fgt, fwd, rid);
                 }
@@ -734,17 +714,13 @@ public class Group extends GroupElement implements java.io.Serializable {
                 Except.throw_exception("API_MethodArgument", desc, "Group.command_inout_asynch");
             }
             int i = 0;
-            Iterator it;
             if (fwd) {
-                final Vector h = get_hierarchy();
-                it = h.iterator();
-                while (it.hasNext()) {
-                    ((GroupDeviceElement) it.next()).command_inout_asynch_i(c, dd[i++], fgt, fwd, rid);
+                final List<GroupDeviceElement> h = get_hierarchy();
+                for (GroupDeviceElement groupDeviceElement : h) {
+                    groupDeviceElement.command_inout_asynch_i(c, dd[i++], fgt, fwd, rid);
                 }
             } else {
-                it = elements.iterator();
-                while (it.hasNext()) {
-                    final GroupElement e = (GroupElement) it.next();
+                for (GroupElement e : elements) {
                     if (e instanceof GroupDeviceElement) {
                         e.command_inout_asynch_i(c, dd[i++], fgt, fwd, rid);
                     }
@@ -762,9 +738,7 @@ public class Group extends GroupElement implements java.io.Serializable {
         synchronized (this) {
             final GroupCmdReplyList reply = new GroupCmdReplyList();
             GroupCmdReplyList sub_reply;
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement ge = (GroupElement) it.next();
+            for (GroupElement ge : elements) {
                 if (ge instanceof GroupDeviceElement || fwd) {
                     sub_reply = ge.command_inout_reply_i(rid, tmo, fwd);
                     if (sub_reply.isEmpty() == false) {
@@ -785,9 +759,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     int read_attribute_asynch_i(final String a, final boolean fwd, final int rid) throws DevFailed {
         synchronized (this) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     e.read_attribute_asynch_i(a, fwd, rid);
                 }
@@ -804,12 +776,10 @@ public class Group extends GroupElement implements java.io.Serializable {
         synchronized (this) {
             final GroupAttrReplyList reply = new GroupAttrReplyList();
             GroupAttrReplyList sub_reply;
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement ge = (GroupElement) it.next();
+            for (GroupElement ge : elements) {
                 if (ge instanceof GroupDeviceElement || fwd) {
                     sub_reply = ge.read_attribute_reply_i(rid, tmo, fwd);
-                    if (sub_reply.isEmpty() == false) {
+                    if (!sub_reply.isEmpty()) {
                         reply.addAll(sub_reply);
                     }
                     if (sub_reply.has_failed()) {
@@ -827,9 +797,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     @Override
     int write_attribute_asynch_i(final DeviceAttribute da, final boolean fwd, final int rid) throws DevFailed {
         synchronized (this) {
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement e = (GroupElement) it.next();
+            for (GroupElement e : elements) {
                 if (e instanceof GroupDeviceElement || fwd) {
                     e.write_attribute_asynch_i(da, fwd, rid);
                 }
@@ -850,17 +818,13 @@ public class Group extends GroupElement implements java.io.Serializable {
                 Except.throw_exception("API_MethodArgument", desc, "Group.write_attribute_asynch");
             }
             int i = 0;
-            Iterator it;
             if (fwd) {
-                final Vector h = get_hierarchy();
-                it = h.iterator();
-                while (it.hasNext()) {
-                    ((GroupDeviceElement) it.next()).write_attribute_asynch_i(da[i++], fwd, rid);
+                final List<GroupDeviceElement> h = get_hierarchy();
+                for (GroupDeviceElement groupDeviceElement : h) {
+                    groupDeviceElement.write_attribute_asynch_i(da[i++], fwd, rid);
                 }
             } else {
-                it = elements.iterator();
-                while (it.hasNext()) {
-                    final GroupElement e = (GroupElement) it.next();
+                for (GroupElement e : elements) {
                     if (e instanceof GroupDeviceElement) {
                         e.write_attribute_asynch_i(da[i++], fwd, rid);
                     }
@@ -878,12 +842,10 @@ public class Group extends GroupElement implements java.io.Serializable {
         synchronized (this) {
             final GroupReplyList reply = new GroupReplyList();
             GroupReplyList sub_reply;
-            final Iterator it = elements.iterator();
-            while (it.hasNext()) {
-                final GroupElement ge = (GroupElement) it.next();
+            for (GroupElement ge : elements) {
                 if (ge instanceof GroupDeviceElement || fwd) {
                     sub_reply = ge.write_attribute_reply_i(rid, tmo, fwd);
-                    if (sub_reply.isEmpty() == false) {
+                    if (!sub_reply.isEmpty()) {
                         reply.addAll(sub_reply);
                     }
                     if (sub_reply.has_failed()) {
@@ -917,13 +879,13 @@ public class Group extends GroupElement implements java.io.Serializable {
         /**
          * Instanciate the TangoElements which name matches the pattern p
          *
-         * @param device name pattern (wild card).
+         * @param p the device name pattern (wild card).
          * @return a vector of GroupElement.
          */
         // ======================================================================
-        public Vector instanciate(final String p) throws DevFailed {
+        public List<GroupDeviceElement> instantiate(final String p) throws DevFailed {
             // - a vector to store GroupElement
-            String[] dnl = null;
+            String[] dnl;
             // - is <p> a device name or a device name pattern ?
             if (p.indexOf('*') == -1) {
                 // - <p> is a pure device name
@@ -935,9 +897,9 @@ public class Group extends GroupElement implements java.io.Serializable {
                 dnl = db.get_device_exported(p);
             }
             if (dnl.length == 0) {
-                return null;
+                return Collections.emptyList();
             }
-            final Vector ge = new Vector();
+            final List<GroupDeviceElement> ge = new ArrayList<>();
             for (final String element : dnl) {
                 ge.add(new GroupDeviceElement(element));
             }
