@@ -35,13 +35,13 @@
 package fr.esrf.TangoApi.Group;
 
 //- Import Java stuffs
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * TANGO group reply for attribute read/write operations
  */
 
-public class GroupAttrReplyList extends Vector implements java.io.Serializable {
+public class GroupAttrReplyList extends CopyOnWriteArrayList<GroupAttrReply> implements java.io.Serializable {
 
     /**
      * Global error flag
@@ -54,12 +54,9 @@ public class GroupAttrReplyList extends Vector implements java.io.Serializable {
     }
     
     /** Adds an element to the list */
-    public boolean add(Object o) {
-        if (o instanceof GroupAttrReply == false) {
-            return true;
-        }
-        GroupAttrReply gcr = (GroupAttrReply)o;
-        if (gcr.has_failed) {
+    @Override
+    public boolean add(GroupAttrReply o) {
+        if (o.has_failed) {
             has_failed = true;
         }
         return super.add(o);
@@ -67,7 +64,7 @@ public class GroupAttrReplyList extends Vector implements java.io.Serializable {
     
     /** Resets error flag and clears the list */
     public void reset() {
-        removeAllElements();
+        clear();
         has_failed = false;
     }
     

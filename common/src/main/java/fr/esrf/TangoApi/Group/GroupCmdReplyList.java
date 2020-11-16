@@ -35,12 +35,14 @@
 package fr.esrf.TangoApi.Group;
 
 //- Import Java stuffs
-import java.util.Vector;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * TANGO group reply list for command
  */
-public class GroupCmdReplyList extends Vector implements java.io.Serializable {
+public class GroupCmdReplyList extends CopyOnWriteArrayList<GroupCmdReply> implements java.io.Serializable {
 
     /**
      * Global error flag
@@ -51,14 +53,15 @@ public class GroupCmdReplyList extends Vector implements java.io.Serializable {
     public GroupCmdReplyList() {
         has_failed = false;
     }
-    
+
+    public Enumeration<GroupCmdReply> elements() {
+        return Collections.enumeration(this);
+    }
+
     /** Adds an element to the list */
-    public boolean add(Object o) {
-        if (o instanceof GroupCmdReply == false) {
-            return true;
-        }
-        GroupCmdReply gcr = (GroupCmdReply)o;
-        if (gcr.has_failed) {
+    @Override
+    public boolean add(GroupCmdReply o) {
+        if (o.has_failed) {
             has_failed = true;
         }
         return super.add(o);
@@ -66,7 +69,7 @@ public class GroupCmdReplyList extends Vector implements java.io.Serializable {
     
     /** Resets error flag and clears the list */
     public void reset() {
-        removeAllElements();
+        clear();
         has_failed = false;
     }
     
