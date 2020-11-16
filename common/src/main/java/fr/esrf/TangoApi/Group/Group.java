@@ -549,7 +549,8 @@ public class Group extends GroupElement implements java.io.Serializable {
     private boolean add_i(final GroupElement e) {
         if (e == null || e == this) {
             // -DEBUG
-            System.out.println("Group::add_i::failed to add " + e.get_name() + " (null or self)");
+            String name = e == this ? e.get_name() : "";
+            System.out.println("Group::add_i::failed to add " + name + " (null or self)");
             return false;
         }
         final GroupElement ge = find_i(e.get_name(), !(e instanceof Group));
