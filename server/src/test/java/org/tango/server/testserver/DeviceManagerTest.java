@@ -36,9 +36,9 @@ public class DeviceManagerTest extends NoDBDeviceManager {
 
     @Test
     public void test() throws DevFailed {
-	final TangoCommand cmd = new TangoCommand(NoDBDeviceManager.deviceName, "getName");
+	final TangoCommand cmd = new TangoCommand(getDefaultDeviceFullName(), "getName");
 	final String name = (String) cmd.executeExtract(null);
-	assertThat(name, equalTo(JTangoTest.NO_DB_DEVICE_NAME));
+	assertThat(name, equalTo(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME));
     }
 
 }

@@ -56,7 +56,7 @@ public class AdminServerTest extends NoDBDeviceManager {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "QueryDevice");
             cmd.execute();
-            assertThat(cmd.extractToString(","), containsString(JTangoTest.NO_DB_DEVICE_NAME));
+            assertThat(cmd.extractToString(","), containsString(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME));
         } catch (final DevFailed e) {
             DevFailedUtils.printDevFailed(e);
             throw e;
@@ -91,8 +91,8 @@ public class AdminServerTest extends NoDBDeviceManager {
     public void testRestartDevice() throws DevFailed {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "DevRestart");
-            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
-            new DeviceProxy(deviceName).ping();
+            cmd.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME);
+            new DeviceProxy(getDefaultDeviceFullName()).ping();
         } catch (final DevFailed e) {
             DevFailedUtils.printDevFailed(e);
             throw e;
@@ -103,7 +103,7 @@ public class AdminServerTest extends NoDBDeviceManager {
     public void testDevEmptyPollStatus() throws DevFailed {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
-            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            cmd.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME);
             System.out.println(cmd.extractToString(","));
         } catch (final DevFailed e) {
             DevFailedUtils.printDevFailed(e);
@@ -114,7 +114,7 @@ public class AdminServerTest extends NoDBDeviceManager {
     private void addAttPoll() throws DevFailed {
         final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
         final int[] param1 = new int[] { 3000 };
-        final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(),
+        final String[] param2 = new String[] { JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(),
                 "shortScalar" };
         cmd.insertMixArgin(param1, param2);
         cmd.execute();
@@ -122,17 +122,17 @@ public class AdminServerTest extends NoDBDeviceManager {
 
     private void remAttPoll() throws DevFailed {
         final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-        rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
+        rem.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, PolledObjectType.ATTRIBUTE.toString(), "shortScalar");
     }
 
     @Test
     public void testAddPollingAttr() throws DevFailed {
         try {
             addAttPoll();
-            final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
+            final TangoAttribute attr = new TangoAttribute(getDefaultDeviceFullName() + "/shortScalar");
             attr.read();
             final TangoCommand status = new TangoCommand(adminName, "DevPollStatus");
-            status.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            status.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME);
             System.out.println(status.extractToString(","));
             remAttPoll();
 
@@ -147,14 +147,14 @@ public class AdminServerTest extends NoDBDeviceManager {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "AddObjPolling");
             final int[] param1 = new int[] { 500 };
-            final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(),
+            final String[] param2 = new String[] { JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(),
                     "testPollingArray" };
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
-            final TangoCommand cmdPolled = new TangoCommand(deviceName + "/testPollingArray");
+            final TangoCommand cmdPolled = new TangoCommand(getDefaultDeviceFullName() + "/testPollingArray");
             cmdPolled.execute();
             final TangoCommand rem = new TangoCommand(adminName, "RemObjPolling");
-            rem.execute(JTangoTest.NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(), "testPollingArray");
+            rem.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, PolledObjectType.COMMAND.toString(), "testPollingArray");
 
         } catch (final DevFailed e) {
             DevFailedUtils.printDevFailed(e);
@@ -166,7 +166,7 @@ public class AdminServerTest extends NoDBDeviceManager {
     public void testDevPollStatus() throws DevFailed {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "DevPollStatus");
-            cmd.execute(JTangoTest.NO_DB_DEVICE_NAME);
+            cmd.execute(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME);
             System.out.println(cmd.extractToString(","));
         } catch (final DevFailed e) {
             DevFailedUtils.printDevFailed(e);
@@ -207,12 +207,12 @@ public class AdminServerTest extends NoDBDeviceManager {
         try {
             final TangoCommand cmd = new TangoCommand(adminName, "SetLoggingLevel");
             final int[] param1 = new int[] { 1 };
-            final String[] param2 = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
+            final String[] param2 = new String[] { JTangoTest.DEFAULT_NO_DB_DEVICE_NAME};
             cmd.insertMixArgin(param1, param2);
             cmd.execute();
 
             final TangoCommand cmd2 = new TangoCommand(adminName, "GetLoggingLevel");
-            final Object in = new String[] { JTangoTest.NO_DB_DEVICE_NAME };
+            final Object in = new String[] { JTangoTest.DEFAULT_NO_DB_DEVICE_NAME};
             cmd2.execute(in);
             final int result = cmd2.getNumLongMixArrayArgout()[0];
             assertThat(result, equalTo(param1[0]));

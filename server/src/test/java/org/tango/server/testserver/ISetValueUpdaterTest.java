@@ -42,7 +42,7 @@ public class ISetValueUpdaterTest extends NoDBDeviceManager {
 
     @Test
     public void test() throws DevFailed {
-	final TangoAttribute ta = new TangoAttribute(NoDBDeviceManager.deviceName + "/doubleDynamic");
+	final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/doubleDynamic");
 	final double written = (Double) ta.readWritten();
 	assertThat(written, equalTo(120.3));
     }

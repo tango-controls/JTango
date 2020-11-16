@@ -134,7 +134,7 @@ public class CommandTest extends NoDBDeviceManager {
             // final TangoCommand tangoCommand = new
             // TangoCommand("test/tango/jtangotest.1/" + command);
 
-            final TangoCommand tangoCommand = new TangoCommand(deviceName + "/" + command);
+            final TangoCommand tangoCommand = new TangoCommand(getDefaultDeviceFullName() + "/" + command);
             if (valueTest instanceof DevVarLongStringArray) {
                 final DevVarLongStringArray mix = (DevVarLongStringArray) valueTest;
                 tangoCommand.insertMixArgin(mix.lvalue, mix.svalue);

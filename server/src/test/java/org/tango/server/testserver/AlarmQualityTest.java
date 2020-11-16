@@ -52,8 +52,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
         final String propName = "StateCheckAttrAlarm";
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { "true" });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
-        new DeviceProxy(deviceName).command_inout("Init");
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
+        new DeviceProxy(getDefaultDeviceFullName()).command_inout("Init");
     }
 
     @AfterClass
@@ -62,15 +62,15 @@ public class AlarmQualityTest extends NoDBDeviceManager {
         final String propName = "StateCheckAttrAlarm";
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { "false" });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
-        new DeviceProxy(deviceName).command_inout("Init");
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
+        new DeviceProxy(getDefaultDeviceFullName()).command_inout("Init");
     }
 
     @Test
     public void testAlarmSpectrum() throws DevFailed {
         final String attrName = "longSpectrum";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(new long[] { -10, 1 });
         ta.read();
         // System.out.println(ta.getQuality().value());
@@ -84,8 +84,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     @Test
     public void testAlarmScalar() throws DevFailed {
         final String attrName = "doubleScalar";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(-10.0);
         ta.read();
         // System.out.println(ta.getQuality().value());
@@ -100,8 +100,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     public void testDeltaScalar() throws DevFailed {
         System.out.println("test deltaAttribute");
         final String attrName = "deltaAttribute";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(-10.0);
         try {
             Thread.sleep(20);
@@ -119,8 +119,8 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     @Test
     public void testWarning() throws DevFailed {
         final String attrName = "longSpectrum";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(new long[] { 4, 3 });
         ta.read();
         // System.out.println(ta.getQuality().value());
@@ -135,7 +135,7 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     @Test
     public void testInvalid() throws DevFailed {
         final String attrName = "invalidQuality";
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         try {
             ta.read();
         } catch (final DevFailed e) {
@@ -154,7 +154,7 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     @Test
     public void testInvalid2() throws DevFailed {
         final String attrName = "invalidQuality2";
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         try {
             ta.read();
         } catch (final DevFailed e) {
@@ -170,14 +170,14 @@ public class AlarmQualityTest extends NoDBDeviceManager {
     @Test(expected = DevFailed.class)
     public void testMaxValueSpectrum() throws DevFailed {
         final String attrName = "longSpectrum";
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(new long[] { -200, 120 });
     }
 
     @Test(expected = DevFailed.class)
     public void testMaxValueScalar() throws DevFailed {
         final String attrName = "doubleScalar";
-        final TangoAttribute ta = new TangoAttribute(deviceName + "/" + attrName);
+        final TangoAttribute ta = new TangoAttribute(getDefaultDeviceFullName() + "/" + attrName);
         ta.write(-200.0);
     }
 

@@ -53,33 +53,22 @@ public class PipesTest extends NoDBDeviceManager {
 
     @BeforeClass
     public static void startDevice() throws DevFailed, IOException {
-        ServerSocket ss1 = null;
-        try {
-            ss1 = new ServerSocket(0);
+        try (ServerSocket ss1 = new ServerSocket(0)) {
             ss1.setReuseAddress(true);
             ss1.close();
             PipeServer.startNoDb(ss1.getLocalPort());
-            deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + PipeServer.NO_DB_DEVICE_NAME + "#dbase=no";
+            deviceFullNameList.add("tango://localhost:" + ss1.getLocalPort() + "/" + PipeServer.NO_DB_DEVICE_NAME + "#dbase=no");
             adminName = "tango://localhost:" + ss1.getLocalPort() + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
                     + ServerManager.getInstance().getServerName() + "#dbase=no";
-        } finally {
-            if (ss1 != null) {
-                ss1.close();
-            }
         }
-        System.out.println(deviceName);
-    }
-
-    @AfterClass
-    public static void stopDevice() throws DevFailed {
-        ServerManager.getInstance().stop();
+        System.out.println(getDefaultDeviceFullName());
     }
 
     @Test
     public void readPipeConfig() throws DevFailed {
         try {
 
-            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
             final List<PipeInfo> infoList = dev.getPipeConfig();
             final PipeInfo info1 = infoList.get(0);
             assertThat(info1.getName(), equalTo("myPipe"));
@@ -109,7 +98,7 @@ public class PipesTest extends NoDBDeviceManager {
 
     @Test
     public void writePipeConfig() throws DevFailed {
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         final List<PipeInfo> infoList = dev.getPipeConfig();
         final PipeInfo info1 = infoList.get(0);
         info1.setDescription("description");
@@ -121,7 +110,7 @@ public class PipesTest extends NoDBDeviceManager {
 
     @Test
     public void readPipe() throws DevFailed {
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         final DevicePipe pipe = dev.readPipe("myPipe");
         assertThat(pipe.getPipeName(), equalTo("myPipe"));
         assertThat(pipe.getPipeBlob().getDataElementNumber(), equalTo(1));
@@ -151,7 +140,7 @@ public class PipesTest extends NoDBDeviceManager {
             pipeBlob.add(new PipeDataElement("Status", DevState.RUNNING));
 
             final DevicePipe devicePipe = new DevicePipe("myPipe", pipeBlob);
-            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
 
             // Then write the pipe
             dev.writePipe(devicePipe);

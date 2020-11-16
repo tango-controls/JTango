@@ -40,13 +40,13 @@ public class DevFailedTest extends NoDBDeviceManager {
 
     @Test(expected = DevFailed.class)
     public void testErrorAttribute() throws DevFailed {
-	final TangoAttribute att = new TangoAttribute(deviceName + "/fduhfd");
+	final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/fduhfd");
 	att.read();
     }
 
     @Test(expected = DevFailed.class)
     public void testErrorCommand() throws DevFailed {
-	final TangoCommand cmd = new TangoCommand(deviceName, "fduhfd");
+	final TangoCommand cmd = new TangoCommand(getDefaultDeviceFullName(), "fduhfd");
 	cmd.execute();
     }
 

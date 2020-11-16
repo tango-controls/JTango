@@ -26,6 +26,8 @@ package org.tango.server.testserver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,36 +44,62 @@ import fr.esrf.Tango.DevFailed;
  */
 public class NoDBDeviceManager {
 
-    public static String deviceName;
-
+    public static List<String> deviceFullNameList = new ArrayList<>();
+    public static boolean isDefault = false;
     public static String adminName;
 
     @BeforeClass
     public static void startDevice() throws DevFailed, IOException {
+        startDevice(null);
+    }
+
+    public static void startDevice(String deviceList) throws DevFailed, IOException {
         System.setProperty("org.tango.server.checkalarms", "false");
-        ServerSocket ss1 = null;
-        try {
-            ss1 = new ServerSocket(0);
+
+        try (ServerSocket ss1 = new ServerSocket(0)) {
             ss1.setReuseAddress(true);
             ss1.close();
-            JTangoTest.startNoDb(ss1.getLocalPort());
 
-            deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
+            if (deviceList == null) {
+                JTangoTest.startNoDb(ss1.getLocalPort());
+                isDefault = true;
+                deviceFullNameList.add("tango://localhost:" + ss1.getLocalPort() + "/"
+                        + JTangoTest.DEFAULT_NO_DB_DEVICE_NAME + "#dbase=no");
+            } else {
+                JTangoTest.startNoDb(ss1.getLocalPort(), deviceList);
+                for (String device : deviceList.split(",")) {
+                    deviceFullNameList.add("tango://localhost:" + ss1.getLocalPort() + "/"
+                            + device + "#dbase=no");
+                }
+            }
             adminName = "tango://localhost:" + ss1.getLocalPort() + "/" + Constants.ADMIN_DEVICE_DOMAIN + "/"
                     + ServerManager.getInstance().getServerName() + "#dbase=no";
-            System.out.println("START " + deviceName);
-        } finally {
-            if (ss1 != null) {
-                ss1.close();
+            for (String device : deviceFullNameList) {
+                System.out.println("START " + device);
             }
         }
+    }
 
+    public static String getDefaultDeviceFullName() {
+        if (!isDefault) {
+            System.out.println("NoDBDeviceManager::getDefaultDeviceFullName::Waring the default device isn't running. " +
+                    "The devices was start with custom name!");
+            System.out.println("NoDBDeviceManager::getDefaultDeviceFullName::Warning return first from running devices");
+        }
+
+        return deviceFullNameList.get(0);
     }
 
     @AfterClass
     public static void stopDevice() throws DevFailed {
         System.out.println("STOP");
         ServerManager.getInstance().stop();
+        clean();
+    }
+
+    protected static void clean() {
+        deviceFullNameList = new ArrayList<>();
+        isDefault = false;
     }
 
 }

@@ -48,17 +48,17 @@ public class SchedulerTest extends NoDBDeviceManager {
     public void test() throws DevFailed {
         final Map<String, String[]> properties = new HashMap<String, String[]>();
         properties.put("isRunRefresh", new String[]{"true"});
-        DatabaseFactory.getDatabase().setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, properties);
-        new DeviceProxy(NoDBDeviceManager.deviceName).command_inout("Init");
+        DatabaseFactory.getDatabase().setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, properties);
+        new DeviceProxy(getDefaultDeviceFullName()).command_inout("Init");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
-        final TangoAttribute attr = new TangoAttribute(NoDBDeviceManager.deviceName + "/isScheduleRunning");
+        final TangoAttribute attr = new TangoAttribute(getDefaultDeviceFullName() + "/isScheduleRunning");
         assertThat(attr.read(boolean.class), equalTo(true));
         properties.put("isRunRefresh", new String[]{"false"});
-        DatabaseFactory.getDatabase().setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, properties);
-        new DeviceProxy(NoDBDeviceManager.deviceName).command_inout("Init");
+        DatabaseFactory.getDatabase().setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, properties);
+        new DeviceProxy(getDefaultDeviceFullName()).command_inout("Init");
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

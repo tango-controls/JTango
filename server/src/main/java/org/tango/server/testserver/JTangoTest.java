@@ -69,7 +69,7 @@ import java.util.Map;
  */
 @Device(transactionType = TransactionType.NONE)
 public final class JTangoTest {
-    public static final String NO_DB_DEVICE_NAME = "1/1/1";
+    public static final String DEFAULT_NO_DB_DEVICE_NAME = "1/1/1";
     // public static final String NO_DB_GIOP_PORT = "12354";
     public static final String INSTANCE_NAME = "1";
     public static final String SERVER_NAME = JTangoTest.class.getSimpleName();
@@ -199,14 +199,18 @@ public final class JTangoTest {
         System.setProperty("OAPort", Integer.toString(portNr));
         ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
         ServerManager.getInstance().startError(
-                new String[]{INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME,
+                new String[]{INSTANCE_NAME, "-nodb", "-dlist", DEFAULT_NO_DB_DEVICE_NAME,
                         "-file=" + JTangoTest.class.getResource("/noDbproperties.txt").getPath()}, SERVER_NAME);
     }
 
     public static void startNoDb(final int portNr) throws DevFailed {
+        startNoDb(portNr, DEFAULT_NO_DB_DEVICE_NAME);
+    }
+
+    public static void startNoDb(final int portNr, String deviceList) throws DevFailed {
         System.setProperty("OAPort", Integer.toString(portNr));
         ServerManager.getInstance().addClass(JTangoTest.class.getCanonicalName(), JTangoTest.class);
-        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME, "-nodb", "-dlist", NO_DB_DEVICE_NAME},
+        ServerManager.getInstance().startError(new String[]{INSTANCE_NAME, "-nodb", "-dlist", deviceList},
                 SERVER_NAME);
     }
 

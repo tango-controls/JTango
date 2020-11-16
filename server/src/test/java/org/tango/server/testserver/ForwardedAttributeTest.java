@@ -82,7 +82,7 @@ public class ForwardedAttributeTest {
             } catch (final InterruptedException e) {
             }
 
-            deviceNameRoot = "tango://localhost:" + ss2.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME
+            deviceNameRoot = "tango://localhost:" + ss2.getLocalPort() + "/" + JTangoTest.DEFAULT_NO_DB_DEVICE_NAME
                     + "#dbase=no";
             ForwardedServer.setNoDbFwdAttributeName(deviceNameRoot + "/doubleScalar");
 

@@ -132,7 +132,7 @@ public class JTangoCommandPerf extends NoDBDeviceManager {
     public JTangoCommandPerf(final Object valueTest, final String command) throws DevFailed {
         // this.command = command;
         this.valueTest = valueTest;
-        tangoCommand = new TangoCommand(deviceName + "/" + command);
+        tangoCommand = new TangoCommand(getDefaultDeviceFullName() + "/" + command);
     }
 
     @Test

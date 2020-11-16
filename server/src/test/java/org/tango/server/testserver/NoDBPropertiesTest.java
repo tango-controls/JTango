@@ -66,8 +66,8 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
                 ss1.close();
             }
         }
-        deviceName = "tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.NO_DB_DEVICE_NAME + "#dbase=no";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        deviceFullNameList.add("tango://localhost:" + ss1.getLocalPort() + "/" + JTangoTest.DEFAULT_NO_DB_DEVICE_NAME + "#dbase=no");
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         final DeviceData devda = dev.command_inout("getMyProperty");
 
         final String value = devda.extractString();
@@ -85,9 +85,9 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
         Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { propValue });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
 
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         dev.command_inout("Init");
         DeviceData devda = dev.command_inout("getMyProperty");
 
@@ -97,7 +97,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
         map = new HashMap<String, String[]>();
         map.put(propName, new String[] { "" });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
 
         dev.command_inout("Init");
         devda = dev.command_inout("getMyProperty");
@@ -115,9 +115,9 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { propValue });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
 
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         dev.command_inout("Init");
         final DeviceData devda = dev.command_inout("isBooleanProp");
 
@@ -136,9 +136,9 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
         final Map<String, String[]> map = new HashMap<String, String[]>();
         map.put(propName, new String[] { propValue });
-        db.setDeviceProperties(JTangoTest.NO_DB_DEVICE_NAME, map);
+        db.setDeviceProperties(JTangoTest.DEFAULT_NO_DB_DEVICE_NAME, map);
 
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         dev.command_inout("Init");
         final DeviceData devda = dev.command_inout("isBooleanProp");
 
@@ -159,7 +159,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
         map.put(propClassName, new String[] { propClassValue });
         db.setClassProperties(JTangoTest.class.getCanonicalName(), map);
 
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         dev.command_inout("Init");
         DeviceData devdaClass = dev.command_inout("getMyClassProperty");
 
@@ -179,7 +179,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
 
     @Test
     public void testEmptyArrayProperty() throws DevFailed{
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         DeviceData devdaClass = dev.command_inout("getEmptyArrayProperty");
         String[] valueClass = devdaClass.extractStringArray();
         System.out.println("test array "+ Arrays.toString(valueClass));
@@ -192,7 +192,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
             final Double dd = new Double(Math.random());
             final String value = dd.toString();
             final String attrName = "shortScalar";
-            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
             final AttributeInfoEx info = dev.get_attribute_info_ex(attrName);
             info.description = value;
             dev.set_attribute_info(new AttributeInfoEx[] { info });
@@ -207,7 +207,7 @@ public class NoDBPropertiesTest extends NoDBDeviceManager {
     @Test
     public void testDefaultAttributeProperty() throws DevFailed {
         final String attrName = "longSpectrum";
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         final AttributeInfoEx info = dev.get_attribute_info_ex(attrName);
         assertThat(info.alarms.min_alarm, equalTo("0"));
         assertThat(info.alarms.max_alarm, equalTo("10"));

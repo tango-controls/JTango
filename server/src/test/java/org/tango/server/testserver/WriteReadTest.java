@@ -39,7 +39,7 @@ public class WriteReadTest extends NoDBDeviceManager {
     @Test
     public void writeRead() throws DevFailed {
         try {
-            final DeviceProxy dev = new DeviceProxy(deviceName);
+            final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
             final DeviceAttribute da = dev.read_attribute("doubleScalar");
             final double input = 10.4;
             da.insert(input);
