@@ -622,6 +622,9 @@ public class Group extends GroupElement implements java.io.Serializable {
             while (dp == null && it.hasNext()) {
                 final GroupElement e = it.next();
                 dp = e.get_device_i(i--);
+                if (e instanceof Group) {
+                    i--;
+                }
             }
             return dp;
         }
