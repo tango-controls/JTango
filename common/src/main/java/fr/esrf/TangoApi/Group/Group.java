@@ -232,7 +232,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public boolean contains(final String n, final boolean fwd) {
         synchronized (this) {
-            return find_i(n, fwd) != null ? true : false;
+            return find_i(n, fwd) != null;
         }
     }
 
@@ -297,8 +297,8 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public int command_inout_asynch(final String c, final boolean fgt, final boolean fwd) throws DevFailed {
         final int rid = command_inout_asynch_i(c, fgt, fwd, next_req_id());
-        if (fgt == false) {
-            arp.put(new Integer(rid), new Boolean(fwd));
+        if (!fgt) {
+            arp.put(rid, fwd);
         }
         return rid;
     }
@@ -309,8 +309,8 @@ public class Group extends GroupElement implements java.io.Serializable {
     public int command_inout_asynch(final String c, final DeviceData dd, final boolean fgt, final boolean fwd)
             throws DevFailed {
         final int rid = command_inout_asynch_i(c, dd, fgt, fwd, next_req_id());
-        if (fgt == false) {
-            arp.put(new Integer(rid), new Boolean(fwd));
+        if (!fgt) {
+            arp.put(rid, fwd);
         }
         return rid;
     }
@@ -321,8 +321,8 @@ public class Group extends GroupElement implements java.io.Serializable {
     public int command_inout_asynch(final String c, final DeviceData[] dd, final boolean fgt, final boolean fwd)
             throws DevFailed {
         final int rid = command_inout_asynch_i(c, dd, fgt, fwd, next_req_id());
-        if (fgt == false) {
-            arp.put(new Integer(rid), new Boolean(fwd));
+        if (!fgt) {
+            arp.put(rid, fwd);
         }
         return rid;
     }
@@ -552,7 +552,7 @@ public class Group extends GroupElement implements java.io.Serializable {
             System.out.println("Group::add_i::failed to add " + e.get_name() + " (null or self)");
             return false;
         }
-        final GroupElement ge = find_i(e.get_name(), e instanceof Group ? false : true);
+        final GroupElement ge = find_i(e.get_name(), !(e instanceof Group));
         if (ge != null && ge != this) {
             // -DEBUG
             System.out.println("Group::add_i::failed to add " + e.get_name() + " (already attached)");
@@ -741,7 +741,7 @@ public class Group extends GroupElement implements java.io.Serializable {
             for (GroupElement ge : elements) {
                 if (ge instanceof GroupDeviceElement || fwd) {
                     sub_reply = ge.command_inout_reply_i(rid, tmo, fwd);
-                    if (sub_reply.isEmpty() == false) {
+                    if (!sub_reply.isEmpty()) {
                         reply.addAll(sub_reply);
                     }
                     if (sub_reply.has_failed()) {
@@ -809,7 +809,7 @@ public class Group extends GroupElement implements java.io.Serializable {
     /**
      * write_attribute_asynch_i - access limited to package Group
      */
-    private int write_attribute_asynch_i(final DeviceAttribute da[], final boolean fwd, final int rid) throws DevFailed {
+    private int write_attribute_asynch_i(final DeviceAttribute[] da, final boolean fwd, final int rid) throws DevFailed {
         synchronized (this) {
             final int gsize = get_size_i(fwd);
             if (gsize != da.length) {
