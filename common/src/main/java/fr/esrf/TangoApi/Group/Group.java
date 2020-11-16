@@ -223,7 +223,14 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public void remove_all() {
         synchronized (this) {
-            elements.removeAllElements();
+            remove_all(false);
+        }
+    }
+
+    public void remove_all(boolean fwd) {
+        synchronized (this) {
+            remove_fwd("*", fwd);
+            elements.clear();
         }
     }
 
