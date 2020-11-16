@@ -72,6 +72,9 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     private int asynch_req_id;
 
+    private static final String API_BAD_ASYN_POLL_ID = "API_BadAsynPollId";
+    private static final String API_BAD_ASYN_POLL_ID_DESC = "Invalid asynch. request identifier specified";
+
     /**
      * Creates a new instance of Group
      */
@@ -328,14 +331,13 @@ public class Group extends GroupElement implements java.io.Serializable {
      * command_inout_reply
      */
     public GroupCmdReplyList command_inout_reply(final int rid, final int tmo) throws DevFailed {
-        final Integer rid_obj = new Integer(rid);
-        final Boolean fwd = (Boolean) arp.get(rid_obj);
+        final Boolean fwd = arp.get(rid);
         if (fwd == null) {
-            Except.throw_exception("API_BadAsynPollId", "Invalid asynch. request identifier specified",
+            Except.throw_exception(API_BAD_ASYN_POLL_ID, API_BAD_ASYN_POLL_ID_DESC,
                     "Group.command_inout_reply");
         }
-        arp.remove(rid_obj);
-        return command_inout_reply_i(rid, tmo, fwd.booleanValue());
+        arp.remove(rid);
+        return command_inout_reply_i(rid, tmo, fwd);
     }
 
     /**
@@ -353,7 +355,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public int read_attribute_asynch(final String a, final boolean fwd) throws DevFailed {
         final int rid = read_attribute_asynch_i(a, fwd, next_req_id());
-        arp.put(new Integer(rid), new Boolean(fwd));
+        arp.put(rid, fwd);
         return rid;
     }
 
@@ -361,14 +363,13 @@ public class Group extends GroupElement implements java.io.Serializable {
      * read_attribute_reply
      */
     public GroupAttrReplyList read_attribute_reply(final int rid, final int tmo) throws DevFailed {
-        final Integer rid_obj = new Integer(rid);
-        final Boolean fwd = (Boolean) arp.get(rid_obj);
+        final Boolean fwd = arp.get(rid);
         if (fwd == null) {
-            Except.throw_exception("API_BadAsynPollId", "Invalid asynch. request identifier specified",
+            Except.throw_exception(API_BAD_ASYN_POLL_ID, API_BAD_ASYN_POLL_ID_DESC,
                     "Group.read_inout_reply");
         }
-        arp.remove(rid_obj);
-        return read_attribute_reply_i(rid, tmo, fwd.booleanValue());
+        arp.remove(rid);
+        return read_attribute_reply_i(rid, tmo, fwd);
     }
 
     /**
@@ -423,7 +424,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public int write_attribute_asynch(final DeviceAttribute da, final boolean fwd) throws DevFailed {
         final int rid = write_attribute_asynch_i(da, fwd, next_req_id());
-        arp.put(new Integer(rid), new Boolean(fwd));
+        arp.put(rid, fwd);
         return rid;
     }
 
@@ -432,7 +433,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     public int write_attribute_asynch(final DeviceAttribute[] da, final boolean fwd) throws DevFailed {
         final int rid = write_attribute_asynch_i(da, fwd, next_req_id());
-        arp.put(new Integer(rid), new Boolean(fwd));
+        arp.put(rid, fwd);
         return rid;
     }
 
@@ -440,14 +441,13 @@ public class Group extends GroupElement implements java.io.Serializable {
      * write_attribute_reply
      */
     public GroupReplyList write_attribute_reply(final int rid, final int tmo) throws DevFailed {
-        final Integer rid_obj = new Integer(rid);
-        final Boolean fwd = (Boolean) arp.get(rid_obj);
+        final Boolean fwd = arp.get(rid);
         if (fwd == null) {
-            Except.throw_exception("API_BadAsynPollId", "Invalid asynch. request identifier specified",
+            Except.throw_exception(API_BAD_ASYN_POLL_ID, API_BAD_ASYN_POLL_ID_DESC,
                     "Group.write_attribute_reply");
         }
-        arp.remove(rid_obj);
-        return write_attribute_reply_i(rid, tmo, fwd.booleanValue());
+        arp.remove(rid);
+        return write_attribute_reply_i(rid, tmo, fwd);
     }
 
     /**
@@ -505,7 +505,7 @@ public class Group extends GroupElement implements java.io.Serializable {
      */
     private Group get_group_i(final String n, final boolean fwd) {
         final GroupElement e = find_i(n, fwd);
-        return e != null && e instanceof Group ? (Group) e : null;
+        return e instanceof Group ? (Group) e : null;
     }
 
     /**
