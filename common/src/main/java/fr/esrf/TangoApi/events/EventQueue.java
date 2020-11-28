@@ -40,10 +40,11 @@ import fr.esrf.TangoDs.Except;
 import fr.esrf.TangoDs.TangoConst;
 
 import java.util.ArrayList;
+import java.util.List;
 //-============================================================================
 
 /**
- * This class manage a vector of EventData to implement
+ * This class manage a List of EventData to implement
  * an event queue mechanism..
  * <Br>
  * <Br>
@@ -175,7 +176,9 @@ public class EventQueue {
     /**
      * The queue itself
      */
-    private ArrayList<EventData> events = new ArrayList<EventData>();
+    private final List<EventData> events = new ArrayList<>();
+
+    private static final String BUFFER_EMPTY = "BUFFER_EMPTY";
 
     //==================================================================
     /**
@@ -201,7 +204,7 @@ public class EventQueue {
      */
     //==================================================================
     public synchronized boolean is_empty() {
-        return (events.size() == 0);
+        return events.isEmpty();
     }
     //==================================================================
     /**
@@ -244,10 +247,12 @@ public class EventQueue {
      */
     //==================================================================
     public synchronized EventData getNextEvent() throws DevFailed {
-        if (events.size() == 0)
-            Except.throw_exception("BUFFER_EMPTY",
+        if (events.isEmpty()) {
+            Except.throw_exception(BUFFER_EMPTY,
                     "Event queue is empty.",
                     "EventQueue.getNextEvent()");
+        }
+
         EventData ev_data = events.get(0);
         events.remove(0);
         return ev_data;
@@ -266,7 +271,7 @@ public class EventQueue {
             if (event.event_type == event_type)
                 ev_data = event;
         if (ev_data == null)
-            Except.throw_exception("BUFFER_EMPTY",
+            Except.throw_exception(BUFFER_EMPTY,
                     "No " + TangoConst.eventNames[event_type] + " in event queue.",
                     "EventQueue.getNextEvent()");
         events.remove(ev_data);
@@ -292,7 +297,7 @@ public class EventQueue {
      */
     // ==========================================================================
     public synchronized EventData[] getEvents(int event_type) {
-        ArrayList<EventData> v = new ArrayList<EventData>();
+        ArrayList<EventData> v = new ArrayList<>();
         for (EventData event : events)
             if (event.event_type == event_type)
                 v.add(event);
@@ -310,11 +315,13 @@ public class EventQueue {
      */
     //==================================================================
     public synchronized long getLastEventDate() throws DevFailed {
-        if (events.size() == 0)
-            Except.throw_exception("BUFFER_EMPTY",
+        if (events.isEmpty()) {
+            Except.throw_exception(BUFFER_EMPTY,
                     "Event queue is empty.",
                     "EventQueu.getNextEvent()");
-        EventData event = events.get(events.size()-1);
+        }
+
+        EventData event = events.get(events.size() - 1);
         return event.date;
     }
 }
