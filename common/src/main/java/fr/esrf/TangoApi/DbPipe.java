@@ -34,7 +34,7 @@
 
 package fr.esrf.TangoApi;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Class Description:
@@ -45,9 +45,9 @@ import java.util.ArrayList;
  */
 
 
-public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
+public class DbPipe extends CopyOnWriteArrayList<DbDatum> implements java.io.Serializable {
 
-    private String name;
+    private final String name;
 
     //===========================================================
     /**
@@ -88,7 +88,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
 
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name property name
      */
@@ -98,7 +98,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name  property name
      * @param value property value
@@ -109,7 +109,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name  property name
      * @param value property value
@@ -120,7 +120,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name  property name
      * @param value property value
@@ -131,7 +131,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name  property name
      * @param value property value
@@ -144,7 +144,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
 
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name   property name
      * @param values property value
@@ -155,7 +155,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name   property name
      * @param values property value
@@ -166,7 +166,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name   property name
      * @param values property value
@@ -177,7 +177,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     }
     //===========================================================
     /**
-     * Add a new DbDatum in Vector
+     * Add a new DbDatum to the list
      *
      * @param name   property name
      * @param values property value
@@ -272,7 +272,7 @@ public class DbPipe extends ArrayList<DbDatum> implements java.io.Serializable {
     //===========================================================
     public boolean is_empty(String name) {
         DbDatum datum = getDatum(name);
-        return datum==null || datum.is_empty();
+        return datum == null || datum.is_empty();
     }
     //===========================================================
     /**
