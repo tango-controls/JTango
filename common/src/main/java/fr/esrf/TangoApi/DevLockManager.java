@@ -79,15 +79,15 @@ class DevLockManager {
         //  Check if java.lang.management classes can be loaded
 		try {
             //noinspection UnusedDeclaration
-            Class c = java.lang.management.ManagementFactory.class;
+            Class.forName("java.lang.management.ManagementFactory",
+                    false,
+                    DevLockManager.class.getClassLoader());
 		}
-		catch (Exception e) {
-			hasManagementClasses = false;	//	Not available
+		catch (LinkageError | ClassNotFoundException e) {
+            //	Not available
+			hasManagementClasses = false;
 		}
-		catch (Error e) {
-			hasManagementClasses = false;	//	Not available
-		}
-	}
+    }
     // ===============================================================
     /**
      * Returns instance of the Object.
@@ -325,10 +325,10 @@ class DevLockManager {
 
     // ===============================================================
     //
-    // Relock vectors and threads management
+    // Relock map and threads management
     //
     // ===============================================================
-    private static Hashtable<String, LockedDeviceAmin> relockMap = null;
+    private static Map<String, LockedDeviceAmin> relockMap = null;
     private static final long VALIDITY_DELAY = 500; // 500 ms before
 
     // ===============================================================
@@ -337,7 +337,7 @@ class DevLockManager {
         // Check if it is the first relock
         if (relockMap == null) {
             // Create hash table for admin devices object
-            relockMap = new Hashtable<String, LockedDeviceAmin>();
+            relockMap = new ConcurrentHashMap<>();
 
             // Create a thread to unlock all devices at exit
             Runtime.getRuntime().addShutdownHook(new ShutdownThread());
@@ -395,11 +395,9 @@ class DevLockManager {
         @Override
         public void run() {
             System.out.println("exiting.....");
-            final Enumeration keys = relockMap.keys();
-            while (keys.hasMoreElements()) {
-            final String key = (String) keys.nextElement();
-            final LockedDeviceAmin lda = relockMap.get(key);
-            lda.cleanUp();
+            for (Map.Entry<String, LockedDeviceAmin> relockEntry : relockMap.entrySet()) {
+                System.out.println("try to cleanup: " + relockEntry.getKey());
+                relockEntry.getValue().cleanUp();
             }
         }
     }
@@ -462,7 +460,7 @@ class DevLockManager {
         LockedDeviceAmin(final String name, final LockedDevice ld) throws DevFailed {
             device = DeviceProxyFactory.get(name);
             this.name = name;
-            devices = new Vector<LockedDevice>();
+            devices = new CopyOnWriteArrayList<>();
             devices.add(ld);
             t_relock = System.currentTimeMillis();
         }
@@ -499,7 +497,7 @@ class DevLockManager {
                 }
             }
             // If no device any more remove itself.
-            if (devices.size() == 0) {
+            if (devices.isEmpty()) {
                 relockMap.remove(name);
             }
             wakeUp();
@@ -614,7 +612,7 @@ class DevLockManager {
         // ===========================================================
         private synchronized void waitNext() {
             long t_sleep = getTimeToSleep();
-            while (t_sleep > VALIDITY_DELAY && devices.size() > 0) {
+            while (t_sleep > VALIDITY_DELAY && devices.isEmpty()) {
                 try {
                     wait(t_sleep);
                 } catch (final InterruptedException e) {
@@ -629,11 +627,11 @@ class DevLockManager {
         // ===========================================================
         @Override
         public void run() {
-            while (devices.size() > 0) {
+            while (devices.isEmpty()) {
                 // RE lock will be done later
                 waitNext();
 
-                if (devices.size() > 0) {
+                if (devices.isEmpty()) {
                     relock();
                     t_relock = System.currentTimeMillis();
                 }
