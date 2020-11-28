@@ -219,13 +219,13 @@ public class DbPipe extends CopyOnWriteArrayList<DbDatum> implements java.io.Ser
     //===========================================================
     public String getStringValue(int index) {
         String[] array = get(index).extractStringArray();
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (int i=0 ; i<array.length ; i++) {
-            str += array[i];
+            str.append(array[i]);
             if (i < array.length - 1)
-                str += "\n";
+                str.append("\n");
         }
-        return str;
+        return str.toString();
     }
     //===========================================================
     /**
@@ -254,13 +254,13 @@ public class DbPipe extends CopyOnWriteArrayList<DbDatum> implements java.io.Ser
 
         //  Else get string value
         String[] array = datum.extractStringArray();
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
-            str += array[i];
+            str.append(array[i]);
             if (i < array.length - 1)
-                str += "\n";
+                str.append("\n");
         }
-        return str;
+        return str.toString();
     }
     //===========================================================
     /**
