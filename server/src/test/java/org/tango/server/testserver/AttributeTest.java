@@ -31,6 +31,9 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.esrf.TangoApi.DeviceAttribute;
+import fr.esrf.TangoApi.DeviceProxy;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -48,7 +51,7 @@ public class AttributeTest extends NoDBDeviceManager {
     private final Object writeValue;
 
     @Parameterized.Parameters(name = "{index}: {1}")
-    public static List<Object[]> getParametres() {
+    public static List<Object[]> getParameters() {
         return Arrays
                 .asList(new Object[][] {
 
@@ -62,13 +65,13 @@ public class AttributeTest extends NoDBDeviceManager {
                         { new short[][] { { -32768, 3500, 32767 }, { 1, 2, 3 } }, "short[][]Dynamic" },
                         // INTEGER
                         { 10, "intScalar" },
-                        { new int[] { 254, 1567981215, 02, 2185 }, "intSpectrum" },
+                        { new int[] { 254, 1567981215, 2, 2185 }, "intSpectrum" },
                         {
                                 new int[][] { { 259874542, 498212434, 420, 48942120 },
                                         { -2147483648, 154, 2147483647, 4541 } }, "intImage" },
                         // INTEGER dynamic
                         { 10, "intDynamic" },
-                        { new int[] { 254, 1567981215, 02, 2185 }, "int[]Dynamic" },
+                        { new int[] { 254, 1567981215, 2, 2185 }, "int[]Dynamic" },
                         {
                                 new int[][] { { 259874542, 498212434, 420, 48942120 },
                                         { -2147483648, 154, 2147483647, 4541 } }, "int[][]Dynamic" },
@@ -173,7 +176,7 @@ public class AttributeTest extends NoDBDeviceManager {
     }
 
     @Test
-    public void attributTest() throws DevFailed {
+    public void attributeTest() throws DevFailed {
         try {
             System.out.println(testNb++ + " TEST " + attributeName);
             final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/" + attributeName);
@@ -219,5 +222,16 @@ public class AttributeTest extends NoDBDeviceManager {
         // catch (final Exception e) {
         // e.printStackTrace();
         // }
+    }
+
+    @Test
+    public void testDevProxyRead() throws DevFailed {
+        DeviceProxy device = new DeviceProxy(deviceName);
+        DeviceAttribute attribute = device.read_attribute(attributeName);
+
+        Assert.assertNotNull(attribute);
+        Assert.assertNotNull(attribute.getQuality());
+
+        Assert.assertThrows(DevFailed.class, () -> device.read_attribute(new String[] {attributeName, attributeName}));
     }
 }
