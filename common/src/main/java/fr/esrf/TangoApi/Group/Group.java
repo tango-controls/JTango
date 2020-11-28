@@ -891,11 +891,11 @@ public class Group extends GroupElement implements java.io.Serializable {
          * Instanciate the TangoElements which name matches the pattern p
          *
          * @param p the device name pattern (wild card).
-         * @return a vector of GroupElement.
+         * @return a list of GroupElement.
          */
         // ======================================================================
         public List<GroupDeviceElement> instantiate(final String p) throws DevFailed {
-            // - a vector to store GroupElement
+            // - a array to store GroupElement
             String[] dnl;
             // - is <p> a device name or a device name pattern ?
             if (p.indexOf('*') == -1) {
