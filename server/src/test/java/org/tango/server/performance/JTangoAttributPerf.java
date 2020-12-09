@@ -109,7 +109,7 @@ public class JTangoAttributPerf extends NoDBDeviceManager {
 
     public JTangoAttributPerf(final String attributeName) throws DevFailed {
         this.attributeName = attributeName;
-        proxy = new DeviceProxy(deviceName);
+        proxy = new DeviceProxy(getDefaultDeviceFullName());
     }
 
     @Test

@@ -38,7 +38,7 @@ public class TimeStampTest extends NoDBDeviceManager {
 
     @Test
     public void test() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/booleanScalar");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/booleanScalar");
 
         att.read();
         assertThat(att.getTimestamp(), equalTo(123456L));
@@ -47,7 +47,7 @@ public class TimeStampTest extends NoDBDeviceManager {
     @Test
     public void testReadTimestampDouble() throws DevFailed {
         try {
-            final TangoAttribute att = new TangoAttribute(deviceName + "/doubleScalar");
+            final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/doubleScalar");
 
             att.read();
             final long time1 = att.getTimestamp();

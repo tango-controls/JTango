@@ -37,7 +37,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test
     public void scalarSimpleTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/enumAttribute");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/enumAttribute");
         // test default value
         att.read();
         // echo test
@@ -49,7 +49,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test(expected = DevFailed.class)
     public void scalarOutOfRangeTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/enumAttribute");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/enumAttribute");
         // test default value
         att.read();
         // echo test
@@ -59,7 +59,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test(expected = DevFailed.class)
     public void scalarSetEnumLabelTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/enumAttribute");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/enumAttribute");
         // modify enum list
         final AttributeInfoEx props = att.getAttributeProxy().get_info_ex();
         props.enum_label = new String[] { "ab", "cd", "ef" };
@@ -68,7 +68,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test
     public void dynamicScalarSimpleTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/DevEnumDynamic");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/DevEnumDynamic");
         // test default value
         att.read();
         // echo test
@@ -80,7 +80,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test
     public void dynamicScalarChangeEnumTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/DevEnumDynamic");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/DevEnumDynamic");
 
         // test default value
         att.read();
@@ -97,7 +97,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test
     public void dynamicScalarChangeEnumTest2() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/DevEnumDynamic");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/DevEnumDynamic");
         // test default value
         att.read();
         // modify enum list
@@ -113,7 +113,7 @@ public class EnumAttributeTest extends NoDBDeviceManager {
 
     @Test(expected = DevFailed.class)
     public void dynamicScalarErrorTest() throws DevFailed {
-        final TangoAttribute att = new TangoAttribute(deviceName + "/DevEnumDynamic");
+        final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/DevEnumDynamic");
         // test default value
         att.read();
         // modify enum list

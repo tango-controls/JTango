@@ -176,7 +176,7 @@ public class AttributeTest extends NoDBDeviceManager {
     public void attributTest() throws DevFailed {
         try {
             System.out.println(testNb++ + " TEST " + attributeName);
-            final TangoAttribute att = new TangoAttribute(deviceName + "/" + attributeName);
+            final TangoAttribute att = new TangoAttribute(getDefaultDeviceFullName() + "/" + attributeName);
             // test default value
             att.read();
             // echo test
@@ -212,7 +212,7 @@ public class AttributeTest extends NoDBDeviceManager {
             }
         } catch (final DevFailed e) {
             e.printStackTrace();
-            System.out.println("FAILED " + deviceName + "/" + attributeName);
+            System.out.println("FAILED " + getDefaultDeviceFullName() + "/" + attributeName);
             DevFailedUtils.printDevFailed(e);
             throw e;
         }

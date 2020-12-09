@@ -39,9 +39,9 @@ public class InitStateTest extends NoDBDeviceManager {
 
     @Test
     public void testInit() throws DevFailed {
-        final TangoAttribute attr = new TangoAttribute(deviceName + "/shortScalar");
+        final TangoAttribute attr = new TangoAttribute(getDefaultDeviceFullName() + "/shortScalar");
         attr.write(20);
-        final TangoCommand tangoCommand = new TangoCommand(deviceName, "Init");
+        final TangoCommand tangoCommand = new TangoCommand(getDefaultDeviceFullName(), "Init");
         tangoCommand.execute();
         final short shortScalar = (Short) attr.read();
         assertThat(shortScalar, equalTo((short) 10));
@@ -49,23 +49,23 @@ public class InitStateTest extends NoDBDeviceManager {
 
     @Test
     public void testInitState() throws DevFailed {
-        final TangoCommand tangoCommand = new TangoCommand(deviceName, "Status");
+        final TangoCommand tangoCommand = new TangoCommand(getDefaultDeviceFullName(), "Status");
         final Object status = tangoCommand.executeExtract(null);
         assertThat(status.toString(), equalTo("hello"));
     }
 
     @Test
     public void testState() throws DevFailed {
-        final TangoCommand tangoCommand = new TangoCommand(deviceName, "testState");
+        final TangoCommand tangoCommand = new TangoCommand(getDefaultDeviceFullName(), "testState");
         tangoCommand.execute();
-        final TangoCommand tangoCommand2 = new TangoCommand(deviceName + "/State");
+        final TangoCommand tangoCommand2 = new TangoCommand(getDefaultDeviceFullName() + "/State");
         final Object state = tangoCommand2.executeExtract(null);
         assertThat((DevState) state, equalTo(DevState.FAULT));
     }
 
     @Test
     public void testBlackBox() throws DevFailed {
-        final DeviceProxy dev = new DeviceProxy(deviceName);
+        final DeviceProxy dev = new DeviceProxy(getDefaultDeviceFullName());
         dev.black_box(10);
     }
 
