@@ -14,7 +14,7 @@ public class DeviceProxyTest extends NoDBDeviceManager {
 
 
     public DeviceProxyTest() throws DevFailed {
-        proxy = new DeviceProxy(deviceName);
+        proxy = new DeviceProxy(getDefaultDeviceFullName());
     }
 
     @Test
