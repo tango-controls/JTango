@@ -226,7 +226,7 @@ public class AttributeTest extends NoDBDeviceManager {
 
     @Test
     public void testDevProxyRead() throws DevFailed {
-        DeviceProxy device = new DeviceProxy(deviceName);
+        DeviceProxy device = new DeviceProxy(getDefaultDeviceFullName());
         DeviceAttribute attribute = device.read_attribute(attributeName);
 
         Assert.assertNotNull(attribute);

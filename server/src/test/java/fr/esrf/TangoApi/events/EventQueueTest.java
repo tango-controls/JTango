@@ -140,11 +140,11 @@ public class EventQueueTest extends NoDBDeviceManager {
     }
 
     private DeviceProxy getDeviceProxy() throws DevFailed {
-        return new DeviceProxy(deviceName);
+        return new DeviceProxy(getDefaultDeviceFullName());
     }
 
     private DeviceInterface getDeviceInterface() throws DevFailed {
-        return new DeviceInterface(deviceName);
+        return new DeviceInterface(getDefaultDeviceFullName());
     }
 
     private DeviceAttribute getAttribute(String name, int value) {
