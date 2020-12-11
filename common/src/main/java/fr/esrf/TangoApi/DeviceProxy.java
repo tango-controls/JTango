@@ -46,7 +46,6 @@ import org.omg.CORBA.Request;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Class Description: This class manage device connection for Tango objects. It
@@ -78,9 +77,9 @@ import java.util.Vector;
 
 public class DeviceProxy extends Connection implements ApiDefs {
 
-    private IDeviceProxyDAO deviceProxyDAO = null;
+    private IDeviceProxyDAO deviceProxyDAO;
 
-    static final private boolean check_idl = false;
+    private static final boolean check_idl = false;
 
     /**
      * DbDevice object to make an agregate..
@@ -1566,7 +1565,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
     // ===================================================================
     public List<String> getPipeNames() throws DevFailed {
         List<PipeInfo> infoList = deviceProxyDAO.getPipeConfig(this);
-        ArrayList<String>   pipeNames = new ArrayList<String>();
+        List<String> pipeNames = new ArrayList<>();
         for (PipeInfo info : infoList)
             pipeNames.add(info.getName());
         return pipeNames;
@@ -1590,7 +1589,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     public PipeInfo getPipeConfig(String pipeName) throws DevFailed {
-        ArrayList<String> list = new ArrayList<String>(1);
+        List<String> list = new ArrayList<>(1);
         list.add(pipeName);
         List<PipeInfo>  infoList = getPipeConfig(list);
         if (infoList.isEmpty())
@@ -1607,7 +1606,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     public List<PipeInfo> getPipeConfig(String[] pipeNames) throws DevFailed {
-        ArrayList<String> list = new ArrayList<String>(pipeNames.length);
+        List<String> list = new ArrayList<>(pipeNames.length);
         Collections.addAll(list, pipeNames);
         return getPipeConfig(list);
     }
@@ -1630,7 +1629,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     public void setPipeConfig(PipeInfo pipeInfo) throws DevFailed {
-        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(1);
+        List<PipeInfo> infoList = new ArrayList<>(1);
         infoList.add(pipeInfo);
         setPipeConfig(infoList);
     }
@@ -1642,7 +1641,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     // ===================================================================
     public void setPipeConfig(PipeInfo[] pipeInfoList) throws DevFailed {
-        ArrayList<PipeInfo> infoList = new ArrayList<PipeInfo>(pipeInfoList.length);
+        List<PipeInfo> infoList = new ArrayList<>(pipeInfoList.length);
         Collections.addAll(infoList, pipeInfoList);
         setPipeConfig(infoList);
     }
@@ -1986,30 +1985,28 @@ public class DeviceProxy extends Connection implements ApiDefs {
      */
     //===============================================================
     private static void checkDuplication(String[] list, String orig) throws DevFailed {
-        Vector<String> dupli = new Vector<String>();
+        List<String> dupli = new ArrayList<>();
         //	For each string
         for (int i = 0 ; i<list.length ; i++) {
             String str = list[i];
             //	Check if it is a duplication
             for (int j = i + 1 ; j<list.length ; j++) {
-                if (list[j].equalsIgnoreCase(str))
-                    //	Check if not already found
-                    if (dupli.indexOf(str)<0)
+                if (list[j].equalsIgnoreCase(str) && !dupli.contains(str)) {
                         dupli.add(str);
+                }
             }
         }
 
-        if (dupli.size()>0) {
-            String message =
-                    "Several times the same attribute in required attribute list: ";
+        if (!dupli.isEmpty()) {
+            StringBuilder message = new StringBuilder("Several times the same attribute in required attribute list: ");
             for (int i = 0 ; i<dupli.size() ; i++) {
-                message += dupli.get(i);
+                message.append(dupli.get(i));
                 if (i<dupli.size() - 1) {
-                    message += ", ";
+                    message.append(", ");
                 }
             }
             Except.throw_exception("",
-                    message, orig);
+                    message.toString(), orig);
         }
     }
 
@@ -2061,7 +2058,7 @@ public class DeviceProxy extends Connection implements ApiDefs {
         //  Check with ZmqEventSubscriptionChange command
         //  since 9.1.0 this command returns Tango release in info mode
         int version = getTangoVersionFromZmqEventSubscriptionChange();
-        if (version>900)    //  Found
+        if (version > 900)    //  Found
             return version;
 
         //  Get the command list
@@ -2095,12 +2092,12 @@ public class DeviceProxy extends Connection implements ApiDefs {
                         return 800;
                 }
                 return 700;
-             case 5:
-			 	return 900;
-       }
-
-        //  Not found
-        return 0;
+            case 5:
+                return 900;
+            default:
+                //  Not found
+                return 0;
+        }
     }
 
     //===================================================================
