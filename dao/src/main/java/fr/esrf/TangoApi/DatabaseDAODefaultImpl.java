@@ -114,7 +114,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
      */
     //==========================================================================
     private String stringArray2String(String[] array) {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         for (int i = 0 ; i<array.length ; i++) {
             sb.append(array[i]);
             if (i<array.length - 1)
@@ -1898,21 +1898,21 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     public String[] getDevices(Database database, String wildcard) throws DevFailed {
         //	Get each field of device name
         StringTokenizer stk = new StringTokenizer(wildcard, "/");
-        Vector<String> vector = new Vector<String>();
+        List<String> list = new ArrayList<>();
         while (stk.hasMoreTokens())
-            vector.add(stk.nextToken());
-        if (vector.size()<3)
+            list.add(stk.nextToken());
+        if (list.size() < 3)
             Except.throw_exception("TangoApi_DeviceNameNotValid",
                     "Device name not valid", "ATangoApi.Database.getDevices()");
 
-        String domain = vector.elementAt(0);
-        String family = vector.elementAt(1);
-        String member = vector.elementAt(2);
-        vector.clear();
+        String domain = list.get(0);
+        String family = list.get(1);
+        String member = list.get(2);
+        list.clear();
 
         //	Check for specifieddomain
         String[] domains = get_device_domain(database, domain);
-        if (domains.length==0)
+        if (domains.length == 0)
             domains = new String[]{domain};
 
         //	Check for all domains found
@@ -1930,14 +1930,11 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
                 //	Add all members found
                 for (String member_1 : members)
-                    vector.add(family_header + member_1);
+                    list.add(family_header + member_1);
             }
         }
-        //	Copy all from vector to String array
-        String[] devices = new String[vector.size()];
-        for (int i = 0 ; i<vector.size() ; i++)
-            devices[i] = vector.elementAt(i);
-        return devices;
+        //	Copy all from list to String array
+        return list.toArray(new String[0]);
     }
 
     //==========================================================================
@@ -1970,7 +1967,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     //==========================================================================
     private List<DbHistory> convertPropertyHistory(String[] ret, boolean isAttribute)
             throws DevFailed {
-        ArrayList<DbHistory> list = new ArrayList<DbHistory>();
+        ArrayList<DbHistory> list = new ArrayList<>();
         int i = 0;
         int count = 0;
         int offset;
@@ -2113,7 +2110,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
     //===================================================================
     public String[] getServices(Database database, String servicename, String instname)
             throws DevFailed {
-        Vector<String> v = new Vector<String>();
+        List<String> list = new ArrayList<>();
         char separ;
 
         //	Read Service property
@@ -2134,19 +2131,16 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
             int start;
             for (String service : services) {
                 start = service.indexOf(separ);
-                if (start>0) {
+                if (start > 0) {
                     String startLine =
                             service.substring(0, start).toLowerCase();
                     if (startLine.equals(target))
-                        v.add(service.substring(
+                        list.add(service.substring(
                                 service.indexOf(':') + 1));
                 }
             }
         }
-        String[] result = new String[v.size()];
-        for (int i = 0 ; i<v.size() ; i++)
-            result[i] = v.get(i);
-        return result;
+        return list.toArray(new String[0]);
     }
 
     //===============================================================
@@ -2171,26 +2165,24 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //	Search if already exists
         boolean exists = false;
-        Vector<String> v = new Vector<String>();
+        List<String> list = new ArrayList<>();
         for (String service : services) {
             String line = service.toLowerCase();
             int idx = line.indexOf(':');
-            if (idx>0)
+            if (idx > 0)
                 line = line.substring(0, idx);
             if (line.equals(target)) {
                 // Found  -> replace existing by new one
                 exists = true;
-                v.add(new_line);
+                list.add(new_line);
             } else
-                v.add(service);
+                list.add(service);
         }
         if (!exists)
-            v.add(new_line);
+            list.add(new_line);
 
-        //	Copy vector to String array
-        services = new String[v.size()];
-        for (int i = 0 ; i<v.size() ; i++)
-            services[i] = v.get(i);
+        //	Copy list to String array
+        services = list.toArray(new String[0]);
 
         //	And finaly put property
         data = new DbDatum(TangoConst.SERVICE_PROP_NAME);
@@ -2219,23 +2211,21 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
 
         //	Search if already exists
         boolean exists = false;
-        Vector<String> v = new Vector<String>();
+        List<String> list = new ArrayList<>();
         for (String service : services) {
             String line = service.toLowerCase();
             int idx = line.indexOf(':');
-            if (idx>0)
+            if (idx > 0)
                 line = line.substring(0, idx);
 
             if (line.equals(target))    // Found
                 exists = true;
             else
-                v.add(service);
+                list.add(service);
         }
         if (exists) {
-            //	Copy vector to String array
-            services = new String[v.size()];
-            for (int i = 0 ; i<v.size() ; i++)
-                services[i] = v.get(i);
+            //	Copy list to String array
+            services = list.toArray(new String[0]);
 
             //	And finally put property
             data = new DbDatum(TangoConst.SERVICE_PROP_NAME);
@@ -2277,16 +2267,15 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
                     //	Check if access deviceName is from env (for tests)
                     String access_deviceName = ApiUtil.getAccessDevname();
                     if (access_deviceName==null || access_deviceName.length()==0) {
-                        if (access_service_read)
-                            if (!database.check_access)
+                        if (access_service_read && !database.check_access)
                                 return TangoConst.ACCESS_WRITE;
 
                         //	Get Access service
                         String[] services =
                                 getServices(database, TangoConst.ACCESS_SERVICE, "*");
-                        if (services.length>0)
+                        if (services.length > 0) {
                             access_deviceName = services[0];
-                        else {
+                        } else {
                             //	if not set --> No check
                             //System.out.println("No Access Service Found !");
                             database.check_access = false;
@@ -2307,8 +2296,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
                 }
 
                 //	if database access not already checked, and not first import -> do it now
-                if (!database.isAccess_checked())
-                    if (!deviceName.equals(database.device.name()))
+                if (!database.isAccess_checked() && !deviceName.equals(database.device.name()))
                         checkAccess(database);
 
             } catch (DevFailed e) {
@@ -2316,8 +2304,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
                 access = TangoConst.ACCESS_READ;
                 //	if cannot import AccessProxy
                 //	-> change description to be more explicit
-                if (e.errors.length>1)
-                    if (e.errors[1].reason.equals("TangoApi_CANNOT_IMPORT_DEVICE"))
+                if (e.errors.length > 1 && e.errors[1].reason.equals("TangoApi_CANNOT_IMPORT_DEVICE"))
                         e.errors[0].desc +=
                                 "\nControlled access service defined in Db but unreachable --> Read Only access given to all devices...";
 
@@ -2462,7 +2449,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         //System.out.println("database.command_inout(\"DbGetDevicePipeList\", argIn)");
 
         String[] array = argOut.extractStringArray();
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         Collections.addAll(list, array);
         return list;
     }
@@ -2481,7 +2468,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argIn.insert(new String[]{className, wildcard});
         DeviceData argOut = database.command_inout("DbGetDevicePipeList", argIn);
         String[] array = argOut.extractStringArray();
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         Collections.addAll(list, array);
         return list;
     }
@@ -2635,7 +2622,7 @@ public class DatabaseDAODefaultImpl extends ConnectionDAODefaultImpl implements 
         argIn.insert(deviceName);
         DeviceData argOut = database.command_inout("DbGetForwardedAttributeListForDevice", argIn);
         String[] array = argOut.extractStringArray();
-        ArrayList<String[]> list = new ArrayList<String[]>();
+        ArrayList<String[]> list = new ArrayList<>();
         for (int i=0 ; i<array.length/3 ; i++) {
             list.add(new String[] { array[3*i], array[3*i+1], array[3*i+2] });
         }

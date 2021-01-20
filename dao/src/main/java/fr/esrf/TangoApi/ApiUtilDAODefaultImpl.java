@@ -49,7 +49,7 @@ import org.omg.CORBA.SystemException;
 import java.util.*;
 
 /**
- * Class Description: This class manage a static vector of Database object. <Br>
+ * Class Description: This class manage a static list of Database object. <Br>
  * <Br>
  * <Br>
  * <b> Usage example: </b> <Br>
@@ -63,14 +63,14 @@ import java.util.*;
  */
 
 public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
-    static private ArrayList<Database> db_list = null;
-    static private Database defaultDatabase = null;
+    private static ArrayList<Database> db_list = null;
+    private static Database defaultDatabase = null;
 
-    static private Hashtable<Integer, AsyncCallObject> async_request_table =
-            new Hashtable<Integer, AsyncCallObject>();
-    static private int async_request_cnt = 0;
-    static private int async_cb_sub_model = ApiDefs.PULL_CALLBACK;
-    static private boolean in_server_code = false;
+    private static final Hashtable<Integer, AsyncCallObject> async_request_table =
+            new Hashtable<>();
+    private static int async_request_cnt = 0;
+    private static int async_cb_sub_model = ApiDefs.PULL_CALLBACK;
+    private static boolean in_server_code = false;
 
     // ===================================================================
     /**
@@ -120,10 +120,10 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             create_orb();
         }
 
-        // If first time, create vector
+        // If first time, create list
         // ---------------------------------------------------------------
         if (db_list == null) {
-            db_list = new ArrayList<Database>();
+            db_list = new ArrayList<>();
         }
         // If first time, create Database object
         // -----------------------------------------------------------
@@ -147,19 +147,17 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
             create_orb();
         }
 
-        // If first time, create vector
+        // If first time, create list
         if (db_list == null) {
-            db_list = new ArrayList<Database>();
+            db_list = new ArrayList<>();
         }
 
         // Build tango_host string
         final String tango_host = host + ":" + port;
 
         // Search if database object already created for this host and port
-        if (defaultDatabase != null) {
-            if (defaultDatabase.get_tango_host().equals(tango_host)) {
-                return defaultDatabase;
-            }
+        if (defaultDatabase != null && defaultDatabase.get_tango_host().equals(tango_host)) {
+            return defaultDatabase;
         }
 
         for (final Database dbase : db_list) {
@@ -186,7 +184,7 @@ public class ApiUtilDAODefaultImpl implements IApiUtilDAO {
     public Database change_db_obj(final String host, final String port) throws DevFailed {
         // Get requested database object
         final Database dbase = get_db_obj(host, port);
-        // And set it at first vector element as default Dbase
+        // And set it at first list element as default Dbase
         db_list.remove(dbase);
         db_list.add(0, dbase);
         defaultDatabase = dbase;
