@@ -18,6 +18,7 @@
         <module>client</module>
         <module>server</module>
         <module>assembly</module>
+        <module>integration-tests</module>
     </modules>
 
     <name>JTango</name>
