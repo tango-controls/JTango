@@ -84,6 +84,18 @@
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>2.22.2</version>
+                        <configuration>
+                            <systemProperties>
+                                <property>
+                                    <name>TANGO_HOST</name>
+                                    <value>${env.TANGO_HOST}</value>
+                                </property>
+                                <property>
+                                    <name>org.tango.server.checkalarms</name>
+                                    <value>false</value>
+                                </property>
+                            </systemProperties>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>ITWithoutTangoDB</id>
@@ -119,6 +131,18 @@
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>2.22.2</version>
+                        <configuration>
+                            <systemProperties>
+                                <property>
+                                    <name>TANGO_HOST</name>
+                                    <value>${env.TANGO_HOST}</value>
+                                </property>
+                                <property>
+                                    <name>org.tango.server.checkalarms</name>
+                                    <value>false</value>
+                                </property>
+                            </systemProperties>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>ITWithTangoDB</id>
