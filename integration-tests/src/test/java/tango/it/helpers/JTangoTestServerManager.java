@@ -16,6 +16,10 @@ public class JTangoTestServerManager {
         serverManager = ServerManager.getInstance();
     }
 
+    public ServerManager getServerManager() {
+        return serverManager;
+    }
+
     public DeviceImpl getDefaultDeviceImp(String tangoClass, String tangoDeviceName) throws NoSuchFieldException, IllegalAccessException, DevFailed {
         TangoExporter tangoExporter = getTangoExporter();
         return tangoExporter.getDevice(tangoClass, tangoDeviceName);
@@ -27,7 +31,6 @@ public class JTangoTestServerManager {
 
     private <T> T getFieldFromServiceManager(String field, Class<T> clazz)
             throws IllegalAccessException, NoSuchFieldException {
-        System.out.println("Extracting " + clazz.getName() + " from ServiceManger");
         Field f = serverManager.getClass().getDeclaredField(field);
         f.setAccessible(true);
         return (T) f.get(serverManager);

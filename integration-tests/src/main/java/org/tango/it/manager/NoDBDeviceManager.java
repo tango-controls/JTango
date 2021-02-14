@@ -50,15 +50,8 @@ public class NoDBDeviceManager implements ITWithoutTangoDB {
 
     private boolean isDefault = false;
 
-//    @BeforeClass
-//    public static void startDevice() throws DevFailed, IOException {
-//        startDevice(null);
-//    }
-
     @Override
     public void startDevices(String deviceList) throws DevFailed, IOException {
-        System.setProperty("org.tango.server.checkalarms", "false");
-
         try (ServerSocket ss1 = new ServerSocket(0)) {
             ss1.setReuseAddress(true);
             ss1.close();
@@ -106,7 +99,6 @@ public class NoDBDeviceManager implements ITWithoutTangoDB {
 
     @Override
     public void stopDevices() throws DevFailed {
-        System.out.println("STOP");
         ServerManager.getInstance().stop();
         clean();
     }
