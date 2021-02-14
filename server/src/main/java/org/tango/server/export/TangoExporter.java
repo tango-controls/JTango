@@ -128,7 +128,7 @@ public final class TangoExporter implements IExporter {
     @Override
     public void unexportDevices() throws DevFailed {
         xlogger.entry();
-        final List<DeviceClassBuilder> clazzToRemove = new ArrayList<DeviceClassBuilder>();
+        final List<DeviceClassBuilder> clazzToRemove = new ArrayList<>();
         for (final DeviceClassBuilder clazz : deviceClassList) {
             if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
                 for (final DeviceImpl device : clazz.getDeviceImplList()) {
@@ -276,7 +276,7 @@ public final class TangoExporter implements IExporter {
     }
 
     public List<DeviceClassBuilder> getDeviceClassList() {
-        return new ArrayList<DeviceClassBuilder>(deviceClassList);
+        return new ArrayList<>(deviceClassList);
     }
 
     public void clearClass() {
