@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.tango-controls</groupId>
         <artifactId>JTangoParent</artifactId>
@@ -56,6 +57,20 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>integration-test-without-tango-db</id>
@@ -77,6 +92,10 @@
                                         <include>**/*</include>
                                     </includes>
                                     <groups>org.tango.it.ITWithoutTangoDB</groups>
+                                    <systemPropertyVariables>
+                                        <TANGO_HOST>${env.TANGO_HOST}</TANGO_HOST>
+                                        <org.tango.server.checkalarms>false</org.tango.server.checkalarms>
+                                    </systemPropertyVariables>
                                 </configuration>
                                 <goals>
                                     <goal>integration-test</goal>
@@ -103,11 +122,16 @@
                         <executions>
                             <execution>
                                 <id>ITWithTangoDB</id>
+                                <phase>integration-test</phase>
                                 <configuration>
                                     <includes>
                                         <include>**/*</include>
                                     </includes>
                                     <groups>org.tango.it.ITWithTangDB</groups>
+                                    <systemPropertyVariables>
+                                        <TANGO_HOST>${env.TANGO_HOST}</TANGO_HOST>
+                                        <org.tango.server.checkalarms>false</org.tango.server.checkalarms>
+                                    </systemPropertyVariables>
                                 </configuration>
                                 <goals>
                                     <goal>integration-test</goal>

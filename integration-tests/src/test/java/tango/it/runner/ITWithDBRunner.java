@@ -30,10 +30,11 @@ public class ITWithDBRunner {
     }
 
     private static void setup(String deviceName) throws DevFailed {
-        init();
-
         System.out.println("Tango host = " + System.getProperty("TANGO_HOST"));
         Assert.assertNotNull(System.getProperty("TANGO_HOST"));
+        Assert.assertFalse(Boolean.parseBoolean(System.getProperty("org.tango.server.checkalarms")));
+
+        init();
 
         manager.addDevice(deviceName);
     }
