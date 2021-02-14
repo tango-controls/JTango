@@ -1,4 +1,4 @@
-package fr.esrf.TangoDs;
+package org.tango.server.testserver;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.*;
@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.tango.it.ITWithTangDB;
-import org.tango.server.testserver.JTangoTest;
 import org.tango.utils.DevFailedUtils;
 import tango.it.runner.ITWithDBRunner;
 
