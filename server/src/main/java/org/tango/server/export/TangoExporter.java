@@ -57,14 +57,14 @@ public final class TangoExporter implements IExporter {
     private final String serverName;
     private final String pid;
     private final Map<String, Class<?>> tangoClasses;
-    private final List<DeviceClassBuilder> deviceClassList = new ArrayList<DeviceClassBuilder>();
+    private final List<DeviceClassBuilder> deviceClassList = new ArrayList<>();
 
     public TangoExporter(final String hostName, final String serverName, final String pid,
             final Map<String, Class<?>> tangoClasses) {
         this.hostName = hostName;
         this.serverName = serverName;
         this.pid = pid;
-        this.tangoClasses = new LinkedHashMap<String, Class<?>>(tangoClasses);
+        this.tangoClasses = new LinkedHashMap<>(tangoClasses);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class TangoExporter implements IExporter {
     @Override
     public void unexportDevices() throws DevFailed {
         xlogger.entry();
-        final List<DeviceClassBuilder> clazzToRemove = new ArrayList<DeviceClassBuilder>();
+        final List<DeviceClassBuilder> clazzToRemove = new ArrayList<>();
         for (final DeviceClassBuilder clazz : deviceClassList) {
             if (!clazz.getDeviceClass().equals(AdminDevice.class)) {
                 for (final DeviceImpl device : clazz.getDeviceImplList()) {
@@ -276,7 +276,7 @@ public final class TangoExporter implements IExporter {
     }
 
     public List<DeviceClassBuilder> getDeviceClassList() {
-        return new ArrayList<DeviceClassBuilder>(deviceClassList);
+        return new ArrayList<>(deviceClassList);
     }
 
     public void clearClass() {
