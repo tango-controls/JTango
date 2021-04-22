@@ -2,9 +2,24 @@
 <settings>
     <servers>
         <server>
-            <id>bintray-tango-controls</id>
-            <username>tango-ci</username>
-            <password>${env.BINTRAY_TOKEN}</password>
+            <id>ossrh</id>
+            <username>${env.MAVEN_CENTRAL_USERNAME}</username>
+            <password>${env.MAVEN_CENTRAL_PASSWORD}</password>
         </server>
     </servers>
+    <profiles>
+        <profile>
+            <id>ossrh</id>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <!-- Your Key Password -->
+                <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
 </settings>

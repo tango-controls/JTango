@@ -29,7 +29,7 @@
         <developerConnection>scm:git:git@github.com:tango-controls/JTango.git</developerConnection>
         <url>https://github.com/tango-controls/JTango</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <developers>
         <developer>
