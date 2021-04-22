@@ -1,0 +1,168 @@
+# See https://docs.gitlab.com/ce/ci/yaml/README.html for the documentation
+image: docker/compose:alpine-1.28.2
+
+variables: &variables
+  FF_NETWORK_PER_BUILD: 1
+  TANGO_HOST: tango_databaseds:10000
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/JTango"
+
+stages:
+  # verification
+  - test
+  - verify
+  #  release
+  - build
+  - upload
+  - deploy
+
+
+.job-template: &job-template
+  services:
+    - name: tangocs/mysql:9.2.2
+      alias: tango_mysql
+      entrypoint:
+        - env
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_INITDB_SKIP_TZINFO=1
+        - /usr/local/bin/docker-entrypoint.sh
+      command:
+        - mysqld
+        - --sql-mode=
+        - --innodb=OFF
+        - --default-storage-engine=MyISAM
+    - name: tangocs/tango-cs:9
+      alias: tango_databaseds
+      entrypoint:
+        - env
+        - MYSQL_HOST=tango_mysql:3306
+        - MYSQL_USER=tango
+        - MYSQL_PASSWORD=tango
+        - MYSQL_DATABASE=tango
+        - /usr/local/bin/wait-for-it.sh
+        - tango_mysql:3306
+        - --timeout=30
+        - --strict
+        - --
+      command:
+        - /usr/bin/supervisord
+        - -c
+        - /etc/supervisord.conf
+  script:
+    - mvn clean install
+  artifacts:
+    untracked: true
+  except:
+    - tags
+
+.release-job-template: &release-job-template
+  script:
+    - mvn clean install -DskipTests
+    # Mark the build artifact(jar) with proper JAVA_VERSION
+    - ls assembly/target/*.jar | cut -f 1,2,3 -d '.' | xargs -Ifile mv file.jar file-${JAVA_VERSION}.jar
+    # Create JTANGO version env variable (use in upload, deploy stage)
+    - echo "JTANGO_${JAVA_VERSION}_VERSION=$(ls assembly/target/*.jar)" > version.env
+  artifacts:
+    paths:
+      - assembly/target/*.jar
+    reports:
+      dotenv: version.env
+  only:
+    - tags
+
+test-java11:
+  image: maven:3.6.3-openjdk-11-slim
+  stage: test
+  <<: *job-template
+  variables:
+    <<: *variables
+
+test-java8:
+  image: maven:3.6-jdk-8-slim
+  stage: test
+  <<: *job-template
+  variables:
+    <<: *variables
+
+deploy-to-sonar:
+  image: maven:3.6.3-openjdk-11-slim
+  stage: verify
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn sonar:sonar -Pverify -Dsonar.qualitygate.wait=true
+  except:
+    - tags
+
+deploy-to-codacy:
+  image: maven:3.6-jdk-8-slim
+  stage: verify
+  dependencies:
+    - test-java11
+  script:
+    #    - mavn clean install -Pverify
+    - mvn com.gavinmogan:codacy-maven-plugin:coverage -Pverify
+  except:
+    - tags
+
+deploy-to-codcov:
+  image: maven:3.6-jdk-8-slim
+  stage: verify
+  dependencies:
+    - test-java11
+  script:
+    #    - mvn clean install -Pverify
+    - bash <(curl -s https://codecov.io/bash)
+  except:
+    - tags
+
+
+release:build:openjdk-11:
+  image: maven:3.6.3-openjdk-11-slim
+  stage: build
+  <<: *release-job-template
+  variables:
+    <<: *variables
+    JAVA_VERSION: openjdk_11
+
+release:build:openjdk-8:
+  image: maven:3.6.3-openjdk-11-slim
+  stage: build
+  <<: *release-job-template
+  variables:
+    <<: *variables
+    JAVA_VERSION: openjdk_8
+
+release:upload:
+  stage: upload
+  image: curlimages/curl:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: release:build:openjdk-11
+      artifacts: true
+    - job: release:build:openjdk-8
+      artifacts: true
+  script:
+    - echo ${JTANGO_openjdk_11_VERSION}
+    - echo ${JTANGO_openjdk_8_VERSION}
+    - echo ${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/JTango-${CI_COMMIT_TAG}-openjdk-8.jar
+    - echo ${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/JTango-${CI_COMMIT_TAG}-openjdk-11.jar
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${JTANGO_openjdk_8_VERSION} ${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/JTango-${CI_COMMIT_TAG}-openjdk-8.jar
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${JTANGO_openjdk_11_VERSION} ${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/JTango-${CI_COMMIT_TAG}-openjdk-11.jar
+
+release:create:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - |
+      release-cli create --name "JTango ${CI_COMMIT_TAG}" --tag-name "${CI_COMMIT_TAG}" --description "#TODO Complete after release will be published" \
+      --assets-link "{\"name\":\"JTango-${CI_COMMIT_TAG}-openjdk_8\",\"url\":\"${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/${JTANGO_openjdk_8_VERSION}}\"}" \
+      --assets-link "{\"name\":\"JTango-${CI_COMMIT_TAG}-openjdk_11\",\"url\":\"${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/${JTANGO_openjdk_11_VERSION}\"}"

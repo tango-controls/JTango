@@ -327,12 +327,13 @@
             </build>
         </profile>
         <profile>
-            <id>travis</id>
+            <id>verify</id>
             <properties>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                 <sonar.organization>tango-controls</sonar.organization>
-                <!--sonar.branch>jtango-9-lts</sonar.branch-->
+                <sonar.host.url>${env.SONAR_HOST_URL}</sonar.host.url>
                 <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
             <build>
                 <plugins>
