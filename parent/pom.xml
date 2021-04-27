@@ -333,7 +333,6 @@
                 <sonar.organization>tango-controls</sonar.organization>
                 <sonar.host.url>${env.SONAR_HOST_URL}</sonar.host.url>
                 <sonar.login>${env.SONAR_TOKEN}</sonar.login>
-                <maven.test.skip>true</maven.test.skip>
             </properties>
             <build>
                 <plugins>

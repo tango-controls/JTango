@@ -48,7 +48,7 @@ stages:
         - -c
         - /etc/supervisord.conf
   script:
-    - mvn clean install
+    - mvn clean install -Pverify
   artifacts:
     untracked: true
   except:
@@ -93,29 +93,7 @@ deploy-to-sonar:
     paths:
       - .sonar/cache
   script:
-    - mvn sonar:sonar -Pverify -Dsonar.qualitygate.wait=true
-  except:
-    - tags
-
-deploy-to-codacy:
-  image: maven:3.6-jdk-8-slim
-  stage: verify
-  dependencies:
-    - test-java11
-  script:
-    #    - mavn clean install -Pverify
-    - mvn com.gavinmogan:codacy-maven-plugin:coverage -Pverify
-  except:
-    - tags
-
-deploy-to-codcov:
-  image: maven:3.6-jdk-8-slim
-  stage: verify
-  dependencies:
-    - test-java11
-  script:
-    #    - mvn clean install -Pverify
-    - bash <(curl -s https://codecov.io/bash)
+    - mvn sonar:sonar -Pverify -Dsonar.qualitygate.wait=true -DskipTests
   except:
     - tags
 
