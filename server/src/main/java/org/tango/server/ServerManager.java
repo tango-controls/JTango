@@ -67,7 +67,7 @@ public final class ServerManager {
     private final Logger logger = LoggerFactory.getLogger(ServerManager.class);
     private final XLogger xlogger = XLoggerFactory.getXLogger(ServerManager.class);
     private final AtomicBoolean isStarted = new AtomicBoolean();
-    private final Map<String, Class<?>> tangoClasses = new LinkedHashMap<String, Class<?>>();
+    private final Map<String, Class<?>> tangoClasses = new LinkedHashMap<>();
     private boolean useDb;
     /**
      * The name of the executable
@@ -90,20 +90,15 @@ public final class ServerManager {
     private String hostIPAddress = "";
 
     private ServerManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            /**
-             * shutdown hook
-             */
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 MDC.put(SERVER_NAME_LOGGING, serverName);
-                logger.debug("Shutdown hook unregister " + serverName);
+                logger.debug("Shutdown hook unregister {}", serverName);
                 try {
                     ServerManager.getInstance().stop();
                 } catch (final DevFailed e) {
                 }
             }
-        }));
+        ));
     }
 
     /**
@@ -130,10 +125,8 @@ public final class ServerManager {
         if (!isStarted.get()) {
             throw DevFailedUtils.newDevFailed("the server must be started");
         }
-        if (tangoExporter != null) {
-            if (tangoClasses.containsValue(deviceClass)) {
-                tangoExporter.buildDevice(deviceName, deviceClass);
-            }
+        if (tangoExporter != null && tangoClasses.containsValue(deviceClass)) {
+            tangoExporter.buildDevice(deviceName, deviceClass);
         }
     }
 
