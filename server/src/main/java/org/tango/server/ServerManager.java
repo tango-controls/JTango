@@ -90,20 +90,15 @@ public final class ServerManager {
     private String hostIPAddress = "";
 
     private ServerManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            /**
-             * shutdown hook
-             */
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 MDC.put(SERVER_NAME_LOGGING, serverName);
-                logger.debug("Shutdown hook unregister " + serverName);
+                logger.debug("Shutdown hook unregister {}", serverName);
                 try {
                     ServerManager.getInstance().stop();
                 } catch (final DevFailed e) {
                 }
             }
-        }));
+        ));
     }
 
     /**

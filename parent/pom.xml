@@ -189,9 +189,13 @@
     </dependencyManagement>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>bintray-tango-controls</id>
-            <url>https://api.bintray.com/maven/tango-controls/jtango/${project.artifactId}/;publish=1</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -269,6 +273,11 @@
     <profiles>
         <profile>
             <id>release</id>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -284,38 +293,45 @@
                                 <id>attach-sources</id>
                                 <phase>verify</phase>
                                 <goals>
-                                    <goal>jar</goal>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
                         <executions>
                             <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
+                                <id>sign-artifacts</id>
                                 <phase>verify</phase>
-                                <configuration>
-                                    <doclint>none</doclint>
-                                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                                </configuration>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
         <profile>
-            <id>travis</id>
+            <id>verify</id>
             <properties>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                 <sonar.organization>tango-controls</sonar.organization>
-                <!--sonar.branch>jtango-9-lts</sonar.branch-->
+                <sonar.host.url>${env.SONAR_HOST_URL}</sonar.host.url>
                 <sonar.login>${env.SONAR_TOKEN}</sonar.login>
             </properties>
             <build>
@@ -324,7 +340,6 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
                         <version>3.7.0.1746</version>
-
                     </plugin>
                     <plugin>
                         <groupId>org.jacoco</groupId>
